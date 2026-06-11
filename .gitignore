@@ -1,0 +1,30 @@
+# Pebble / Waf Build Output
+build/
+.lock-waf_*
+# the build copies the repo-root shared/ into each watchface and compiles it
+# to .reso there - pure build output (the real source lives in /shared/)
+watchfaces/*/shared/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Editor / OS cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Temp & Local Secrets
+.tmp
+.env
+.env.local
+
+# Various Dev Tools
+.dev-tools
+
+# Third-party vendored assets (fonts, icons, templates) - not redistributed.
+# Includes the TheLCARS.com template: please go to https://www.thelcars.com/
+# to download and support the creator.
+vendor/

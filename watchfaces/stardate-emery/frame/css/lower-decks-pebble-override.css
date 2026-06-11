@@ -1,0 +1,24 @@
+@charset "utf-8";
+/*
+  lower-decks-pebble-override.css
+  -------------------------------
+  Snaps thelcars.com "lower-decks" palette onto the Pebble-64 color space
+  (every channel is one of 0x00 / 0x55 / 0xAA / 0xFF) so the baked watch
+  background uses only colors the Pebble Time 2 (Emery) display can render.
+
+  Load AFTER lower-decks.css. We override only the base palette vars; the
+  vendor's role vars resolve var() at use-time and inherit these. "nudged" = a
+  shade that shares a Pebble cell with another, pushed to an adjacent cell so the
+  two stay separable.
+
+  * = a color the watch frame actually renders.
+*/
+:root {
+  --butter:         #FFFFAA; /*   GColorPastelYellow */
+  --daybreak:       #FFAA00; /* * GColorChromeYellow   - bottom seam accent */
+  --harvestgold:    #FFAA55; /* * GColorRajah          - top cap accent */
+  --honey:          #FFAAAA; /*   GColorMelon */
+  --october-sunset: #FF5500; /* * GColorOrange         - frame (top + bottom sweep) */
+  --orange:         #FF5500; /*   GColorOrange          (shares cell with october-sunset) */
+  --rich-pumpkin:   #AA5500; /*   GColorWindsorTan */
+}

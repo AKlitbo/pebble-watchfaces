@@ -1,0 +1,9 @@
+# Normalise line endings to LF - Pebble's WSL/Docker toolchain chokes on CRLF.
+* text=auto eol=lf
+
+# Binary assets
+*.png   binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+*.pbw   binary

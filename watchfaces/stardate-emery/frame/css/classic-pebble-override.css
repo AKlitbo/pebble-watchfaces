@@ -1,0 +1,51 @@
+@charset "utf-8";
+/*
+  classic-pebble-override.css
+  ---------------------------
+  Snaps thelcars.com "classic" palette onto the Pebble-64 color space
+  (every channel is one of 0x00 / 0x55 / 0xAA / 0xFF) so the baked watch
+  background uses only colors the Pebble Time 2 (Emery) display can render.
+
+  Load AFTER classic.css. We override only the base palette vars; the
+  vendor's role vars resolve var() at use-time and inherit these. "nudged" = a
+  shade that shares a Pebble cell with another, pushed to an adjacent cell so the
+  two stay separable.
+
+  * = a color the watch frame actually renders.
+*/
+:root {
+  /* Violets / Blues */
+  --african-violet: #AAAAFF; /* * GColorBabyBlueEyes        - bars, buttons, font */
+  --bluey:          #55AAFF; /* * GColorPictonBlue          - top frame + banner (nudged) */
+  --moonlit-violet: #AA55FF; /* * GColorLavenderIndigo      - bar end-caps */
+  --blue:           #5555FF; /*   GColorVeryLightBlue */
+  --sky:            #AAAAAA; /*   GColorLightGray            (nudged) */
+  --ice:            #AAFFFF; /*   GColorCeleste              (nudged) */
+  --gray:           #5555AA; /*   GColorLiberty */
+  --lilac:          #FF55FF; /*   GColorShockingPink */
+  --magenta:        #AA55AA; /*   GColorPurpureus */
+  --violet-creme:   #FFAAFF; /*   GColorRichBrilliantLavender */
+  --link-color:     #AA00FF; /*   GColorVividViolet */
+
+  /* Reds / Oranges / Golds */
+  --orange:         #FF5500; /* * GColorOrange              - banner + seam block (nudged) */
+  --golden-orange:  #FFAA00; /* * GColorChromeYellow        - bar text */
+  --red:            #AA5555; /* * GColorRoseVale            - bottom frame + corner */
+  --mars:           #FF0000; /*   GColorRed */
+  --tomato:         #FF5555; /*   GColorSunsetOrange */
+  --gold:           #FFFF00; /*   GColorYellow               (nudged) */
+  --butterscotch:   #FFAA55; /*   GColorRajah */
+  --peach:          #FF55AA; /*   GColorBrilliantRose        (nudged) */
+  --almond:         #FFAAAA; /*   GColorMelon */
+  --almond-creme:   #FFFFAA; /*   GColorPastelYellow         (nudged) */
+  --sunflower:      #FFFF55; /*   GColorIcterine             (nudged) */
+
+  /* Greens / Olives */
+  --green:          #AAAA55; /*   GColorBrass */
+  --lima-bean:      #AAFF55; /*   GColorInchworm             (nudged) */
+
+  /* Neutral */
+  --space-white:    #FFFFFF; /*   GColorWhite */
+
+  --banner-color:   var(--bluey);
+}

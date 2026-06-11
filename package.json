@@ -1,0 +1,20 @@
+{
+  "name": "stardate-watchfaces",
+  "version": "1.0.0",
+  "private": true,
+  "author": "NullSyntax",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "gen:icons": "node tools/generate-icons.js",
+    "gen:frame": "node tools/generate-frame.js",
+    "gen:frames": "node tools/generate-frame.js stardate-emery classic-standard && node tools/generate-frame.js stardate-emery lower-decks && node tools/generate-frame.js stardate-emery lower-decks-padd && node tools/generate-frame.js stardate-emery nemesis-blue-standard"
+  },
+  "devDependencies": {
+    "@rebble/clay": "^1.0.10",
+    "dotenv": "^17.4.2",
+    "playwright": "^1.60.0",
+    "sharp": "^0.35.1",
+    "vitest": "^4.1.8"
+  }
+}
