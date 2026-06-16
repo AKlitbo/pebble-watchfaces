@@ -13,6 +13,7 @@ static Layer *s_glyphs_layer;   // weather / heart / feet icons over the readout
 
 static GFont s_font_label;  // Antonio 10 - bar labels
 static GBitmap *s_heart_bmp, *s_feet_bmp, *s_wx_bmp, *s_thermo_bmp;
+static uint32_t s_wx_resource;  // resource id currently in s_wx_bmp, to skip redundant reloads
 static int s_batt_level;
 
 typedef struct
@@ -78,7 +79,8 @@ void widgets_create(Layer *parent)
     s_heart_bmp = gbitmap_create_with_resource(RESOURCE_ID_ICON_HEART);
     s_feet_bmp = gbitmap_create_with_resource(RESOURCE_ID_ICON_FEET);
     s_thermo_bmp = gbitmap_create_with_resource(RESOURCE_ID_ICON_THERMOMETER);
-    s_wx_bmp = gbitmap_create_with_resource(RESOURCE_ID_ICON_WI_NA);
+    s_wx_resource = RESOURCE_ID_ICON_WI_NA;
+    s_wx_bmp = gbitmap_create_with_resource(s_wx_resource);
 
     s_battery_layer = layer_create(bounds);
     layer_set_update_proc(s_battery_layer, battery_update_proc);
@@ -136,13 +138,23 @@ void widgets_set_battery(int level)
 // swap the weather glyph for the given condition
 void widgets_set_weather_icon(const char *condition)
 {
+    uint32_t resource = wx_resource_for(condition);
+
+    // the ~30-min refresh and every temp-unit re-request resend the same
+    // condition, so skip the destroy/create + repaint when the icon is unchanged
+    if (resource == s_wx_resource && s_wx_bmp)
+    {
+        return;
+    }
+
     if (s_wx_bmp)
     {
         gbitmap_destroy(s_wx_bmp);
         s_wx_bmp = NULL;
     }
 
-    s_wx_bmp = gbitmap_create_with_resource(wx_resource_for(condition));
+    s_wx_resource = resource;
+    s_wx_bmp = gbitmap_create_with_resource(resource);
 
     if (s_glyphs_layer)
     {
