@@ -1,8 +1,8 @@
 {
-  "name": "stardate-watchfaces",
-  "version": "1.0.0",
+  "name": "lcars-stardate-watchfaces",
+  "version": "1.0.1",
   "private": true,
-  "author": "NullSyntax",
+  "author": "Null Syntax",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",

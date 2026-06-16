@@ -1,7 +1,7 @@
 {
   "name": "lcars-stardate-emery",
-  "author": "NullSyntax",
-  "version": "1.0.0",
+  "author": "Null Syntax",
+  "version": "1.1.0",
   "keywords": [
     "pebble-app"
   ],
@@ -27,6 +27,7 @@
       "TEMPERATURE",
       "CONDITIONS",
       "REQUEST_WEATHER",
+      "REQUEST_SETTINGS",
       "WEATHER_OK",
       "LATITUDE",
       "LONGITUDE",
@@ -43,10 +44,10 @@
     ],
     "resources": {
       "media": [
-        { "type": "bitmap", "name": "IMAGE_BG_CLASSIC",          "file": "images/background.png" },
-        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS",      "file": "images/background-lower-decks.png" },
-        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD", "file": "images/background-lower-decks-padd.png" },
-        { "type": "bitmap", "name": "IMAGE_BG_NEMESIS_BLUE",     "file": "images/background-nemesis-blue.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_CLASSIC", "file": "images/background.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS", "file": "images/background-lower-decks.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD","file": "images/background-lower-decks-padd.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_NEMESIS_BLUE", "file": "images/background-nemesis-blue.png" },
         { "type": "bitmap", "name": "ICON_HEART", "file": "../../../shared/resources/icons/heart.png" },
         { "type": "bitmap", "name": "ICON_FEET", "file": "../../../shared/resources/icons/feet.png" },
         { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "../../../shared/resources/icons/thermometer.png" },
