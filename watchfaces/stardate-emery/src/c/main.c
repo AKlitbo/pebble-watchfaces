@@ -6,16 +6,14 @@
 #include "settings/settings.h"
 #include "shell/shell.h"
 
-static int s_battery_level;
-
-// pull fresh health + battery readings into the ui
-static void update_info(void)
+// pull fresh health readings into the ui (driven by health events, not polled)
+static void update_health(void)
 {
     int hr = health_get_current_hr();
     int steps = health_get_today_steps();
     int distance_m = health_get_today_distance();
 
-    shell_update_info(hr, steps, distance_m, s_battery_level);
+    shell_update_info(hr, steps, distance_m);
 }
 
 // redraw after a settings change, re-rendering the clock when the time/date format changed
@@ -29,13 +27,11 @@ static void on_settings_changed(bool time_or_date_changed)
     }
 }
 
-// per-minute: redraw time, refresh readouts, poll weather every 30 min
+// per-minute: redraw the time (and .beats at minute resolution), poll weather
+// every 30 min. health is refreshed from health events, not polled here
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
     shell_update_time(tick_time);
-
-    // refresh health readouts (also keeps .beats current at minute resolution)
-    update_info();
 
     if (tick_time->tm_min % 30 == 0)
     {
@@ -43,21 +39,20 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
     }
 }
 
-// refresh readouts on a relevant health event
+// refresh health readouts only when the health service reports new data
 static void health_handler(HealthEventType event, void *context)
 {
     if (event == HealthEventHeartRateUpdate || event == HealthEventMovementUpdate ||
         event == HealthEventSignificantUpdate)
     {
-        update_info();
+        update_health();
     }
 }
 
-// cache the battery level and refresh the ui
+// redraw the battery gauge when the charge level changes
 static void battery_callback(BatteryChargeState state)
 {
-    s_battery_level = state.charge_percent;
-    update_info();
+    shell_set_battery(state.charge_percent);
 }
 
 // initialize sub-systems, seed the first render, and subscribe to services
@@ -84,8 +79,8 @@ static void init(void)
     battery_state_service_subscribe(battery_callback);
     battery_callback(battery_state_service_peek());
 
-    // seed the info line (heart rate / steps / battery) before the first event
-    update_info();
+    // seed the health readouts before the first health event
+    update_health();
 }
 
 // tear down the ui shell

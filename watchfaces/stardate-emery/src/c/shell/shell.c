@@ -179,8 +179,8 @@ static void render_traversal(void)
     text_layer_set_text(s_steps_layer, s_steps_buffer);
 }
 
-// update heart-rate and traversal readouts, plus the battery gauge
-void shell_update_info(int hr, int steps, int distance_m, int battery_level)
+// update the heart-rate and traversal readouts from a health event
+void shell_update_info(int hr, int steps, int distance_m)
 {
     if (hr > 0)
     {
@@ -198,8 +198,12 @@ void shell_update_info(int hr, int steps, int distance_m, int battery_level)
     s_last_steps = steps;
     s_last_distance_m = distance_m;
     render_traversal();
+}
 
-    widgets_set_battery(battery_level);
+// redraw the battery gauge
+void shell_set_battery(int level)
+{
+    widgets_set_battery(level);
 }
 
 // set the temp + condition text and swap the weather glyph
