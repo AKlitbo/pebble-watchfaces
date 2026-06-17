@@ -5,6 +5,7 @@
 #include "health/health.h"
 #include "settings/settings.h"
 #include "shell/shell.h"
+#include "units/units.h"
 
 // pull fresh health readings into the ui (driven by health events, not polled)
 static void update_health(void)
@@ -16,15 +17,73 @@ static void update_health(void)
     shell_update_info(hr, steps, distance_m);
 }
 
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
+
+// fires at each .beats boundary so the @beat readout never sits stale between the
+// 86.4s beats. NULL when not in .beats mode, where MINUTE_UNIT drives instead
+static AppTimer *s_beats_timer;
+
+// wall-clock time of the last weather poll, so the beats ticker can keep the 30-min
+// refresh going while MINUTE_UNIT is unsubscribed
+static time_t s_last_weather;
+
+// redraw the time slot and re-arm for the next beat boundary. also keeps the 30-min
+// weather poll alive, since the minute ticker that owns it is off in .beats mode
+static void beats_timer_handler(void *data)
+{
+    time_t now = time(NULL);
+
+    // real tm: shell_update_time still draws the date line
+    shell_update_time(localtime(&now));  
+
+    if (now - s_last_weather >= 30 * 60)
+    {
+        appmessage_request_weather();
+        s_last_weather = now;
+    }
+
+    s_beats_timer = app_timer_register(units_ms_until_next_beat(), beats_timer_handler, NULL);
+}
+
+// run exactly one ticker for the active format: the beats AppTimer in .beats mode,
+// MINUTE_UNIT otherwise. Duplicate calls are harmless, so it's safe to call on init and every settings save.
+static void update_refresh_mode(void)
+{
+    if (g_settings.TimeFormat == 3)
+    {
+        if (!s_beats_timer)
+        {
+            // hand the cadence to the beats timer
+            tick_timer_service_unsubscribe();  
+
+            // defer the first poll a full interval
+            s_last_weather = time(NULL);       
+            s_beats_timer = app_timer_register(units_ms_until_next_beat(), beats_timer_handler, NULL);
+        }
+    }
+    else if (s_beats_timer)
+    {
+        app_timer_cancel(s_beats_timer);
+        s_beats_timer = NULL;
+
+        // resume the minute ticker
+        tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);  
+    }
+}
+
 // redraw after a settings change, re-rendering the clock when the time/date format changed
 static void on_settings_changed(bool time_or_date_changed)
 {
     shell_update_display();
+    
     if (time_or_date_changed)
     {
         time_t now = time(NULL);
         shell_update_time(localtime(&now));
     }
+
+    // swap to the right ticker if TimeFormat changed
+    update_refresh_mode(); 
 }
 
 // per-minute: redraw the time (and .beats at minute resolution), poll weather
@@ -67,6 +126,7 @@ static void init(void)
         .on_coords = shell_set_coords,
         .on_settings_changed = on_settings_changed,
     });
+    
     health_init(health_handler);
 
     // seed the initial time/date render before the first tick
@@ -81,6 +141,9 @@ static void init(void)
 
     // seed the health readouts before the first health event
     update_health();
+
+    // pick the ticker for the active format (swaps off MINUTE_UNIT if .beats is on)
+    update_refresh_mode();
 }
 
 // tear down the ui shell
