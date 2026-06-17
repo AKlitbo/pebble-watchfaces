@@ -76,12 +76,20 @@ void draw_lcars_battery_gauge(GContext *ctx, GRect area, int level, GColor accen
     }
 
     GColor on = (level <= 20) ? GColorRed : (level <= 40) ? GColorChromeYellow : accent_color;
-    GColor off = GColorDarkGray;
 
     for (int i = 0; i < kSegments; i++)
     {
         GRect cell = GRect(inner.origin.x + i * (kSegW + kGap), inner.origin.y, kSegW, inner.size.h);
-        graphics_context_set_fill_color(ctx, i < lit ? on : off);
+
+        // lit cells are filled solid, empty cells are hollow - a black interior with
+        // an accent outline, so the cell stays visible without reading as charged
+        graphics_context_set_fill_color(ctx, i < lit ? on : GColorBlack);
         graphics_fill_rect(ctx, cell, 1, GCornersAll);
+
+        if (i >= lit)
+        {
+            graphics_context_set_stroke_color(ctx, accent_color);
+            graphics_draw_round_rect(ctx, cell, 1);
+        }
     }
 }

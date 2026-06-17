@@ -17,10 +17,8 @@ uint32_t bg_resource_for_theme(uint8_t theme)
     }
 }
 
-// the top-left cap color the battery gauge is painted over, per theme. These
-// mirror each frame's `.sp-top` cap class (see frame/*.html + the pebble
-// overrides): Lower Decks harvestgold / PADD night-rain / Nemesis tangerine,
-// with Classic's african-violet as the default
+// the top-left cap color the battery gauge is painted over, per theme. 
+// these mirror each frame's `.sp-top` cap class
 GColor panel_accent_for_theme(uint8_t theme)
 {
     switch (theme)
@@ -28,10 +26,10 @@ GColor panel_accent_for_theme(uint8_t theme)
         case 1:  // harvestgold (#FFAA55)
             return GColorRajah;
         case 2:  // night-rain (#5555AA)
-            return GColorLiberty;  
+            return GColorLiberty;
         case 3:  // tangerine (#FFAA55)
-            return GColorRajah;  
+            return GColorRajah;
         default: // african-violet (#AAAAFF)
-            return GColorBabyBlueEyes;  
+            return GColorBabyBlueEyes;
     }
 }
