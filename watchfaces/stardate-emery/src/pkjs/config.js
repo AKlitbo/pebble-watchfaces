@@ -108,12 +108,23 @@ module.exports = [
         "description": "How the date line is written.",
         "defaultValue": "%Y.%m%d",
         "options": [
-          { "label": "2026.0612  (yyyy.mmdd)", "value": "%Y.%m%d" },
-          { "label": "2026-06-12  (yyyy-mm-dd)", "value": "%Y-%m-%d" },
-          { "label": "FRI JUN 12", "value": "%a %b %d" },
-          { "label": "JUN 12", "value": "%b %d" },
-          { "label": "06/12/2026  (mm/dd/yyyy)", "value": "%m/%d/%Y" },
-          { "label": "12.06.2026  (dd.mm.yyyy)", "value": "%d.%m.%Y" }
+          { "label": "2026.0618 (yyyy.mmdd)", "value": "%Y.%m%d" },
+          { "label": "2026.06.18 (yyyy.mm.dd)", "value": "%Y.%m.%d" },
+          { "label": "06.18.2026 (mm.dd.yyyy)", "value": "%m.%d.%Y" },
+          { "label": "18.06.2026 (dd.mm.yyyy)", "value": "%d.%m.%Y" },
+          { "label": "2026-06-18 (yyyy-mm-dd)", "value": "%Y-%m-%d" },
+          { "label": "06-18-2026 (mm-dd-yyyy)", "value": "%m-%d-%Y" },
+          { "label": "18-06-2026 (dd-mm-yyyy)", "value": "%d-%m-%Y" },
+          { "label": "2026/06/18 (yyyy/mm/dd)", "value": "%Y/%m/%d" },
+          { "label": "06/18/2026 (mm/dd/yyyy)", "value": "%m/%d/%Y" },
+          { "label": "18/06/2026 (dd/mm/yyyy)", "value": "%d/%m/%Y" },
+          { "label": "JUN 18 (mmm dd)", "value": "%b %d" },
+          { "label": "JUN 18 2026 (mmm dd yyyy)", "value": "%b %d %Y" },
+          { "label": "18 JUN 2026 (dd mmm yyyy)", "value": "%d %b %Y" },
+          { "label": "THU JUN 18 (ddd mmm dd)", "value": "%a %b %d" },
+          { "label": "THU 18 JUN (ddd dd mmm)", "value": "%a %d %b" },
+          { "label": "2026-169 (yyyy.dayofyear)", "value": "%Y.%j" },
+          { "label": "2026-169 (yyyy-dayofyear)", "value": "%Y-%j" }
         ]
       },
       {
