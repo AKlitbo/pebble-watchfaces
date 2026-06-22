@@ -1,0 +1,17 @@
+@charset "utf-8";
+:root {
+    --bg:            #000000;
+    --primary:       #FFAA00;
+    --secondary:     #FFAA55;
+    --secondary-dim: #AA5500;
+    --tertiary:      #FF5500;
+    --grid-primary:      rgba(255, 170, 0, 0.06);
+    --crosshair-primary: rgba(255, 170, 0, 0.55);
+    --ring-primary:      rgba(255, 170, 0, 0.70);
+    --grid-secondary:    rgba(255, 170, 85, 0.22);
+    --bezel:             rgba(255, 170, 85, 0.45);
+    --time-glow:         rgba(255, 170, 0, 0.70);
+    --data-glow:         rgba(255, 170, 0, 0.60);
+    --banner-glow:       rgba(255, 170, 85, 0.50);
+    --scanline:          rgba(0, 0, 0, 0.22);
+}

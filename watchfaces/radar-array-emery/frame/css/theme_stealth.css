@@ -1,0 +1,21 @@
+@charset "utf-8";
+/*  
+  Pebble-64 palette definition for the radar array frame.
+  Only uses Pebble-renderable colors (channels: 00/55/AA/FF).  
+*/
+:root {
+    --bg:            #000000; /* GColorBlack        */
+    --primary:       #AAAAAA; /* GColorLightGray    */
+    --secondary:     #55FFFF; /* GColorElectricBlue */
+    --secondary-dim: #0055AA; /* GColorCobaltBlue   */
+    --tertiary:      #0055FF; /* GColorBlueMoon     */
+    --grid-primary:      rgba(170, 170, 170, 0.06); /* GColorBlack / GColorLightGray    */
+    --crosshair-primary: rgba(85, 85, 85, 0.55);    /* GColorBlack / GColorDarkGray     */
+    --ring-primary:      rgba(85, 85, 85, 0.70);    /* GColorBlack / GColorDarkGray     */
+    --grid-secondary:    rgba(85, 255, 255, 0.22);  /* GColorBlack / GColorElectricBlue */
+    --bezel:             rgba(85, 255, 255, 0.45);  /* GColorBlack / GColorElectricBlue */
+    --time-glow:         rgba(170, 170, 170, 0.70); /* GColorBlack / GColorLightGray    */
+    --data-glow:         rgba(170, 170, 170, 0.60); /* GColorBlack / GColorLightGray    */
+    --banner-glow:       rgba(85, 255, 255, 0.50);  /* GColorBlack / GColorElectricBlue */
+    --scanline:          rgba(0, 0, 0, 0.22);       /* GColorBlack / Backdrop           */
+}

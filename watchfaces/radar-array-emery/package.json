@@ -1,0 +1,93 @@
+{
+  "name": "radar-array-emery",
+  "author": "Null Syntax",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "scripts": {
+    "gen:frame": "node tools/generate-frame.js radar-array",
+    "gen:themes": "node tools/generate-frame.js radar-array --theme all",
+    "gen:preview": "node tools/generate-frame.js radar-array --preview"
+  },
+  "pebble": {
+    "displayName": "Radar Array",
+    "uuid": "bad9fa8c-1dde-4314-ba22-68d8806c6fb3",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "capabilities": [
+      "location",
+      "configurable",
+      "health"
+    ],
+    "messageKeys": [
+      "TEMPERATURE",
+      "CONDITIONS",
+      "REQUEST_WEATHER",
+      "REQUEST_SETTINGS",
+      "WEATHER_OK",
+      "LATITUDE",
+      "LONGITUDE",
+      "LOCATION_NAME",
+      "USE_GPS",
+      "GPS_FALLBACK",
+      "WEATHER_PROVIDER",
+      "API_KEY",
+      "TEMPERATURE_UNIT",
+      "DATE_FORMAT",
+      "THEME",
+      "STEPS_MODE",
+      "TIME_FORMAT",
+      "BLUETOOTH_ICON",
+      "BLUETOOTH_VIBE_CONNECT",
+      "BLUETOOTH_VIBE_DISCONNECT"
+    ],
+    "resources": {
+      "media": [
+        { "type": "bitmap", "name": "IMAGE_BG_DEFAULT", "file": "images/background-default.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_RESCUE", "file": "images/background-rescue.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_NEON","file": "images/background-neon.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_STEALTH", "file": "images/background-stealth.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_PHOSPHOR", "file": "images/background-phosphor.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_CRIMSON", "file": "images/background-crimson.png" },
+        { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "../../../lib/resources/icons/bluetooth-md.png" },
+        { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "../../../lib/resources/icons/bluetooth-slash-md.png" },
+        {
+          "type": "font",
+          "name": "FONT_STM_40",
+          "file": "fonts/ShareTechMono-Regular.ttf",
+          "characterRegex": "[0-9:@]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_STM_17",
+          "file": "fonts/ShareTechMono-Regular.ttf",
+          "characterRegex": "[A-Z0-9 ./-]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_STM_18",
+          "file": "fonts/ShareTechMono-Regular.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_STM_14",
+          "file": "fonts/ShareTechMono-Regular.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_STM_12",
+          "file": "fonts/ShareTechMono-Regular.ttf"
+        }
+      ]
+    }
+  }
+}

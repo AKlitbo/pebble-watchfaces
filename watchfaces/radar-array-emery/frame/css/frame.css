@@ -1,0 +1,335 @@
+@charset "utf-8";
+
+
+/* Browser-preview backdrop. Ignored in frame-render mode. */
+body {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    display: flex;
+    margin: 0;
+    background: #333;
+}
+
+/* True Emery screen size (200x228 px). Watch scales down to fit here. */
+.viewport {
+    width: 200px;
+    height: 228px;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+/* The watch container: authored at 4x, scaled down to 200x228 Emery screen. */
+.watch {
+    width: 960px;
+    height: 1094px;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    transform: scale(0.208333);
+    transform-origin: top left;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--primary);
+}
+
+/* Background layers (behind all readouts). */
+
+/* Primary measurement grid. */
+.grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+        repeating-linear-gradient(to right,  var(--grid-primary) 0 1px, transparent 1px 48px),
+        repeating-linear-gradient(to bottom, var(--grid-primary) 0 1px, transparent 1px 48px);
+}
+
+/* subtle CRT scanlines */
+.scan {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0 5px,
+        var(--scanline) 5px 6px
+    );
+}
+
+/* Reticle crosshair (spans bracket-to-bracket). */
+.crosshair-h {
+    position: absolute;
+    z-index: 1;
+    left: 168px;
+    top: 463px;
+    width: 624px;
+    height: 4px; /* -> ~1px */
+    background: var(--crosshair-primary);
+}
+
+.crosshair-v {
+    position: absolute;
+    z-index: 1;
+    left: 478px;
+    top: 153px;
+    width: 4px;
+    height: 625px;
+    background: var(--crosshair-primary);
+}
+
+/* Edge ranging scales. */
+.scale {
+    position: absolute;
+    z-index: 1;
+    top: 185px;
+    width: 26px;
+    height: 560px; /* centered on the scope (centre y465, 560/2 = 280) */
+    background: repeating-linear-gradient(to bottom, var(--secondary-dim) 0 4px, transparent 4px 30px);
+}
+
+.scale-left  { left: 20px; }
+.scale-right { right: 20px; }
+
+/* Thin bezel. */
+.bezel {
+    position: absolute;
+    inset: 8px;
+    z-index: 4;
+    pointer-events: none;
+    border: 3px solid var(--bezel);
+}
+
+/* Top HUD bar (battery left, right side reserved). */
+.hud {
+    position: absolute;
+    z-index: 5;
+    top: 12px;
+    left: 40px;
+    right: 40px;
+    height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pwr {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pwr-label {
+    color: var(--secondary);
+    font-size: 36px; /* -> 7.5px */
+    letter-spacing: 1px;
+}
+
+/* Battery (preview only, app fills at runtime). */
+.batt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 120px;
+    height: 50px;
+    padding: 7px;
+    border: 4px solid var(--secondary);
+    box-sizing: border-box;
+}
+
+.batt i {
+    flex: 1;
+    align-self: stretch;
+    background: var(--secondary);
+}
+
+.batt i:nth-child(5) { background: transparent; }
+
+/* GPS coordinates (preview only, C-drawn at runtime). */
+.coords {
+    position: absolute;
+    z-index: 5;
+    top: 71px;
+    left: 40px;
+    right: 40px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.coords .coord {
+    color: var(--primary);
+    font-size: 46px; /* -> 9.6px */
+    letter-spacing: 2px;
+}
+
+/* Main scope (primary CRT radar). */
+.scope {
+    position: absolute;
+    z-index: 2;
+    left: 192px;
+    top: 177px;
+    width: 576px;
+    height: 576px;
+}
+
+/* Radial tick marks. */
+.ticks {
+    position: absolute;
+    inset: -32px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, var(--primary) 0 0.7deg, transparent 0.7deg 7.5deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 290px, #000 292px 308px, transparent 309px);
+            mask: radial-gradient(circle, transparent 0 290px, #000 292px 308px, transparent 309px);
+}
+
+.ring-outer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 5px solid var(--primary);
+}
+
+.ring-inner {
+    position: absolute;
+    inset: 110px;
+    border-radius: 50%;
+    border: 3px solid var(--ring-primary);
+}
+
+/* Live time formatting (glow is preview-only). */
+.time {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 196px; /* -> ~41px */
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--primary);
+    text-shadow: 0 0 18px var(--time-glow);
+}
+
+.meridiem {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 63%;
+    text-align: center;
+    font-size: 44px; /* -> 9px */
+    letter-spacing: 4px;
+    color: var(--secondary);
+}
+
+/* Corner reticle brackets. */
+.bracket {
+    position: absolute;
+    z-index: 2;
+    width: 70px;
+    height: 70px;
+    border: 5px solid var(--secondary);
+}
+
+.bracket.tl { left: 168px;  top: 153px;  border-right: 0; border-bottom: 0; }
+.bracket.tr { right: 168px; top: 153px;  border-left: 0;  border-bottom: 0; }
+.bracket.bl { left: 168px;  bottom: 316px; border-right: 0; border-top: 0; }
+.bracket.br { right: 168px; bottom: 316px; border-left: 0;  border-top: 0; }
+
+/* Target box (secondary trench grid). */
+.target {
+    position: absolute;
+    z-index: 2;
+    left: 106px;
+    top: 796px;
+    width: 748px;
+    height: 128px;
+    border: 4px solid var(--secondary);
+    box-sizing: border-box;
+}
+
+.target-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+    repeating-linear-gradient(
+        to right,
+        var(--grid-secondary) 0 1px,
+        transparent 1px 60px
+    ),
+    repeating-linear-gradient(
+        to bottom,
+        var(--grid-secondary) 0 1px,
+        transparent 1px 42px
+    );
+}
+
+/* Exhaust-port target lock marker. */
+.target-marker {
+    position: absolute;
+    z-index: 1;
+    left: 9px;
+    top: 9px;
+    width: 100px;
+    height: 100px;
+    background: var(--tertiary);
+    /*! box-shadow: 0 0 0 8px transparent, 0 0 0 11px var(--tertiary); */
+}
+
+/* Live date formatting. */
+.target .banner {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    bottom: 14px;
+    text-align: center;
+    line-height: 1;
+    font-size: 66px; /* -> 13.75px */
+    letter-spacing: 4px;
+    color: var(--secondary);
+    text-shadow: 0 0 12px var(--banner-glow);
+}
+
+/* Bottom telemetry formatting. */
+.telemetry {
+    position: absolute;
+    z-index: 5;
+    left: 40px;
+    right: 40px;
+    top: 921px;
+    height: 132px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell .lbl {
+    color: var(--secondary-dim);
+    font-size: 30px; /* -> 6.25px */
+    letter-spacing: 2px;
+}
+
+.cell .data {
+    color: var(--primary);
+    font-size: 62px; /* -> 13px */
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 0 12px var(--data-glow);
+}
+
+/* Frame-render mode (?frame): renders full 4x size for screenshot tool. */
+html.frame-render body {
+    display: block;
+    padding: 0;
+    min-height: 0;
+}

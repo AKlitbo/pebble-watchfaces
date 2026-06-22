@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Radar Array</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap">
+        <link rel="stylesheet" type="text/css" href="css/frame.css">
+        <link rel="stylesheet" type="text/css" href="css/theme_default.css">
+    </head>
+    <body>
+        <div class="viewport">
+            <div class="watch">
+                <!-- background field: grid, crosshair, edge scales, scanlines, bezel -->
+                <div class="grid"></div>
+                <div class="crosshair-h"></div>
+                <div class="crosshair-v"></div>
+                <div class="scale scale-left"></div>
+                <div class="scale scale-right"></div>
+
+                <!-- top HUD: battery -->
+                <header class="hud">
+                    <div class="pwr">
+                        <div class="batt"><i></i><i></i><i></i><i></i><i></i></div>
+                    </div>
+                </header>
+
+                <!-- coordinates: the live GPS lat/lon readout (C-drawn) -->
+                <div class="coords">
+                    <span class="data coord">34.05N 118.24W</span>
+                </div>
+
+                <!-- main scope: green CRT radar holding the live time -->
+                <div class="scope">
+                    <div class="ticks"></div>
+                    <div class="ring-outer"></div>
+                    <div class="ring-inner"></div>
+                    <div class="time">10:42</div>
+                    <div class="meridiem">AM</div>
+                </div>
+                <div class="bracket tl"></div>
+                <div class="bracket tr"></div>
+                <div class="bracket bl"></div>
+                <div class="bracket br"></div>
+
+                <!-- target box: amber trench grid holding the date -->
+                <div class="target">
+                    <div class="target-grid"></div>
+                    <div class="target-marker"></div>
+                    <div class="banner date">SAT 19 JUN</div>
+                </div>
+
+                <!-- bottom telemetry: weather / pulse / range -->
+                <div class="telemetry">
+                    <div class="cell">
+                        <div class="lbl">TEMP</div>
+                        <div class="data">13&deg;</div>
+                    </div>
+                    <div class="cell">
+                        <div class="lbl">PULSE</div>
+                        <div class="data">72</div>
+                    </div>
+                    <div class="cell">
+                        <div class="lbl">RANGE</div>
+                        <div class="data">8420</div>
+                    </div>
+                </div>
+
+                <!-- CRT scanlines + bezel sit above the readouts -->
+                <div class="scan"></div>
+                <div class="bezel"></div>
+            </div>
+        </div>
+        <script>
+            // ?frame switches to the shipped chrome-only bake: clear the live
+            // readouts so only the static frame chrome is captured
+            if (location.search.indexOf('frame') >= 0) {
+              document.documentElement.classList.add('frame-render');
+              document.querySelectorAll('.time, .meridiem, .banner, .data, .lbl, .pwr-label')
+                      .forEach(function (el) { el.textContent = ''; });
+              document.querySelectorAll('.batt')
+                      .forEach(function (el) { el.style.display = 'none'; });
+            }
+        </script>
+    </body>
+</html>
