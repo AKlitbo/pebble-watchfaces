@@ -1,0 +1,16 @@
+@charset "utf-8";
+/*  
+  Pebble-64 palette overrides for the classic LCARS frame.
+  Redefines base vars from the vendor CSS so only Pebble-renderable
+  colors (channels: 00/55/AA/FF) appear in the baked frame.  
+*/
+:root {
+  --african-violet: #AAAAFF; /* GColorBabyBlueEyes   */
+  --bluey:          #55AAFF; /* GColorPictonBlue     */
+  --moonlit-violet: #AA55FF; /* GColorLavenderIndigo */
+  --orange:         #FF5500; /* GColorOrange         */
+  --golden-orange:  #FFAA00; /* GColorChromeYellow   */
+  --red:            #AA5555; /* GColorRoseVale       */
+  --butterscotch:   #FFAA55; /* GColorRajah          */
+  --banner-color:   var(--bluey);
+}

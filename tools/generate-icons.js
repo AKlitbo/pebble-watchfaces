@@ -1,19 +1,22 @@
 #!/usr/bin/env node
-/*
- * generate-icons.js - rasterize watchface SVG glyphs into Pebble PNG resources.
+/**
+ * Rasterize watchface SVG glyphs into Pebble PNG resources.
  *
  * Sources are vendored under vendor/:
  *   weather-icons - Erik Flowers
  *   uxwing - heart, feet, thermometer
+ *   svgrepo - bluetooth on/slash
  *
  * Glyphs are forced to white because upstream SVGs do not define a consistent
- * fill or stroke color.
+ * fill or stroke color. Faces that need another color recolor the loaded bitmap's
+ * palette at runtime, so one white master serves every tint instead of
+ * shipping a per-color asset.
  *
  * Each icon is rasterized at its final display size. Pebble clips bitmaps
  * rather than scaling them at draw time.
  *
  * Output:
- *   shared/resources/icons/<name>.png
+ *   lib/resources/icons/<name>.png
  *
  * Re-run after editing:
  *   npm run gen:icons
@@ -24,11 +27,12 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 
-const OUT = path.resolve(__dirname, '..', 'shared', 'resources', 'icons');
+const OUT = path.resolve(__dirname, '..', 'lib', 'resources', 'icons');
 const VENDOR = path.resolve(__dirname, '..', 'vendor');
 
 const WI = (file) => path.join(VENDOR, 'weather-icons', 'svg', file);
 const UX = (file) => path.join(VENDOR, 'uxwing', file);
+const SR = (file) => path.join(VENDOR, 'svgrepo', file);
 
 const WHITE = '#ffffff';
 
@@ -41,7 +45,7 @@ const TRANSPARENT = {
 
 // name -> [vendored svg path, [width, height]]
 const FILE_ICONS = {
-  // weather (Erik Flowers), rendered into the 24x24 WX_ICON slot
+  // Erik Flowers, rendered into the 24x24 WX_ICON slot
   'wi-clear':        [WI('wi-day-sunny.svg'),    [24, 24]],
   'wi-night-clear':  [WI('wi-night-clear.svg'),  [24, 24]],
   'wi-cloudy':       [WI('wi-cloudy.svg'),       [24, 24]],
@@ -54,18 +58,33 @@ const FILE_ICONS = {
   'wi-snow-wind':    [WI('wi-snow-wind.svg'),    [24, 24]],
   'wi-thunderstorm': [WI('wi-thunderstorm.svg'), [24, 24]],
   'wi-na':           [WI('wi-na.svg'),           [24, 24]],
-  // glyphs (UXWing)
+  // UXWing
   'heart':       [UX('heart-pulse-icon.svg'), [14, 14]],
   'feet':        [UX('steps-icon.svg'),       [14, 14]],
-  'thermometer': [UX('thermometer-icon.svg'), [13, 17]]
+  'thermometer': [UX('thermometer-icon.svg'), [13, 17]],
+  // SVG Repo
+  'bluetooth-sm':       [SR('bluetooth-on.svg'),    [10, 10]],
+  'bluetooth-slash-sm': [SR('bluetooth-slash.svg'), [10, 10]],
+  'bluetooth-md':       [SR('bluetooth-on.svg'),    [14, 14]],
+  'bluetooth-slash-md': [SR('bluetooth-slash.svg'), [14, 14]]
 };
 
 function whiten(svgText) {
-  // injecting fill and stroke directly into the root svg tag using regex avoids needing a heavy dom parser in node just to change colors
-  return svgText.replace(
-    /<svg\b/,
-    `<svg fill="${WHITE}" stroke="${WHITE}"`
+  // recolor any hard-coded black so stroke-style glyphs (which set their own color on the path) come through white
+  let out = svgText.replace(
+    /(fill|stroke)="(#000000|#000|black)"/gi,
+    `$1="${WHITE}"`
   );
+
+  // glyphs that never declare a root fill default to black, so force white there. glyphs that already declare a root fill (e.g. fill="none" on stroke icons) are left untouched so their outlines stay open instead of being flooded white. injecting into the root svg tag with a regex avoids pulling in a heavy dom parser just to change colors
+  if (!/<svg\b[^>]*\bfill=/i.test(out)) {
+    out = out.replace(
+      /<svg\b/,
+      `<svg fill="${WHITE}" stroke="${WHITE}"`
+    );
+  }
+
+  return out;
 }
 
 async function render(svgText, [width, height], outputFile) {

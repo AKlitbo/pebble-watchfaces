@@ -1,0 +1,124 @@
+{
+  "name": "lcars-stardate-emery",
+  "author": "Null Syntax",
+  "version": "1.2.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "scripts": {
+    "gen:frame": "node tools/generate-frame.js",
+    "gen:frames": "node tools/generate-frame.js classic-standard && node tools/generate-frame.js lower-decks && node tools/generate-frame.js lower-decks-padd && node tools/generate-frame.js nemesis-blue-standard"
+  },  
+  "pebble": {
+    "displayName": "Stardate Emery",
+    "uuid": "68b0e2fe-b970-4cb2-8b4c-45ea9c13d968",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "capabilities": [
+      "location",
+      "configurable",
+      "health"
+    ],
+    "messageKeys": [
+      "TEMPERATURE",
+      "CONDITIONS",
+      "REQUEST_WEATHER",
+      "REQUEST_SETTINGS",
+      "WEATHER_OK",
+      "LATITUDE",
+      "LONGITUDE",
+      "LOCATION_NAME",
+      "USE_GPS",
+      "GPS_FALLBACK",
+      "WEATHER_PROVIDER",
+      "API_KEY",
+      "TEMPERATURE_UNIT",
+      "DATE_FORMAT",
+      "THEME",
+      "STEPS_MODE",
+      "TIME_FORMAT",
+      "BLUETOOTH_ICON",
+      "BLUETOOTH_VIBE_CONNECT",
+      "BLUETOOTH_VIBE_DISCONNECT"
+    ],
+    "resources": {
+      "media": [
+        { "type": "bitmap", "name": "IMAGE_BG_CLASSIC", "file": "images/background.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS", "file": "images/background-lower-decks.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD","file": "images/background-lower-decks-padd.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_NEMESIS_BLUE", "file": "images/background-nemesis-blue.png" },
+        { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "../../../lib/resources/icons/bluetooth-md.png" },
+        { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "../../../lib/resources/icons/bluetooth-slash-md.png" },
+        { "type": "bitmap", "name": "ICON_HEART", "file": "../../../lib/resources/icons/heart.png" },
+        { "type": "bitmap", "name": "ICON_FEET", "file": "../../../lib/resources/icons/feet.png" },
+        { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "../../../lib/resources/icons/thermometer.png" },
+        { "type": "bitmap", "name": "ICON_WI_CLEAR", "file": "../../../lib/resources/icons/wi-clear.png" },
+        { "type": "bitmap", "name": "ICON_WI_NIGHT_CLEAR", "file": "../../../lib/resources/icons/wi-night-clear.png" },
+        { "type": "bitmap", "name": "ICON_WI_CLOUDY", "file": "../../../lib/resources/icons/wi-cloudy.png" },
+        { "type": "bitmap", "name": "ICON_WI_FOG", "file": "../../../lib/resources/icons/wi-fog.png" },
+        { "type": "bitmap", "name": "ICON_WI_DRIZZLE", "file": "../../../lib/resources/icons/wi-drizzle.png" },
+        { "type": "bitmap", "name": "ICON_WI_RAIN", "file": "../../../lib/resources/icons/wi-rain.png" },
+        { "type": "bitmap", "name": "ICON_WI_SLEET", "file": "../../../lib/resources/icons/wi-sleet.png" },
+        { "type": "bitmap", "name": "ICON_WI_SNOW", "file": "../../../lib/resources/icons/wi-snow.png" },
+        { "type": "bitmap", "name": "ICON_WI_SHOWERS", "file": "../../../lib/resources/icons/wi-showers.png" },
+        { "type": "bitmap", "name": "ICON_WI_SNOW_WIND", "file": "../../../lib/resources/icons/wi-snow-wind.png" },
+        { "type": "bitmap", "name": "ICON_WI_THUNDERSTORM", "file": "../../../lib/resources/icons/wi-thunderstorm.png" },
+        { "type": "bitmap", "name": "ICON_WI_NA", "file": "../../../lib/resources/icons/wi-na.png" },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_62",
+          "file": "../../../lib/resources/fonts/Antonio.ttf",
+          "characterRegex": "[0-9:@]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_36",
+          "file": "../../../lib/resources/fonts/Antonio.ttf",
+          "characterRegex": "[A-Z0-9 ./-]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_32",
+          "file": "../../../lib/resources/fonts/Antonio.ttf",
+          "characterRegex": "[A-Z0-9 ./-]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_28",
+          "file": "../../../lib/resources/fonts/Antonio.ttf",
+          "characterRegex": "[A-Z0-9 ./-]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_20",
+          "file": "../../../lib/resources/fonts/Antonio.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_16",
+          "file": "../../../lib/resources/fonts/Antonio.ttf",
+          "characterRegex": "[A-Z0-9 .-]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_12",
+          "file": "../../../lib/resources/fonts/Antonio.ttf",
+          "characterRegex": "[0-9-]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_ANTONIO_10",
+          "file": "../../../lib/resources/fonts/Antonio.ttf"
+        }
+      ]
+    }
+  }
+}

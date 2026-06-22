@@ -1,9 +1,13 @@
 # Pebble / Waf Build Output
 build/
 .lock-waf_*
-# the build copies the repo-root shared/ into each watchface and compiles it
-# to .reso there - pure build output (the real source lives in /shared/)
-watchfaces/*/shared/
+# compiled resource artifacts waf mirrors out of build/ (real sources in /lib/)
+*.reso
+watchfaces/*/lib/
+
+# Python
+__pycache__/
+*.pyc
 
 # Node
 node_modules/
@@ -16,6 +20,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Doxygen
+.doxygen
+
 # Temp & Local Secrets
 .tmp
 .env
@@ -25,8 +32,7 @@ Thumbs.db
 .dev-tools
 
 # Per Watchface Lock
-watchfaces/stardate-emery/package-lock.json
-watchfaces/stardate-gabbro/package-lock.json
+watchfaces/*/package-lock.json
 
 # Third-party vendored assets (fonts, icons, templates) - not redistributed.
 # Includes the TheLCARS.com template: please go to https://www.thelcars.com/

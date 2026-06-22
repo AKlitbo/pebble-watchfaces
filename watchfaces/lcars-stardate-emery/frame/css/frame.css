@@ -1,0 +1,244 @@
+@charset "utf-8";
+/*  
+	Shared layout for Pebble LCARS watchfaces.
+	Authored at 4x scale (scaled down via transform).
+	Per-theme palettes live in theme_*.css files. 
+*/
+
+/* Browser-preview backdrop. Ignored in frame-render mode. */
+body {
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	display: flex;
+	margin: 0;
+	background: #333;
+}
+
+/* True Emery screen size (200x228 px). Watch scales down to fit here. */
+.viewport {
+	width: 200px;
+	height: 228px;
+	overflow: hidden;
+	background: #000;
+}
+
+/* Section header bars (overrides vendor clamp() sizing for 4x scale). */
+.watch .lcars-text-bar {
+	height: 43px;
+	margin-block: 0;
+	border-left-width: 35px;
+	border-right-width: 35px;
+}
+
+.watch .lcars-text-bar h3 {
+	height: 59px;
+	font-size: 40px;
+	padding-inline: 19px;
+}
+
+.watch .lcars-text-bar::before,
+.watch .lcars-text-bar::after {
+	width: 8px;
+	height: 43px;
+	/* match the bar height so the end-notch doesn't overhang */
+}
+
+/* STARDATE header alignment (matches bottom readouts). */
+.watch .stardate-bar {
+	margin: 12px 28px 0 28px;
+}
+
+/* Bottom readouts layout (Weather left, Vitals/Traversal stacked right). */
+.watch .readouts {
+	display: flex;
+	gap: 24px;
+	margin-top: 14px;
+}
+
+.watch .readouts>.readout {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.watch .readout-stack {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.watch .readout-stack .readout {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Readout data value container. */
+.watch .readout .data {
+	flex: 1;
+	min-height: 1.5em;
+	/* reserve the value's slot even when empty */
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-end;
+	padding: 10px 16px 0 0;
+	font-size: 70px;
+	font-weight: 700;
+	line-height: 1;
+	color: var(--light-color, #fff);
+}
+
+/* Big left readout formatting. */
+.watch .weather .data {
+	font-size: 96px;
+	align-items: center;
+	padding-top: 0;
+}
+
+/* Frame-render mode (?frame): renders full 4x size for screenshot tool. */
+html.frame-render body {
+	display: block;
+	padding: 0;
+	min-height: 0;
+}
+
+html.frame-render .viewport {
+	width: 960px;
+	height: 1094px;
+}
+
+html.frame-render .watch {
+	transform: none;
+}
+
+/* The watch container: authored at 4x, scaled down to 200x228 Emery screen. */
+.watch {
+	width: 960px;
+	height: 1094px;
+	transform: scale(0.208333);
+	transform-origin: top left;
+	background: #000;
+	display: flex;
+	flex-direction: column;
+	--lfw: 224px;
+	/* sidebar (-> 56px) */
+	--bar-height: 44px;
+	/* segmented bar (-> 11px) */
+}
+
+/* Top region layout: sidebar + banner + flexible gap. */
+.watch .wrap {
+	padding: 0;
+	column-gap: 0;
+	overflow: visible;
+	margin: 0;
+	display: flex;
+}
+
+.watch .wrap-top {
+	height: 360px;
+	/* -> 90px */
+}
+
+.watch #gap {
+	flex: 1;
+	margin-top: 20px;
+	/* -> 5px gap */
+}
+
+.watch .bar-panel.first-bar-panel {
+	margin-top: 0;
+}
+
+/* Sidebars clipping and layout. */
+.watch .left-frame-top {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	width: var(--lfw);
+}
+
+.watch .left-frame {
+	padding-top: 0;
+	overflow: hidden;
+	width: var(--lfw);
+	display: flex;
+	flex-direction: column;
+}
+
+.watch .left-frame-top,
+.watch .left-frame {
+	font-size: 48px;
+}
+
+.watch .sp {
+	display: flex;
+	align-items: flex-end;
+	justify-content: flex-end;
+	padding: 12px 24px;
+	color: #000;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: 2px;
+}
+
+.watch .sp-top {
+	height: 104px;
+	border-bottom: 12px solid #000;
+}
+
+.watch .sp-fill {
+	flex: 1;
+}
+
+.watch .seam {
+	border-bottom: 12px solid #000;
+}
+
+/* Right side */
+.watch .right-frame-top {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.watch .banner {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 0 32px 0 0;
+	margin: 0;
+	font-size: 84px;
+	font-weight: 700;
+	letter-spacing: 4px;
+	white-space: nowrap;
+	color: var(--banner-color);
+}
+
+.watch .right-frame {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+/* Centre column main container. */
+.watch main {
+	padding: 0 28px 0 28px;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+/* The big clock - fills the space between the stardate bar and readouts. */
+.watch .time {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #fff;
+	font-size: 200px;
+	font-weight: 700;
+	letter-spacing: 12px;
+}

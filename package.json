@@ -6,9 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:icons": "node tools/generate-icons.js",
-    "gen:frame": "node tools/generate-frame.js",
-    "gen:frames": "node tools/generate-frame.js stardate-emery classic-standard && node tools/generate-frame.js stardate-emery lower-decks && node tools/generate-frame.js stardate-emery lower-decks-padd && node tools/generate-frame.js stardate-emery nemesis-blue-standard"
+    "gen:icons": "node tools/generate-icons.js"
   },
   "devDependencies": {
     "@rebble/clay": "^1.0.10",

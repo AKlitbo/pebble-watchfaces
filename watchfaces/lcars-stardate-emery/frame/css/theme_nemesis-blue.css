@@ -1,0 +1,16 @@
+@charset "utf-8";
+/*  
+  Pebble-64 palette overrides for the nemesis-blue LCARS frame.
+  Redefines base vars from the vendor CSS so only Pebble-renderable
+  colors (channels: 00/55/AA/FF) appear in the baked frame.  
+*/
+:root {
+  --cool:        #55AAFF; /* GColorPictonBlue   */
+  --evening:     #0055FF; /* GColorBlueMoon     */
+  --galaxy-gray: #555555; /* GColorDarkGray     */
+  --ghost:       #AAAAFF; /* GColorBabyBlueEyes */
+  --honey:       #FFAAAA; /* GColorMelon        */
+  --midnight:    #0000FF; /* GColorBlue         */
+  --moonbeam:    #FFFFFF; /* GColorWhite        */
+  --tangerine:   #FFAA55; /* GColorRajah        */
+}
