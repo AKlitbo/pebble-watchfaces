@@ -1,6 +1,8 @@
 /**
  * @file widgets.h
  * @brief Overlay widgets API: layers the shell mounts over the baked LCARS frame.
+ *
+ * @ingroup watchface-lcars
  */
 #pragma once
 #include <pebble.h>

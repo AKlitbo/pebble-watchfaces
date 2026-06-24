@@ -1,6 +1,8 @@
 /**
  * @file distance.h
  * @brief pure distance conversions + formatting (no SDK)
+ *
+ * @ingroup lib
  */
 #pragma once
 #include <stddef.h>

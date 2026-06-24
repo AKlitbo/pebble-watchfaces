@@ -6,6 +6,8 @@
  * gauge - create it after the background layer and before the text layers to
  * preserve z-order. labels are drawn here (not baked) so a future locale can
  * swap the strings.
+ *
+ * @ingroup watchface-radar
  */
 #pragma once
 #include <pebble.h>

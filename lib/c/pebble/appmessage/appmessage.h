@@ -7,6 +7,8 @@
 
 /**
  * @brief Callbacks the app supplies so the transport stays decoupled from the ui shell.
+ *
+ * @ingroup lib
  */
 typedef struct
 {

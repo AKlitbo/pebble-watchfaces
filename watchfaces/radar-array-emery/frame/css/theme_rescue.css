@@ -1,20 +1,22 @@
-/*  
-  Pebble-64 palette definition for the radar array frame.
-  Only uses Pebble-renderable colors (channels: 00/55/AA/FF).  
+@charset "utf-8";
+/*
+  Rescue (red/white) radar palette, built from the Pebble-64 GColors in
+  lib/css/pebble-colors.css. Translucent overlays use color-mix against
+  transparent, so each glow keeps its exact GColor at reduced opacity.
 */
 :root {
-    --bg:            #000000; /* GColorBlack        */
-    --primary:       #FF0000; /* GColorRed          */
-    --secondary:     #AAAAAA; /* GColorLightGray    */
-    --secondary-dim: #555555; /* GColorDarkGray     */
-    --tertiary:      #FFAA00; /* GColorChromeYellow */
-    --grid-primary:      rgba(255, 0, 0, 0.06);     /* GColorBlack / GColorRed               */
-    --crosshair-primary: rgba(170, 0, 0, 0.55);     /* GColorBlack / GColorDarkCandyAppleRed */
-    --ring-primary:      rgba(170, 0, 0, 0.70);     /* GColorBlack / GColorDarkCandyAppleRed */
-    --grid-secondary:    rgba(170, 170, 170, 0.22); /* GColorBlack / GColorLightGray         */
-    --bezel:             rgba(170, 170, 170, 0.45); /* GColorBlack / GColorLightGray         */
-    --time-glow:         rgba(255, 0, 0, 0.70);     /* GColorBlack / GColorRed               */
-    --data-glow:         rgba(255, 0, 0, 0.60);     /* GColorBlack / GColorRed               */
-    --banner-glow:       rgba(170, 170, 170, 0.50); /* GColorBlack / GColorLightGray         */
-    --scanline:          rgba(0, 0, 0, 0.22);       /* GColorBlack / Backdrop                */
+    --bg:            var(--GColorBlack);
+    --primary:       var(--GColorRed);
+    --secondary:     var(--GColorLightGray);
+    --secondary-dim: var(--GColorDarkGray);
+    --tertiary:      var(--GColorChromeYellow);
+    --grid-primary:      color-mix(in srgb, var(--GColorRed) 6%, transparent);
+    --crosshair-primary: color-mix(in srgb, var(--GColorDarkCandyAppleRed) 55%, transparent);
+    --ring-primary:      color-mix(in srgb, var(--GColorDarkCandyAppleRed) 70%, transparent);
+    --grid-secondary:    color-mix(in srgb, var(--GColorLightGray) 22%, transparent);
+    --bezel:             color-mix(in srgb, var(--GColorLightGray) 45%, transparent);
+    --time-glow:         color-mix(in srgb, var(--GColorRed) 70%, transparent);
+    --data-glow:         color-mix(in srgb, var(--GColorRed) 60%, transparent);
+    --banner-glow:       color-mix(in srgb, var(--GColorLightGray) 50%, transparent);
+    --scanline:          color-mix(in srgb, var(--GColorBlack) 22%, transparent);
 }

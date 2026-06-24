@@ -1,6 +1,8 @@
 /**
  * @file icons.h
  * @brief condition-string to weather-icon resource lookup
+ *
+ * @ingroup lib
  */
 #pragma once
 #include <pebble.h>

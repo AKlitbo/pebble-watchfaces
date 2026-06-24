@@ -1,6 +1,8 @@
 /**
  * @file layout.h
  * @brief Spatial map for the LCARS frame (200x228), kept in sync with the background image.
+ *
+ * @ingroup watchface-lcars
  */
 #pragma once
 #include <pebble.h>

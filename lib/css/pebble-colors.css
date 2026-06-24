@@ -1,0 +1,78 @@
+@charset "utf-8";
+/*
+  The full Pebble-64 color gamut (the only colors a color Pebble can show: every
+  channel is 00/55/AA/FF) exposed as CSS variables named after their GColor.
+
+  Frame stylesheets reference these (e.g. color: var(--GColorVividCerulean)) so a
+  baked fill always lands on a real GColor with no dithering, and the variable name
+  is the exact constant to pass to the C side. Generated from the SDK's
+  gcolor_definitions.h - keep in sync if the palette ever changes.
+
+  Link this before a face's frame.css and theme so the variables resolve.
+*/
+:root {
+  --GColorBlack: #000000;
+  --GColorOxfordBlue: #000055;
+  --GColorDukeBlue: #0000AA;
+  --GColorBlue: #0000FF;
+  --GColorDarkGreen: #005500;
+  --GColorMidnightGreen: #005555;
+  --GColorCobaltBlue: #0055AA;
+  --GColorBlueMoon: #0055FF;
+  --GColorIslamicGreen: #00AA00;
+  --GColorJaegerGreen: #00AA55;
+  --GColorTiffanyBlue: #00AAAA;
+  --GColorVividCerulean: #00AAFF;
+  --GColorGreen: #00FF00;
+  --GColorMalachite: #00FF55;
+  --GColorMediumSpringGreen: #00FFAA;
+  --GColorCyan: #00FFFF;
+  --GColorBulgarianRose: #550000;
+  --GColorImperialPurple: #550055;
+  --GColorIndigo: #5500AA;
+  --GColorElectricUltramarine: #5500FF;
+  --GColorArmyGreen: #555500;
+  --GColorDarkGray: #555555;
+  --GColorLiberty: #5555AA;
+  --GColorVeryLightBlue: #5555FF;
+  --GColorKellyGreen: #55AA00;
+  --GColorMayGreen: #55AA55;
+  --GColorCadetBlue: #55AAAA;
+  --GColorPictonBlue: #55AAFF;
+  --GColorBrightGreen: #55FF00;
+  --GColorScreaminGreen: #55FF55;
+  --GColorMediumAquamarine: #55FFAA;
+  --GColorElectricBlue: #55FFFF;
+  --GColorDarkCandyAppleRed: #AA0000;
+  --GColorJazzberryJam: #AA0055;
+  --GColorPurple: #AA00AA;
+  --GColorVividViolet: #AA00FF;
+  --GColorWindsorTan: #AA5500;
+  --GColorRoseVale: #AA5555;
+  --GColorPurpureus: #AA55AA;
+  --GColorLavenderIndigo: #AA55FF;
+  --GColorLimerick: #AAAA00;
+  --GColorBrass: #AAAA55;
+  --GColorLightGray: #AAAAAA;
+  --GColorBabyBlueEyes: #AAAAFF;
+  --GColorSpringBud: #AAFF00;
+  --GColorInchworm: #AAFF55;
+  --GColorMintGreen: #AAFFAA;
+  --GColorCeleste: #AAFFFF;
+  --GColorRed: #FF0000;
+  --GColorFolly: #FF0055;
+  --GColorFashionMagenta: #FF00AA;
+  --GColorMagenta: #FF00FF;
+  --GColorOrange: #FF5500;
+  --GColorSunsetOrange: #FF5555;
+  --GColorBrilliantRose: #FF55AA;
+  --GColorShockingPink: #FF55FF;
+  --GColorChromeYellow: #FFAA00;
+  --GColorRajah: #FFAA55;
+  --GColorMelon: #FFAAAA;
+  --GColorRichBrilliantLavender: #FFAAFF;
+  --GColorYellow: #FFFF00;
+  --GColorIcterine: #FFFF55;
+  --GColorPastelYellow: #FFFFAA;
+  --GColorWhite: #FFFFFF;
+}

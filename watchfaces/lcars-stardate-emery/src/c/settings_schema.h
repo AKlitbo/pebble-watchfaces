@@ -3,6 +3,8 @@
  * @brief lcars-stardate-emery settings schema: version 2, with a v0 migration that lifts
  * its pre-versioning blob. key 5 and the v1 size are frozen - changing either makes
  * watches in the field lose their settings.
+ *
+ * @ingroup watchface-lcars
  */
 #pragma once
 #include "settings/settings.h"

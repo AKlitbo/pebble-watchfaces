@@ -1,6 +1,8 @@
 /**
  * @file units.h
  * @brief unit conversion + distance formatting helpers
+ *
+ * @ingroup lib
  */
 #pragma once
 #include <pebble.h>

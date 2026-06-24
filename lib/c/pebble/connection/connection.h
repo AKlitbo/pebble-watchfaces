@@ -1,6 +1,8 @@
 /**
  * @file connection.h
  * @brief pebble connection (bluetooth) service: tracks whether the phone is in range
+ *
+ * @ingroup lib
  */
 #pragma once
 #include <pebble.h>

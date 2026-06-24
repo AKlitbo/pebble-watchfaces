@@ -182,10 +182,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
             {
                 temp_value = -99;
             }
+
             if (temp_value > 199)
             {
                 temp_value = 199;
             }
+            
             snprintf(temperature_buffer, sizeof(temperature_buffer),
                 settings_u8(SETTING_TEMPERATURE_UNIT) ? "%d°F" : "%d°C", temp_value);
 

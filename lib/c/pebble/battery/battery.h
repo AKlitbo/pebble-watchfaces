@@ -1,6 +1,8 @@
 /**
  * @file battery.h
  * @brief battery service: tracks charge level and charging state
+ *
+ * @ingroup lib
  */
 #pragma once
 #include <pebble.h>

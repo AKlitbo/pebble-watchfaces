@@ -1,6 +1,8 @@
 /**
  * @file text_case.h
  * @brief pure ascii case helpers (no SDK)
+ *
+ * @ingroup lib
  */
 #pragma once
 

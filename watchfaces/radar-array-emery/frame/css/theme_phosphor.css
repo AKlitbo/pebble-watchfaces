@@ -1,17 +1,22 @@
 @charset "utf-8";
+/*
+  Phosphor (amber) radar palette, built from the Pebble-64 GColors in
+  lib/css/pebble-colors.css. Translucent overlays use color-mix against
+  transparent, so each glow keeps its exact GColor at reduced opacity.
+*/
 :root {
-    --bg:            #000000;
-    --primary:       #FFAA00;
-    --secondary:     #FFAA55;
-    --secondary-dim: #AA5500;
-    --tertiary:      #FF5500;
-    --grid-primary:      rgba(255, 170, 0, 0.06);
-    --crosshair-primary: rgba(255, 170, 0, 0.55);
-    --ring-primary:      rgba(255, 170, 0, 0.70);
-    --grid-secondary:    rgba(255, 170, 85, 0.22);
-    --bezel:             rgba(255, 170, 85, 0.45);
-    --time-glow:         rgba(255, 170, 0, 0.70);
-    --data-glow:         rgba(255, 170, 0, 0.60);
-    --banner-glow:       rgba(255, 170, 85, 0.50);
-    --scanline:          rgba(0, 0, 0, 0.22);
+    --bg:            var(--GColorBlack);
+    --primary:       var(--GColorChromeYellow);
+    --secondary:     var(--GColorRajah);
+    --secondary-dim: var(--GColorWindsorTan);
+    --tertiary:      var(--GColorOrange);
+    --grid-primary:      color-mix(in srgb, var(--GColorChromeYellow) 6%, transparent);
+    --crosshair-primary: color-mix(in srgb, var(--GColorChromeYellow) 55%, transparent);
+    --ring-primary:      color-mix(in srgb, var(--GColorChromeYellow) 70%, transparent);
+    --grid-secondary:    color-mix(in srgb, var(--GColorRajah) 22%, transparent);
+    --bezel:             color-mix(in srgb, var(--GColorRajah) 45%, transparent);
+    --time-glow:         color-mix(in srgb, var(--GColorChromeYellow) 70%, transparent);
+    --data-glow:         color-mix(in srgb, var(--GColorChromeYellow) 60%, transparent);
+    --banner-glow:       color-mix(in srgb, var(--GColorRajah) 50%, transparent);
+    --scanline:          color-mix(in srgb, var(--GColorBlack) 22%, transparent);
 }

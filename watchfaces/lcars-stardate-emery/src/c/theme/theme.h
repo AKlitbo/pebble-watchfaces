@@ -1,6 +1,8 @@
 /**
  * @file theme.h
  * @brief Theme to background-resource and accent-color mapping.
+ *
+ * @ingroup watchface-lcars
  */
 #pragma once
 #include <pebble.h>

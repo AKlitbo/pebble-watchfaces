@@ -1,14 +1,14 @@
 @charset "utf-8";
-/*  
-  Pebble-64 palette overrides for the lower-decks LCARS frame.
-  Redefines base vars from the vendor CSS so only Pebble-renderable
-  colors (channels: 00/55/AA/FF) appear in the baked frame. 
+/*
+  Lower-decks LCARS frame palette. Redefines the vendor CSS base vars with
+  Pebble-64 GColors from lib/css/pebble-colors.css, so the baked frame
+  uses only colors the watch can render.
 */
 :root {
-  --butter:         #FFFFAA; /* GColorPastelYellow */
-  --daybreak:       #FFAA00; /* GColorChromeYellow */
-  --harvestgold:    #FFAA55; /* GColorRajah        */
-  --honey:          #FFAAAA; /* GColorMelon        */
-  --october-sunset: #FF5500; /* GColorOrange       */
-  --orange:         #FF5500; /* GColorOrange       */
+  --butter:         var(--GColorPastelYellow);
+  --daybreak:       var(--GColorChromeYellow);
+  --harvestgold:    var(--GColorRajah);
+  --honey:          var(--GColorMelon);
+  --october-sunset: var(--GColorOrange);
+  --orange:         var(--GColorOrange);
 }

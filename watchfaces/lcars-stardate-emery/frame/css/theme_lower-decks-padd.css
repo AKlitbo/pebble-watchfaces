@@ -1,19 +1,19 @@
 @charset "utf-8";
-/*  
-  Pebble-64 palette overrides for the lower-decks-padd LCARS frame.
-  Redefines base vars from the vendor CSS so only Pebble-renderable
-  colors (channels: 00/55/AA/FF) appear in the baked frame.  
+/*
+  Lower-decks-padd LCARS frame palette. Redefines the vendor CSS base vars with
+  Pebble-64 GColors from lib/css/pebble-colors.css, so the baked frame
+  uses only colors the watch can render.
 */
 :root {
-  /* 
+  /*
     The three distinct blues PADD is built on, each in its own Pebble cell so
-    they stay separable: cornflower (frame) / light periwinkle / slate. 
+    they stay separable: cornflower (frame) / light periwinkle / slate.
   */
-  --alpha-blue:  #55AAFF; /* GColorPictonBlue   */
-  --arctic-snow: #AAAAFF; /* GColorBabyBlueEyes */
-  --night-rain:  #5555AA; /* GColorLiberty      */
-  --arctic-ice:  #AAFFFF; /* GColorCeleste      */
-  --radioactive: #AAFFFF; /* GColorCeleste      */
-  --beta-blue:   #55AAAA; /* GColorCadetBlue    */
-  --light-color: #FFFFFF;
+  --alpha-blue:  var(--GColorPictonBlue);
+  --arctic-snow: var(--GColorBabyBlueEyes);
+  --night-rain:  var(--GColorLiberty);
+  --arctic-ice:  var(--GColorCeleste);
+  --radioactive: var(--GColorCeleste);
+  --beta-blue:   var(--GColorCadetBlue);
+  --light-color: var(--GColorWhite);
 }

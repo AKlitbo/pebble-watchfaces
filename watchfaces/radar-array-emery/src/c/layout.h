@@ -4,6 +4,8 @@
  *
  * Live values fill the SLOT_* rects (drawn by the shell), and the static labels
  * fill the LBL_* rects (drawn by widgets, so they can localize).
+ *
+ * @ingroup watchface-radar
  */
 #pragma once
 #include <pebble.h>

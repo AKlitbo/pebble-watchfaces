@@ -1,6 +1,8 @@
 /**
  * @file health.h
  * @brief health-service accessors (no-op stubs when PBL_HEALTH is absent)
+ *
+ * @ingroup lib
  */
 #pragma once
 #include <pebble.h>

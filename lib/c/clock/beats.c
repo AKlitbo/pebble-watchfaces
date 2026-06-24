@@ -4,7 +4,6 @@
  */
 #include "beats.h"
 
-// a .beats day is 1000 beats of MS_PER_BEAT each (MS_PER_DAY total)
 int beats_from_ms(int64_t ms_into_bmt_day)
 {
     if (ms_into_bmt_day < 0)

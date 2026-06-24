@@ -1,17 +1,22 @@
 @charset "utf-8";
+/*
+  Crimson radar palette, built from the Pebble-64 GColors in
+  lib/css/pebble-colors.css. Translucent overlays use color-mix against
+  transparent, so each glow keeps its exact GColor at reduced opacity.
+*/
 :root {
-    --bg:            #000000;
-    --primary:       #FF0000;
-    --secondary:     #AA0000;
-    --secondary-dim: #550000;
-    --tertiary:      #FF5500;
-    --grid-primary:      rgba(255, 0, 0, 0.06);
-    --crosshair-primary: rgba(170, 0, 0, 0.55);
-    --ring-primary:      rgba(170, 0, 0, 0.70);
-    --grid-secondary:    rgba(255, 0, 0, 0.22);
-    --bezel:             rgba(170, 0, 0, 0.45);
-    --time-glow:         rgba(255, 0, 0, 0.70);
-    --data-glow:         rgba(255, 0, 0, 0.60);
-    --banner-glow:       rgba(170, 0, 0, 0.50);
-    --scanline:          rgba(0, 0, 0, 0.22);
+    --bg:            var(--GColorBlack);
+    --primary:       var(--GColorRed);
+    --secondary:     var(--GColorDarkCandyAppleRed);
+    --secondary-dim: var(--GColorBulgarianRose);
+    --tertiary:      var(--GColorOrange);
+    --grid-primary:      color-mix(in srgb, var(--GColorRed) 6%, transparent);
+    --crosshair-primary: color-mix(in srgb, var(--GColorDarkCandyAppleRed) 55%, transparent);
+    --ring-primary:      color-mix(in srgb, var(--GColorDarkCandyAppleRed) 70%, transparent);
+    --grid-secondary:    color-mix(in srgb, var(--GColorRed) 22%, transparent);
+    --bezel:             color-mix(in srgb, var(--GColorDarkCandyAppleRed) 45%, transparent);
+    --time-glow:         color-mix(in srgb, var(--GColorRed) 70%, transparent);
+    --data-glow:         color-mix(in srgb, var(--GColorRed) 60%, transparent);
+    --banner-glow:       color-mix(in srgb, var(--GColorDarkCandyAppleRed) 50%, transparent);
+    --scanline:          color-mix(in srgb, var(--GColorBlack) 22%, transparent);
 }
