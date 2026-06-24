@@ -14,6 +14,20 @@ static const SettingsSchema *s_schema;
 static const SettingField *s_by_id[SETTING_COUNT];
 
 /**
+ * @brief Whether a tuple carries an integer payload (TUPLE_INT or TUPLE_UINT).
+ *
+ * Inbox payloads are phone-controlled, so the wire type is checked before a
+ * value is read through a type-specific accessor.
+ *
+ * @param tuple The tuple to check.
+ * @return true if the tuple is an int or uint.
+ */
+static bool tuple_is_int(const Tuple *tuple)
+{
+    return tuple->type == TUPLE_INT || tuple->type == TUPLE_UINT;
+}
+
+/**
  * @brief A pointer to a field's storage inside the active face's blob.
  *
  * @param field The setting field to get the pointer for.
@@ -324,15 +338,38 @@ SettingsInbound settings_apply_inbox(DictionaryIterator *iter)
         switch (field->type)
         {
             case SETTING_BOOL:
+                if (!tuple_is_int(tuple))
+                {
+                    continue;  // wrong wire type for a bool, skip rather than read a bogus pointer
+                }
+
                 *(bool *)ptr = (tuple->value->int32 == 1);
                 break;
 
             case SETTING_ENUM_U8:  // arrives as a cstring - atoi it
-                *(uint8_t *)ptr = (uint8_t)atoi(tuple->value->cstring);
+            {
+                if (tuple->type != TUPLE_CSTRING)
+                {
+                    continue;
+                }
+
+                int value = atoi(tuple->value->cstring);
+                if (value < 0 || value >= field->enum_count)
+                {
+                    value = (int)field->default_num;  // out-of-range from the phone, clamp to default
+                }
+
+                *(uint8_t *)ptr = (uint8_t)value;
                 break;
+            }
 
             case SETTING_CSTRING:
             {
+                if (tuple->type != TUPLE_CSTRING)
+                {
+                    continue;
+                }
+
                 // read through a char pointer so gcc does not flag the
                 // zero-length cstring[] flexible array member subscript
                 const char *value = tuple->value->cstring;
@@ -340,6 +377,7 @@ SettingsInbound settings_apply_inbox(DictionaryIterator *iter)
                 {
                     set_cstring((char *)ptr, value, field->size);
                 }
+
                 break;
             }
         }

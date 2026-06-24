@@ -9,6 +9,7 @@
 #include "health/health.h"
 #include "layout.h"
 #include "settings/settings.h"
+#include "settings/setting_values.h"
 #include "settings_schema.h"
 #include "shell/shell.h"
 #include "units/units.h"
@@ -67,7 +68,7 @@ static void beats_timer_handler(void *data)
  */
 static void update_refresh_mode(void)
 {
-    if (settings_u8(SETTING_TIME_FORMAT) == 3)
+    if (settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS)
     {
         if (!s_beats_timer)
         {

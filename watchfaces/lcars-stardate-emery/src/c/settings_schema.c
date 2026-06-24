@@ -7,6 +7,7 @@
  */
 #include "settings_schema.h"
 #include "settings/settings_catalog.h"
+#include "settings/setting_values.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -50,11 +51,11 @@ static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(LcarsSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(LcarsSettings, date_format), "%Y.%m%d"),
     KNOWN_THEME(offsetof(LcarsSettings, theme), 4),
-    KNOWN_STEPS_MODE(offsetof(LcarsSettings, steps_mode), 3),
-    KNOWN_TIME_FORMAT(offsetof(LcarsSettings, time_format), 4),
+    KNOWN_STEPS_MODE(offsetof(LcarsSettings, steps_mode), STEPS_MODE_COUNT),
+    KNOWN_TIME_FORMAT(offsetof(LcarsSettings, time_format), TIME_FORMAT_COUNT),
     KNOWN_BLUETOOTH_ICON(offsetof(LcarsSettings, bluetooth_icon)),
-    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(LcarsSettings, vibe_connect), 4),
-    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(LcarsSettings, vibe_disconnect), 4),
+    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(LcarsSettings, vibe_connect), VIBE_COUNT),
+    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(LcarsSettings, vibe_disconnect), VIBE_COUNT),
 };
 
 /**

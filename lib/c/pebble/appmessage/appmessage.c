@@ -135,15 +135,21 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     Tuple *conditions_tuple = dict_find(iterator, MESSAGE_KEY_CONDITIONS);
     Tuple *wx_ok_tuple = dict_find(iterator, MESSAGE_KEY_WEATHER_OK);
 
-    if (temp_tuple && conditions_tuple)
+    // the payload is phone-controlled, so the wire types are checked before reading -
+    // temperature rides an int, conditions a cstring, the ok flag an int
+    bool temp_is_int = temp_tuple && (temp_tuple->type == TUPLE_INT || temp_tuple->type == TUPLE_UINT);
+    bool conditions_is_str = conditions_tuple && conditions_tuple->type == TUPLE_CSTRING;
+
+    if (temp_is_int && conditions_is_str)
     {
-        // Missing ok flag (older JS) is treated as a real reading
-        bool wx_ok = (!wx_ok_tuple) || (wx_ok_tuple->value->int32 == 1);
+        // missing ok flag (older JS) is treated as a real reading
+        bool wx_ok = (!wx_ok_tuple) ||
+            ((wx_ok_tuple->type == TUPLE_INT || wx_ok_tuple->type == TUPLE_UINT) && wx_ok_tuple->value->int32 == 1);
+
         static char temperature_buffer[8];
         static char conditions_buffer[32];
 
-        snprintf(conditions_buffer, sizeof(conditions_buffer), "%s",
-            conditions_tuple->value->cstring);
+        snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", conditions_tuple->value->cstring);
 
         if (wx_ok)
         {
@@ -167,12 +173,15 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         }
     }
 
-    // Coordinates arrive pre-formatted as LCARS dash strings ("33-44", "-112-07")
+    // Coordinates arrive pre-formatted as LCARS dash strings ("33-44", "-112-07"),
+    // each only read when present and actually a cstring
     Tuple *lat_t = dict_find(iterator, MESSAGE_KEY_LATITUDE);
     Tuple *lon_t = dict_find(iterator, MESSAGE_KEY_LONGITUDE);
     if ((lat_t || lon_t) && s_handlers.on_coords)
     {
-        s_handlers.on_coords(lat_t ? lat_t->value->cstring : "", lon_t ? lon_t->value->cstring : "");
+        const char *lat = (lat_t && lat_t->type == TUPLE_CSTRING) ? lat_t->value->cstring : "";
+        const char *lon = (lon_t && lon_t->type == TUPLE_CSTRING) ? lon_t->value->cstring : "";
+        s_handlers.on_coords(lat, lon);
     }
 
     // decode every settings field the message carries, and the table owns which keys

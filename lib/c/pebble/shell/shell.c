@@ -8,6 +8,7 @@
 #include "zone.h"
 #include "connection/connection.h"
 #include "settings/settings.h"
+#include "settings/setting_values.h"
 #include "units/units.h"
 #include "vibe/vibe.h"
 #include "text_case.h"
@@ -36,20 +37,20 @@ static bool s_bt_connected = true; // Assume connected until the first peek/even
 static void render_steps_readout(void);
 
 /**
- * @brief Fire the chosen vibe pattern (0=None, 1=Short, 2=Long, 3=Double).
+ * @brief Fire the chosen vibe pattern.
  *
  * Stays silent during quiet time, so the link dropping at night won't buzz.
  *
- * @param pattern The vibe pattern to fire.
+ * @param pattern The vibe pattern to fire (a VibeChoice).
  */
 static void play_vibe(uint8_t pattern)
 {
     switch (pattern)
     {
-        case 1: vibe_pulse(VibePulseShort); break;
-        case 2: vibe_pulse(VibePulseLong); break;
-        case 3: vibe_pulse(VibePulseDouble); break;
-        default: break;  // None
+        case VIBE_SHORT:  vibe_pulse(VibePulseShort);  break;
+        case VIBE_LONG:   vibe_pulse(VibePulseLong);   break;
+        case VIBE_DOUBLE: vibe_pulse(VibePulseDouble); break;
+        default: break;  // VIBE_NONE
     }
 }
 
@@ -138,15 +139,15 @@ void shell_update_time(struct tm *tick_time)
     uint8_t time_format = settings_u8(SETTING_TIME_FORMAT);
 
     // Swatch .beats - replaces the clock
-    if (time_format == 3)
+    if (time_format == TIME_FORMAT_BEATS)
     {
         snprintf(s_time_buffer, sizeof(s_time_buffer), "@%03d", units_swatch_beats());
     }
     else
     {
         // 24 -> 12 -> System
-        const char *fmt = (time_format == 2) ? "%H:%M"
-            : (time_format == 1)
+        const char *fmt = (time_format == TIME_FORMAT_24H) ? "%H:%M"
+            : (time_format == TIME_FORMAT_12H)
                 ? "%I:%M"
                 : (clock_is_24h_style() ? "%H:%M" : "%I:%M");
 
@@ -157,7 +158,7 @@ void shell_update_time(struct tm *tick_time)
 
     // AM/PM only makes sense on a 12-hour clock (explicit 12-hour, or System when
     // the watch isn't in 24h mode). Cleared otherwise so it never shows on 24h/.beats
-    bool h12 = (time_format == 1) || (time_format == 0 && !clock_is_24h_style());
+    bool h12 = (time_format == TIME_FORMAT_12H) || (time_format == TIME_FORMAT_SYSTEM && !clock_is_24h_style());
     set_zone_text(ZONE_MERIDIEM, h12 ? (tick_time->tm_hour < 12 ? "AM" : "PM") : "");
 
     static char s_date_buffer[24];
@@ -183,10 +184,10 @@ static void render_steps_readout(void)
     }
 
     uint8_t mode = settings_u8(SETTING_STEPS_MODE);
-    if (mode == 1 || mode == 2)
+    if (mode == STEPS_MODE_MILES || mode == STEPS_MODE_KM)
     {
         units_format_distance(s_steps_buffer, sizeof(s_steps_buffer), s_last_distance_m,
-                              mode == 1);
+                              mode == STEPS_MODE_MILES);
     }
     else
     {

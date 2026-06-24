@@ -8,6 +8,7 @@
  */
 #include "settings_schema.h"
 #include "settings/settings_catalog.h"
+#include "settings/setting_values.h"
 
 #include <stddef.h>
 
@@ -40,11 +41,11 @@ static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(RadarSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(RadarSettings, date_format), "%a %d %b"),
     KNOWN_THEME(offsetof(RadarSettings, theme), 6),
-    KNOWN_STEPS_MODE(offsetof(RadarSettings, steps_mode), 3),
-    KNOWN_TIME_FORMAT(offsetof(RadarSettings, time_format), 4),
+    KNOWN_STEPS_MODE(offsetof(RadarSettings, steps_mode), STEPS_MODE_COUNT),
+    KNOWN_TIME_FORMAT(offsetof(RadarSettings, time_format), TIME_FORMAT_COUNT),
     KNOWN_BLUETOOTH_ICON(offsetof(RadarSettings, bluetooth_icon)),
-    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(RadarSettings, vibe_connect), 4),
-    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(RadarSettings, vibe_disconnect), 4),
+    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(RadarSettings, vibe_connect), VIBE_COUNT),
+    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(RadarSettings, vibe_disconnect), VIBE_COUNT),
 };
 
 static const SettingsSchema s_schema = {

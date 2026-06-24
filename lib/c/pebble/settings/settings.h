@@ -7,8 +7,6 @@
 #pragma once
 #include <pebble.h>
 
-
-
 /**
  * @brief Identity of a known (shared) setting, used for typed reads and indexing.
  *
