@@ -37,7 +37,13 @@ GFont fonts_get(FontId id)
     }
     else
     {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "fonts_get: id %d out of range", id);
+        // out-of-range can't index s_warned[FONT_COUNT], so dedup with its own flag
+        static bool s_oor_warned;
+        if (!s_oor_warned)
+        {
+            s_oor_warned = true;
+            APP_LOG(APP_LOG_LEVEL_ERROR, "fonts_get: id %d out of range", id);
+        }
     }
 
     return fonts_get_system_font(FONT_KEY_GOTHIC_24);

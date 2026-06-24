@@ -18,6 +18,11 @@ float distance_m_to_km(int meters)
 
 void distance_format(char *buffer, size_t size, int meters, bool miles)
 {
+    if (meters < 0)
+    {
+        meters = 0;
+    }
+
     float dist = miles ? distance_m_to_miles(meters) : distance_m_to_km(meters);
 
     // round to one decimal in integer space so the carry is handled (4.96 -> 5.0)

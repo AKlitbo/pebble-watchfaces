@@ -32,7 +32,7 @@ GColor panel_accent_for_theme(uint8_t theme)
         case 2:  // Neon
             return GColorCyan;
         case 3:  // Stealth
-            return GColorElectricBlue;       
+            return GColorElectricBlue;
         case 4:  // Phosphor
             return GColorRajah;
         case 5:  // Crimson
@@ -51,7 +51,7 @@ GColor primary_color_for_theme(uint8_t theme)
         case 2:  // Neon
             return GColorMagenta;
         case 3:  // Stealth
-            return GColorLightGray;        
+            return GColorLightGray;
         case 4:  // Phosphor
             return GColorChromeYellow;
         case 5:  // Crimson

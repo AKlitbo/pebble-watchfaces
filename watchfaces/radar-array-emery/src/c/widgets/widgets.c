@@ -27,8 +27,6 @@ typedef struct
 {
     GRect area;
     const char *text;
-    GColor color;
-    GTextAlignment align;
 } Label;
 
 /**
@@ -45,16 +43,16 @@ static void labels_update_proc(Layer *layer, GContext *ctx)
     GColor accent = panel_accent_for_theme(settings_u8(SETTING_THEME));
 
     const Label labels[] = {
-        {LBL_TEMP,  "TEMP",  accent, GTextAlignmentCenter},
-        {LBL_PULSE, "PULSE", accent, GTextAlignmentCenter},
-        {LBL_RANGE, "RANGE", accent, GTextAlignmentCenter},
+        {LBL_TEMP,  "TEMP"},
+        {LBL_PULSE, "PULSE"},
+        {LBL_RANGE, "RANGE"},
     };
 
+    graphics_context_set_text_color(ctx, accent);
     for (unsigned i = 0; i < ARRAY_LENGTH(labels); i++)
     {
-        graphics_context_set_text_color(ctx, labels[i].color);
         graphics_draw_text(ctx, labels[i].text, font, labels[i].area,
-            GTextOverflowModeFill, labels[i].align, NULL);
+            GTextOverflowModeFill, GTextAlignmentCenter, NULL);
     }
 }
 

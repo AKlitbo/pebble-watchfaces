@@ -24,9 +24,14 @@ static int64_t ms_into_bmt_day(void)
     time_ms(&now, &ms);  // seconds + the ms within that second
 
     struct tm *utc = gmtime(&now);
-    long secs = utc->tm_hour * 3600 + utc->tm_min * 60 + utc->tm_sec;
+    if (!utc)
+    {
+        // unconvertible time_t: degrade to ms into a notional midnight rather than deref null
+        return (int64_t)ms;
+    }
+    long secs = utc->tm_hour * SECS_PER_HOUR + utc->tm_min * SECS_PER_MIN + utc->tm_sec;
 
-    return (((int64_t)((secs + 3600) % 86400)) * 1000LL) + ms;
+    return (((int64_t)((secs + BMT_UTC_OFFSET_S) % SECS_PER_DAY)) * MS_PER_SEC) + ms;
 }
 
 int units_swatch_beats(void)

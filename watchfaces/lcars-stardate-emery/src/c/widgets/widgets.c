@@ -84,6 +84,10 @@ static void lcars_battery_gauge(GContext *ctx, GRect area, int level, GColor acc
 
     const int segments = 5, gap = 2;
     int seg_w = (inner.size.w - (segments - 1) * gap) / segments;
+    if (seg_w < 1)
+    {
+        seg_w = 1;
+    }
 
     int lit = (level * segments + 50) / 100;
     if (lit == 0 && level > 0)

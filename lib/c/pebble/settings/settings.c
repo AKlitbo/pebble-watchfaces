@@ -65,6 +65,29 @@ static void build_index(void)
 }
 
 /**
+ * @brief Copy a cstring into a fixed buffer, NUL-terminating within size.
+ *
+ * A NULL src yields an empty string. Shared by the defaults, the sanitize
+ * repair, and the inbound copy so the bounded-copy idiom lives in one place.
+ *
+ * @param dst The destination buffer.
+ * @param src The source string, or NULL for empty.
+ * @param size The size of the destination buffer.
+ */
+static void set_cstring(char *dst, const char *src, uint16_t size)
+{
+    if (src)
+    {
+        strncpy(dst, src, size - 1);
+        dst[size - 1] = '\0';
+    }
+    else
+    {
+        dst[0] = '\0';
+    }
+}
+
+/**
  * @brief Seed every field with its fresh-install default.
  */
 static void apply_defaults(void)
@@ -85,15 +108,7 @@ static void apply_defaults(void)
                 break;
 
             case SETTING_CSTRING:
-                if (field->default_str)
-                {
-                    strncpy((char *)ptr, field->default_str, field->size - 1);
-                    ((char *)ptr)[field->size - 1] = '\0';
-                }
-                else
-                {
-                    ((char *)ptr)[0] = '\0';
-                }
+                set_cstring((char *)ptr, field->default_str, field->size);
                 break;
         }
     }
@@ -132,16 +147,7 @@ static bool sanitize_cstring(const SettingField *field)
         return false;
     }
 
-    if (field->default_str)
-    {
-        strncpy(str, field->default_str, field->size - 1);
-        str[field->size - 1] = '\0';
-    }
-    else
-    {
-        str[0] = '\0';
-    }
-
+    set_cstring(str, field->default_str, field->size);
     return true;
 }
 
@@ -332,8 +338,7 @@ SettingsInbound settings_apply_inbox(DictionaryIterator *iter)
                 const char *value = tuple->value->cstring;
                 if (value[0] != '\0')
                 {
-                    strncpy((char *)ptr, value, field->size - 1);
-                    ((char *)ptr)[field->size - 1] = '\0';
+                    set_cstring((char *)ptr, value, field->size);
                 }
                 break;
             }
