@@ -32,10 +32,6 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
 // 86.4s beats. NULL when not in .beats mode, where MINUTE_UNIT drives instead
 static AppTimer *s_beats_timer;
 
-// wall-clock time of the last weather poll, so the beats ticker can keep the 30-min
-// refresh going while MINUTE_UNIT is unsubscribed
-static time_t s_last_weather;
-
 /**
  * @brief Redraw the time slot and re-arm for the next beat boundary.
  *
@@ -51,11 +47,7 @@ static void beats_timer_handler(void *data)
     // real tm: shell_update_time still draws the date line
     shell_update_time(localtime(&now));
 
-    if (now - s_last_weather >= 30 * 60)
-    {
-        appmessage_request_weather();
-        s_last_weather = now;
-    }
+    appmessage_request_weather_if_due(now);
 
     s_beats_timer = app_timer_register(units_ms_until_next_beat(), beats_timer_handler, NULL);
 }
@@ -72,11 +64,9 @@ static void update_refresh_mode(void)
     {
         if (!s_beats_timer)
         {
-            // hand the cadence to the beats timer
+            // hand the cadence to the beats timer; the weather poll clock lives in the
+            // appmessage module, so it carries over the swap unchanged
             tick_timer_service_unsubscribe();
-
-            // defer the first poll a full interval
-            s_last_weather = time(NULL);
             s_beats_timer = app_timer_register(units_ms_until_next_beat(), beats_timer_handler, NULL);
         }
     }
@@ -122,10 +112,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
     shell_update_time(tick_time);
 
-    if (tick_time->tm_min % 30 == 0)
-    {
-        appmessage_request_weather();
-    }
+    appmessage_request_weather_if_due(time(NULL));
 }
 
 /**

@@ -14,13 +14,27 @@ static AppMessageHandlers s_handlers;
 #define WEATHER_RETRY_MAX 3
 // Delay to ride out transient drop
 #define WEATHER_RETRY_DELAY_MS 5000
+// How often weather is re-polled
+#define WEATHER_POLL_INTERVAL_S (30 * 60)
+
+// wall-clock time of the last weather request, so the poll cadence is one elapsed
+// clock the face can drive from any ticker
+static time_t s_last_weather_request;
 
 // Timer for weather retry
 static AppTimer *s_weather_retry_timer;
 // Number of retries left
 static int s_weather_retries_left;
-// True when outbox enqueued weather request (ignores settings replies)
-static bool s_weather_send_pending;
+
+// the outbox carries one message at a time, so the most recent send's kind tells
+// its delivery/failure callback whether it owns the weather retry
+typedef enum
+{
+    OUTBOX_NONE,
+    OUTBOX_WEATHER,
+    OUTBOX_SETTINGS
+} OutboxKind;
+static OutboxKind s_outbox_kind;
 
 /**
  * @brief Resend after a delay, and re-arm again if the outbox is still busy.
@@ -48,7 +62,7 @@ static bool send_weather_request(void)
         return false;
     }
 
-    s_weather_send_pending = true;
+    s_outbox_kind = OUTBOX_WEATHER;
     return true;
 }
 
@@ -86,11 +100,20 @@ static void weather_retry(void *data)
 
 void appmessage_request_weather(void)
 {
+    s_last_weather_request = time(NULL);
     s_weather_retries_left = WEATHER_RETRY_MAX;
 
     if (!send_weather_request())
     {
         schedule_weather_retry();
+    }
+}
+
+void appmessage_request_weather_if_due(time_t now)
+{
+    if (now - s_last_weather_request >= WEATHER_POLL_INTERVAL_S)
+    {
+        appmessage_request_weather();
     }
 }
 
@@ -110,9 +133,9 @@ static void send_settings(void)
 
     settings_serialize(iter);
 
-    // this send is settings, not weather, so don't let its outbox_sent cancel a
-    // weather retry that may be waiting on the timer
-    s_weather_send_pending = false;
+    // tag the send as settings so its delivery callback won't cancel a weather
+    // retry waiting on the timer (only a weather delivery owns that)
+    s_outbox_kind = OUTBOX_SETTINGS;
     app_message_outbox_send();
 }
 
@@ -146,7 +169,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         bool wx_ok = (!wx_ok_tuple) ||
             ((wx_ok_tuple->type == TUPLE_INT || wx_ok_tuple->type == TUPLE_UINT) && wx_ok_tuple->value->int32 == 1);
 
-        static char temperature_buffer[8];
+        static char temperature_buffer[12];  // sign + up to 3 digits + degree + unit (multibyte) + NUL
         static char conditions_buffer[32];
 
         snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", conditions_tuple->value->cstring);
@@ -154,6 +177,15 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         if (wx_ok)
         {
             int temp_value = (int)temp_tuple->value->int32;
+            // clamp to a sane range so an extreme/corrupt value can't truncate mid-multibyte
+            if (temp_value < -99)
+            {
+                temp_value = -99;
+            }
+            if (temp_value > 199)
+            {
+                temp_value = 199;
+            }
             snprintf(temperature_buffer, sizeof(temperature_buffer),
                 settings_u8(SETTING_TEMPERATURE_UNIT) ? "%d°F" : "%d°C", temp_value);
 
@@ -227,7 +259,12 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context)
 static void outbox_failed_callback(DictionaryIterator *iter, AppMessageResult reason, void *context)
 {
     APP_LOG(APP_LOG_LEVEL_WARNING, "Outbox failed: %d", (int)reason);
-    schedule_weather_retry();
+
+    // a failed settings reply must not arm a weather retry; only retry weather sends
+    if (s_outbox_kind == OUTBOX_WEATHER)
+    {
+        schedule_weather_retry();
+    }
 }
 
 /**
@@ -241,12 +278,13 @@ static void outbox_failed_callback(DictionaryIterator *iter, AppMessageResult re
  */
 static void outbox_sent_callback(DictionaryIterator *iter, void *context)
 {
-    if (!s_weather_send_pending)
+    // a settings reply sharing the outbox proves nothing about the weather channel
+    if (s_outbox_kind != OUTBOX_WEATHER)
     {
         return;
     }
 
-    s_weather_send_pending = false;
+    s_outbox_kind = OUTBOX_NONE;
     s_weather_retries_left = 0;
 
     if (s_weather_retry_timer)

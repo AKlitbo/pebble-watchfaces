@@ -6,7 +6,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:icons": "node tools/generate-icons.js"
+    "gen:icons": "node tools/generate-icons.js",
+    "gen:conditions": "node tools/generate-conditions.js"
   },
   "devDependencies": {
     "@rebble/clay": "^1.0.10",
