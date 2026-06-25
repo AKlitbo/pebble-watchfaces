@@ -9,8 +9,12 @@ This repository contains multiple watchface variants and the shared library that
 * **`watchfaces/`**: Individual watchface projects.
   * `lcars-stardate-emery`: A standard LCARS themed watchface for the Pebble Time 2 (**Emery**).
   * `radar-array-emery`: A radar-array themed watchface for the Pebble Time 2 (**Emery**).
-* **`lib/`**: Common C and JavaScript code used across all watchfaces, including weather providers, unit conversion, health data, and shell components.
-* **`tools/`**: Development utilities for rasterizing icons from SVG sources. 
+* **`lib/`**: The shared engine powering all watchfaces.
+  * **`c/` & `js/`**: Common device/host code (weather providers, unit conversion, health data, UI components).
+  * **`css/`**: Shared CSS stylesheets used across web-based configuration pages and preview frames.
+  * **`py/`**: Centralized Python helpers that abstract away the Pebble SDK build boilerplate for all watchfaces.
+  * **`resources/`**: Common image assets and icons shared between faces (e.g., weather condition glyphs, connection symbols).
+* **`tools/`**: Shared Node.js development utilities for rendering watchface preview frames, rasterizing SVG icons, and generating C resource tables.
 * **`vendor/`**: Third-party assets and templates.
 
 ## Screenshots
