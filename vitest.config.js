@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 // dotenv/config reads .env for those vars and the timeout covers the round-trips
 export default defineConfig({
   test: {
-    include: ['lib/**/*.spec.js'],
+    include: ['lib/**/*.spec.js', 'tools/**/*.spec.js'],
     exclude: ['**/node_modules/**'],
     setupFiles: ['dotenv/config'],
     testTimeout: 15000,

@@ -99,7 +99,7 @@ async function render(svgText, [width, height], outputFile) {
     .toFile(outputFile);
 }
 
-(async () => {
+async function main() {
   await fs.promises.mkdir(OUT, { recursive: true });
 
   let count = 0;
@@ -125,7 +125,13 @@ async function render(svgText, [width, height], outputFile) {
     `Rendered ${count} Icons -> \n` +
     `    ${path.relative(path.resolve(__dirname, '..'), OUT)}`
   );
-})().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+}
+
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+module.exports = { whiten };
