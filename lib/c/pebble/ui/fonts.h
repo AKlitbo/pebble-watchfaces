@@ -18,6 +18,7 @@
 typedef enum
 {
     FONT_TIME,    // Clock readout
+    FONT_TIME_SM, // Clock readout fallback for the wide .beats token
     FONT_DATE,    // Date banner
     FONT_DATE_SM, // Date banner fallback for wide formats
     FONT_DATE_XS, // Date banner fallback for the widest formats

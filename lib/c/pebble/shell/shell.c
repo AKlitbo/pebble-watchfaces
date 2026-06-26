@@ -146,15 +146,19 @@ void shell_update_time(struct tm *tick_time)
     else
     {
         // 24 -> 12 -> System
-        const char *fmt = (time_format == TIME_FORMAT_24H) ? "%H:%M"
-            : (time_format == TIME_FORMAT_12H)
-                ? "%I:%M"
-                : (clock_is_24h_style() ? "%H:%M" : "%I:%M");
+        bool h24 = (time_format == TIME_FORMAT_24H)
+            || (time_format == TIME_FORMAT_SYSTEM && clock_is_24h_style());
+        const char *fmt = h24 ? "%H:%M" : "%I:%M";
 
         strftime(s_time_buffer, sizeof(s_time_buffer), fmt, tick_time);
     }
 
-    set_zone_text(ZONE_TIME, s_time_buffer);
+    // route through the fit path so the clock's font + rect get re-applied on each
+    // render (the .beats token and HH:MM can land on different font tiers)
+    if (s_layers[ZONE_TIME])
+    {
+        zone_set_text_fit(s_layers[ZONE_TIME], &s_zones[ZONE_TIME], s_time_buffer);
+    }
 
     // AM/PM only makes sense on a 12-hour clock (explicit 12-hour, or System when
     // the watch isn't in 24h mode). Cleared otherwise so it never shows on 24h/.beats

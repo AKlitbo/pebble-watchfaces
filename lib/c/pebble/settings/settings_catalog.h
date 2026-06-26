@@ -87,4 +87,13 @@
     { .id = SETTING_BLUETOOTH_VIBE_DISCONNECT, .message_key = &MESSAGE_KEY_BLUETOOTH_VIBE_DISCONNECT, \
       .type = SETTING_ENUM_U8, .offset = (off), .enum_count = (count) }
 
+/**
+ * @brief Setting definition for Battery Display (icon + percent / icon / percent).
+ * @param off Offset into the face's settings struct.
+ * @param count The number of enum values.
+ */
+#define KNOWN_BATTERY_DISPLAY(off, count) \
+    { .id = SETTING_BATTERY_DISPLAY, .message_key = &MESSAGE_KEY_BATTERY_DISPLAY, \
+      .type = SETTING_ENUM_U8, .offset = (off), .enum_count = (count) }
+
 /** @} */

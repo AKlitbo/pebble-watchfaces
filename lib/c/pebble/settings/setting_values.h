@@ -48,4 +48,15 @@ typedef enum
     VIBE_COUNT
 } VibeChoice;
 
+/**
+ * @brief SETTING_BATTERY_DISPLAY choices: what the battery readout shows.
+ */
+typedef enum
+{
+    BATTERY_DISPLAY_BOTH    = 0,  // icon + percent
+    BATTERY_DISPLAY_ICON    = 1,  // icon only
+    BATTERY_DISPLAY_PERCENT = 2,  // percent only
+    BATTERY_DISPLAY_COUNT
+} BatteryDisplay;
+
 /** @} */
