@@ -1,0 +1,14 @@
+@charset "utf-8";
+/*
+  Lower-decks-padd-mono LCARS frame palette. Redefines the vendor CSS base vars with
+  Pebble-64 GColors from lib/css/pebble-colors.css.
+*/
+:root {
+  --alpha-blue:  var(--GColorLightGray);
+  --arctic-snow: var(--GColorWhite);
+  --night-rain:  var(--GColorDarkGray);
+  --arctic-ice:  var(--GColorWhite);
+  --radioactive: var(--GColorWhite);
+  --beta-blue:   var(--GColorDarkGray);
+  --light-color: var(--GColorWhite);
+}

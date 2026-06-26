@@ -42,7 +42,7 @@
 
 // --- LCARS Bar Labels ---
 // left-aligned in black holder boxes on colored bars
-#define LCARS_LABEL_COLOR GColorChromeYellow
+
 #define LBL_STARDATE GRect(60, 2, 54, 10)
 #define LBL_WEATHER GRect(60, 166, 54, 10)
 #define LBL_HR GRect(133, 166, 54, 10)

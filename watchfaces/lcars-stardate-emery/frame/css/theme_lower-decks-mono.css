@@ -1,0 +1,13 @@
+@charset "utf-8";
+/*
+  Lower-decks-mono LCARS frame palette. Redefines the vendor CSS base vars with
+  Pebble-64 GColors from lib/css/pebble-colors.css.
+*/
+:root {
+  --butter:         var(--GColorWhite);
+  --daybreak:       var(--GColorLightGray);
+  --harvestgold:    var(--GColorWhite);
+  --honey:          var(--GColorLightGray);
+  --october-sunset: var(--GColorDarkGray);
+  --orange:         var(--GColorDarkGray);
+}

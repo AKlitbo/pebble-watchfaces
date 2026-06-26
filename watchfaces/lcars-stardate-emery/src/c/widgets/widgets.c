@@ -64,8 +64,9 @@ static void lcars_label(GContext *ctx, GRect area, const char *text, GFont font,
  * @param area The bounding box of the battery icon.
  * @param level Battery charge level percentage.
  * @param accent_color The outline and nub color.
+ * @param fill_color The lit-segment color (already level- and theme-resolved).
  */
-static void lcars_battery_gauge(GContext *ctx, GRect area, int level, GColor accent_color)
+static void lcars_battery_gauge(GContext *ctx, GRect area, int level, GColor accent_color, GColor fill_color)
 {
     if (level < 0)
     {
@@ -99,15 +100,13 @@ static void lcars_battery_gauge(GContext *ctx, GRect area, int level, GColor acc
         lit = 1;
     }
 
-    GColor on = (level <= 20) ? GColorRed : (level <= 40) ? GColorChromeYellow : accent_color;
-
     for (int i = 0; i < segments; i++)
     {
         GRect cell = GRect(inner.origin.x + i * (seg_w + gap), inner.origin.y, seg_w, inner.size.h);
 
         // lit cells are filled solid, empty cells are hollow - a black interior with
         // an accent outline, so the cell stays visible without reading as charged
-        graphics_context_set_fill_color(ctx, i < lit ? on : GColorBlack);
+        graphics_context_set_fill_color(ctx, i < lit ? fill_color : GColorBlack);
         graphics_fill_rect(ctx, cell, 1, GCornersAll);
 
         if (i >= lit)
@@ -142,9 +141,11 @@ static void labels_update_proc(Layer *layer, GContext *ctx)
         {LBL_STEPS, "TRAVERSAL"},
     };
 
+    GColor lbl_color = label_color_for_theme(settings_u8(SETTING_THEME));
+
     for (unsigned i = 0; i < ARRAY_LENGTH(labels); i++)
     {
-        lcars_label(ctx, labels[i].area, labels[i].text, s_font_label, LCARS_LABEL_COLOR, 3);
+        lcars_label(ctx, labels[i].area, labels[i].text, s_font_label, lbl_color, 3);
     }
 }
 
@@ -156,8 +157,10 @@ static void labels_update_proc(Layer *layer, GContext *ctx)
  */
 static void battery_update_proc(Layer *layer, GContext *ctx)
 {
-    GColor accent = panel_accent_for_theme(settings_u8(SETTING_THEME));
-    lcars_battery_gauge(ctx, GRect(6, 4, 32, 12), s_batt_level, accent);
+    uint8_t theme = settings_u8(SETTING_THEME);
+    GColor accent = panel_accent_for_theme(theme);
+    GColor fill = battery_fill_for_theme(theme, s_batt_level);
+    lcars_battery_gauge(ctx, GRect(6, 4, 32, 12), s_batt_level, accent, fill);
 }
 
 /**

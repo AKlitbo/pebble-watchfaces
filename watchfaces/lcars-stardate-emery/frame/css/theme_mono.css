@@ -1,0 +1,15 @@
+@charset "utf-8";
+/*
+  Mono LCARS frame palette. Redefines the vendor CSS base vars with
+  Pebble-64 GColors from lib/css/pebble-colors.css.
+*/
+:root {
+  --african-violet: var(--GColorWhite);
+  --bluey:          var(--GColorLightGray);
+  --moonlit-violet: var(--GColorDarkGray);
+  --orange:         var(--GColorDarkGray);
+  --golden-orange:  var(--GColorLightGray);
+  --red:            var(--GColorWhite);
+  --butterscotch:   var(--GColorDarkGray);
+  --banner-color:   var(--bluey);
+}

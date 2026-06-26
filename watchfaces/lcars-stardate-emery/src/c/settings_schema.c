@@ -52,7 +52,7 @@ static LcarsSettings s_settings;
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(LcarsSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(LcarsSettings, date_format), "%Y.%m%d"),
-    KNOWN_THEME(offsetof(LcarsSettings, theme), 4),
+    KNOWN_THEME(offsetof(LcarsSettings, theme), 7),
     KNOWN_STEPS_MODE(offsetof(LcarsSettings, steps_mode), STEPS_MODE_COUNT),
     KNOWN_TIME_FORMAT(offsetof(LcarsSettings, time_format), TIME_FORMAT_COUNT),
     KNOWN_BLUETOOTH_ICON(offsetof(LcarsSettings, bluetooth_icon)),

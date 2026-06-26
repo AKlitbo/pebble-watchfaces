@@ -1,7 +1,7 @@
 {
   "name": "lcars-stardate-emery",
   "author": "Null Syntax",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "keywords": [
     "pebble-app"
   ],
@@ -54,6 +54,9 @@
         { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS", "file": "images/background-lower-decks.png" },
         { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD","file": "images/background-lower-decks-padd.png" },
         { "type": "bitmap", "name": "IMAGE_BG_NEMESIS_BLUE", "file": "images/background-nemesis-blue.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_MONO", "file": "images/background-lower-decks-mono.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD_MONO", "file": "images/background-lower-decks-padd-mono.png" },
         { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "../../../lib/resources/icons/bluetooth-md.png" },
         { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "../../../lib/resources/icons/bluetooth-slash-md.png" },
         { "type": "bitmap", "name": "ICON_HEART", "file": "../../../lib/resources/icons/heart.png" },
