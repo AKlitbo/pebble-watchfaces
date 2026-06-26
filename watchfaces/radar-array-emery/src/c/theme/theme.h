@@ -11,7 +11,7 @@
 
 /**
  * @brief Maps the Theme setting (0=Default, 1=Rescue, 2=Neon, 3=Stealth,
- * 4=Phosphor, 5=Crimson) to its baked frame background resource.
+ * 4=Phosphor, 5=Crimson, 6=Mono) to its baked frame background resource.
  *
  * @param theme The theme setting value.
  * @return The background resource ID.
@@ -34,5 +34,17 @@ GColor panel_accent_for_theme(uint8_t theme);
  * @return The primary color.
  */
 GColor primary_color_for_theme(uint8_t theme);
+
+/**
+ * @brief The lit-segment color for the battery gauge at a given charge level.
+ *
+ * Color themes warn with red (critical) and amber (low); the Mono theme stays
+ * grayscale, leaving the lit-segment count to signal charge.
+ *
+ * @param theme The theme setting value.
+ * @param level Battery charge level percentage.
+ * @return The fill color for lit segments.
+ */
+GColor battery_fill_for_theme(uint8_t theme, int level);
 
 /** @} */

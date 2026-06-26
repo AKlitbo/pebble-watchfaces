@@ -1,0 +1,22 @@
+@charset "utf-8";
+/*
+  Mono radar palette, built from the Pebble-64 GColors in
+  lib/css/pebble-colors.css. Translucent overlays use color-mix against
+  transparent, so each glow keeps its exact GColor at reduced opacity.
+*/
+:root {
+    --bg:            var(--GColorBlack);
+    --primary:       var(--GColorWhite);
+    --secondary:     var(--GColorLightGray);
+    --secondary-dim: var(--GColorDarkGray);
+    --tertiary:      var(--GColorLightGray);
+    --grid-primary:      color-mix(in srgb, var(--GColorWhite) 6%, transparent);
+    --crosshair-primary: color-mix(in srgb, var(--GColorWhite) 55%, transparent);
+    --ring-primary:      color-mix(in srgb, var(--GColorWhite) 70%, transparent);
+    --grid-secondary:    color-mix(in srgb, var(--GColorLightGray) 22%, transparent);
+    --bezel:             color-mix(in srgb, var(--GColorLightGray) 45%, transparent);
+    --time-glow:         color-mix(in srgb, var(--GColorWhite) 70%, transparent);
+    --data-glow:         color-mix(in srgb, var(--GColorWhite) 60%, transparent);
+    --banner-glow:       color-mix(in srgb, var(--GColorLightGray) 50%, transparent);
+    --scanline:          color-mix(in srgb, var(--GColorBlack) 22%, transparent);
+}

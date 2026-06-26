@@ -10,7 +10,8 @@ module.exports = buildConfig({
       { "label": "Neon", "value": 2 },
       { "label": "Stealth", "value": 3 },
       { "label": "Phosphor", "value": 4 },
-      { "label": "Crimson", "value": 5 }
+      { "label": "Crimson", "value": 5 },
+      { "label": "Mono", "value": 6 }
     ]
   },
   location: { gpsDefault: true },

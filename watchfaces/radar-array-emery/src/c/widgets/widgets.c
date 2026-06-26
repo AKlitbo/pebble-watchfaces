@@ -80,7 +80,8 @@ static void battery_update_proc(Layer *layer, GContext *ctx)
     }
 
     GRect body = BATT_RECT;
-    GColor accent = panel_accent_for_theme(settings_u8(SETTING_THEME));
+    uint8_t theme = settings_u8(SETTING_THEME);
+    GColor accent = panel_accent_for_theme(theme);
 
     int nub_h = body.size.h / 2;
     GRect nub = GRect(body.origin.x + body.size.w, body.origin.y + (body.size.h - nub_h) / 2, 2, nub_h);
@@ -106,7 +107,7 @@ static void battery_update_proc(Layer *layer, GContext *ctx)
         lit = 1;  // never read empty while there's still charge
     }
 
-    GColor on = (level <= 20) ? GColorRed : (level <= 40) ? GColorChromeYellow : primary_color_for_theme(settings_u8(SETTING_THEME));
+    GColor on = battery_fill_for_theme(theme, level);
     graphics_context_set_fill_color(ctx, on);
 
     for (int i = 0; i < lit; i++)

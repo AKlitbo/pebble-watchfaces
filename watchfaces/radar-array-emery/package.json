@@ -1,7 +1,7 @@
 {
   "name": "radar-array-emery",
   "author": "Null Syntax",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "keywords": [
     "pebble-app"
   ],
@@ -56,6 +56,7 @@
         { "type": "bitmap", "name": "IMAGE_BG_STEALTH", "file": "images/background-stealth.png" },
         { "type": "bitmap", "name": "IMAGE_BG_PHOSPHOR", "file": "images/background-phosphor.png" },
         { "type": "bitmap", "name": "IMAGE_BG_CRIMSON", "file": "images/background-crimson.png" },
+        { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
         { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "../../../lib/resources/icons/bluetooth-md.png" },
         { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "../../../lib/resources/icons/bluetooth-slash-md.png" },
         {

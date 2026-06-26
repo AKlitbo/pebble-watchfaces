@@ -42,7 +42,7 @@ static RadarSettings s_settings;
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(RadarSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(RadarSettings, date_format), "%a %d %b"),
-    KNOWN_THEME(offsetof(RadarSettings, theme), 6),
+    KNOWN_THEME(offsetof(RadarSettings, theme), 7),
     KNOWN_STEPS_MODE(offsetof(RadarSettings, steps_mode), STEPS_MODE_COUNT),
     KNOWN_TIME_FORMAT(offsetof(RadarSettings, time_format), TIME_FORMAT_COUNT),
     KNOWN_BLUETOOTH_ICON(offsetof(RadarSettings, bluetooth_icon)),
