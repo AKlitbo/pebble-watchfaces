@@ -1,6 +1,6 @@
 {
-  "name": "lcars-stardate-watchfaces",
-  "version": "1.0.3",
+  "name": "pebble-watchfaces",
+  "version": "1.1.0",
   "private": true,
   "author": "Null Syntax",
   "scripts": {

@@ -7,7 +7,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { buildIconsTable } from './generate-conditions.js';
+import { buildIconsTable, buildLabelsTable, buildDevConditionsTable } from './generate-conditions.js';
 import vocabulary from '../lib/js/weather/conditions.js';
 
 describe('buildIconsTable', () => {
@@ -76,6 +76,134 @@ describe('buildIconsTable', () => {
     for (const { token, resource } of vocabulary.conditions) {
       expect(source).toContain(`!strcmp(condition, "${token}")`);
       expect(source).toContain(`return RESOURCE_ID_ICON_${resource};`);
+    }
+  });
+
+  /** The wire carries "<token>_NIGHT" after dark; without the generated night
+   *  branch the watch would fall through to WI_NA and lose the moon glyph. */
+  test('emits a _NIGHT branch mapping to the night resource for night-capable rows', () => {
+    const source = buildIconsTable({
+      fallback: { resource: 'WI_NA' },
+      conditions: [{ token: 'RAIN', resource: 'WI_RAIN', nightResource: 'WI_NIGHT_RAIN' }]
+    });
+
+    expect(source).toContain(
+      '    if (!strcmp(condition, "RAIN_NIGHT"))\n    {\n        return RESOURCE_ID_ICON_WI_NIGHT_RAIN;\n    }'
+    );
+  });
+
+  /** A row with no nightResource must not emit a phantom _NIGHT branch. */
+  test('omits the _NIGHT branch when a row has no night resource', () => {
+    const source = buildIconsTable({
+      fallback: { resource: 'WI_NA' },
+      conditions: [{ token: 'DUST', resource: 'WI_DUST' }]
+    });
+
+    expect(source).not.toContain('DUST_NIGHT');
+  });
+
+  /** The fallback is now an object; the generator must read fallback.resource, not the object itself. */
+  test('accepts an object fallback and uses its resource', () => {
+    const source = buildIconsTable({
+      fallback: { resource: 'WI_NA', labelShort: 'UNKNOWN', labelLong: 'Unknown' },
+      conditions: [{ token: 'RAIN', resource: 'WI_RAIN' }]
+    });
+
+    expect(source.trimEnd().endsWith('    return RESOURCE_ID_ICON_WI_NA;\n}')).toBe(true);
+  });
+});
+
+describe('buildLabelsTable', () => {
+  /** A roomy face shows labelLong; a wrong/dropped mapping renders "Unknown" instead of "Partly Cloudy". */
+  test('maps each token to its short and long label', () => {
+    const source = buildLabelsTable({
+      fallback: { resource: 'WI_NA', labelShort: 'UNKNOWN', labelLong: 'Unknown' },
+      conditions: [{ token: 'PCLDY', resource: 'WI_PARTLY_CLOUDY', labelShort: 'PCLDY', labelLong: 'Partly Cloudy' }]
+    });
+
+    expect(source).toContain('    if (!strcmp(condition, "PCLDY"))\n    {\n        return "PCLDY";\n    }');
+    expect(source).toContain('    if (!strcmp(condition, "PCLDY"))\n    {\n        return "Partly Cloudy";\n    }');
+  });
+
+  /** The C side never strips the night marker, so a night token must resolve to the
+   *  same label as its day token instead of falling through to the fallback. */
+  test('maps a night token to the same labels as its day token', () => {
+    const source = buildLabelsTable({
+      fallback: { resource: 'WI_NA', labelShort: 'UNKNOWN', labelLong: 'Unknown' },
+      conditions: [{ token: 'RAIN', resource: 'WI_RAIN', nightResource: 'WI_NIGHT_RAIN', labelShort: 'RAIN', labelLong: 'Rain' }]
+    });
+
+    expect(source).toContain('!strcmp(condition, "RAIN_NIGHT")');
+    expect(source.match(/return "Rain";/g)).toHaveLength(2); // day + night branch
+  });
+
+  /** Both lookup functions must fall back to the configured labels for an unknown/null token. */
+  test('ends each function with the configured fallback label', () => {
+    const source = buildLabelsTable({
+      fallback: { resource: 'WI_NA', labelShort: 'UNKNOWN', labelLong: 'Unknown' },
+      conditions: [{ token: 'RAIN', resource: 'WI_RAIN', labelShort: 'RAIN', labelLong: 'Rain' }]
+    });
+
+    expect(source).toContain('const char *wx_label_short_for_table');
+    expect(source).toContain('const char *wx_label_long_for_table');
+    expect(source).toContain('return "UNKNOWN";');
+    expect(source).toContain('return "Unknown";');
+  });
+
+  /** Every shipped condition must reach both label tables - a dropped one renders the fallback. */
+  test('covers every condition in the real vocabulary', () => {
+    const source = buildLabelsTable(vocabulary);
+
+    for (const { token, labelShort, labelLong } of vocabulary.conditions) {
+      expect(source).toContain(`!strcmp(condition, "${token}")`);
+      expect(source).toContain(`return "${labelShort}";`);
+      expect(source).toContain(`return "${labelLong}";`);
+    }
+  });
+});
+
+describe('buildDevConditionsTable', () => {
+  /** The icon walk taps this array in order, so a night form must sit right after its day
+   *  form or the two never appear side by side for comparison. */
+  test('emits each night token adjacent to its day token', () => {
+    const source = buildDevConditionsTable({
+      conditions: [{ token: 'RAIN', resource: 'WI_RAIN', nightResource: 'WI_NIGHT_RAIN' }]
+    });
+
+    expect(source).toContain('"RAIN", "RAIN_NIGHT",');
+  });
+
+  /** A day-only condition has no night form, so it must emit a single token rather than a
+   *  bogus "<token>_NIGHT" the icon table would resolve to the fallback. */
+  test('emits a lone token for a day-only condition', () => {
+    const source = buildDevConditionsTable({
+      conditions: [{ token: 'CLEAR', resource: 'WI_CLEAR' }]
+    });
+
+    expect(source).toContain('    "CLEAR",\n');
+    expect(source).not.toContain('CLEAR_NIGHT');
+  });
+
+  /** The walk must end on an unrecognised token so the NA fallback icon gets exercised too. */
+  test('ends with a bogus token for the NA fallback', () => {
+    const source = buildDevConditionsTable({
+      conditions: [{ token: 'CLEAR', resource: 'WI_CLEAR' }]
+    });
+
+    expect(source).toContain('"ZZZ"');
+    expect(source).toContain('static const char *const wx_dev_condition_tokens[]');
+  });
+
+  /** The icon walk's coverage is only complete if every shipped token (day and night) is in
+   *  the list, so a vocabulary addition can never silently skip an icon. */
+  test('covers every token in the real vocabulary', () => {
+    const source = buildDevConditionsTable(vocabulary);
+
+    for (const { token, nightResource } of vocabulary.conditions) {
+      expect(source).toContain(`"${token}"`);
+      if (nightResource) {
+        expect(source).toContain(`"${token}_NIGHT"`);
+      }
     }
   });
 });

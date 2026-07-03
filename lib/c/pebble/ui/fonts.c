@@ -1,10 +1,10 @@
 /**
  * @file fonts.c
- * @brief font registry implementation: a flat id-indexed table of loaded handles
+ * @brief Font registry implementation: a flat id-indexed table of loaded handles
  */
-#include "fonts.h"
+#include "ui/fonts.h"
 
-static GFont s_fonts[FONT_COUNT]; // Loaded font handles
+static GFont s_fonts[FONT_COUNT]; // loaded font handles
 
 void fonts_register(FontId id, GFont handle)
 {
@@ -24,8 +24,8 @@ GFont fonts_get(FontId id)
         return s_fonts[id];
     }
 
-    // a mis-wired zone resolves the same id every tick, so log the miss once per
-    // id rather than spamming the log; out-of-range is a build-time bug, log it plainly
+    // a mis-wired zone resolves the same id every tick so log the miss once per
+    // id rather than spamming the log. out-of-range is a build-time bug so log it plainly
     if (id < FONT_COUNT)
     {
         static bool s_warned[FONT_COUNT];
@@ -37,7 +37,7 @@ GFont fonts_get(FontId id)
     }
     else
     {
-        // out-of-range can't index s_warned[FONT_COUNT], so dedup with its own flag
+        // out-of-range can't index s_warned[FONT_COUNT] so dedup with its own flag
         static bool s_oor_warned;
         if (!s_oor_warned)
         {

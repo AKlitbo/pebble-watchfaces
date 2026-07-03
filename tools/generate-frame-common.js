@@ -56,8 +56,8 @@ function faceScreenSize(faceDir) {
   return PLATFORM_DIMS.emery;
 }
 
-// walk up from the face dir to the repo root - the nearest ancestor holding both
-// watchfaces/ and tools/. derived, not hard-coded, so the tool survives a move
+// walk up from the face dir to the repo root. the nearest ancestor holding both
+// watchfaces/ and tools/. worked out at run time not hard-coded so the tool survives a move
 function findRepoRoot(startDir) {
   let dir = startDir;
 
@@ -77,7 +77,7 @@ function findRepoRoot(startDir) {
   return startDir;  // fallback - keep going rather than crash
 }
 
-// every theme_<name>.css under frame/css, by name
+// every theme_<name>.css under frame/css by name
 function discoverThemes(cssDir) {
   return fs.readdirSync(cssDir)
     .map((file) => file.match(/^theme_(.+)\.css$/))
@@ -101,8 +101,8 @@ async function applyTheme(page, cssDir, themeName) {
 }
 
 // strip the live readouts so the bake is pure graphics chrome (the app draws the
-// labels/time/values and fills any gauges at runtime). selectors come as arrays;
-// querySelectorAll wants one comma-joined string, and an empty list is a no-op
+// labels/time/values and fills any gauges at runtime). selectors come as arrays
+// querySelectorAll wants one comma-joined string and an empty list is a no-op
 async function clearLiveLayers(page, clearTextSelectors, hideSelectors) {
   const clearSel = clearTextSelectors.join(', ');
   const hideSel = hideSelectors.join(', ');
@@ -146,7 +146,7 @@ function run(config) {
       continue;
     }
 
-    // --theme <name> swaps the palette stylesheet, and --theme all bakes every theme
+    // --theme <name> swaps the palette stylesheet and --theme all bakes every theme
     if (argv[i] === '--theme') {
       theme = argv[++i];
       continue;
@@ -169,7 +169,7 @@ function run(config) {
     process.exit(1);
   }
 
-  // the set to render: a named theme, every theme, or null (the HTML's linked theme)
+  // the set to render is a named theme or every theme or null (the HTML's linked theme)
   let themes;
   if (theme === 'all') {
     themes = discoverThemes(cssDir);
@@ -184,7 +184,7 @@ function run(config) {
   }
 
   // base drops a trailing -standard. a face can map one base to the bare
-  // background.png (bareBackgroundBase); everything else lands at background-<base>.png
+  // background.png (bareBackgroundBase). everything else lands at background-<base>.png
   const base = frame.replace(/-standard$/, '');
 
   function outFor(themeName) {
@@ -213,7 +213,7 @@ function run(config) {
 
     await clearLiveLayers(page, config.clearTextSelectors, config.hideSelectors);
 
-    // networkidle doesnt guarantee custom webfonts are painted, so await the font api
+    // networkidle doesnt guarantee custom webfonts are painted so await the font api
     await page.evaluate(() => document.fonts && document.fonts.ready);
     await page.waitForTimeout(200);
 

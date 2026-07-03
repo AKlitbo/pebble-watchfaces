@@ -1,6 +1,6 @@
 /**
  * @file fonts.h
- * @brief font registry: a face loads its custom fonts once under a category id, the rest
+ * @brief Font registry: a face loads its custom fonts once under a category id, the rest
  * of the ui looks them up by id so layout tables can stay static (an id, not a
  * runtime GFont handle). single-platform binaries register their own handles, so
  * there is no per-platform font-set resolution here
@@ -17,14 +17,17 @@
  */
 typedef enum
 {
-    FONT_TIME,    // Clock readout
-    FONT_TIME_SM, // Clock readout fallback for the wide .beats token
-    FONT_DATE,    // Date banner
-    FONT_DATE_SM, // Date banner fallback for wide formats
-    FONT_DATE_XS, // Date banner fallback for the widest formats
-    FONT_SM,      // Weather temp
-    FONT_VALUE,   // Heartrate / steps values
-    FONT_COORD,   // Lat / lon
+    FONT_TIME_BIG, // 1x4 clock readout
+    FONT_TIME,    // clock readout
+    FONT_TIME_SM, // clock readout fallback for the wide .beats token
+    FONT_DATE,    // date banner
+    FONT_DATE_SM, // date banner fallback for wide formats
+    FONT_DATE_XS, // date banner fallback for the widest formats
+    FONT_SM,      // weather temp
+    FONT_SM_NARROW, // fallback for long strings in 1x2
+    FONT_SM_MED,    // one step below FONT_SM (modular-emery: Teko 24). 1x2 time shrink
+    FONT_VALUE,   // heartrate / steps values
+    FONT_COORD,   // lat / lon
     FONT_XS,      // AM/PM superscript
     FONT_COUNT
 } FontId;
@@ -38,7 +41,7 @@ typedef enum
 void fonts_register(FontId id, GFont handle);
 
 /**
- * @brief Resolve a category id to its handle; falls back to the system font on a miss.
+ * @brief Resolve a category id to its handle. Falls back to the system font on a miss.
  *
  * @param id The category id.
  * @return The font handle.

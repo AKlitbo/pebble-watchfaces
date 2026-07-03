@@ -6,8 +6,8 @@ import glob
 
 def _repo_root(ctx):
     """
-    The repo root - the nearest ancestor of the face dir holding both watchfaces/
-    and lib/. Derived by walking up rather than assuming a fixed depth, so the
+    The repo root: the nearest ancestor of the face dir holding both watchfaces/
+    and lib/. Found by walking up rather than assuming a fixed depth, so the
     layout can move without breaking every wscript.
     """
     node = ctx.path
@@ -43,7 +43,7 @@ def generate_frames(ctx):
     falls back to the last-baked images.
 
     Themes are discovered dynamically. A single-frame face bakes every
-    frame/css/theme_*.css via "--theme all" (the generator enumerates them); a
+    frame/css/theme_*.css via "--theme all" (the generator enumerates them). A
     multi-frame face bakes each frame/*.html, which links its own palette.
     """
     from waflib import Logs
@@ -58,7 +58,7 @@ def generate_frames(ctx):
     if not htmls or not _frames_stale(face, frame_dir):
         return
 
-    # one frame -> bake every theme palette; many frames -> bake each in turn
+    # one frame -> bake every theme palette. many frames -> bake each in turn
     commands = []
     if len(htmls) > 1:
         for html in htmls:
@@ -97,58 +97,71 @@ def build_face(ctx, exclude_c=None):
     C/JS plus the shared lib/, compile the app (and optional worker) per target
     platform, bundle with PebbleKit JS, and archive the .pbw afterward.
 
-    exclude_c is an ant-glob exclude list for the shared lib/c sweep - a face with
+    exclude_c is an ant-glob exclude list for the shared lib/c sweep. A face with
     no weather glyph passes '**/weather/icons.c' to drop the icon resources it
     doesn't bundle.
     """
     repo = _repo_root(ctx)
 
-    # lib/ = code shared by ALL faces. lib/c/ is pure (SDK-free, host-testable);
-    # lib/c/pebble/ needs the SDK; lib/js/ is PebbleKit JS
+    # lib/ = code shared by ALL faces. lib/c/core/ is pure (SDK-free and host-testable).
+    # lib/c/pebble/ needs the SDK. lib/js/ is PebbleKit JS
     lib_dir = repo.find_dir('lib')
     if not lib_dir:
         ctx.fatal('Could not find the "lib" directory at the repo root.')
 
     lib_c = lib_dir.find_dir('c')
+    lib_c_core = lib_c.find_dir('core')
     lib_c_pebble = lib_c.find_dir('pebble')
     lib_js = lib_dir.find_dir('js')
-    # this face's own sources (zone table, widgets, main, any skin code)
+    # this face's own sources (zone table and widgets and main and any skin code)
     local_c = ctx.path.find_dir('src/c')
 
+    # only the two roots + the face-local dir are on the include path. every shared
+    # header is included with its folder relative to a root (e.g. "ui/engine/engine.h" or
+    # "clock/beats.h") so moving a folder never touches this list
     include_paths = [
-        lib_c.abspath(),
-        lib_c.find_dir('clock').abspath(),
-        lib_c.find_dir('units').abspath(),
-        lib_c.find_dir('text').abspath(),
+        lib_c_core.abspath(),
         lib_c_pebble.abspath(),
-        lib_c_pebble.find_dir('appmessage').abspath(),
-        lib_c_pebble.find_dir('settings').abspath(),
-        lib_c_pebble.find_dir('weather').abspath(),
-        lib_c_pebble.find_dir('units').abspath(),
-        lib_c_pebble.find_dir('health').abspath(),
-        lib_c_pebble.find_dir('shell').abspath(),
-        lib_c_pebble.find_dir('ui').abspath(),
         local_c.abspath()
     ]
 
-    # one glob recurses into both lib/c/ (pure) and lib/c/pebble/ (SDK)
+    # one glob recurses the whole shared tree: lib/c/core/ (pure) + lib/c/pebble/ (SDK)
     c_sources = (ctx.path.ant_glob('src/c/**/*.c')
                  + lib_c.ant_glob('**/*.c', excl=exclude_c or []))
 
     js_sources = ctx.path.ant_glob(['src/pkjs/**/*.js', 'src/pkjs/**/*.json'])
     if lib_js:
-        # exclude *.spec.js - test files, never imported by index.js, not shipped
+        # exclude *.spec.js. test files never imported by index.js and not shipped
         js_sources += lib_js.ant_glob('**/*.js', excl=['**/*.spec.js'])
 
     build_worker = os.path.exists('worker_src')
     binaries = []
     cached_env = ctx.env
 
+    cflags = []
+    pkg_node = ctx.path.find_node('package.json')
+    if pkg_node:
+        try:
+            with open(pkg_node.abspath(), 'r') as pkg_f:
+                pkg_data = json.load(pkg_f)
+                mkeys = pkg_data.get('pebble', {}).get('messageKeys', [])
+                if isinstance(mkeys, list):
+                    for mk in mkeys:
+                        if isinstance(mk, str):
+                            cflags.append('-DHAS_MESSAGE_KEY_' + mk + '=1')
+                elif isinstance(mkeys, dict):
+                    for mk in mkeys.keys():
+                        cflags.append('-DHAS_MESSAGE_KEY_' + mk + '=1')
+        except Exception:
+            pass
+
     for platform in ctx.env.TARGET_PLATFORMS:
         ctx.env = ctx.all_envs[platform]
         ctx.set_group(ctx.env.PLATFORM_NAME)
 
         ctx.env.append_value('INCLUDES', include_paths)
+        if cflags:
+            ctx.env.append_value('CFLAGS', cflags)
 
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
 
@@ -201,7 +214,7 @@ def copy_current_pbw(ctx):
 
     pkg_path = os.path.join(ctx.path.abspath(), 'package.json')
     if os.path.exists(pkg_path):
-        # a malformed package.json should fail with a clear message, not a traceback
+        # a malformed package.json should fail with a clear message not a traceback
         version = 'unknown'
         try:
             with open(pkg_path, 'r') as pkg_f:

@@ -1,17 +1,17 @@
 /**
  * @file zone.h
- * @brief layout primitives: defines paintable areas and text alignments
+ * @brief Layout primitives: defines paintable areas and text alignments
  *
  * @ingroup lib
  */
-// a Zone is everything needed to present one text slot: where it sits, which
-// registered font + alignment + colour to use, and up to two smaller font/rect
-// tiers to step down to when the text would overflow. A face declares a static
-// const table of these; the shell loops it to build the text layers
+// a Zone is everything needed to present one text slot: where it sits and which
+// registered font + alignment + colour to use plus up to two smaller font/rect
+// tiers to step down to when the text would overflow. a face declares a static
+// const table of these and the engine loops it to build the text layers
 #pragma once
 #include <pebble.h>
 
-#include "fonts.h"
+#include "ui/fonts.h"
 
 /** @addtogroup lib @{ */
 

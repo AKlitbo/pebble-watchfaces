@@ -1,8 +1,8 @@
 /**
  * @file zone.c
- * @brief layout primitives implementation
+ * @brief Layout primitives implementation
  */
-#include "zone.h"
+#include "ui/zone.h"
 
 TextLayer *zone_make_layer(Layer *parent, const Zone *zone)
 {
@@ -25,10 +25,10 @@ static int text_width(const char *text, GFont font, GTextAlignment align)
 
 void zone_set_text_fit(TextLayer *layer, const Zone *zone, const char *text)
 {
-    // step down through the font tiers, largest first, and use the largest one
+    // step down through the font tiers largest first and use the largest one
     // whose text fits. a face omits a tier by leaving its rect zero-sized (C
-    // zero-fills structs); tier 0 always exists. if nothing fits, the smallest
-    // defined tier wins and the text layer trails an ellipsis as a last resort.
+    // zero-fills structs). tier 0 always exists. if nothing fits the smallest
+    // defined tier wins and the text layer trails an ellipsis as a last resort
     const FontId fonts[3] = {zone->font_id, zone->font_id_fallback, zone->font_id_fallback2};
     const GRect rects[3] = {zone->rect, zone->rect_fallback, zone->rect_fallback2};
 
