@@ -197,16 +197,17 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         }
         else
         {
-            // no live reading (e.g. no location set or network error) so clear the placeholder
+            // no live reading (e.g. no location set or network error). the NULL cond tells the
+            // store to keep its last good reading rather than blank out
             APP_LOG(APP_LOG_LEVEL_INFO, "Weather Unavailable: %s", conditions_buffer);
             if (s_handlers.on_weather)
             {
-                s_handlers.on_weather("--", NULL);
+                s_handlers.on_weather(NULL, NULL);
             }
         }
     }
 
-    // extra weather readings only for faces that declare the keys (e.g. Modular).
+    // extra weather readings only for faces that declare the keys (e.g. Gridlock).
     // the keys are absent from other faces' message_keys so guard the whole block
     // on the generated #defines to keep the shared transport compiling everywhere
 #if defined(HAS_MESSAGE_KEY_HUMIDITY) && defined(HAS_MESSAGE_KEY_WIND_SPEED) && \
