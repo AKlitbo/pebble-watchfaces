@@ -1,58 +1,41 @@
 /**
  * @file widgets.h
- * @brief Overlay widgets: the layers the shell mounts over the baked VS Code frame.
- *
- * This face's painted overlays are the battery percentage (next to the baked
- * battery glyph in the editor stats row), the weather condition glyph (top-left of
- * the terminal stats, swapped per condition and tinted to the theme), and the
- * bluetooth connection glyph (bottom-left of the status bar). Create them after the
- * background layer and before the text layers to preserve z-order.
+ * @brief Overlay painters for the VS Code face, exposed as stateless draws the engine's
+ * overlays draw-slot calls: the battery percentage/icon, the weather condition glyph
+ * (swapped per condition and tinted to the theme), and the bluetooth glyph. The glyphs
+ * come from the shared icon cache and the engine owns the layer.
  *
  * @ingroup watchface-vscode
  */
 #pragma once
 #include <pebble.h>
 
-#include "shell/shell.h"
-
 /** @addtogroup watchface-vscode @{ */
 
 /**
- * @brief Create the overlay layers.
+ * @brief Draw the battery icon and/or percentage, per the Battery Display setting.
  *
- * @param parent The parent layer.
- */
-void widgets_create(Layer *parent);
-
-/**
- * @brief Destroy the overlay layers and icon bitmaps.
- */
-void widgets_destroy(void);
-
-/**
- * @brief Set the battery level (0..100) and redraw the percentage.
- *
+ * @param ctx The graphics context.
  * @param level Battery charge level percentage.
  */
-void widgets_set_battery(int level);
+void widgets_draw_battery(GContext *ctx, int level);
 
 /**
- * @brief Swap/hide the bluetooth connection glyph.
+ * @brief Draw the bluetooth glyph for the link state (connected vs slashed).
  *
- * @param status The new bluetooth connection status.
+ * @param ctx The graphics context.
+ * @param connected True when the phone link is up.
  */
-void widgets_set_bluetooth(BluetoothStatus status);
+void widgets_draw_bt(GContext *ctx, bool connected);
 
 /**
- * @brief Swap the weather condition glyph (top-left terminal stat) for a condition.
+ * @brief Draw the weather condition glyph, tinted to the theme's stats colour.
  *
- * @param condition The condition abbreviation string.
+ * The glyph comes from the shared icon cache, so each condition's picture loads once.
+ *
+ * @param ctx The graphics context.
+ * @param condition The weather condition token.
  */
-void widgets_set_weather_icon(const char *condition);
-
-/**
- * @brief Force an overlay repaint (e.g. after a theme change recolors the readout).
- */
-void widgets_mark_labels_dirty(void);
+void widgets_draw_weather(GContext *ctx, const char *condition);
 
 /** @} */

@@ -5,7 +5,7 @@
  * The colors approximate VS Code's syntax palette within the Pebble-64 gamut:
  * keyword-blue for the clock, string-orange/red for the date, mint for the temp +
  * battery, and a light-blue for the steps. Light-theme colors are kept dark so they
- * read on the white editor field; Terminal is a single phosphor green.
+ * read on the white editor field. Terminal is a single phosphor green.
  */
 #include "theme.h"
 

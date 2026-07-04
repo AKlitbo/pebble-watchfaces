@@ -9,8 +9,8 @@
  * @ingroup watchface-vscode
  */
 #include "settings_schema.h"
-#include "settings/settings_catalog.h"
-#include "settings/setting_values.h"
+#include "system/settings/settings_catalog.h"
+#include "system/settings/setting_values.h"
 
 #include <stddef.h>
 
@@ -39,7 +39,7 @@ typedef struct VscodeSettings
 static VscodeSettings s_settings;
 
 // the date defaults to a compact single line ("JUN 18") to fit the terminal panel.
-// 6 themes: Dark+, Light, Terminal, Cyberpunk, Synthwave, Mono.
+// 6 themes: Dark+ / Light / Terminal / Cyberpunk / Synthwave / Mono.
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(VscodeSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(VscodeSettings, date_format), "%b %d"),
@@ -55,13 +55,13 @@ static const SettingField s_fields[] = {
 static const SettingsSchema s_schema = {
     .key = VSCODE_SETTINGS_KEY,
     .version = VSCODE_SETTINGS_VERSION,
-    // unshipped fields all landed in v1, so the current struct is the v1 size
+    // unshipped fields all landed in v1 so the current struct is the v1 size
     .min_versioned_size = sizeof(VscodeSettings),
     .blob = &s_settings,
     .blob_size = sizeof(VscodeSettings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
-    .migrate = NULL,  // no legacy blobs - this face never existed without these fields
+    .migrate = NULL,  // no legacy blobs. this face never existed without these fields
 };
 
 const SettingsSchema *vscode_settings_schema(void)
