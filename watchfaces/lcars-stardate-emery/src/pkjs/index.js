@@ -3,7 +3,7 @@
  *
  * Thin wrapper over the shared bootstrap (see lib/js/pkjs/app.js). This face
  * formats coordinates in LCARS dash style into separate latitude/longitude
- * keys; everything else is shared.
+ * keys. Everything else is shared.
  */
 
 const { startPebbleApp } = require('../../../../lib/js/pkjs/app');
@@ -30,7 +30,7 @@ function fmtCoord(v) {
 
 startPebbleApp({
   clayConfig,
-  // dash style into two keys; fmtCoord yields '' for a missing coordinate
+  // dash style into two keys. fmtCoord yields '' for a missing coordinate
   formatCoords: (messageKeys, result) => ({
     [messageKeys.LATITUDE]: fmtCoord(result.lat),
     [messageKeys.LONGITUDE]: fmtCoord(result.lon)

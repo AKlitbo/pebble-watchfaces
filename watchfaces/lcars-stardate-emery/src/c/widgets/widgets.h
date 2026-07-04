@@ -1,57 +1,47 @@
 /**
  * @file widgets.h
- * @brief Overlay widgets API: layers the shell mounts over the baked LCARS frame.
+ * @brief Overlay painters for the LCARS face, exposed as stateless draws the engine's
+ * overlays draw-slot calls. This module owns the label font while the glyphs come from
+ * the shared icon cache. The engine owns the layer.
  *
  * @ingroup watchface-lcars
  */
 #pragma once
 #include <pebble.h>
 
-#include "shell/shell.h"
-
 /** @addtogroup watchface-lcars @{ */
 
-/**
- * @brief Painted overlays drawn on top of the baked LCARS frame.
- *
- * Includes the battery gauge, the amber bar labels, and the weather / heart /
- * feet / bluetooth glyphs. This module owns the overlay layers plus their label
- * font and icon bitmaps - create it after the background layer and before the
- * text layers to preserve z-order.
- *
- * @param parent The parent layer.
- */
-void widgets_create(Layer *parent);
+/** @brief Load the label font. */
+void widgets_load(void);
+
+/** @brief Free the label font. */
+void widgets_unload(void);
 
 /**
- * @brief Destroy the overlay layers, font, and icon bitmaps.
+ * @brief Draw the four LCARS bar labels (STARDATE / SENSORS / VITALS / TRAVERSAL).
+ *
+ * @param ctx The graphics context.
  */
-void widgets_destroy(void);
+void widgets_draw_labels(GContext *ctx);
 
 /**
- * @brief Set the battery level (0..100) and redraw the gauge.
+ * @brief Draw the battery gauge on the top-left block.
  *
+ * @param ctx The graphics context.
  * @param level Battery charge level percentage.
  */
-void widgets_set_battery(int level);
+void widgets_draw_battery(GContext *ctx, int level);
 
 /**
- * @brief Swaps the weather glyph.
+ * @brief Draw the weather / thermometer / heart / feet glyphs, plus the bluetooth glyph.
  *
- * @param condition The weather condition abbreviation.
- */
-void widgets_set_weather_icon(const char *condition);
-
-/**
- * @brief Swap/hide the connection glyph.
+ * The glyphs come from the shared icon cache, so each one loads a single time.
  *
- * @param status The new bluetooth connection status.
+ * @param ctx The graphics context.
+ * @param condition The weather condition token (drives the weather glyph).
+ * @param bt_show True to draw the bluetooth glyph (the show/hide setting).
+ * @param bt_connected True when the phone link is up (connected vs slashed glyph).
  */
-void widgets_set_bluetooth(BluetoothStatus status);
-
-/**
- * @brief Force a label repaint.
- */
-void widgets_mark_labels_dirty(void);
+void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, bool bt_connected);
 
 /** @} */

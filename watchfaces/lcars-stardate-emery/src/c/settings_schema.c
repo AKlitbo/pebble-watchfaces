@@ -2,21 +2,21 @@
  * @file settings_schema.c
  * @brief lcars-stardate-emery settings schema: this face's persisted-settings identity.
  *
- * key 5 and the 21-byte v1 floor are frozen - changing either makes watches in the
+ * key 5 and the 21-byte v1 floor are frozen. Changing either makes watches in the
  * field lose their settings.
  *
  * @ingroup watchface-lcars
  */
 #include "settings_schema.h"
-#include "settings/settings_catalog.h"
-#include "settings/setting_values.h"
+#include "system/settings/settings_catalog.h"
+#include "system/settings/setting_values.h"
 
 #include <stddef.h>
 #include <string.h>
 
 #define LCARS_SETTINGS_KEY 5
 #define LCARS_SETTINGS_VERSION 2
-// smallest versioned blob accepted; fields are append-only so this never changes
+// smallest versioned blob accepted. fields are append-only so this never changes
 #define LCARS_SETTINGS_V1_SIZE 21
 
 /** @addtogroup watchface-lcars @{ */
@@ -26,7 +26,7 @@
  *
  * The byte layout is frozen: it shipped as a flat blob (version byte, then
  * each field in this order), so members may be renamed but never reordered,
- * retyped, or inserted - only appended. The static asserts below guard it.
+ * retyped, or inserted. Only appended. The static asserts below guard it.
  */
 typedef struct LcarsSettings
 {
@@ -47,7 +47,7 @@ _Static_assert(offsetof(LcarsSettings, bluetooth_icon) == LCARS_SETTINGS_V1_SIZE
 
 static LcarsSettings s_settings;
 
-// lcars subscribes to every known setting, in its frozen struct order. "%Y.%m%d" is
+// lcars subscribes to every known setting in its frozen struct order. "%Y.%m%d" is
 // its numeric stardate-style date default.
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(LcarsSettings, temperature_unit)),

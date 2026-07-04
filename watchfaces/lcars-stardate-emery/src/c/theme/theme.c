@@ -63,8 +63,8 @@ GColor battery_fill_for_theme(uint8_t theme, int level)
 {
     GColor healthy = panel_accent_for_theme(theme);
 
-    // mono themes keep the gauge grayscale - the lit-segment count already shows the
-    // charge, so the red/amber low-battery warnings would only break the monochrome look
+    // mono themes keep the gauge grayscale. the lit-segment count already shows the
+    // charge so the red/amber low-battery warnings would only break the monochrome look
     switch (theme)
     {
         case 4:  // Classic Mono

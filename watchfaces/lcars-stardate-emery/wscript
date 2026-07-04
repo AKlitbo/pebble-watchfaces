@@ -3,7 +3,7 @@
 #
 # Thin per-face wrapper: regenerate generated assets, then hand the shared build
 # (sources, per-platform compile, bundle, .pbw archive) to lib/py/waf_helpers.py.
-# This face ships the weather glyph, so it keeps the shared lib/c/weather/icons.c.
+# This face ships the weather glyph, so it keeps the shared lib/c/pebble/ui/weather/icons.c.
 # ==============================================================================
 import os.path
 import sys
