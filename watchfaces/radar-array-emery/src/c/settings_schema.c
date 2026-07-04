@@ -9,8 +9,8 @@
  * @ingroup watchface-radar
  */
 #include "settings_schema.h"
-#include "settings/settings_catalog.h"
-#include "settings/setting_values.h"
+#include "system/settings/settings_catalog.h"
+#include "system/settings/setting_values.h"
 
 #include <stddef.h>
 
@@ -53,14 +53,14 @@ static const SettingField s_fields[] = {
 static const SettingsSchema s_schema = {
     .key = RADAR_SETTINGS_KEY,
     .version = RADAR_SETTINGS_VERSION,
-    // radar is unshipped, so its v1 is the current struct. once radar ships, freeze
+    // radar is unshipped so its v1 is the current struct. once radar ships freeze
     // this to a literal byte count and bump the version on any further field append
     .min_versioned_size = sizeof(RadarSettings),
     .blob = &s_settings,
     .blob_size = sizeof(RadarSettings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
-    .migrate = NULL,  // no legacy blobs - this face never existed without these fields
+    .migrate = NULL,  // no legacy blobs. this face never existed without these fields
 };
 
 const SettingsSchema *radar_settings_schema(void)

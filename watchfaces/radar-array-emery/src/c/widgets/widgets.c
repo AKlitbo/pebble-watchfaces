@@ -1,24 +1,17 @@
 /**
  * @file widgets.c
- * @brief Painted overlays: the static frame labels and the battery gauge, drawn over
- * the baked frame.
+ * @brief Painted overlays: the static frame labels, the battery gauge, and the bluetooth
+ * glyph, drawn over the baked frame by the engine's overlays draw-slot.
  *
  * @ingroup watchface-radar
  */
 #include "widgets.h"
 
 #include "layout.h"
-#include "fonts.h"
+#include "ui/fonts.h"
+#include "ui/icon_cache.h"
 #include "theme/theme.h"
-#include "settings/settings.h"
-
-static Layer *s_labels_layer;   // TEMP / PULSE / RANGE
-static Layer *s_battery_layer;  // battery gauge in the top-left
-static Layer *s_bt_layer;       // bluetooth status glyph in the date-bar cell
-static int s_batt_level;
-
-static GBitmap *s_bt_on_bmp, *s_bt_off_bmp;
-static BluetoothStatus s_bt_status = BT_HIDDEN;
+#include "system/settings/settings.h"
 
 /** @addtogroup watchface-radar @{ */
 
@@ -31,15 +24,7 @@ typedef struct
     const char *text;
 } Label;
 
-/**
- * @brief Paint the static labels.
- *
- * TEMP / PULSE / RANGE captions in the panel accent, matching the frame chrome.
- *
- * @param layer The layer being updated.
- * @param ctx The graphics context.
- */
-static void labels_update_proc(Layer *layer, GContext *ctx)
+void widgets_draw_labels(GContext *ctx)
 {
     GFont font = fonts_get(FONT_XS);
     GColor accent = panel_accent_for_theme(settings_u8(SETTING_THEME));
@@ -58,17 +43,8 @@ static void labels_update_proc(Layer *layer, GContext *ctx)
     }
 }
 
-/**
- * @brief Battery outlined in the theme accent, with five level-coloured segments.
- *
- * (Theme primary healthy, amber low, red critical) and a little terminal nub.
- *
- * @param layer The layer being updated.
- * @param ctx The graphics context.
- */
-static void battery_update_proc(Layer *layer, GContext *ctx)
+void widgets_draw_battery(GContext *ctx, int level)
 {
-    int level = s_batt_level;
     if (level < 0)
     {
         level = 0;
@@ -91,7 +67,7 @@ static void battery_update_proc(Layer *layer, GContext *ctx)
     graphics_context_set_stroke_color(ctx, accent);
     graphics_draw_rect(ctx, body);
 
-    // five segments, lit from the left by charge level
+    // five segments lit from the left by charge level
     const int segments = 5;
     const int gap = 1;
     GRect inner = GRect(body.origin.x + 2, body.origin.y + 1, body.size.w - 4, body.size.h - 2);
@@ -118,21 +94,9 @@ static void battery_update_proc(Layer *layer, GContext *ctx)
     }
 }
 
-/**
- * @brief Blit the bluetooth glyph for the current status.
- *
- * Nothing when hidden/connected has no bitmap. Honors PNG transparency so
- * the white glyph sits on the cell.
- *
- * @param layer The layer being updated.
- * @param ctx The graphics context.
- */
-static void bt_update_proc(Layer *layer, GContext *ctx)
+void widgets_draw_bt(GContext *ctx, bool connected)
 {
-    GBitmap *bmp = (s_bt_status == BT_CONNECTED) ? s_bt_on_bmp
-                 : (s_bt_status == BT_DISCONNECTED) ? s_bt_off_bmp
-                 : NULL;
-
+    GBitmap *bmp = icon_get(connected ? RESOURCE_ID_ICON_BLUETOOTH : RESOURCE_ID_ICON_BLUETOOTH_SLASH);
     if (!bmp)
     {
         return;
@@ -140,83 +104,6 @@ static void bt_update_proc(Layer *layer, GContext *ctx)
 
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
     graphics_draw_bitmap_in_rect(ctx, bmp, BT_ICON);
-}
-
-void widgets_create(Layer *parent)
-{
-    GRect bounds = layer_get_bounds(parent);
-
-    s_bt_on_bmp = gbitmap_create_with_resource(RESOURCE_ID_ICON_BLUETOOTH);
-    s_bt_off_bmp = gbitmap_create_with_resource(RESOURCE_ID_ICON_BLUETOOTH_SLASH);
-
-    s_battery_layer = layer_create(bounds);
-    layer_set_update_proc(s_battery_layer, battery_update_proc);
-    layer_add_child(parent, s_battery_layer);
-
-    s_labels_layer = layer_create(bounds);
-    layer_set_update_proc(s_labels_layer, labels_update_proc);
-    layer_add_child(parent, s_labels_layer);
-
-    s_bt_layer = layer_create(bounds);
-    layer_set_update_proc(s_bt_layer, bt_update_proc);
-    layer_add_child(parent, s_bt_layer);
-}
-
-void widgets_destroy(void)
-{
-    layer_destroy(s_labels_layer);
-    layer_destroy(s_battery_layer);
-    layer_destroy(s_bt_layer);
-    s_labels_layer = NULL;
-    s_battery_layer = NULL;
-    s_bt_layer = NULL;
-
-    if (s_bt_on_bmp)
-    {
-        gbitmap_destroy(s_bt_on_bmp);
-        s_bt_on_bmp = NULL;
-    }
-
-    if (s_bt_off_bmp)
-    {
-        gbitmap_destroy(s_bt_off_bmp);
-        s_bt_off_bmp = NULL;
-    }
-}
-
-void widgets_set_battery(int level)
-{
-    s_batt_level = level;
-    if (s_battery_layer)
-    {
-        layer_mark_dirty(s_battery_layer);
-    }
-}
-
-void widgets_set_weather_icon(const char *condition)
-{
-}
-
-void widgets_set_bluetooth(BluetoothStatus status)
-{
-    s_bt_status = status;
-    if (s_bt_layer)
-    {
-        layer_mark_dirty(s_bt_layer);
-    }
-}
-
-void widgets_mark_labels_dirty(void)
-{
-    if (s_labels_layer)
-    {
-        layer_mark_dirty(s_labels_layer);
-    }
-
-    if (s_battery_layer)
-    {
-        layer_mark_dirty(s_battery_layer);
-    }
 }
 
 /** @} */

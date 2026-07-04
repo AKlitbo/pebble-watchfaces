@@ -8,7 +8,7 @@
  * @ingroup watchface-radar
  */
 #pragma once
-#include "settings/settings.h"
+#include "system/settings/settings.h"
 
 /** @addtogroup watchface-radar @{ */
 

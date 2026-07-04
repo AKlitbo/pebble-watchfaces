@@ -69,8 +69,8 @@ GColor primary_color_for_theme(uint8_t theme)
 
 GColor battery_fill_for_theme(uint8_t theme, int level)
 {
-    // the Mono theme keeps the gauge grayscale - the lit-segment count already shows
-    // the charge, so the red/amber low-battery warnings would only break the look
+    // the Mono theme keeps the gauge grayscale. the lit-segment count already shows
+    // the charge so the red/amber low-battery warnings would only break the look
     if (theme == 6)  // Mono
     {
         return primary_color_for_theme(theme);

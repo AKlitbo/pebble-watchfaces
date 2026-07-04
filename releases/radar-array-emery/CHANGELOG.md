@@ -5,6 +5,17 @@ All notable changes to the Radar Array Emery watchface are documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-03
+
+### Added
+
+- Weather now keeps its last reading when a refresh fails or the watchface reloads, rather than blanking to dashes. A weather provider outage, a dropped phone connection, or reloading after you open the timeline no longer wipes the display, and it refreshes on its own once new data comes through.
+- The GPS coordinate readout is remembered the same way, so it stays on screen across a reload instead of resetting to dashes.
+
+### Changed
+
+- Updated watchface backgrounds and settings layout to improve readability.
+
 ## [1.1.0] - 2026-06-25
 
 ### Added

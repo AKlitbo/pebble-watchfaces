@@ -1,21 +1,25 @@
 /**
  * @file layout.c
- * @brief radar-array-emery face: the zone table plus the WatchfaceDescriptor hooks that wire
- * the shell to this face's Share Tech Mono fonts, baked radar-array frame, and the
- * painted labels + battery gauge.
+ * @brief radar-array-emery face: the zone table bound to shared readouts, the baked frame,
+ * and the overlays draw-slot (labels + battery + bluetooth). No shell. The face drives the
+ * engine directly from main.
  */
 #include "layout.h"
 
-#include "fonts.h"
-#include "zone.h"
+#include "ui/fonts.h"
+#include "ui/zone.h"
+#include "ui/readouts.h"
+#include "ui/icon_cache.h"
 #include "theme/theme.h"
 #include "widgets/widgets.h"
+#include "io/stores/system_store.h"
+#include "system/settings/settings.h"
+#include "system/settings/setting_values.h"
 
 // --- Zone table ---
-// every live slot: geometry from the SLOT_* map, font by registry id, alignment,
+// every live slot: geometry from the SLOT_* map plus font by registry id plus alignment
 // and colour. colours are seeded with the Default palette and re-set per theme by
-// apply_theme_colors: readouts take the primary phosphor, the date/meridiem the
-// chrome accent
+// apply_theme_colors: readouts take the primary phosphor and the date/meridiem the chrome accent
 static Zone s_zones[ZONE_COUNT] = {
     [ZONE_TIME]     = {.rect = SLOT_TIME,     .font_id = FONT_TIME,  .align = GTextAlignmentCenter, .color = GColorGreen},
     [ZONE_MERIDIEM] = {.rect = SLOT_MERIDIEM, .font_id = FONT_XS,    .align = GTextAlignmentCenter, .color = GColorChromeYellow},
@@ -25,22 +29,12 @@ static Zone s_zones[ZONE_COUNT] = {
     [ZONE_HR]       = {.rect = SLOT_HR,       .font_id = FONT_VALUE, .align = GTextAlignmentCenter, .color = GColorGreen},
     [ZONE_STEPS]    = {.rect = SLOT_STEPS,    .font_id = FONT_VALUE, .align = GTextAlignmentCenter, .color = GColorGreen},
     [ZONE_LAT]      = {.rect = SLOT_COORD,    .font_id = FONT_COORD, .align = GTextAlignmentCenter, .color = COORD_TEXT_COLOR},
-    // ZONE_COND and ZONE_LON are omitted (left zeroed): no condition glyph, and the
-    // coordinate readout is a single combined lat/lon string in ZONE_LAT
+    // ZONE_COND and ZONE_LON are omitted: no condition glyph and the coordinate readout is
+    // a single combined lat/lon string the phone sends in ZONE_LAT
 };
 
 /**
- * @brief Returns the face's zone table.
- *
- * @return A pointer to the face's static zone table.
- */
-static const Zone *face_zones(void)
-{
-    return s_zones;
-}
-
-/**
- * @brief Set the zone text colors to the current theme's primary phosphor.
+ * @brief Set the zone text colours to the current theme's phosphor and accent.
  *
  * @param theme The theme setting value.
  */
@@ -70,15 +64,12 @@ static void load_fonts(void)
 }
 
 // --- Baked radar-array frame ---
-// Bitmap layer for the frame
 static BitmapLayer *s_frame_layer;
-// Bitmap for the frame
 static GBitmap *s_frame_bitmap;
-// 0xFF = nothing loaded yet (forces first load)
-static uint8_t s_loaded_theme = 0xFF;
+static uint8_t s_loaded_theme = 0xFF;  // 0xFF = nothing loaded yet (forces first load)
 
 /**
- * @brief Load the baked frame for a theme.
+ * @brief (Re)load the baked frame for a theme.
  *
  * @param theme The theme setting value.
  */
@@ -106,40 +97,69 @@ static void load_frame(uint8_t theme)
 }
 
 /**
- * @brief The frame bitmap sits at the bottom, the painted overlays just above it.
+ * @brief Overlays draw-slot: the static labels, the battery gauge, and the bluetooth glyph.
  *
- * @param parent The parent layer to add the scene to.
- * @param theme The theme setting value.
+ * @param ctx The graphics context.
+ * @param bounds The slot bounds (the full window).
+ * @param data Unused.
  */
-static void create_scene(Layer *parent, uint8_t theme)
+static void draw_overlays(GContext *ctx, GRect bounds, const void *data)
 {
-    apply_theme_colors(theme);
+    widgets_draw_labels(ctx);
+    widgets_draw_battery(ctx, system_store_battery());
 
-    s_frame_layer = bitmap_layer_create(layer_get_bounds(parent));
-    layer_add_child(parent, bitmap_layer_get_layer(s_frame_layer));
-    load_frame(theme);
-
-    widgets_create(parent);
+    // honour the show/hide setting. the store owns the connect/disconnect vibe
+    if (settings_u8(SETTING_BLUETOOTH_ICON))
+    {
+        widgets_draw_bt(ctx, system_store_bluetooth());
+    }
 }
 
-/**
- * @brief Swap the frame background and refresh the dynamic zone colors.
- *
- * @param theme The new theme setting value.
- */
-static void update_theme(uint8_t theme)
+void radar_setup(Window *window)
 {
+    uint8_t theme = settings_u8(SETTING_THEME);
+    apply_theme_colors(theme);
+    load_fonts();
+
+    Layer *root = window_get_root_layer(window);
+    window_set_background_color(window, GColorBlack);
+
+    // the frame bitmap sits at the bottom under the engine's slot layers
+    s_frame_layer = bitmap_layer_create(layer_get_bounds(root));
+    layer_add_child(root, bitmap_layer_get_layer(s_frame_layer));
+    load_frame(theme);
+}
+
+uint8_t radar_build(EngineSlot *out, uint8_t max, GRect bounds)
+{
+    uint8_t i = 0;
+
+    // overlays first so they sit under the text readouts
+    out[i++] = (EngineSlot){.frame = bounds, .draw = draw_overlays};
+
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_TIME],     .text = readout_time};
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_MERIDIEM], .text = readout_meridiem};
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_DATE],     .text = readout_date};
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_WEATHER],  .text = readout_weather_temp};
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_HR],       .text = readout_hr};
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_STEPS],    .text = readout_steps};
+    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_LAT],      .text = readout_lat};
+
+    return i;
+}
+
+void radar_apply_theme(void)
+{
+    uint8_t theme = settings_u8(SETTING_THEME);
     apply_theme_colors(theme);
     load_frame(theme);
 }
 
-/**
- * @brief Destroy the scene and unload fonts/bitmaps.
- */
-static void destroy_scene(void)
+void radar_teardown(void)
 {
-    widgets_destroy();
+    icons_cleanup();
     bitmap_layer_destroy(s_frame_layer);
+    s_frame_layer = NULL;
 
     if (s_frame_bitmap)
     {
@@ -148,25 +168,5 @@ static void destroy_scene(void)
     }
 
     fonts_unload_all();
-
-    // force a reload if the window is recreated
-    s_frame_layer = NULL;
-    s_loaded_theme = 0xFF;
-}
-
-static const WatchfaceDescriptor s_face = {
-    .zones = face_zones,
-    .load_fonts = load_fonts,
-    .create_scene = create_scene,
-    .destroy_scene = destroy_scene,
-    .update_theme = update_theme,
-    .set_battery = widgets_set_battery,
-    .set_weather_icon = widgets_set_weather_icon,
-    .set_bluetooth = widgets_set_bluetooth,
-    .refresh_overlays = widgets_mark_labels_dirty,
-};
-
-const WatchfaceDescriptor *radar_array_face(void)
-{
-    return &s_face;
+    s_loaded_theme = 0xFF;  // force a reload if the window is recreated
 }

@@ -2,8 +2,8 @@
  * PebbleKit JS entry point.
  *
  * Thin wrapper over the shared bootstrap (see lib/js/pkjs/app.js). This face
- * formats coordinates as a single hemisphere-style readout in the LATITUDE key;
- * everything else is shared.
+ * formats coordinates as a single hemisphere-style readout in the LATITUDE key.
+ * Everything else is shared.
  */
 
 const { startPebbleApp } = require('../../../../lib/js/pkjs/app');
@@ -41,7 +41,7 @@ function coordString(result) {
 
 startPebbleApp({
   clayConfig,
-  // the combined readout travels in LATITUDE; LONGITUDE is left empty
+  // the combined readout travels in LATITUDE. LONGITUDE is left empty
   formatCoords: (messageKeys, result) => ({
     [messageKeys.LATITUDE]: coordString(result),
     [messageKeys.LONGITUDE]: ''

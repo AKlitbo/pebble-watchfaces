@@ -1,186 +1,100 @@
 /**
  * @file main.c
- * @brief radar-array-emery entry point: wires services to the ui shell.
+ * @brief radar-array-emery entry point: wires services to their stores and drives the slot
+ * engine directly (no shell).
  */
 #include <pebble.h>
 
-#include "appmessage/appmessage.h"
-#include "battery/battery.h"
-#include "health/health.h"
+#include "io/appmessage/appmessage.h"
+#include "ui/engine/engine.h"
+#include "io/stores/health_store.h"
+#include "io/stores/location_store.h"
+#include "io/stores/system_store.h"
+#include "io/stores/time_store.h"
+#include "io/stores/weather_store.h"
+#include "dev/dev.h"
 #include "layout.h"
-#include "settings/settings.h"
-#include "settings/setting_values.h"
+#include "system/settings/settings.h"
+#include "system/settings/setting_values.h"
 #include "settings_schema.h"
-#include "shell/shell.h"
-#include "units/units.h"
+#include "system/vibe/vibe.h"
+
+static Window *s_window;
 
 /**
- * @brief Pull fresh health readings into the ui (driven by health events, not polled).
+ * @brief The time-store rules from the current settings (cadence follows the time format).
  */
-static void update_health(void)
+static TimeConfig time_cfg(void)
 {
-    int hr = health_get_current_hr();
-    int steps = health_get_today_steps();
-    int distance_m = health_get_today_distance();
-
-    shell_update_info(hr, steps, distance_m);
-}
-
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
-
-// fires at each .beats boundary so the @beat readout never sits stale between the
-// 86.4s beats. NULL when not in .beats mode, where MINUTE_UNIT drives instead
-static AppTimer *s_beats_timer;
-
-/**
- * @brief Redraw the time slot and re-arm for the next beat boundary.
- *
- * Also keeps the 30-min weather poll alive, since the minute ticker that
- * owns it is off in .beats mode.
- *
- * @param data The timer context (unused).
- */
-static void beats_timer_handler(void *data)
-{
-    time_t now = time(NULL);
-
-    // real tm: shell_update_time still draws the date line
-    shell_update_time(localtime(&now));
-
-    appmessage_request_weather_if_due(now);
-
-    s_beats_timer = app_timer_register(units_ms_until_next_beat(), beats_timer_handler, NULL);
+    bool beats = settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS;
+    return (TimeConfig){
+        .enabled = true,
+        .live = true,
+        .minute_tick = !beats,  // the shell faces run one cadence: .beats replaces the clock
+        .beats = beats,
+    };
 }
 
 /**
- * @brief Run exactly one ticker for the active format.
+ * @brief Redraw after a settings change: re-theme, rebuild the slots, re-arm the ticker.
  *
- * The beats AppTimer in .beats mode, MINUTE_UNIT otherwise. Duplicate calls
- * are harmless, so it's safe to call on init and every settings save.
- */
-static void update_refresh_mode(void)
-{
-    if (settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS)
-    {
-        if (!s_beats_timer)
-        {
-            // hand the cadence to the beats timer; the weather poll clock lives in the
-            // appmessage module, so it carries over the swap unchanged
-            tick_timer_service_unsubscribe();
-            s_beats_timer = app_timer_register(units_ms_until_next_beat(), beats_timer_handler, NULL);
-        }
-    }
-    else if (s_beats_timer)
-    {
-        app_timer_cancel(s_beats_timer);
-        s_beats_timer = NULL;
-
-        // resume the minute ticker
-        tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-    }
-}
-
-/**
- * @brief Per-minute: redraw the time, poll weather every 30 min.
- *
- * Health refreshes from health events, not polled here.
- *
- * @param tick_time The current time.
- * @param units_changed The units that changed.
- */
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
-{
-    shell_update_time(tick_time);
-
-    appmessage_request_weather_if_due(time(NULL));
-}
-
-/**
- * @brief Redraw after a settings change.
- *
- * @param time_or_date_changed True if the time or date format changed.
+ * @param time_or_date_changed True if the time or date format changed (unused: a rebuild
+ * re-pulls every readout anyway).
  */
 static void on_settings_changed(bool time_or_date_changed)
 {
-    shell_update_display();
+    // re-apply the zone colours + frame then rebuild so the text-slots pick them up. the
+    // rebuild also re-pulls every readout covering a steps-mode / unit / format change
+    radar_apply_theme();
+    engine_rebuild();
 
-    if (time_or_date_changed)
-    {
-        time_t now = time(NULL);
-        shell_update_time(localtime(&now));
-    }
-
-    // swap to the right ticker if TimeFormat changed
-    update_refresh_mode();
+    time_store_reconfigure(time_cfg());  // swaps to the .beats ticker if the format changed
 }
 
-/**
- * @brief Refresh health readouts only when the health service reports new data.
- *
- * @param event The health event type.
- * @param context Context (unused).
- */
-static void health_handler(HealthEventType event, void *context)
-{
-    if (event == HealthEventHeartRateUpdate || event == HealthEventMovementUpdate ||
-        event == HealthEventSignificantUpdate)
-    {
-        update_health();
-    }
-}
-
-/**
- * @brief Redraw the battery gauge when the charge level changes.
- *
- * @param state The new battery state.
- */
-static void battery_callback(BatteryChargeState state)
-{
-    shell_set_battery(state.charge_percent);
-}
-
-/**
- * @brief Initialize sub-systems, seed the first render, and subscribe to services.
- */
 static void init(void)
 {
-    // radar owns its schema: v1, its own key, no migration. the readout-style date
+    // radar owns its schema: v1 with its own key and no migration. the readout-style date
     // default ("SAT 19 JUN") lives in the schema's field table
     settings_init(radar_settings_schema());
 
-    shell_init(radar_array_face());
+    // each store owns its own source. init starts it (live) or seeds it. dev mode seeds
+    // every store from a fixed fixture (live=false) for deterministic screenshots
+    if (!dev_seed_stores())
+    {
+        system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
+        health_store_init((HealthConfig){.enabled = true, .live = true}, NULL);
+        time_store_init(time_cfg(), NULL);
+        weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = 30}, NULL);
+        location_store_init((LocationConfig){.enabled = true, .live = true}, NULL);
+    }
 
-    // wire the appmessage transport to the shell (the transport stays shell-agnostic)
-    appmessage_init((AppMessageHandlers){
-        .on_weather = shell_set_weather,
-        .on_coords = shell_set_coords,
-        .on_settings_changed = on_settings_changed,
-    });
+    s_window = window_create();
+    radar_setup(s_window);              // fonts + frame + overlays + theme colours
+    engine_init(s_window, radar_build); // build the slot layers over the frame
+    window_stack_push(s_window, true);
 
-    health_init(health_handler);
+    // any store change repaints all slots
+    time_store_subscribe(engine_mark_dirty);
+    health_store_subscribe(engine_mark_dirty);
+    weather_store_subscribe(engine_mark_dirty);
+    location_store_subscribe(engine_mark_dirty);
+    system_store_subscribe(engine_mark_dirty);
 
-    // seed the initial time/date render before the first tick
-    time_t temp = time(NULL);
-    struct tm *tick_time = localtime(&temp);
-    shell_update_time(tick_time);
+    // weather_store + location_store own their channels. main only wires settings
+    appmessage_on_settings_changed(on_settings_changed);
+    appmessage_open();
 
-    // services and callbacks
-    tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-    battery_init(battery_callback);
-
-    // seed the health readouts before the first health event
-    update_health();
-
-    // pick the ticker for the active format (swaps off MINUTE_UNIT if .beats is on)
-    update_refresh_mode();
+    // dev mode only: force the theme then paint the fixture then subscribe the tap walk
+    dev_start(radar_apply_theme);
 }
 
-/**
- * @brief Tear down the ui shell.
- */
 static void deinit(void)
 {
-    shell_deinit();
+    dev_stop();
+    system_store_deinit();
+    engine_deinit();
+    radar_teardown();
+    window_destroy(s_window);
 }
 
 int main(void)

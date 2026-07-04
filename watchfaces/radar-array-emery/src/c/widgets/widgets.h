@@ -1,57 +1,37 @@
 /**
  * @file widgets.h
- * @brief Overlay widgets: the layers the shell mounts over the baked radar-array frame.
- *
- * This module owns the static labels (TEMP / PULSE / RANGE) and the battery
- * gauge - create it after the background layer and before the text layers to
- * preserve z-order. labels are drawn here (not baked) so a future locale can
- * swap the strings.
+ * @brief Painted overlays for the radar face, exposed as stateless draws the engine's
+ * overlays draw-slot calls. The bluetooth glyph comes from the shared icon cache and the
+ * engine owns the layer.
  *
  * @ingroup watchface-radar
  */
 #pragma once
 #include <pebble.h>
 
-#include "shell/shell.h"
-
 /** @addtogroup watchface-radar @{ */
 
 /**
- * @brief Create the overlay layers.
+ * @brief Draw the static TEMP / PULSE / RANGE captions in the panel accent.
  *
- * @param parent The parent layer.
+ * @param ctx The graphics context.
  */
-void widgets_create(Layer *parent);
+void widgets_draw_labels(GContext *ctx);
 
 /**
- * @brief Destroy the overlay layers, font, and icon bitmaps.
- */
-void widgets_destroy(void);
-
-/**
- * @brief Set the battery level (0..100) and redraw the gauge.
+ * @brief Draw the battery gauge: an accent outline with five level-coloured segments.
  *
+ * @param ctx The graphics context.
  * @param level Battery charge level percentage.
  */
-void widgets_set_battery(int level);
+void widgets_draw_battery(GContext *ctx, int level);
 
 /**
- * @brief No glyph on this face (no-op).
+ * @brief Draw the bluetooth glyph for the link state (connected vs slashed).
  *
- * @param condition The weather condition abbreviation.
+ * @param ctx The graphics context.
+ * @param connected True when the phone link is up.
  */
-void widgets_set_weather_icon(const char *condition);
-
-/**
- * @brief Swap/hide the connection glyph.
- *
- * @param status The new bluetooth connection status.
- */
-void widgets_set_bluetooth(BluetoothStatus status);
-
-/**
- * @brief Force a label + gauge repaint.
- */
-void widgets_mark_labels_dirty(void);
+void widgets_draw_bt(GContext *ctx, bool connected);
 
 /** @} */
