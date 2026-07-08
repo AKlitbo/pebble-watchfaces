@@ -12,12 +12,15 @@
 // registered channel handlers. each stays NULL until a consumer opts in
 static struct
 {
-    WeatherHandler         on_weather;
-    CoordsHandler          on_coords;
-    SettingsChangedHandler on_settings_changed;
-    WeatherExtraHandler    on_weather_extra;
-    WeatherForecastHandler on_weather_forecast;
-    LocationNameHandler    on_location_name;
+    WeatherHandler              on_weather;
+    CoordsHandler               on_coords;
+    SettingsChangedHandler      on_settings_changed;
+    WeatherExtraHandler         on_weather_extra;
+    WeatherForecastHandler      on_weather_forecast;
+    WeatherForecastStripHandler on_forecast_hourly;
+    WeatherForecastStripHandler on_forecast_daily;
+    LocationNameHandler         on_location_name;
+    StockStripHandler           on_stock_strip;
 } s_handlers;
 
 void appmessage_on_weather(WeatherHandler cb)                  { s_handlers.on_weather = cb; }
@@ -25,7 +28,10 @@ void appmessage_on_coords(CoordsHandler cb)                    { s_handlers.on_c
 void appmessage_on_settings_changed(SettingsChangedHandler cb) { s_handlers.on_settings_changed = cb; }
 void appmessage_on_weather_extra(WeatherExtraHandler cb)       { s_handlers.on_weather_extra = cb; }
 void appmessage_on_weather_forecast(WeatherForecastHandler cb) { s_handlers.on_weather_forecast = cb; }
+void appmessage_on_weather_forecast_hourly(WeatherForecastStripHandler cb) { s_handlers.on_forecast_hourly = cb; }
+void appmessage_on_weather_forecast_daily(WeatherForecastStripHandler cb)  { s_handlers.on_forecast_daily = cb; }
 void appmessage_on_location_name(LocationNameHandler cb)       { s_handlers.on_location_name = cb; }
+void appmessage_on_stock_strip(StockStripHandler cb)          { s_handlers.on_stock_strip = cb; }
 
 #define WEATHER_RETRY_MAX 3          // phone-side pkjs suspend retry count
 #define WEATHER_RETRY_DELAY_MS 5000  // delay to ride out transient drop
@@ -39,7 +45,8 @@ typedef enum
 {
     OUTBOX_NONE,
     OUTBOX_WEATHER,
-    OUTBOX_SETTINGS
+    OUTBOX_SETTINGS,
+    OUTBOX_STOCK
 } OutboxKind;
 static OutboxKind s_outbox_kind;
 
@@ -113,6 +120,28 @@ void appmessage_request_weather(void)
     {
         schedule_weather_retry();
     }
+}
+
+void appmessage_request_stock(void)
+{
+    // best effort. if the outbox is busy the next poll picks it up. no retry budget like
+    // weather since stocks refresh on a slow timer anyway
+#if defined(HAS_MESSAGE_KEY_REQUEST_STOCK)
+    DictionaryIterator *iter;
+    if (app_message_outbox_begin(&iter) != APP_MSG_OK)
+    {
+        return;
+    }
+
+    dict_write_uint8(iter, MESSAGE_KEY_REQUEST_STOCK, 1);
+    if (app_message_outbox_send() != APP_MSG_OK)
+    {
+        return;
+    }
+
+    // tag the send so a weather delivery callback never claims this one
+    s_outbox_kind = OUTBOX_STOCK;
+#endif
 }
 
 /**
@@ -260,6 +289,43 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
                 ? (int)pchance_t->value->int32 : INT_MIN;
 
             s_handlers.on_weather_forecast(uv, temp_max, temp_min, precip_chance);
+        }
+    }
+#endif
+
+    // the forecast strips ride as packed byte arrays. same opt-in guard as the other
+    // weather channels. the store owns the wire format so we just pass the raw bytes on
+#if defined(HAS_MESSAGE_KEY_FORECAST_HOURLY)
+    if (s_handlers.on_forecast_hourly)
+    {
+        Tuple *fc_hourly_t = dict_find(iterator, MESSAGE_KEY_FORECAST_HOURLY);
+        if (fc_hourly_t && fc_hourly_t->type == TUPLE_BYTE_ARRAY)
+        {
+            s_handlers.on_forecast_hourly(fc_hourly_t->value->data, fc_hourly_t->length);
+        }
+    }
+#endif
+
+#if defined(HAS_MESSAGE_KEY_FORECAST_DAILY)
+    if (s_handlers.on_forecast_daily)
+    {
+        Tuple *fc_daily_t = dict_find(iterator, MESSAGE_KEY_FORECAST_DAILY);
+        if (fc_daily_t && fc_daily_t->type == TUPLE_BYTE_ARRAY)
+        {
+            s_handlers.on_forecast_daily(fc_daily_t->value->data, fc_daily_t->length);
+        }
+    }
+#endif
+
+    // the watchlist strip rides as a packed byte array. same opt-in guard as the forecast
+    // strips. the store owns the wire format so we just pass the raw bytes on
+#if defined(HAS_MESSAGE_KEY_STOCK_STRIP)
+    if (s_handlers.on_stock_strip)
+    {
+        Tuple *stock_t = dict_find(iterator, MESSAGE_KEY_STOCK_STRIP);
+        if (stock_t && stock_t->type == TUPLE_BYTE_ARRAY)
+        {
+            s_handlers.on_stock_strip(stock_t->value->data, stock_t->length);
         }
     }
 #endif

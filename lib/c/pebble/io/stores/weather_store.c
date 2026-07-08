@@ -34,6 +34,8 @@ static struct
     int    temp_max;      // today's high (WEATHER_NO_TEMP when none)
     int    temp_min;      // today's low (WEATHER_NO_TEMP when none)
     int    precip_chance; // percent chance of precip (-1 when none)
+    WeatherHourly hourly; // the hourly forecast strip (count 0 when none)
+    WeatherDaily  daily;  // the 7-day forecast strip (count 0 when none)
     time_t last_sync;
 } s_state;
 
@@ -58,6 +60,8 @@ static void reset_state(void)
     s_state.temp_max = WEATHER_NO_TEMP;
     s_state.temp_min = WEATHER_NO_TEMP;
     s_state.precip_chance = -1;
+    s_state.hourly.count = 0;
+    s_state.daily.count = 0;
     s_state.last_sync = 0;
 }
 
@@ -77,6 +81,33 @@ static void set_current(const char *temp, const char *cond)
     snprintf(s_state.cond, sizeof(s_state.cond), "%s", cond ? cond : "--");
     s_state.last_sync = time(NULL);
     persist_save();
+    if (s_cb) s_cb();
+}
+
+// prefill the whole store from a seed (dev/screenshots). copies the extras too so a seeded
+// face shows full weather not just temp and cond. s_cb is NULL at init so no redraw fires here
+static void apply_seed(const WeatherSeed *seed)
+{
+    snprintf(s_state.temp, sizeof(s_state.temp), "%s", seed->temp ? seed->temp : "--");
+    snprintf(s_state.cond, sizeof(s_state.cond), "%s", seed->cond ? seed->cond : "--");
+    s_state.humidity = seed->humidity;
+    s_state.wind_kmh = seed->wind_kmh;
+    snprintf(s_state.wind_dir, sizeof(s_state.wind_dir), "%s", seed->wind_dir ? seed->wind_dir : "");
+    snprintf(s_state.sunrise, sizeof(s_state.sunrise), "%s", seed->sunrise ? seed->sunrise : "");
+    snprintf(s_state.sunset, sizeof(s_state.sunset), "%s", seed->sunset ? seed->sunset : "");
+    s_state.uv = seed->uv;
+    s_state.temp_max = seed->temp_max;
+    s_state.temp_min = seed->temp_min;
+    s_state.precip_chance = seed->precip_chance;
+    if (seed->forecast_hourly)
+    {
+        s_state.hourly = *seed->forecast_hourly;
+    }
+    if (seed->forecast_daily)
+    {
+        s_state.daily = *seed->forecast_daily;
+    }
+    s_state.last_sync = time(NULL);
     if (s_cb) s_cb();
 }
 
@@ -129,6 +160,91 @@ static void on_forecast(int uv, int temp_max, int temp_min, int precip_chance)
     if (s_cb) s_cb();
 }
 
+// reads a little-endian signed 16-bit value out of a byte pair
+static int16_t read_i16(const uint8_t *p)
+{
+    return (int16_t)(p[0] | (p[1] << 8));
+}
+
+/**
+ * @brief Hourly forecast channel. Unpacks the wire bytes into the strip.
+ *
+ * Wire layout is [count][base_hour][step_hours] then per column [code][temp_lo][temp_hi].
+ * A short or malformed buffer is dropped so a bad message can't leave a half-filled row.
+ */
+static void on_forecast_hourly(const uint8_t *buf, uint16_t len)
+{
+    if (!buf || len < 3)
+    {
+        return;
+    }
+
+    uint8_t count = buf[0];
+    if (count > WEATHER_FORECAST_COLS)
+    {
+        count = WEATHER_FORECAST_COLS;
+    }
+
+    // three header bytes then three bytes per column
+    if (len < (uint16_t)(3 + count * 3))
+    {
+        return;
+    }
+
+    s_state.hourly.count = count;
+    s_state.hourly.base_hour = buf[1];
+    s_state.hourly.step_hours = buf[2];
+    for (uint8_t i = 0; i < count; i++)
+    {
+        const uint8_t *col = buf + 3 + i * 3;
+        s_state.hourly.col[i].code = col[0];
+        s_state.hourly.col[i].temp = read_i16(col + 1);
+    }
+
+    s_state.last_sync = time(NULL);
+    persist_save();
+    if (s_cb) s_cb();
+}
+
+/**
+ * @brief 7-day forecast channel. Unpacks the wire bytes into the strip.
+ *
+ * Wire layout is [count][base_weekday] then per column [code][max_lo][max_hi][min_lo][min_hi].
+ */
+static void on_forecast_daily(const uint8_t *buf, uint16_t len)
+{
+    if (!buf || len < 2)
+    {
+        return;
+    }
+
+    uint8_t count = buf[0];
+    if (count > WEATHER_FORECAST_COLS)
+    {
+        count = WEATHER_FORECAST_COLS;
+    }
+
+    // two header bytes then five bytes per column
+    if (len < (uint16_t)(2 + count * 5))
+    {
+        return;
+    }
+
+    s_state.daily.count = count;
+    s_state.daily.base_weekday = buf[1];
+    for (uint8_t i = 0; i < count; i++)
+    {
+        const uint8_t *col = buf + 2 + i * 5;
+        s_state.daily.col[i].code = col[0];
+        s_state.daily.col[i].temp_max = read_i16(col + 1);
+        s_state.daily.col[i].temp_min = read_i16(col + 3);
+    }
+
+    s_state.last_sync = time(NULL);
+    persist_save();
+    if (s_cb) s_cb();
+}
+
 /**
  * @brief Location-name channel.
  */
@@ -174,7 +290,7 @@ void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
 
     if (seed)
     {
-        set_current(seed->temp, seed->cond);  // s_cb is NULL until the face subscribes so no redraw yet
+        apply_seed(seed);  // s_cb is NULL until the face subscribes so no redraw yet
     }
     else if (cfg.live
              && persist_exists(WEATHER_STORE_PERSIST_KEY)
@@ -198,6 +314,8 @@ void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
         appmessage_on_weather(on_weather);
         appmessage_on_weather_extra(on_extra);
         appmessage_on_weather_forecast(on_forecast);
+        appmessage_on_weather_forecast_hourly(on_forecast_hourly);
+        appmessage_on_weather_forecast_daily(on_forecast_daily);
         appmessage_on_location_name(on_location_name);
 
         // first fetch shortly after launch then every poll interval
@@ -230,6 +348,9 @@ int         weather_store_uv(void)            { return s_state.uv; }
 int         weather_store_temp_max(void)      { return s_state.temp_max; }
 int         weather_store_temp_min(void)      { return s_state.temp_min; }
 int         weather_store_precip_chance(void) { return s_state.precip_chance; }
+
+const WeatherHourly *weather_store_forecast_hourly(void) { return &s_state.hourly; }
+const WeatherDaily  *weather_store_forecast_daily(void)  { return &s_state.daily; }
 
 int weather_store_age_s(void)
 {
