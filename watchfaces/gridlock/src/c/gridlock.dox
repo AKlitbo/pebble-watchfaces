@@ -1,0 +1,99 @@
+/**
+ * @defgroup gridlock Gridlock Watchface
+ *
+ * The Gridlock face itself: the grid engine, the module catalog, layouts, draw helpers,
+ * theme, and settings schema. Everything here is specific to this face and sits on top of
+ * the shared @ref lib base.
+ *
+ * The subgroups below split it up by job.
+ */
+
+/**
+ * @defgroup gridlock_engine Engine
+ * @ingroup gridlock
+ *
+ * The grid engine and the pieces around it: the catalog of modules, the layouts, and the app
+ * setup in main. It hands each cell its own clipped layer and repaints when a reading changes.
+ */
+
+/**
+ * @defgroup gridlock_draw Draw Helpers
+ * @ingroup gridlock
+ *
+ * Shared drawing helpers the modules lean on: the panel frame, the stat panel drawer, icons,
+ * metrics, and the header fonts. Keeps every module painting the same shapes the same way.
+ */
+
+/**
+ * @defgroup gridlock_settings Settings and Theme
+ * @ingroup gridlock
+ *
+ * The face's own settings schema, its persist keys, and the theme colours. This is where the
+ * face names its fields and picks the palette each module draws with.
+ */
+
+/**
+ * @defgroup gridlock_dev Dev Tools
+ * @ingroup gridlock
+ *
+ * Development-only helpers, like the tap cycle that previews layouts and styles. Off in a
+ * normal build.
+ */
+
+/**
+ * @defgroup gridlock_modules Panel Modules
+ * @ingroup gridlock
+ *
+ * The panels themselves, split by what they show. Each module is just data plus a little
+ * draw function, and the engine wraps it in the shared frame.
+ */
+
+/**
+ * @defgroup gridlock_mod_time Time
+ * @ingroup gridlock_modules
+ *
+ * Clock, date, other time zones, the moon, and swatch .beats.
+ */
+
+/**
+ * @defgroup gridlock_mod_weather Weather
+ * @ingroup gridlock_modules
+ *
+ * The current weather plus the many readouts around it: temperature, wind, humidity, the
+ * sun times, the forecast strips, and friends.
+ */
+
+/**
+ * @defgroup gridlock_mod_health Health
+ * @ingroup gridlock_modules
+ *
+ * Steps, heart rate, calories, sleep, distance, and the little activity graphs.
+ */
+
+/**
+ * @defgroup gridlock_mod_calendar Calendar
+ * @ingroup gridlock_modules
+ *
+ * The agenda, the countdown to the next event, and the free or busy view.
+ */
+
+/**
+ * @defgroup gridlock_mod_stock Stock
+ * @ingroup gridlock_modules
+ *
+ * A single quote and the watchlist of a few tickers.
+ */
+
+/**
+ * @defgroup gridlock_mod_system System
+ * @ingroup gridlock_modules
+ *
+ * The watch's own bits: battery, the phone connection, and the quiet time marker.
+ */
+
+/**
+ * @defgroup gridlock_mod_composite Composite
+ * @ingroup gridlock_modules
+ *
+ * Panels that fold a few readings into one tile, like the combined date and time.
+ */

@@ -19,6 +19,20 @@ def _repo_root(ctx):
     ctx.fatal('waf_helpers: could not locate the repo root (no ancestor with lib/)')
 
 
+def _source_face(ctx):
+    """
+    The watchfaces/<face>/ dir feeding this sandbox. A face with one target names its sandbox
+    after itself, so the sandbox name is the face. A face with several targets (a watchface and
+    a watchapp, say) names each sandbox after its target instead, so the manifest step writes a
+    .source-face marker here to map the sandbox back to its source face. Fall back to the sandbox
+    name when there is no marker.
+    """
+    marker = ctx.path.find_node('.source-face')
+    if marker:
+        return marker.read().strip()
+    return ctx.path.name
+
+
 def build_conditions(ctx):
     """
     Regenerate the weather-icon lookup (icons_table.g.h) from the shared condition
@@ -39,9 +53,10 @@ def build_conditions(ctx):
 def stage_shared_sources(ctx):
     """
     Mirror this face's src/ and resources/ plus the shared lib/ into this build folder
-    (targets/<face>/) so the SDK sees a normal, self-contained project. The sandbox is
-    named after the face, so ctx.path.name is the face; its src/ and resources/ live under
-    watchfaces/<face>/, while lib/ is shared at the repo root and comes along for the C.
+    (targets/<target>/) so the SDK sees a normal, self-contained project. The source face
+    comes from _source_face (the sandbox name, or the .source-face marker when a face feeds
+    several targets); its src/ and resources/ live under watchfaces/<face>/, while lib/ is
+    shared at the repo root and comes along for the C.
 
     emit/ is not staged: build:pkjs writes it straight into this sandbox (targets/<face>/emit)
     keeping the watchfaces/<face>/src/pkjs + lib/ts layout, so the entry's relative requires
@@ -54,7 +69,7 @@ def stage_shared_sources(ctx):
     _repo_root would resolve to this folder instead.
     """
     repo_root = ctx.path.parent.parent.abspath()
-    face = ctx.path.name
+    face = _source_face(ctx)
     face_root = _face_root(repo_root, face)
     if not face_root:
         ctx.fatal('No source for face "{}" under watchfaces/.'.format(face))
@@ -275,9 +290,10 @@ def build_face(ctx, extra_cflags=None):
 
     ctx.env = cached_env
 
-    # emit/ keeps the source tree's shape, so the entry sits wherever the face's pkjs does. that
-    # is one folder deep for a face of its own and two for one inside a family, so it is found
-    # rather than assumed
+    # emit/ keeps the source tree's shape, so the entry sits wherever the face's pkjs does: one
+    # folder deep for a face of its own, two for one inside a family, and under the source face
+    # rather than the sandbox when a face feeds several targets. found rather than assumed, so
+    # none of that has to be worked out twice
     entries = ctx.path.ant_glob('emit/watchfaces/**/src/pkjs/index.js')
     if not entries:
         ctx.fatal('No pkjs entry in emit/: did build:pkjs run for this face?')

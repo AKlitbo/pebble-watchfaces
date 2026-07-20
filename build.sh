@@ -32,17 +32,24 @@ build_face() {
 
   node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON "$here/tools/manifest/build-manifests.ts" "$face"
 
-  # compile the TypeScript pkjs runtime (watchfaces/<face>/src/pkjs + lib/ts) into
-  # targets/<face>/emit/, the gitignored tree the Pebble bundler reads. the .ts is the source
-  # of truth, so this runs before every build
-  (cd "$here" && npm run build:pkjs -- "$face")
+  # a face usually builds one target (the face itself), but can declare several (a watchface
+  # and a watchapp from one source). the manifest step wrote a sandbox per target; ask it which
+  local targets
+  targets=$(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON "$here/tools/manifest/build-manifests.ts" --targets "$face")
 
-  echo "== building watchface $face =="
-  (
-    cd "$here/targets/$face"
-    [[ "$clean" == 1 ]] && pebble clean
-    pebble build ${args[@]+"${args[@]}"}
-  )
+  for target in $targets; do
+    # compile the TypeScript pkjs runtime (watchfaces/<face>/src/pkjs + lib/ts) into
+    # targets/<target>/emit/, the gitignored tree the Pebble bundler reads. the .ts is the
+    # source of truth, so this runs before every build
+    (cd "$here" && npm run build:pkjs -- "$target" "$face")
+
+    echo "== building $target (face $face) =="
+    (
+      cd "$here/targets/$target"
+      [[ "$clean" == 1 ]] && pebble clean
+      pebble build ${args[@]+"${args[@]}"}
+    )
+  done
 }
 
 # a face is any directory under watchfaces/ carrying an appinfo, at the top level or one deeper

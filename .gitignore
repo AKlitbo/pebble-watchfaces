@@ -9,6 +9,7 @@ build/
 targets/*/package.json
 targets/*/tsconfig.pkjs.json
 targets/*/wscript
+targets/*/.source-face
 targets/*/src/
 targets/*/lib/
 targets/*/family/

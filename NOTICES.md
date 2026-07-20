@@ -57,6 +57,33 @@ The faces in this family all set their type in the same face, and each bundles i
   Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's
   [OFL.txt](watchfaces/sketchbook/ridgeline/resources/fonts/OFL.txt)
 
+### Gridlock
+
+The clock and values are set in Teko and Share Tech Mono. The rest are the header-font options the
+settings page offers, so a build carries all of them whichever one is picked. They share one
+[OFL.txt](watchfaces/gridlock/resources/fonts/OFL.txt), which carries a copyright notice for each.
+
+- **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
+- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012,
+  Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
+- **[Aldrich](https://fonts.google.com/specimen/Aldrich)**: Copyright (c) Matthew Desmond, 2011
+- **[Electrolize](https://fonts.google.com/specimen/Electrolize)**: Copyright (c) 2011, Cyreal, with
+  Reserved Font Name "Electrolize"
+- **[Kode Mono](https://fonts.google.com/specimen/Kode+Mono)**: Copyright 2023 The Kode Mono Project
+  Authors
+- **[Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans)**: Copyright 2021 The Pixelify
+  Sans Project Authors
+- **[Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)**: Copyright 2012 The Press
+  Start 2P Project Authors, with Reserved Font Name "Press Start 2P"
+- **[Quantico](https://fonts.google.com/specimen/Quantico)**: Copyright (c) 2011 Matthew Desmond,
+  with Reserved Font Name "Quantico"
+
+One of Gridlock's header fonts is not under the OFL:
+
+- **[LECO 2014](https://www.1001fonts.com/leco-2014-font.html)**: released into the public domain by
+  its author. It ships as `LECO2014-Regular.ttf` beside the others, and the note at the foot of that
+  face's `OFL.txt` says so, since the OFL text there does not cover it.
+
 ### IDE VSCode
 
 Both fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a

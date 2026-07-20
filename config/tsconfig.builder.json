@@ -1,0 +1,11 @@
+// typechecks the Clay builder sources under watchfaces/<face>/src/pkjs/clay/builder/
+// run by npm run typecheck. gen:gridlock:clay is what actually bundles those pieces
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "noEmit": true
+  },
+  "include": ["../watchfaces/**/src/pkjs/clay/builder/**/*.ts"],
+  "exclude": ["../node_modules", "../**/*.spec.ts", "../**/*.manifest.ts"]
+}

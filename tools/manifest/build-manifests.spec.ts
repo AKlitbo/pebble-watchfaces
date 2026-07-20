@@ -7,7 +7,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { buildMedia, buildManifest } from './build-manifests';
+import { buildMedia, buildManifest, resolveTargets } from './build-manifests';
 import type { SharedAppinfo } from './build-manifests';
 
 // a fresh config per test so the mutation check can't be masked by an earlier test
@@ -106,5 +106,43 @@ describe('buildManifest', () => {
     const result = buildManifest(config, rootPkg, target);
 
     expect(result.pebble.resources.media.find((item) => item.name === 'ICON_ONE').menuIcon).toBe(true);
+  });
+});
+
+describe('resolveTargets', () => {
+  /** The common face inlines one target, so a missing targets map still builds exactly that one .pbw. */
+  test('returns the inline single target when there is no targets map', () => {
+    const config = { ...makeConfig(), name: 'radar-array', watchface: true };
+
+    const result = resolveTargets(config);
+
+    expect(result).toEqual([{ name: 'radar-array', watchface: true, menuIcon: undefined }]);
+  });
+
+  /** Gridlock ships a watchface and a watchapp from one source, so both sandboxes must come back. */
+  test('returns every target from a targets map', () => {
+    const config = {
+      ...makeConfig(),
+      targets: {
+        watchface: { name: 'gridlock-face', watchface: true },
+        watchapp: { name: 'gridlock-app', watchface: false, menuIcon: 'ICON_ONE' },
+      },
+    };
+
+    const result = resolveTargets(config);
+
+    expect(result).toEqual([
+      { name: 'gridlock-face', watchface: true },
+      { name: 'gridlock-app', watchface: false, menuIcon: 'ICON_ONE' },
+    ]);
+  });
+
+  /** An appinfo with no identity at all is a build-input mistake, so it must fail loudly not silently. */
+  test('throws when there is neither a targets map nor a name', () => {
+    const config = makeConfig();
+
+    const call = () => resolveTargets(config);
+
+    expect(call).toThrow(/neither a targets map nor a top-level name/);
   });
 });
