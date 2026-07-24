@@ -37,6 +37,21 @@ Create `watchfaces/<name>/` with the layout above, then build it. The sandbox, m
 entry point are all generated from the face's name and appinfo. Add `<name>` to the CI matrix in
 [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
 
+## Releasing
+
+Pushing a `<face>-v<version>` tag is the whole process. [release.yml](.github/workflows/release.yml)
+builds that face, takes its notes from the matching `CHANGELOG.md` section, and publishes the `.pbw`.
+
+```sh
+# date the [1.5.0] heading in watchfaces/lcars-stardate/CHANGELOG.md first, then
+git tag lcars-stardate-v1.5.0
+git push origin lcars-stardate-v1.5.0
+```
+
+The tag version must match `version` in that face's `config/pebble.appinfo.json`, the changelog entry
+must be dated, and the tag must not already be released. The workflow checks all three before it
+spends time on a build, so a mistake costs seconds.
+
 ## Development
 
 ```sh

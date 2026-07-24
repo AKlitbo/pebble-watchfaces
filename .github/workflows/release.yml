@@ -1,0 +1,84 @@
+name: Release
+
+# faces version independently, so a release is tagged per face: <face>-v<version>, e.g.
+# lcars-stardate-v1.5.0. pushing that tag is the whole release process
+on:
+  push:
+    tags: ['*-v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # split lcars-stardate-v1.5.0 into face and version, then check the tag against the tree it
+      # points at. a tag that disagrees with the manifest is a typo, and catching it here costs
+      # seconds instead of a published release nobody can unpublish cleanly
+      - name: Resolve Face And Version
+        id: face
+        run: |
+          tag="$GITHUB_REF_NAME"
+          version="${tag##*-v}"
+          face="${tag%-v$version}"
+          appinfo="watchfaces/$face/config/pebble.appinfo.json"
+
+          if [ ! -f "$appinfo" ]; then
+            echo "tag $tag names face '$face', which has no watchfaces/$face/" >&2
+            exit 1
+          fi
+
+          manifest_version=$(jq -r .version "$appinfo")
+          if [ "$manifest_version" != "$version" ]; then
+            echo "tag $tag disagrees with $appinfo (version $manifest_version)" >&2
+            exit 1
+          fi
+
+          {
+            echo "face=$face"
+            echo "version=$version"
+            echo "display=$(jq -r .displayName "$appinfo")"
+            echo "asset=$face-emery-$version.pbw"
+          } >> "$GITHUB_OUTPUT"
+
+      # a re-pushed or moved tag would otherwise build for minutes and only then hit "release
+      # already exists" on the final step. republishing over a shipped release is not something
+      # to do silently, so this stops early and leaves the existing one alone
+      - name: Check Release Is New
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "$GITHUB_REF_NAME is already released: delete it first to republish" >&2
+            exit 1
+          fi
+
+      # fails when the entry is still Unreleased or empty, so an unwritten changelog stops the
+      # release rather than shipping with blank notes
+      - name: Build Release Notes
+        run: |
+          {
+            printf 'Released %s.\n\n' "$(bash tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}' --date)"
+            bash tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}'
+          } > notes.md
+
+      - uses: ./.github/actions/setup-pebble
+
+      - name: Build Watchface
+        run: bash build.sh ${{ steps.face.outputs.face }}
+
+      # build.sh emits <face>.pbw, unversioned. the release asset carries the version so a
+      # downloaded file is still identifiable months later
+      - name: Name The Asset
+        run: cp targets/${{ steps.face.outputs.face }}/build/${{ steps.face.outputs.face }}.pbw ${{ steps.face.outputs.asset }}
+
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "${{ steps.face.outputs.asset }}" \
+            --title "${{ steps.face.outputs.display }} ${{ steps.face.outputs.version }}" \
+            --notes-file notes.md
