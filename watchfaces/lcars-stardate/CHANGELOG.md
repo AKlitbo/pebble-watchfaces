@@ -5,7 +5,7 @@ All notable changes to the LCARS Stardate watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.0] - Unreleased
+## [1.5.0] - 2026-07-23
 
 > [!IMPORTANT]
 > This release corrects the watchface's message keys. As a result, some settings may reset to their defaults after updating and need to be set again.
@@ -117,3 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced health stat updates to improve battery life.
 
 ## [1.0.0] - 2026-06-14
+
+### Added
+
+- First release of the LCARS Stardate watchface.
