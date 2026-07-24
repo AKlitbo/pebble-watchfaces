@@ -1,7 +1,7 @@
 /**
  * @file dev_walk.c
- * @brief The shared frame-face dev harness: fixture-as-store-seeds plus the theme and icon
- * walks. Always compiled and gc-dropped from any face that never calls it (release builds).
+ * @brief The shared frame-face dev harness: fixture-as-store-seeds plus the theme walk.
+ * Always compiled and gc-dropped from any face that never calls it (release builds).
  */
 #include "dev/dev_walk.h"
 
@@ -14,7 +14,6 @@
 #include "io/stores/location_store.h"
 #include "system/settings/settings.h"
 #include "ui/engine/engine.h"
-#include "ui/weather/conditions_dev_table.h"
 
 /**
  * @brief The believable happy numbers a screenshot sits on. One fixture for now. A selector
@@ -22,7 +21,7 @@
  */
 typedef struct
 {
-    const char *temp;
+    int16_t temp;
     const char *cond;
     int hr;
     int steps;
@@ -37,7 +36,7 @@ typedef struct
 } DevFixture;
 
 static const DevFixture s_default = {
-    .temp = "21°", .cond = "PCLDY",
+    .temp = 21, .cond = "PCLDY",
     .hr = 72, .steps = 8431, .calories = 420, .sleep_min = 431, .active_min = 52, .distance_m = 5300,
     .battery = 64, .bluetooth = true,
     .lat = "33-44", .lon = "-112-07",
@@ -46,19 +45,6 @@ static const DevFixture s_default = {
 static DevWalkMode s_mode;
 static void (*s_apply_theme)(void);
 static uint8_t s_theme;
-static int s_icon;
-
-/**
- * @brief Re-seed weather_store (live=false) with the fixture temp and a given condition,
- * which fires its subscriber so the engine repaints. Used to step the icon walk.
- *
- * @param cond The condition token to show.
- */
-static void seed_weather(const char *cond)
-{
-    WeatherSeed seed = {.temp = s_default.temp, .cond = cond};
-    weather_store_init((WeatherConfig){.enabled = true, .live = false, .poll_min = 0}, &seed);
-}
 
 /**
  * @brief Accelerometer tap: advance the active walk by one.
@@ -76,11 +62,6 @@ static void tap_handler(AccelAxisType axis, int32_t direction)
         if (s_apply_theme) s_apply_theme();
         engine_rebuild();
     }
-    else if (s_mode == DEV_WALK_ICONS)
-    {
-        s_icon = (s_icon + 1) % (int)ARRAY_LENGTH(wx_dev_condition_tokens);
-        seed_weather(wx_dev_condition_tokens[s_icon]);
-    }
 }
 
 void dev_walk_seed_stores(int hour, int min)
@@ -93,7 +74,11 @@ void dev_walk_seed_stores(int hour, int min)
     pinned.tm_sec = 0;
     time_store_init((TimeConfig){.enabled = true, .live = false, .minute_tick = false, .beats = false}, &pinned);
 
-    WeatherSeed wx = {.temp = s_default.temp, .cond = s_default.cond};
+    // spread the empty seed so every reading the fixture does not set (humidity, wind, uv, …)
+    // reads as "--" rather than a bogus 0
+    WeatherSeed wx = WEATHER_SEED_EMPTY;
+    wx.temp = s_default.temp;
+    wx.cond = s_default.cond;
     weather_store_init((WeatherConfig){.enabled = true, .live = false, .poll_min = 0}, &wx);
 
     HealthSeed health = {.hr = s_default.hr, .steps = s_default.steps, .calories = s_default.calories,
@@ -108,19 +93,13 @@ void dev_walk_seed_stores(int hour, int min)
     location_store_init((LocationConfig){.enabled = true, .live = false}, &location);
 }
 
-void dev_walk_init(DevWalkMode mode, uint8_t icon_theme, void (*apply_theme)(void))
+void dev_walk_init(DevWalkMode mode, void (*apply_theme)(void))
 {
     s_mode = mode;
     s_apply_theme = apply_theme;
     s_theme = 0;
-    s_icon = 0;
 
-    if (mode == DEV_WALK_ICONS)
-    {
-        settings_set_u8(SETTING_THEME, icon_theme);
-        seed_weather(wx_dev_condition_tokens[0]);
-    }
-    else if (mode == DEV_WALK_THEMES)
+    if (mode == DEV_WALK_THEMES)
     {
         settings_set_u8(SETTING_THEME, 0);
     }

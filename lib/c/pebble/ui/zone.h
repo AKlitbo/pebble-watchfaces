@@ -2,7 +2,7 @@
  * @file zone.h
  * @brief Layout primitives: defines paintable areas and text alignments
  *
- * @ingroup lib
+ * @ingroup lib_ui
  */
 // a Zone is everything needed to present one text slot: where it sits and which
 // registered font + alignment + colour to use plus up to two smaller font/rect
@@ -13,26 +13,10 @@
 
 #include "ui/fonts.h"
 
-/** @addtogroup lib @{ */
-
 /**
- * @brief The slot vocabulary shared by the current (vitals) face family.
- *
- * A face that diverges from this set would define its own enum + shell.
+ * @addtogroup lib_ui
+ * @{
  */
-typedef enum
-{
-    ZONE_TIME,
-    ZONE_MERIDIEM,
-    ZONE_DATE,
-    ZONE_WEATHER,
-    ZONE_COND,
-    ZONE_HR,
-    ZONE_STEPS,
-    ZONE_LAT,
-    ZONE_LON,
-    ZONE_COUNT
-} ZoneId;
 
 /**
  * @brief Defines a paintable area, including geometry and styling.
@@ -43,10 +27,10 @@ typedef struct
     FontId         font_id;
     GTextAlignment align;
     GColor         color;
-    FontId         font_id_fallback;  // first step-down when the text overflows the primary
-    GRect          rect_fallback;
-    FontId         font_id_fallback2; // second step-down for the widest strings
-    GRect          rect_fallback2;    // omit a tier by leaving its rect zero-sized
+    FontId         font_id_fallback;  ///< First smaller font to try when the text overflows the main one
+    GRect          rect_fallback;     ///< Area for the first smaller font
+    FontId         font_id_fallback2; ///< Second smaller font for the widest strings
+    GRect          rect_fallback2;    ///< Area for the second smaller font. Leave it zero-sized to skip this step
 } Zone;
 
 /**
@@ -54,7 +38,8 @@ typedef struct
  *
  * @param parent The parent layer.
  * @param zone The zone properties.
- * @return The new text layer.
+ * @return The new text layer, or NULL when the heap had no room for it. A caller holding NULL
+ *   has an empty slot, so it must check before passing the layer back in.
  */
 TextLayer *zone_make_layer(Layer *parent, const Zone *zone);
 

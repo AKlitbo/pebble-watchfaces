@@ -1,0 +1,17 @@
+// typechecks the build and generator scripts plus the configs in here
+// run by npm run typecheck. these run under node so they never ship to the watch
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
+  },
+  "include": [
+    "../tools/**/*.ts",
+    "../lib/tools/**/*.ts",
+    "../config/**/*.ts",
+    "../watchfaces/*/src/pkjs/clay/builder/*.manifest.ts"
+  ],
+  "exclude": ["../node_modules", "../targets", "../**/*.spec.ts"]
+}

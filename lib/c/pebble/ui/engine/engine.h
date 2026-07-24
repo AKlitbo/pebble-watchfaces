@@ -4,21 +4,24 @@
  * and repaints them all when a store changes. A slot is either a text-slot (a TextLayer built
  * from a Zone, so the font-fit tiers still apply) or a draw-slot (a custom layer whose
  * update_proc paints a gauge, icon, or panel). A face supplies a build callback. A dynamic
- * face (the grid) re-runs it on a layout change. This is the shared core the shell and the
- * modular grid engine both sit on.
+ * face (the grid) re-runs it on a layout change. This is the shared core a face's own engine
+ * sits on.
  *
- * @ingroup lib
+ * @ingroup lib_ui
  */
 #pragma once
 #include <pebble.h>
 
 #include "ui/zone.h"
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_ui
+ * @{
+ */
 
-// most slots a single face can declare (modular's grid tops out at 10 cells and the shell
-// faces at ~12 zones + widgets)
-#define ENGINE_MAX_SLOTS 16
+/// Most slots a single face can declare. Ten is the ceiling of the largest layout a face builds
+/// here, so the slot arrays hold no dead entries. A face wanting more zones bumps this
+#define ENGINE_MAX_SLOTS 10
 
 /**
  * @brief One slot of a face. Set `zone` (+ `text`) for a text-slot, or `frame` (+ `draw`)
@@ -26,12 +29,14 @@
  */
 typedef struct
 {
-    GRect frame;                                            /**< draw-slot layer frame */
-    void (*draw)(GContext *ctx, GRect bounds, const void *data); /**< draw-slot paint */
-    const void *data;                                       /**< draw-slot payload */
+    GRect frame;                                            /**< Draw slot layer frame */
+    void (*draw)(GContext *ctx, GRect bounds, const void *data); /**< Draw slot paint */
+    const void *data;                                       /**< Draw slot data */
 
-    const Zone *zone;                                       /**< text-slot geometry + font tiers */
-    void (*text)(char *out, size_t n);                      /**< text-slot: pull + format from a store */
+    const Zone *zone;                                       /**< Text slot area and font tiers */
+    void (*text)(char *out, size_t n);                      /**< Text slot: pulls and formats from a store */
+
+    uint32_t tags;                                          /**< Which stores this slot reads from, for engine_mark_dirty_tags (0 means repaint on any change) */
 } EngineSlot;
 
 /**
@@ -57,5 +62,13 @@ void engine_rebuild(void);
 
 /** @brief Repaint every slot: text-slots re-pull + fit, draw-slots mark dirty. */
 void engine_mark_dirty(void);
+
+/**
+ * @brief Repaint only the slots whose tags intersect `changed` (plus any slot with no tags).
+ * Lets a face route a store change to just the slots that read from it.
+ *
+ * @param changed The dependency bits that changed.
+ */
+void engine_mark_dirty_tags(uint32_t changed);
 
 /** @} */

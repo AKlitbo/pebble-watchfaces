@@ -1,0 +1,13 @@
+// base compiler options for the pkjs runtime build (src/pkjs + lib/ts -> emit/).
+// build-pkjs.ts generates a per-face targets/<face>/tsconfig.pkjs.json that extends this and
+// supplies rootDir/outDir/include for the face being built. run via npm run build:pkjs -- <face>.
+// the only tsconfig here that emits rather than just checks.
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "allowJs": false
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "bluetooth":       { "svg": "sr/bluetooth-on",    "size": [14, 14] },
+  "bluetooth-slash": { "svg": "sr/bluetooth-slash", "size": [14, 14] }
+}

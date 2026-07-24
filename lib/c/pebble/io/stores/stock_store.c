@@ -8,37 +8,25 @@
 #include <time.h>
 
 #include "io/appmessage/appmessage.h"
+#include "io/stores/store_persist.h"
 
 // a short first fetch after launch (fires from the event loop so appmessage is open by then)
 // then the recurring poll runs at the configured interval
 #define STOCK_FIRST_POLL_MS 700
 
-// persist slot for the last good strip so a relaunch shows it straight away instead of
-// blanking. sits just below the weather store's 255 and well clear of the settings keys
-#define STOCK_STORE_PERSIST_KEY 254
-
 static struct
 {
+    uint8_t    tag;  // STORE_TAG_STOCK, so a restore can tell this blob from another shape
     StockStrip strip;
     time_t     last_sync;
 } s_state;
+_Static_assert(sizeof(s_state) <= PERSIST_DATA_MAX_LENGTH, "stock state must fit one persist key");
 
 static void (*s_cb)(void);
 static AppTimer *s_timer;
 static int s_poll_ms;
 static bool s_live;
-
-// reads a little-endian signed 16-bit value out of a byte pair
-static int16_t read_i16(const uint8_t *p)
-{
-    return (int16_t)(p[0] | (p[1] << 8));
-}
-
-// reads a little-endian signed 32-bit value out of four bytes
-static int32_t read_i32(const uint8_t *p)
-{
-    return (int32_t)((uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24));
-}
+static uint32_t s_persist_key; // the slot the face handed us for the saved strip
 
 // --- state writers (internal: only the channel handler + the seed touch these) ---
 
@@ -53,7 +41,7 @@ static void persist_save(void)
 {
     if (s_live)
     {
-        persist_write_data(STOCK_STORE_PERSIST_KEY, &s_state, sizeof(s_state));
+        store_save(s_persist_key, &s_state, sizeof(s_state), STORE_TAG_STOCK);
     }
 }
 
@@ -71,68 +59,20 @@ static void apply_seed(const StockSeed *seed)
 // --- appmessage channel handler (the store owns its own wiring) ---
 
 /**
- * @brief Stock channel. Unpacks the wire bytes into the strip.
+ * @brief Stock channel. Takes the watchlist the reader unpacked and puts it away.
  *
- * Wire layout is [count] then per slot [ok][price int32 LE cents][pct int16 LE
- * hundredths][symLen][sym bytes]. Slots are variable length so we walk the buffer and bounds
- * check each step. A short or malformed buffer is dropped so a bad message can never leave a
- * half-filled strip. The strip is built in a local first and only committed once it parses
- * clean so a mid-parse bail keeps the last good reading.
+ * A message that does not read clean leaves the last good quotes where they are, so a bad one can
+ * never blank the watchlist.
  *
  * @param buf The raw wire bytes.
  * @param len How many bytes there are.
  */
 static void on_stock_strip(const uint8_t *buf, uint16_t len)
 {
-    if (!buf || len < 1)
+    StockStrip built;
+    if (!stock_wire_decode(buf, len, &built))
     {
         return;
-    }
-
-    uint8_t count = buf[0];
-    if (count > STOCK_MAX_SLOTS)
-    {
-        count = STOCK_MAX_SLOTS;
-    }
-
-    StockStrip built;
-    built.count = 0;
-
-    uint16_t offset = 1;
-    for (uint8_t i = 0; i < count; i++)
-    {
-        // the fixed part of a slot is ok(1) + price(4) + pct(2) + symLen(1) = 8 bytes
-        if (offset + 8 > len)
-        {
-            return; // malformed, keep the old strip
-        }
-
-        StockSlot *slot = &built.slot[i];
-        slot->ok = buf[offset] != 0;
-        slot->price_cents = read_i32(buf + offset + 1);
-        slot->change_pct = read_i16(buf + offset + 5);
-        uint8_t sym_len = buf[offset + 7];
-        offset += 8;
-
-        if (offset + sym_len > len)
-        {
-            return; // symbol runs past the buffer
-        }
-
-        // copy what fits in the slot buffer but always step past the whole wire symbol
-        uint8_t copy = sym_len;
-        if (copy > STOCK_SYMBOL_LEN - 1)
-        {
-            copy = STOCK_SYMBOL_LEN - 1;
-        }
-        for (uint8_t c = 0; c < copy; c++)
-        {
-            slot->symbol[c] = (char)buf[offset + c];
-        }
-        slot->symbol[copy] = '\0';
-        offset += sym_len;
-
-        built.count++;
     }
 
     s_state.strip = built;
@@ -149,7 +89,16 @@ static void on_stock_strip(const uint8_t *buf, uint16_t len)
 static void poll_fire(void *data)
 {
     appmessage_request_stock();
-    s_timer = app_timer_register(s_poll_ms, poll_fire, NULL);
+    // re-arm only when there is a real interval, so a 0ms poll_min can never spin the loop.
+    // this keeps poll_fire self-defending regardless of how the timer was first armed
+    if (s_poll_ms > 0)
+    {
+        s_timer = app_timer_register(s_poll_ms, poll_fire, NULL);
+    }
+    else
+    {
+        s_timer = NULL;  // fired and not re-arming, so drop the now-stale handle
+    }
 }
 
 static void stop_polling(void)
@@ -171,6 +120,7 @@ void stock_store_subscribe(void (*cb)(void))
 void stock_store_init(StockConfig cfg, const StockSeed *seed)
 {
     s_live = cfg.live; // set before any persist_save so it knows whether to write
+    s_persist_key = cfg.persist_key;
     reset_state();
     s_poll_ms = cfg.poll_min * 60 * 1000;
 
@@ -178,13 +128,19 @@ void stock_store_init(StockConfig cfg, const StockSeed *seed)
     {
         apply_seed(seed); // s_cb is NULL until the face subscribes so no redraw yet
     }
-    else if (cfg.live
-             && persist_exists(STOCK_STORE_PERSIST_KEY)
-             && persist_get_size(STOCK_STORE_PERSIST_KEY) == (int)sizeof(s_state))
+    else if (cfg.live)
     {
         // restore the last good strip so a relaunch shows it right away. the first poll
         // then refreshes it in the background
-        persist_read_data(STOCK_STORE_PERSIST_KEY, &s_state, sizeof(s_state));
+        if (store_restore(s_persist_key, &s_state, sizeof(s_state), STORE_TAG_STOCK))
+        {
+            // stock_store_slot bounds an index against this count, so pin it to what the slot
+            // array actually holds before anything can ask for a slot past the end
+            if (s_state.strip.count > STOCK_MAX_SLOTS)
+            {
+                s_state.strip.count = 0;
+            }
+        }
     }
 
     if (!cfg.enabled)
@@ -197,9 +153,14 @@ void stock_store_init(StockConfig cfg, const StockSeed *seed)
         // the store owns the stock channel. faces that don't declare the key never see it fire
         appmessage_on_stock_strip(on_stock_strip);
 
-        // first fetch shortly after launch then every poll interval
+        // first fetch shortly after launch then every poll interval. poll_min 0 disables
+        // polling (matching reconfigure), so only arm when there is a real interval,
+        // otherwise poll_fire would re-arm a 0ms timer and spin the event loop
         stop_polling();
-        s_timer = app_timer_register(STOCK_FIRST_POLL_MS, poll_fire, NULL);
+        if (s_poll_ms > 0)
+        {
+            s_timer = app_timer_register(STOCK_FIRST_POLL_MS, poll_fire, NULL);
+        }
     }
 }
 
@@ -210,7 +171,12 @@ void stock_store_reconfigure(StockConfig cfg)
     stop_polling();
     if (cfg.enabled && cfg.live && s_poll_ms > 0)
     {
-        s_timer = app_timer_register(s_poll_ms, poll_fire, NULL);
+        // an empty store has nothing but -- to draw, so catch up right away: the panel may have
+        // just been added to the layout, or this very save may have cancelled the launch poll.
+        // one that already holds quotes keeps its cadence, so a save that only touched colours
+        // never pulls a fetch forward and spends a metered provider's quota
+        int delay_ms = (s_state.strip.count == 0) ? STOCK_FIRST_POLL_MS : s_poll_ms;
+        s_timer = app_timer_register(delay_ms, poll_fire, NULL);
     }
 }
 

@@ -4,20 +4,23 @@
  * geolocation the weather rides on), so a face hands it the rules, optionally seeds it, then
  * reads lat/lon back. There's no poll timer. Coords arrive alongside weather.
  *
- * @ingroup lib
+ * @ingroup lib_stores
  */
 #pragma once
 #include <pebble.h>
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_stores
+ * @{
+ */
 
 /**
  * @brief The rules a face hands the store.
  */
 typedef struct
 {
-    bool enabled; // false = inert (no channel holds nothing) for a face without coord slots
-    bool live;    // true = subscribe the coords channel. false = seed-only (dev/screenshots)
+    bool enabled; ///< False makes the store do nothing for a face without coordinate slots
+    bool live;    ///< True subscribes the coordinates channel and false just keeps the fake data for screenshots
 } LocationConfig;
 
 /**
@@ -25,8 +28,8 @@ typedef struct
  */
 typedef struct
 {
-    const char *lat;
-    const char *lon;
+    const char *lat; ///< Latitude string
+    const char *lon; ///< Longitude string
 } LocationSeed;
 
 /**
@@ -40,7 +43,10 @@ void location_store_init(LocationConfig cfg, const LocationSeed *seed);
 /** @brief Hand it the function to call when the coordinates change (the screen redraw). */
 void location_store_subscribe(void (*cb)(void));
 
-const char *location_store_lat(void); // latitude string (empty until we get one)
-const char *location_store_lon(void); // longitude string (empty until we get one)
+/** @brief The latitude string, or empty if we have not got one yet. */
+const char *location_store_lat(void);
+
+/** @brief The longitude string, or empty if we have not got one yet. */
+const char *location_store_lon(void);
 
 /** @} */

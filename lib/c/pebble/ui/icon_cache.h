@@ -5,18 +5,22 @@
  * tint and an optional auto-trim that measures each icon's transparent border so a caller
  * can pin the visible art instead of the padded bitmap box.
  *
- * @ingroup lib
+ * @ingroup lib_ui
  */
 #pragma once
 #include <pebble.h>
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_ui
+ * @{
+ */
 
-// auto-trim measures each icon's transparent margin once on load so placement can follow
-// the visible art. flip to 0 to fall back to pinning the full bitmap box
+/// Auto-trim measures each icon's see-through margin once on load so placement can follow
+/// the visible art. Set to 0 to pin the full bitmap box instead
 #define ICON_AUTOTRIM 1
-// logs each icon's measured N/E/S/W on first load so you can cross-check the numbers.
-// off by default in the shared lib so a normal build stays quiet. a face can flip it on
+
+/// Logs each icon's measured N/E/S/W on first load so you can check the numbers. Off by
+/// default in the shared lib so a normal build stays quiet. A face can switch it on
 #define ICON_TRIM_LOG 0
 
 /**

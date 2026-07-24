@@ -1,0 +1,8 @@
+{
+  "defaultFrame": "radar-array",
+  "defaultScale": 4,
+  "supportsTheme": true,
+  "bareBackgroundBase": null,
+  "clearTextSelectors": [".time", ".meridiem", ".banner", ".data", ".lbl", ".pwr-label", ".tlabel"],
+  "hideSelectors": [".batt"]
+}

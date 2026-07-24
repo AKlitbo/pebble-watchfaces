@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  # build each watchface (regenerates the manifest, compiles the TS pkjs, runs pebble build).
+  # one job per face so a failing face does not block the others' artifacts
+  pebble:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        face: [lcars-stardate, radar-array, ide-vscode]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-pebble
+
+      # build.sh <face> regenerates the manifest, compiles watchfaces/<face>/src/pkjs + lib/ts
+      # into targets/<face>/emit/, then runs `pebble build`. node (setup-node) and pebble (uv,
+      # on GITHUB_PATH) are both available here.
+      - name: Build Watchface
+        run: bash build.sh ${{ matrix.face }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pbw-${{ matrix.face }}
+          path: |
+            targets/${{ matrix.face }}/build/*.pbw
+          if-no-files-found: error
+
+  vitest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+
+  # host C unit tests over the lib/c/core maths. no SDK or node needed: gcc and make ship on the
+  # runner
+  c-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # shell: bash for pipefail. the default shell is `bash -e` without it, which would report
+      # tee's exit code and let a failing suite pass
+      - name: Run C Tests
+        shell: bash
+        run: make -C lib/c/spec | tee c-tests.log
+
+      # always() so a failing suite still reports its numbers
+      - name: C Test Summary
+        if: always()
+        run: bash tools/ci/report-c-tests.sh c-tests.log

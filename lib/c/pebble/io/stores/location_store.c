@@ -4,25 +4,39 @@
  * coords channel.
  */
 #include "io/stores/location_store.h"
+#include "io/stores/store_persist.h"
 
 #include <stdio.h>
 #include <string.h>
 
 #include "io/appmessage/appmessage.h"
+#include "wire/coords.h"
 
 // persist slot for the last good fix so a relaunch (e.g. after the timeline) shows the coords
-// straight away instead of blanking to "--". distinct from the weather store's key (255) and
-// clear of the settings keys which sit in a low band (1 / 5)
-#define LOCATION_STORE_PERSIST_KEY 254
+// straight away instead of blanking to "--". own key clear of the weather store (255) the
+// stock store (254) and the settings keys which sit in a low band (1 to 8)
+#define LOCATION_STORE_PERSIST_KEY 253
 
 static struct
 {
+    uint8_t tag; // STORE_TAG_LOCATION, so a restore can tell this blob from another shape
     char lat[20];
     char lon[20];
 } s_state;
+_Static_assert(sizeof(s_state) <= PERSIST_DATA_MAX_LENGTH, "location state must fit one persist key");
 
 static void (*s_cb)(void);
 static bool s_live;  // true = a live face, so the cache is worth reading and writing
+
+// stash the coords so a relaunch can restore them. only a live face writes, and only a real fix,
+// so a dropped one can't stomp the last good location
+static void persist_save(void)
+{
+    if (s_live && coords_look_real(s_state.lat, s_state.lon))
+    {
+        store_save(LOCATION_STORE_PERSIST_KEY, &s_state, sizeof(s_state), STORE_TAG_LOCATION);
+    }
+}
 
 /**
  * @brief Save the latest coordinates and tell whoever is listening. Doubles as the coords
@@ -31,17 +45,6 @@ static bool s_live;  // true = a live face, so the cache is worth reading and wr
  * @param lat Latitude string, empty when unavailable.
  * @param lon Longitude string, empty when unavailable.
  */
-// stash the coords so a relaunch can restore them. only a live face writes, and only a real
-// fix (a coordinate always carries digits, unlike the "NO LOCK" placeholder or an empty no-fix)
-// so a dropped fix can't stomp the last good location
-static void persist_save(void)
-{
-    if (s_live && strpbrk(s_state.lat, "0123456789"))
-    {
-        persist_write_data(LOCATION_STORE_PERSIST_KEY, &s_state, sizeof(s_state));
-    }
-}
-
 static void set(const char *lat, const char *lon)
 {
     snprintf(s_state.lat, sizeof(s_state.lat), "%s", lat ? lat : "");
@@ -65,13 +68,11 @@ void location_store_init(LocationConfig cfg, const LocationSeed *seed)
     {
         set(seed->lat, seed->lon);  // s_cb is NULL until the face subscribes so no redraw yet
     }
-    else if (cfg.live
-             && persist_exists(LOCATION_STORE_PERSIST_KEY)
-             && persist_get_size(LOCATION_STORE_PERSIST_KEY) == (int)sizeof(s_state))
+    else if (cfg.live)
     {
         // restore the last good fix so a relaunch shows it right away. s_cb is still NULL so no
         // redraw fires here, but the first paint (window push) re-pulls every readout
-        persist_read_data(LOCATION_STORE_PERSIST_KEY, &s_state, sizeof(s_state));
+        store_restore(LOCATION_STORE_PERSIST_KEY, &s_state, sizeof(s_state), STORE_TAG_LOCATION);
     }
 
     if (!cfg.enabled)

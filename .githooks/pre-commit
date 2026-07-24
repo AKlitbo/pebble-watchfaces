@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Lint and typecheck before a commit lands.
+#
+# CI runs these too, but CI only speaks up after a push, which is easy to miss with no
+# reviewer waiting. This is the same gate, one step earlier.
+#
+# Install once:  git config core.hooksPath .githooks
+# Skip on purpose (a WIP commit):  git commit --no-verify
+#
+# Deliberately no `npm test`: 628 tests on every commit trains you to reach for
+# --no-verify, and a hook you always skip is worse than no hook. CI runs them.
+set -euo pipefail
+
+npm run lint
+npm run typecheck

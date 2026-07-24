@@ -1,110 +1,123 @@
 import os
 import shutil
 import json
-import glob
 
 
 def _repo_root(ctx):
     """
-    The repo root: the nearest ancestor of the face dir holding both watchfaces/
-    and lib/. Found by walking up rather than assuming a fixed depth, so the
-    layout can move without breaking every wscript.
+    The repo root: the nearest ancestor of the face dir holding lib/ (the reusable
+    base). Found by walking up rather than assuming a fixed depth, so the layout can
+    move without breaking every wscript. The marker is name-agnostic to the face
+    folder, so renaming it never breaks this.
     """
     node = ctx.path
     while node is not None:
-        if node.find_dir('watchfaces') and node.find_dir('lib'):
+        if node.find_dir('lib'):
             return node
         node = node.parent
 
-    ctx.fatal('waf_helpers: could not locate the repo root (no ancestor with watchfaces/ and lib/)')
+    ctx.fatal('waf_helpers: could not locate the repo root (no ancestor with lib/)')
 
 
-def generate_conditions(ctx):
+def build_conditions(ctx):
     """
-    Regenerate the weather-icon lookup (icons_table.h) from the shared condition
-    vocabulary in lib/js/weather/conditions.js. Non-fatal: the generated header is
+    Regenerate the weather-icon lookup (icons_table.g.h) from the shared condition
+    vocabulary in lib/ts/weather/conditions.ts. Non-fatal: the generated header is
     committed, so a node-less environment still builds with the last-generated table.
     """
     from waflib import Logs
 
-    script = _repo_root(ctx).find_node('tools/generate-conditions.js')
-    if script and ctx.exec_command(['node', script.abspath()]) != 0:
-        Logs.warn('generate-conditions: node unavailable; using committed icons_table.h')
+    # the tools are ESM .ts in a package with no "type", which is what keeps the tsc-emitted
+    # runtime .js CommonJS for the bundler. node detects the module type from the syntax and
+    # warns about it, so silence just that warning rather than declare a type
+    script = _repo_root(ctx).find_node('lib/tools/build-conditions.ts')
+    cmd = ['node', '--disable-warning=MODULE_TYPELESS_PACKAGE_JSON', script.abspath()] if script else None
+    if script and ctx.exec_command(cmd) != 0:
+        Logs.warn('build-conditions: node unavailable; using committed icons_table.g.h')
 
 
-def generate_frames(ctx):
+def stage_shared_sources(ctx):
     """
-    Bake each face's HTML frame chrome into its background PNGs by invoking the
-    shared tools/generate-frame.js.
+    Mirror this face's src/ and resources/ plus the shared lib/ into this build folder
+    (targets/<face>/) so the SDK sees a normal, self-contained project. The sandbox is
+    named after the face, so ctx.path.name is the face; its src/ and resources/ live under
+    watchfaces/<face>/, while lib/ is shared at the repo root and comes along for the C.
 
-    Incremental: a face is re-baked only when a frame source (frame/**/*.html or
-    *.css) is newer than its background*.png, so an untouched build launches no
-    browser. Non-fatal: the PNGs are committed, so a build without node/playwright
-    falls back to the last-baked images.
+    emit/ is not staged: build:pkjs writes it straight into this sandbox (targets/<face>/emit)
+    keeping the watchfaces/<face>/src/pkjs + lib/ts layout, so the entry's relative requires
+    (../../../../lib/ts) already resolve here.
 
-    Themes are discovered dynamically. A single-frame face bakes every
-    frame/css/theme_*.css via "--theme all" (the generator enumerates them). A
-    multi-frame face bakes each frame/*.html, which links its own palette.
+    Only files whose size or mtime differ are copied, and mtimes are preserved, so an
+    untouched rebuild does not force a full recompile. Staged files whose source is
+    gone are dropped. The roots come from ctx.path.parent.parent (the true repo root, since
+    this folder sits under targets/), not _repo_root, because once lib/ is staged here
+    _repo_root would resolve to this folder instead.
     """
-    from waflib import Logs
-
-    face = ctx.path
-    tool = _repo_root(ctx).find_node('tools/generate-frame.js')
-    frame_dir = face.find_dir('frame')
-    if not tool or not frame_dir:
-        return
-
-    htmls = frame_dir.ant_glob('*.html')
-    if not htmls or not _frames_stale(face, frame_dir):
-        return
-
-    # one frame -> bake every theme palette. many frames -> bake each in turn
-    commands = []
-    if len(htmls) > 1:
-        for html in htmls:
-            commands.append(['node', tool.abspath(), html.name])
-    else:
-        command = ['node', tool.abspath(), htmls[0].name]
-        if frame_dir.ant_glob('css/theme_*.css'):
-            command += ['--theme', 'all']
-        commands.append(command)
-
-    for command in commands:
-        if ctx.exec_command(command) != 0:
-            Logs.warn('generate-frame: node/playwright unavailable; using committed background PNGs')
-            return
+    repo_root = ctx.path.parent.parent.abspath()
+    face = ctx.path.name
+    face_root = os.path.join(repo_root, 'watchfaces', face)
+    sources = {
+        'src': os.path.join(face_root, 'src'),
+        'resources': os.path.join(face_root, 'resources'),
+        'lib': os.path.join(repo_root, 'lib'),
+    }
+    for name, src_dir in sources.items():
+        if os.path.isdir(src_dir):
+            _mirror_tree(src_dir, os.path.join(ctx.path.abspath(), name))
 
 
-def _frames_stale(face, frame_dir):
-    """True when a frame source is newer than the baked PNGs, or none exist yet."""
-    images_dir = face.find_dir('resources/images')
-    images = images_dir.ant_glob('background*.png') if images_dir else []
-    if not images:
+def _mirror_tree(src, dst):
+    """Copy src into dst, refreshing changed files and dropping ones src no longer has."""
+    if not os.path.isdir(dst):
+        os.makedirs(dst)
+
+    # add or refresh anything that differs
+    for root, _dirs, files in os.walk(src):
+        rel = os.path.relpath(root, src)
+        dst_root = dst if rel == '.' else os.path.join(dst, rel)
+        if not os.path.isdir(dst_root):
+            os.makedirs(dst_root)
+        for name in files:
+            src_file = os.path.join(root, name)
+            dst_file = os.path.join(dst_root, name)
+            if _needs_copy(src_file, dst_file):
+                shutil.copy2(src_file, dst_file)
+
+    # drop staged files (and now-empty dirs) whose source has gone away
+    for root, dirs, files in os.walk(dst, topdown=False):
+        rel = os.path.relpath(root, dst)
+        src_root = src if rel == '.' else os.path.join(src, rel)
+        for name in files:
+            if not os.path.exists(os.path.join(src_root, name)):
+                os.remove(os.path.join(root, name))
+        for name in dirs:
+            staged = os.path.join(root, name)
+            if not os.path.isdir(os.path.join(src_root, name)) and not os.listdir(staged):
+                os.rmdir(staged)
+
+
+def _needs_copy(src_file, dst_file):
+    """True when dst is missing or differs from src in size or whole-second mtime."""
+    if not os.path.exists(dst_file):
         return True
-
-    sources = frame_dir.ant_glob('**/*.html') + frame_dir.ant_glob('**/*.css')
-    if not sources:
-        return False
-
-    newest_source = max(os.path.getmtime(node.abspath()) for node in sources)
-    oldest_output = min(os.path.getmtime(node.abspath()) for node in images)
-    return newest_source > oldest_output
+    src_stat = os.stat(src_file)
+    dst_stat = os.stat(dst_file)
+    return (src_stat.st_size != dst_stat.st_size
+            or int(src_stat.st_mtime) != int(dst_stat.st_mtime))
 
 
-def build_face(ctx, exclude_c=None):
+def build_face(ctx, extra_cflags=None):
     """
-    The shared build for every face: resolve include paths, collect this face's
-    C/JS plus the shared lib/, compile the app (and optional worker) per target
-    platform, bundle with PebbleKit JS, and archive the .pbw afterward.
-
-    exclude_c is an ant-glob exclude list for the shared lib/c sweep. A face with
-    no weather glyph passes '**/weather/icons.c' to drop the icon resources it
-    doesn't bundle.
+    The build: resolve include paths, collect the face's C/JS plus the shared lib/,
+    compile the app per target platform, bundle with PebbleKit JS, and archive the
+    .pbw afterward. extra_cflags are appended to every platform's CFLAGS (the watchapp
+    build passes -DBUILD_WATCHAPP).
     """
     repo = _repo_root(ctx)
 
-    # lib/ = code shared by ALL faces. lib/c/core/ is pure (SDK-free and host-testable).
-    # lib/c/pebble/ needs the SDK. lib/js/ is PebbleKit JS
+    # lib/ = the reusable base copied into every face. lib/c/core/ is pure (SDK-free and
+    # host-testable). lib/c/pebble/ needs the SDK. the PebbleKit JS is compiled out of
+    # lib/ts/ into emit/ before the build, so only the C comes from here
     lib_dir = repo.find_dir('lib')
     if not lib_dir:
         ctx.fatal('Could not find the "lib" directory at the repo root.')
@@ -112,11 +125,10 @@ def build_face(ctx, exclude_c=None):
     lib_c = lib_dir.find_dir('c')
     lib_c_core = lib_c.find_dir('core')
     lib_c_pebble = lib_c.find_dir('pebble')
-    lib_js = lib_dir.find_dir('js')
-    # this face's own sources (zone table and widgets and main and any skin code)
+    # this face's own sources (grid engine, widgets, main, theme)
     local_c = ctx.path.find_dir('src/c')
 
-    # only the two roots + the face-local dir are on the include path. every shared
+    # only the two lib roots + the face-local dir are on the include path. every shared
     # header is included with its folder relative to a root (e.g. "ui/engine/engine.h" or
     # "clock/beats.h") so moving a folder never touches this list
     include_paths = [
@@ -125,16 +137,17 @@ def build_face(ctx, exclude_c=None):
         local_c.abspath()
     ]
 
-    # one glob recurses the whole shared tree: lib/c/core/ (pure) + lib/c/pebble/ (SDK)
-    c_sources = (ctx.path.ant_glob('src/c/**/*.c')
-                 + lib_c.ant_glob('**/*.c', excl=exclude_c or []))
+    # one glob recurses the whole shared tree: lib/c/core/ (pure) + lib/c/pebble/ (SDK).
+    # drop the colocated host tests (*.spec.c) and the vendored test harness (spec/) so
+    # they never spend a byte on the watch
+    c_sources = ctx.path.ant_glob('src/c/**/*.c') + lib_c.ant_glob(
+        '**/*.c', excl=['**/*.spec.c', 'spec/**'])
 
-    js_sources = ctx.path.ant_glob(['src/pkjs/**/*.js', 'src/pkjs/**/*.json'])
-    if lib_js:
-        # exclude *.spec.js. test files never imported by index.js and not shipped
-        js_sources += lib_js.ant_glob('**/*.js', excl=['**/*.spec.js'])
+    # emit/ is build:pkjs output and holds nothing but the JS the watch ships: the specs
+    # and the clay/builder pieces are dropped at the tsc level (config/tsconfig.pkjs.json),
+    # and the generated *.g.js components are copied in beside it. so the whole tree goes
+    js_sources = ctx.path.ant_glob('emit/**/*.js')
 
-    build_worker = os.path.exists('worker_src')
     binaries = []
     cached_env = ctx.env
 
@@ -152,8 +165,20 @@ def build_face(ctx, exclude_c=None):
                 elif isinstance(mkeys, dict):
                     for mk in mkeys.keys():
                         cflags.append('-DHAS_MESSAGE_KEY_' + mk + '=1')
+
+                # the shared weather-icon lookup (lib/c/.../ui/weather/icons.c) is gated on
+                # HAS_WEATHER_ICONS. it references the ICON_WEATHER_NOW_* set via generated
+                # tables, so only a face that ships those icons should compile it. the whole
+                # set travels together, so the always-present fallback is a reliable proxy.
+                media = pkg_data.get('pebble', {}).get('resources', {}).get('media', [])
+                if isinstance(media, list) and any(
+                        isinstance(m, dict) and m.get('name') == 'ICON_WEATHER_NOW_NA' for m in media):
+                    cflags.append('-DHAS_WEATHER_ICONS=1')
         except Exception:
             pass
+
+    if extra_cflags:
+        cflags.extend(extra_cflags)
 
     for platform in ctx.env.TARGET_PLATFORMS:
         ctx.env = ctx.all_envs[platform]
@@ -171,65 +196,18 @@ def build_face(ctx, exclude_c=None):
             bin_type='app'
         )
 
-        binary_info = {'platform': platform, 'app_elf': app_elf}
-
-        if build_worker:
-            worker_elf = '{}/pebble-worker.elf'.format(ctx.env.BUILD_DIR)
-            ctx.pbl_build(
-                source=ctx.path.ant_glob('worker_src/c/**/*.c'),
-                target=worker_elf,
-                bin_type='worker'
-            )
-            binary_info['worker_elf'] = worker_elf
-
-        binaries.append(binary_info)
+        binaries.append({'platform': platform, 'app_elf': app_elf})
 
     ctx.env = cached_env
+
+    # emit/ keeps the source tree's shape, so the entry sits under the face's pkjs path.
+    # the sandbox is named after the face (ctx.path.name)
+    face = ctx.path.name
+    js_entry = 'emit/watchfaces/{}/src/pkjs/index.js'.format(face)
 
     ctx.set_group('bundle')
     ctx.pbl_bundle(
         binaries=binaries,
         js=js_sources,
-        js_entry_file='src/pkjs/index.js'
+        js_entry_file=js_entry
     )
-
-    ctx.add_post_fun(copy_current_pbw)
-
-
-def copy_current_pbw(ctx):
-    """
-    After the pebble bundle is built, this copies the resulting .pbw into the
-    releases/<face> directory, appending the version number from package.json.
-    Any older .pbw versions are moved to a 'previous' subdirectory.
-    """
-    face = ctx.path.name
-
-    src_pbw = os.path.join(ctx.path.abspath(), 'build', '{}.pbw'.format(face))
-    if not os.path.exists(src_pbw):
-        return
-
-    releases_dir = os.path.join(_repo_root(ctx).abspath(), 'releases', face)
-    if not os.path.isdir(releases_dir):
-        os.makedirs(releases_dir)
-
-    pkg_path = os.path.join(ctx.path.abspath(), 'package.json')
-    if os.path.exists(pkg_path):
-        # a malformed package.json should fail with a clear message not a traceback
-        version = 'unknown'
-        try:
-            with open(pkg_path, 'r') as pkg_f:
-                version = json.load(pkg_f).get('version', 'unknown')
-        except (ValueError, OSError) as err:
-            ctx.fatal('waf_helpers: could not read {}: {}'.format(pkg_path, err))
-
-        dest_filename = '{}-{}.pbw'.format(face, version)
-        dest_file = os.path.join(releases_dir, dest_filename)
-
-        previous_dir = os.path.join(releases_dir, 'previous')
-        for existing_pbw in glob.glob(os.path.join(releases_dir, '*.pbw')):
-            if os.path.basename(existing_pbw) != dest_filename:
-                if not os.path.isdir(previous_dir):
-                    os.makedirs(previous_dir)
-                shutil.move(existing_pbw, os.path.join(previous_dir, os.path.basename(existing_pbw)))
-
-        shutil.copy2(src_pbw, dest_file)

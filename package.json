@@ -1,20 +1,43 @@
 {
   "name": "pebble-watchfaces",
-  "version": "1.1.0",
-  "private": true,
   "author": "Null Syntax",
+  "version": "1.2.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "engines": {
+    "node": ">=24.2"
+  },
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "gen:icons": "node tools/generate-icons.js",
-    "gen:conditions": "node tools/generate-conditions.js"
+    "test": "vitest run --config config/vitest.config.ts",
+    "test:watch": "vitest --config config/vitest.config.ts",
+    "test:coverage": "vitest run --config config/vitest.config.ts --coverage",
+    "lint": "eslint . --config config/eslint.config.ts",
+    "lint:fix": "eslint . --fix --config config/eslint.config.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p config/tsconfig.tools.json && tsc -p config/tsconfig.spec.json",
+    "build:pkjs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/pkjs/build-pkjs.ts",
+    "build:conditions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/build-conditions.ts",
+    "build:manifests": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/manifest/build-manifests.ts",
+    "gen:icons": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/icons/generate-icons.ts",
+    "gen:frame": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/frame/generate-frame.ts"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@rebble/clay": "^1.0.10",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^24.13.3",
+    "@vitest/coverage-v8": "^4.1.8",
     "dotenv": "^17.4.2",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
+    "ical.js": "^2.2.1",
+    "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
     "sharp": "^0.35.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.64.0",
     "vitest": "^4.1.8"
   }
 }

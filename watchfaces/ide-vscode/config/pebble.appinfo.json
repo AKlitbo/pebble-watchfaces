@@ -1,0 +1,107 @@
+{
+  "name": "ide-vscode",
+  "displayName": "IDE VSCode",
+  "version": "1.2.0",
+  "watchface": true,
+  "uuid": "1ab9dff0-f6fd-4e0a-8e23-bc9ff80d45f2",
+  "sdkVersion": "3",
+  "enableMultiJS": true,
+  "targetPlatforms": [
+    "emery"
+  ],
+  "capabilities": [
+    "location",
+    "configurable",
+    "health"
+  ],
+  "messageKeys": [
+    "WEATHER_TEMPERATURE",
+    "WEATHER_CONDITIONS",
+    "WEATHER_REQUEST",
+    "SETTINGS_REQUEST",
+    "WEATHER_OK",
+    "LOCATION_LATITUDE",
+    "LOCATION_LONGITUDE",
+    "LOCATION_NAME",
+    "LOCATION_USE_GPS",
+    "LOCATION_GPS_FALLBACK",
+    "WEATHER_PROVIDER",
+    "WEATHER_API_KEY",
+    "WEATHER_TEMPERATURE_UNIT",
+    "CLOCK_DATE_FORMAT",
+    "APPEARANCE_THEME",
+    "HEALTH_STEPS_MODE",
+    "CLOCK_TIME_FORMAT",
+    "CONNECTION_BLUETOOTH_ICON",
+    "CONNECTION_VIBE_CONNECT",
+    "CONNECTION_VIBE_DISCONNECT",
+    "BATTERY_DISPLAY"
+  ],
+  "resources": {
+    "media": [
+      { "type": "bitmap", "name": "IMAGE_BG_DARK", "file": "images/background-dark.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_LIGHT", "file": "images/background-light.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_TERMINAL", "file": "images/background-terminal.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_CYBERPUNK", "file": "images/background-cyberpunk.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_SYNTHWAVE", "file": "images/background-synthwave.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLEAR", "file": "icons/weather-now-clear.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_CLEAR", "file": "icons/weather-now-night-clear.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLOUDY", "file": "icons/weather-now-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_FOG", "file": "icons/weather-now-fog.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_DRIZZLE", "file": "icons/weather-now-drizzle.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_RAIN", "file": "icons/weather-now-rain.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SLEET", "file": "icons/weather-now-sleet.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SNOW", "file": "icons/weather-now-snow.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SHOWERS", "file": "icons/weather-now-showers.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SNOW_WIND", "file": "icons/weather-now-snow-wind.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_THUNDERSTORM", "file": "icons/weather-now-thunderstorm.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NA", "file": "icons/weather-now-na.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_PARTLY_CLOUDY", "file": "icons/weather-now-partly-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_PARTLY_CLOUDY", "file": "icons/weather-now-night-partly-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_CLOUDY", "file": "icons/weather-now-night-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_FOG", "file": "icons/weather-now-night-fog.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_DRIZZLE", "file": "icons/weather-now-night-drizzle.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SLEET", "file": "icons/weather-now-night-sleet.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_RAIN", "file": "icons/weather-now-night-rain.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SNOW", "file": "icons/weather-now-night-snow.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SHOWERS", "file": "icons/weather-now-night-showers.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SNOW_WIND", "file": "icons/weather-now-night-snow-wind.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_THUNDERSTORM", "file": "icons/weather-now-night-thunderstorm.png" },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_78",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_72",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_20",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_14",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_12",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "raw",
+        "name": "NOTICE",
+        "file": "notice.txt"
+      }
+    ]
+  }
+}

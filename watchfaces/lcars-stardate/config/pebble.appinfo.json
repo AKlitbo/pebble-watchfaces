@@ -1,0 +1,129 @@
+{
+  "name": "lcars-stardate",
+  "displayName": "LCARS Stardate",
+  "version": "1.5.0",
+  "watchface": true,
+  "uuid": "68b0e2fe-b970-4cb2-8b4c-45ea9c13d968",
+  "sdkVersion": "3",
+  "enableMultiJS": true,
+  "targetPlatforms": [
+    "emery"
+  ],
+  "capabilities": [
+    "location",
+    "configurable",
+    "health"
+  ],
+  "messageKeys": [
+    "WEATHER_TEMPERATURE",
+    "WEATHER_CONDITIONS",
+    "WEATHER_REQUEST",
+    "SETTINGS_REQUEST",
+    "WEATHER_OK",
+    "LOCATION_LATITUDE",
+    "LOCATION_LONGITUDE",
+    "LOCATION_NAME",
+    "LOCATION_USE_GPS",
+    "LOCATION_GPS_FALLBACK",
+    "WEATHER_PROVIDER",
+    "WEATHER_API_KEY",
+    "WEATHER_TEMPERATURE_UNIT",
+    "CLOCK_DATE_FORMAT",
+    "APPEARANCE_THEME",
+    "HEALTH_STEPS_MODE",
+    "CLOCK_TIME_FORMAT",
+    "CONNECTION_BLUETOOTH_ICON",
+    "CONNECTION_VIBE_CONNECT",
+    "CONNECTION_VIBE_DISCONNECT"
+  ],
+  "resources": {
+    "media": [
+      { "type": "bitmap", "name": "IMAGE_BG_CLASSIC", "file": "images/background.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS", "file": "images/background-lower-decks.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD", "file": "images/background-lower-decks-padd.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_NEMESIS_BLUE", "file": "images/background-nemesis-blue.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_MONO", "file": "images/background-lower-decks-mono.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_LOWER_DECKS_PADD_MONO", "file": "images/background-lower-decks-padd-mono.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
+      { "type": "bitmap", "name": "ICON_HEART", "file": "icons/heart.png" },
+      { "type": "bitmap", "name": "ICON_FEET", "file": "icons/feet.png" },
+      { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLEAR", "file": "icons/weather-now-clear.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_CLEAR", "file": "icons/weather-now-night-clear.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLOUDY", "file": "icons/weather-now-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_FOG", "file": "icons/weather-now-fog.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_DRIZZLE", "file": "icons/weather-now-drizzle.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_RAIN", "file": "icons/weather-now-rain.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SLEET", "file": "icons/weather-now-sleet.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SNOW", "file": "icons/weather-now-snow.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SHOWERS", "file": "icons/weather-now-showers.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_SNOW_WIND", "file": "icons/weather-now-snow-wind.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_THUNDERSTORM", "file": "icons/weather-now-thunderstorm.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NA", "file": "icons/weather-now-na.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_PARTLY_CLOUDY", "file": "icons/weather-now-partly-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_PARTLY_CLOUDY", "file": "icons/weather-now-night-partly-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_CLOUDY", "file": "icons/weather-now-night-cloudy.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_FOG", "file": "icons/weather-now-night-fog.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_DRIZZLE", "file": "icons/weather-now-night-drizzle.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SLEET", "file": "icons/weather-now-night-sleet.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_RAIN", "file": "icons/weather-now-night-rain.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SNOW", "file": "icons/weather-now-night-snow.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SHOWERS", "file": "icons/weather-now-night-showers.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_SNOW_WIND", "file": "icons/weather-now-night-snow-wind.png" },
+      { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_THUNDERSTORM", "file": "icons/weather-now-night-thunderstorm.png" },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_62",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_36",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_32",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_28",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_20",
+        "file": "fonts/Antonio.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_16",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[A-Z0-9 .-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_12",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[0-9-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ANTONIO_10",
+        "file": "fonts/Antonio.ttf"
+      },
+      {
+        "type": "raw",
+        "name": "NOTICE",
+        "file": "notice.txt"
+      }
+    ]
+  }
+}

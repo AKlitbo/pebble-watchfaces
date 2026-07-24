@@ -6,12 +6,15 @@
  * label for roomy faces. Both accept the wire token (including the "_NIGHT"
  * forms) and return a string literal, so callers never strip the night marker.
  *
- * @ingroup lib
+ * @ingroup lib_ui
  */
 #pragma once
 #include <pebble.h>
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_ui
+ * @{
+ */
 
 /**
  * @brief Compact display label for a condition token (e.g. "PCLDY").

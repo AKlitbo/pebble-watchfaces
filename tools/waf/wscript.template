@@ -1,0 +1,53 @@
+# ==============================================================================
+# GENERATED from tools/waf/wscript.template by tools/manifest/build-manifests.ts.
+# Do not edit targets/<face>/wscript; edit the template instead.
+#
+# Waf build rules for one watchface. This sandbox is named after the face
+# (targets/<face>/), and waf_helpers reads that name to find the face's sources
+# under watchfaces/<face>/.
+#
+# Stage the face's sources plus the shared lib/ into this folder, then hand the
+# build (sources, per-platform compile, bundle, .pbw archive) to
+# lib/py/waf_helpers.py. The reusable lib/ sits at the repo root, two levels up
+# (this folder sits under targets/). This file is identical for every face, which
+# is why it is generated rather than committed once per face.
+# ==============================================================================
+import os.path
+import sys
+from waflib.Tools import c_preproc
+
+# let waf's preprocessor scanner trace through absolute include paths so it discovers
+# the transitive pebble.h include and the SDK can inject the resource_ids.auto.h
+# dependency before compilation starts
+c_preproc.go_absolute = True
+
+top = '.'
+out = 'build'
+
+
+def options(ctx):
+    ctx.load('pebble_sdk')
+
+
+def configure(ctx):
+    ctx.load('pebble_sdk')
+
+
+def build(ctx):
+    # load the shared waf helpers from the repo root's lib/py (two levels up: this
+    # folder sits under targets/). the staged lib/ here does not exist until
+    # stage_shared_sources runs, so load from the real root, not this folder
+    lib_path = os.path.join(ctx.path.parent.parent.abspath(), 'lib', 'py')
+    if lib_path not in sys.path:
+        sys.path.insert(0, lib_path)
+
+    import waf_helpers
+
+    # stage before loading the SDK: pebble_sdk scans resources/ as it loads, so the
+    # shared sources have to be in place first
+    waf_helpers.stage_shared_sources(ctx)
+
+    ctx.load('pebble_sdk')
+
+    waf_helpers.build_conditions(ctx)
+    waf_helpers.build_face(ctx)

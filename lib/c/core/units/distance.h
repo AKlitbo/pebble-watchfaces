@@ -2,29 +2,34 @@
  * @file distance.h
  * @brief Pure distance conversions + formatting (no SDK)
  *
- * @ingroup lib
+ * @ingroup lib_core
  */
 #pragma once
 #include <stddef.h>
 #include <stdbool.h>
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_core
+ * @{
+ */
 
 /**
- * @brief Meters to miles.
+ * @brief Unit label for the current distance mode ("MI" or "KM").
  *
- * @param meters The distance in meters.
- * @return Distance in miles.
+ * @param miles Miles if true, otherwise km.
+ * @return Static unit string.
  */
-float distance_m_to_miles(int meters);
+const char *distance_unit(bool miles);
 
 /**
- * @brief Meters to kilometers.
+ * @brief Format meters as "N.N" (rounded to tenth), no unit suffix.
  *
- * @param meters The distance in meters.
- * @return Distance in kilometers.
+ * @param buffer Output buffer.
+ * @param size Buffer size.
+ * @param meters Distance in meters.
+ * @param miles Format as miles if true, otherwise km.
  */
-float distance_m_to_km(int meters);
+void distance_format_value(char *buffer, size_t size, int meters, bool miles);
 
 /**
  * @brief Format meters as "N.N MI" or "N.N KM" (rounded to tenth).

@@ -4,11 +4,11 @@
  */
 #include "ui/fonts.h"
 
-static GFont s_fonts[FONT_COUNT]; // loaded font handles
+static GFont s_fonts[FONT_SLOTS_MAX]; // loaded font handles
 
 void fonts_register(FontId id, GFont handle)
 {
-    if (id >= FONT_COUNT)
+    if (id >= FONT_SLOTS_MAX)
     {
         APP_LOG(APP_LOG_LEVEL_ERROR, "fonts_register: id %d out of range", id);
         return;
@@ -19,16 +19,16 @@ void fonts_register(FontId id, GFont handle)
 
 GFont fonts_get(FontId id)
 {
-    if (id < FONT_COUNT && s_fonts[id])
+    if (id < FONT_SLOTS_MAX && s_fonts[id])
     {
         return s_fonts[id];
     }
 
     // a mis-wired zone resolves the same id every tick so log the miss once per
     // id rather than spamming the log. out-of-range is a build-time bug so log it plainly
-    if (id < FONT_COUNT)
+    if (id < FONT_SLOTS_MAX)
     {
-        static bool s_warned[FONT_COUNT];
+        static bool s_warned[FONT_SLOTS_MAX];
         if (!s_warned[id])
         {
             s_warned[id] = true;
@@ -37,7 +37,7 @@ GFont fonts_get(FontId id)
     }
     else
     {
-        // out-of-range can't index s_warned[FONT_COUNT] so dedup with its own flag
+        // out-of-range can't index s_warned[FONT_SLOTS_MAX] so dedup with its own flag
         static bool s_oor_warned;
         if (!s_oor_warned)
         {
@@ -51,7 +51,7 @@ GFont fonts_get(FontId id)
 
 void fonts_unload_all(void)
 {
-    for (int i = 0; i < FONT_COUNT; i++)
+    for (int i = 0; i < FONT_SLOTS_MAX; i++)
     {
         if (s_fonts[i])
         {

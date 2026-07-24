@@ -15,6 +15,7 @@ static struct
 static bool s_bt_initialized;   // the first bluetooth reading only seeds. later changes can buzz
 static void (*s_cb)(void);
 static BtVibePolicy s_vibe;
+static void (*s_reconnect)(void); // fired on a real disconnected -> connected transition
 
 /**
  * @brief Save the battery reading and notify.
@@ -31,10 +32,19 @@ static void set_battery(int level, bool charging)
  */
 static void set_bluetooth(bool connected)
 {
+    bool was_connected = s_state.bluetooth_connected;
+
     // hand a real transition to the face's policy. the first reading only seeds the state
-    if (s_bt_initialized && s_state.bluetooth_connected != connected && s_vibe)
+    if (s_bt_initialized && was_connected != connected && s_vibe)
     {
         s_vibe(connected);
+    }
+
+    // the phone app just came back. let the face catch up its phone-backed readouts now instead
+    // of waiting out each store's poll. the first reading only seeds, so this skips at launch
+    if (s_bt_initialized && !was_connected && connected && s_reconnect)
+    {
+        s_reconnect();
     }
 
     s_bt_initialized = true;
@@ -59,6 +69,11 @@ static void on_connection(bool connected)
 void system_store_subscribe(void (*cb)(void))
 {
     s_cb = cb;
+}
+
+void system_store_on_reconnect(void (*cb)(void))
+{
+    s_reconnect = cb;
 }
 
 void system_store_init(SystemConfig cfg, const SystemSeed *seed)

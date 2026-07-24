@@ -1,49 +1,53 @@
 /**
  * @file fonts.h
- * @brief Font registry: a face loads its custom fonts once under a category id, the rest
- * of the ui looks them up by id so layout tables can stay static (an id, not a
- * runtime GFont handle). single-platform binaries register their own handles, so
- * there is no per-platform font-set resolution here
+ * @brief Font registry: a face loads its custom fonts once, each under a small integer slot id, and
+ * the rest of the ui looks them up by id so layout tables can stay static (an id, not a live GFont
+ * handle). The registry does not care which fonts they are. The face owns the slots and what they
+ * mean (see the face's own draw/fonts.h), this just maps an id to its handle
  *
- * @ingroup lib
+ * @ingroup lib_ui
  */
 #pragma once
 #include <pebble.h>
 
-/** @addtogroup lib @{ */
-
 /**
- * @brief Identifier for each loaded font category.
+ * @addtogroup lib_ui
+ * @{
  */
-typedef enum
-{
-    FONT_TIME_BIG, // 1x4 clock readout
-    FONT_TIME,    // clock readout
-    FONT_TIME_SM, // clock readout fallback for the wide .beats token
-    FONT_DATE,    // date banner
-    FONT_DATE_SM, // date banner fallback for wide formats
-    FONT_DATE_XS, // date banner fallback for the widest formats
-    FONT_SM,      // weather temp
-    FONT_SM_NARROW, // fallback for long strings in 1x2
-    FONT_SM_MED,    // one step below FONT_SM (modular-emery: Teko 24). 1x2 time shrink
-    FONT_VALUE,   // heartrate / steps values
-    FONT_COORD,   // lat / lon
-    FONT_XS,      // AM/PM superscript
-    FONT_COUNT
-} FontId;
 
 /**
- * @brief Store a loaded font handle under its category id.
+ * @brief A font slot id. The face defines its slots as 0 to FONT_SLOTS_MAX-1 and the registry
+ * treats the id as a plain index.
+ */
+typedef uint8_t FontId;
+
+/// Registry capacity. Sized to the face's slot count so the table wastes no memory. The face's
+/// draw/fonts.h checks FONT_COUNT against this at build time, so adding a slot past it fails the
+/// build with a clear message. Raise it by the same amount you grow the face
+#define FONT_SLOTS_MAX 16
+
+/**
+ * @brief Store a loaded font handle under its slot id.
  *
- * @param id The category id.
+ * You keep the handle. Registering over a slot that already holds one just overwrites it and the
+ * old font stays loaded, so a face swapping a font at runtime needs to hang on to the old handle
+ * and unload it first. fonts_unload_all is the only place the registry unloads anything, which is
+ * what tidies up whatever is left in a slot at the end. So keep it to one handle per slot. Put the
+ * same handle under two ids and fonts_unload_all tries to unload it twice.
+ *
+ * A NULL handle goes in like any other and fonts_get then reads that slot as empty and hands back
+ * the system font for the rest of the session. fonts_load_custom_font gives you NULL when it cannot
+ * load the resource, so passing that straight in quietly parks you on the fallback.
+ *
+ * @param id The slot id.
  * @param handle The loaded font handle.
  */
 void fonts_register(FontId id, GFont handle);
 
 /**
- * @brief Resolve a category id to its handle. Falls back to the system font on a miss.
+ * @brief Resolve a slot id to its handle. Falls back to the system font on a miss.
  *
- * @param id The category id.
+ * @param id The slot id.
  * @return The font handle.
  */
 GFont fonts_get(FontId id);

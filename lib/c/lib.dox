@@ -1,0 +1,56 @@
+/**
+ * @defgroup lib Shared Base Library
+ *
+ * The reusable, watch-neutral base you would copy to start a new watchface. It holds the
+ * stores, the AppMessage pipeline, the settings framework, the units, the slot engine, and
+ * the weather tables. It never reaches into face code.
+ *
+ * The subgroups below split it up by job.
+ */
+
+/**
+ * @defgroup lib_core Core Helpers
+ * @ingroup lib
+ *
+ * Pure maths and text helpers with no watch SDK, so they are easy to test off the watch.
+ * Think .beats time, moon phase, weekday names, number formatting, and unit conversions.
+ */
+
+/**
+ * @defgroup lib_io Data In and Out
+ * @ingroup lib
+ *
+ * The AppMessage pipeline that talks to the phone, plus the little byte readers the stores
+ * use to unpack the packed strips.
+ */
+
+/**
+ * @defgroup lib_stores Stores
+ * @ingroup lib
+ *
+ * The active stores. Each one holds a kind of reading (weather, health, calendar and friends),
+ * keeps it fresh, and nudges the screen when it changes.
+ */
+
+/**
+ * @defgroup lib_settings Settings
+ * @ingroup lib
+ *
+ * The persist and settings framework. A face hands it a field table and it does the load, the
+ * save, and the phone sync without naming any single setting itself.
+ */
+
+/**
+ * @defgroup lib_system System Bits
+ * @ingroup lib
+ *
+ * Watch-level odds and ends: buzzing on a bluetooth change and formatting the system units.
+ */
+
+/**
+ * @defgroup lib_ui UI
+ * @ingroup lib
+ *
+ * The drawing side: the slot engine, zones, fonts, the icon cache, and the weather icons and
+ * labels.
+ */

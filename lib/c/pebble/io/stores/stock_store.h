@@ -5,37 +5,17 @@
  * then reads the slots and subscribes for repaints. The phone data flows straight in and
  * nobody wires it.
  *
- * @ingroup lib
+ * @ingroup lib_stores
  */
 #pragma once
 #include <pebble.h>
 
-/** @addtogroup lib @{ */
-
-// how many tickers the watchlist can hold. matches STOCK_MAX_SLOTS on the phone
-#define STOCK_MAX_SLOTS 4
-
-// room for a ticker (up to ~6) or a short status word ("INVALID KEY" is 11) plus the NUL
-#define STOCK_SYMBOL_LEN 12
+#include "wire/stock_wire.h"
 
 /**
- * @brief One quote slot. When ok is false the symbol field carries a short status word
- * ("RATE LIMIT" and friends) instead of a ticker so the watch has something to show.
+ * @addtogroup lib_stores
+ * @{
  */
-typedef struct
-{
-    char symbol[STOCK_SYMBOL_LEN]; // ticker, or status text when ok is false, "" when empty
-    int  price_cents;              // last price times 100
-    int  change_pct;               // percent change times 100, signed
-    bool ok;                       // true = a live reading, false = a status message
-} StockSlot;
-
-/** @brief The watchlist strip. count is 0 until a reading lands. */
-typedef struct
-{
-    uint8_t   count;                 // how many slots are filled (0 = none yet)
-    StockSlot slot[STOCK_MAX_SLOTS];
-} StockStrip;
 
 /**
  * @brief The rules a face hands the store, built from its own settings so the store names no
@@ -43,9 +23,10 @@ typedef struct
  */
 typedef struct
 {
-    bool enabled;   // false = inert (no channel no timer holds nothing)
-    bool live;      // true = subscribe the channel + poll. false = seed-only (dev/screenshots)
-    int  poll_min;  // minutes between stock requests
+    bool     enabled;     ///< False makes the store do nothing (no channel and no timer)
+    bool     live;        ///< True subscribes the channel and polls. False just keeps the fake data for screenshots
+    int      poll_min;    ///< Minutes between stock requests
+    uint32_t persist_key; ///< Slot for the last good strip so the face owns the key instead of the store
 } StockConfig;
 
 /**
@@ -54,7 +35,7 @@ typedef struct
  */
 typedef struct
 {
-    const StockStrip *strip; // the slots to show, or NULL for none
+    const StockStrip *strip; ///< The slots to show, or NULL for none
 } StockSeed;
 
 /**

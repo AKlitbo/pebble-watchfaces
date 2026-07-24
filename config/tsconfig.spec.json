@@ -1,0 +1,23 @@
+// typechecks the *.spec.ts suite
+// run by npm run typecheck
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    // the specs run in jsdom so they need the DOM types
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
+  },
+  // these two .d.ts files declare globals the specs use without importing them
+  "include": [
+    "../**/*.spec.ts",
+    "../lib/ts/pkjs/pebble.d.ts",
+    "../watchfaces/*/src/pkjs/generated.d.ts"
+  ],
+  "exclude": [
+    "../node_modules",
+    "../targets"
+  ]
+}

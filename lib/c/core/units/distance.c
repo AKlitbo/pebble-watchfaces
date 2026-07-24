@@ -6,26 +6,29 @@
 
 #include <stdio.h>
 
-float distance_m_to_miles(int meters)
+const char *distance_unit(bool miles)
 {
-    return meters / 1609.344f;
+    return miles ? "MI" : "KM";
 }
 
-float distance_m_to_km(int meters)
-{
-    return meters / 1000.0f;
-}
-
-void distance_format(char *buffer, size_t size, int meters, bool miles)
+void distance_format_value(char *buffer, size_t size, int meters, bool miles)
 {
     if (meters < 0)
     {
         meters = 0;
     }
 
-    float dist = miles ? distance_m_to_miles(meters) : distance_m_to_km(meters);
+    // tenths of the display unit in whole integer math so no float library gets linked in.
+    // a tenth of a mile is 160.9344 m so scale by 625/100584 (10000/1609344 reduced) and
+    // a tenth of a km is a flat 100 m. adding half the divisor rounds to the nearest tenth
+    // and the miles product stays inside 32 bits below about 3400 km
+    int tenths = miles ? (meters * 625 + 50292) / 100584 : (meters + 50) / 100;
+    snprintf(buffer, size, "%d.%d", tenths / 10, tenths % 10);
+}
 
-    // round to one decimal in integer space so the carry is handled (4.96 -> 5.0)
-    int tenths = (int)(dist * 10.0f + 0.5f);
-    snprintf(buffer, size, "%d.%d %s", tenths / 10, tenths % 10, miles ? "MI" : "KM");
+void distance_format(char *buffer, size_t size, int meters, bool miles)
+{
+    char value[12];
+    distance_format_value(value, sizeof(value), meters, miles);
+    snprintf(buffer, size, "%s %s", value, distance_unit(miles));
 }

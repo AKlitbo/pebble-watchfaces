@@ -51,7 +51,7 @@ static void beats_fire(void *data)
 
 /**
  * @brief Run the tickers the config asks for. The two cadences are independent, so a face can
- * have the minute tick, the .beats timer, or both (modular shows a clock and .beats together).
+ * have the minute tick, the .beats timer, or both (a clock and .beats can run together).
  */
 static void start_ticker(void)
 {

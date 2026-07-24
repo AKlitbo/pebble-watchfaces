@@ -1,0 +1,8 @@
+{
+  "defaultFrame": "classic-standard",
+  "defaultScale": 4,
+  "supportsTheme": false,
+  "bareBackgroundBase": "classic",
+  "clearTextSelectors": [".time", ".banner", ".data"],
+  "hideSelectors": [".lcars-text-bar h3"]
+}

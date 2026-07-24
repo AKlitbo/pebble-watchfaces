@@ -8,16 +8,10 @@
 #include "clock/beats.h"
 #include "units/distance.h"
 
-/**
- * @brief Calculate ms since Biel Mean Time (UTC+1) midnight.
- *
- * Has sub-second precision. .beats boundaries fall mid-second, so we work
- * in ms. Flooring whole seconds reads one beat behind right when the
- * refresh timer fires.
- *
- * @return Milliseconds into the current BMT day.
- */
-static int64_t ms_into_bmt_day(void)
+// read the clock, break it apart, and hand the pieces to the maths. reading and breaking apart are
+// the parts that need the SDK: gmtime and struct tm are pebble.h's here rather than time.h's, so
+// they stay on this side of the fence and the sum lives next door in core
+static int32_t ms_into_bmt_day(void)
 {
     time_t now;
     uint16_t ms;
@@ -27,11 +21,10 @@ static int64_t ms_into_bmt_day(void)
     if (!utc)
     {
         // unconvertible time_t: degrade to ms into a notional midnight rather than deref null
-        return (int64_t)ms;
+        return (int32_t)ms;
     }
-    long secs = utc->tm_hour * SECS_PER_HOUR + utc->tm_min * SECS_PER_MIN + utc->tm_sec;
 
-    return (((int64_t)((secs + BMT_UTC_OFFSET_S) % SECS_PER_DAY)) * MS_PER_SEC) + ms;
+    return beats_ms_from_hms(utc->tm_hour, utc->tm_min, utc->tm_sec, ms);
 }
 
 int units_swatch_beats(void)
@@ -47,4 +40,14 @@ uint32_t units_ms_until_next_beat(void)
 void units_format_distance(char *buffer, size_t size, int meters, bool miles)
 {
     distance_format(buffer, size, meters, miles);
+}
+
+void units_format_distance_value(char *buffer, size_t size, int meters, bool miles)
+{
+    distance_format_value(buffer, size, meters, miles);
+}
+
+const char *units_distance_unit(bool miles)
+{
+    return distance_unit(miles);
 }

@@ -1,6 +1,6 @@
 /**
  * @file readouts.c
- * @brief Shared text formatters for the vitals faces.
+ * @brief Text formatters shared by the faces, bound to the engine's text-slots.
  */
 #include "ui/readouts.h"
 
@@ -87,8 +87,17 @@ void readout_steps(char *out, size_t n)
 
 void readout_weather_temp(char *out, size_t n)
 {
-    const char *temp = weather_store_temp();
-    snprintf(out, n, "%s", temp[0] ? temp : "--");
+    // the store hands back a whole number already in the user's unit
+    // WEATHER_NO_TEMP means we have not got a reading yet
+    // the unit letter goes on the end so it reads like "23C" or "73F"
+    int temp = weather_store_temp();
+    if (temp == WEATHER_NO_TEMP)
+    {
+        snprintf(out, n, "--");
+        return;
+    }
+
+    snprintf(out, n, "%d%c", temp, settings_u8(SETTING_TEMPERATURE_UNIT) ? 'F' : 'C');
 }
 
 void readout_weather_cond(char *out, size_t n)

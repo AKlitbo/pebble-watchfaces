@@ -29,10 +29,19 @@ void vibe_pulse(VibePulse pulse)
     }
 }
 
-void vibe_bt_transition(bool connected)
+void vibe_custom(const uint32_t *durations, uint32_t num_segments)
 {
-    uint8_t choice = connected ? settings_u8(SETTING_BLUETOOTH_VIBE_CONNECT)
-                               : settings_u8(SETTING_BLUETOOTH_VIBE_DISCONNECT);
+    // stay silent during do-not-disturb, same as vibe_pulse
+    if (quiet_time_is_active())
+    {
+        return;
+    }
+
+    vibes_enqueue_custom_pattern((VibePattern){ .durations = durations, .num_segments = num_segments });
+}
+
+void vibe_choice(uint8_t choice)
+{
     switch (choice)
     {
         case VIBE_SHORT:  vibe_pulse(VibePulseShort);  break;
@@ -40,4 +49,10 @@ void vibe_bt_transition(bool connected)
         case VIBE_DOUBLE: vibe_pulse(VibePulseDouble); break;
         default: break;  // VIBE_NONE
     }
+}
+
+void vibe_bt_transition(bool connected)
+{
+    vibe_choice(connected ? settings_u8(SETTING_BLUETOOTH_VIBE_CONNECT)
+                          : settings_u8(SETTING_BLUETOOTH_VIBE_DISCONNECT));
 }

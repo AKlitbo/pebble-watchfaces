@@ -1,0 +1,84 @@
+{
+  "name": "radar-array",
+  "displayName": "Radar Array",
+  "version": "1.3.0",
+  "watchface": true,
+  "uuid": "bad9fa8c-1dde-4314-ba22-68d8806c6fb3",
+  "sdkVersion": "3",
+  "enableMultiJS": true,
+  "targetPlatforms": [
+    "emery"
+  ],
+  "capabilities": [
+    "location",
+    "configurable",
+    "health"
+  ],
+  "messageKeys": [
+    "WEATHER_TEMPERATURE",
+    "WEATHER_CONDITIONS",
+    "WEATHER_REQUEST",
+    "SETTINGS_REQUEST",
+    "WEATHER_OK",
+    "LOCATION_LATITUDE",
+    "LOCATION_LONGITUDE",
+    "LOCATION_NAME",
+    "LOCATION_USE_GPS",
+    "LOCATION_GPS_FALLBACK",
+    "WEATHER_PROVIDER",
+    "WEATHER_API_KEY",
+    "WEATHER_TEMPERATURE_UNIT",
+    "CLOCK_DATE_FORMAT",
+    "APPEARANCE_THEME",
+    "HEALTH_STEPS_MODE",
+    "CLOCK_TIME_FORMAT",
+    "CONNECTION_BLUETOOTH_ICON",
+    "CONNECTION_VIBE_CONNECT",
+    "CONNECTION_VIBE_DISCONNECT"
+  ],
+  "resources": {
+    "media": [
+      { "type": "bitmap", "name": "IMAGE_BG_DEFAULT", "file": "images/background-default.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_RESCUE", "file": "images/background-rescue.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_NEON", "file": "images/background-neon.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_STEALTH", "file": "images/background-stealth.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_PHOSPHOR", "file": "images/background-phosphor.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_CRIMSON", "file": "images/background-crimson.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
+      {
+        "type": "font",
+        "name": "FONT_STM_40",
+        "file": "fonts/ShareTechMono-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_17",
+        "file": "fonts/ShareTechMono-Regular.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_18",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_14",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_12",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "raw",
+        "name": "NOTICE",
+        "file": "notice.txt"
+      }
+    ]
+  }
+}

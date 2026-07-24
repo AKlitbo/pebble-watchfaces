@@ -7,6 +7,11 @@
 TextLayer *zone_make_layer(Layer *parent, const Zone *zone)
 {
     TextLayer *layer = text_layer_create(zone->rect);
+    if (!layer)
+    {
+        return NULL; // no room on the heap, so the caller gets an empty slot not a bad pointer
+    }
+
     text_layer_set_background_color(layer, GColorClear);
     text_layer_set_font(layer, fonts_get(zone->font_id));
     text_layer_set_text_alignment(layer, zone->align);

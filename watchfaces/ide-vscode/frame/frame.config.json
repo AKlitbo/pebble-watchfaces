@@ -1,0 +1,8 @@
+{
+  "defaultFrame": "vscode",
+  "defaultScale": 1,
+  "supportsTheme": true,
+  "bareBackgroundBase": null,
+  "clearTextSelectors": [".time", ".data"],
+  "hideSelectors": []
+}

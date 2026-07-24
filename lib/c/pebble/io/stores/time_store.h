@@ -4,27 +4,30 @@
  * AppTimer) and swaps between them for the current cadence, so a face just hands it the
  * rules and reads the time back.
  *
- * @ingroup lib
+ * @ingroup lib_stores
  */
 #pragma once
 #include <pebble.h>
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_stores
+ * @{
+ */
 
 /**
  * @brief The rules a face hands the store, built from its own settings so the store names no
  * SETTING_*.
  *
- * The two cadences are independent, so a face can run either or both: the shell faces set
- * exactly one (their time format is a single exclusive choice), while modular runs the minute
+ * The two cadences are independent, so a face can run either or both. One face might run
+ * exactly one when its time format is a single exclusive choice. Another runs the minute
  * tick always plus the beats timer whenever a live .beats module is on screen.
  */
 typedef struct
 {
-    bool enabled;     // false = inert
-    bool live;        // true = run the tickers. false = seed-only (a frozen clock for screenshots)
-    bool minute_tick; // run the minute tick (clock date and most readouts)
-    bool beats;       // also run the 86.4s .beats timer (for a live .beats readout)
+    bool enabled;     ///< False makes the store do nothing
+    bool live;        ///< True runs the tickers and false freezes the clock for screenshots
+    bool minute_tick; ///< Run the minute tick (clock date and most readouts)
+    bool beats;       ///< Also run the 86.4 second .beats timer for a live .beats readout
 } TimeConfig;
 
 /**

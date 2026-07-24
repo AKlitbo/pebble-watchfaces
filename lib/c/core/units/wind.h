@@ -2,11 +2,14 @@
  * @file wind.h
  * @brief Pure wind-speed conversions + unit labels (no SDK)
  *
- * @ingroup lib
+ * @ingroup lib_core
  */
 #pragma once
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_core
+ * @{
+ */
 
 /**
  * @brief Which unit a wind speed reads out in.

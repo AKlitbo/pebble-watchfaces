@@ -1,0 +1,38 @@
+name: Setup Pebble
+description: Install Node, the project deps, and the Pebble SDK so `bash build.sh` can run.
+
+# shared by ci.yml and release.yml: both need an identical toolchain, and a release that
+# builds differently from CI is a release nobody tested
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        cache: npm
+
+    # the pkjs bundle requires @rebble/clay, so a full install is needed
+    - name: Install Node Deps
+      shell: bash
+      run: npm ci
+
+    # SDK + emulator system libs (developer.repebble.com/sdk/)
+    - name: Install SDK System Deps
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libsdl2-2.0-0 libglib2.0-0 libpixman-1-0 zlib1g libsndio7.0 \
+          binutils-arm-none-eabi
+
+    - name: Install uv
+      shell: bash
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+    - name: Install pebble-tool + SDK Core
+      shell: bash
+      run: |
+        uv tool install pebble-tool
+        pebble sdk install latest

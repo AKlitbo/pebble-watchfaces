@@ -2,11 +2,14 @@
  * @file text_case.h
  * @brief Pure ascii case helpers (no SDK)
  *
- * @ingroup lib
+ * @ingroup lib_core
  */
 #pragma once
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_core
+ * @{
+ */
 
 /**
  * @brief Uppercase an ascii string in place.

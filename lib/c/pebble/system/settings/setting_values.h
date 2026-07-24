@@ -4,14 +4,17 @@
  *
  * The wire format and Clay config encode these as bare integers. C branches read
  * them by name instead. The order mirrors each setting's config.js option list,
- * and the trailing *_COUNT sentinel feeds the schema's enum_count so the bound
+ * and the trailing *_COUNT marker feeds the schema's enum_count so the limit
  * can't drift from the values.
  *
- * @ingroup lib
+ * @ingroup lib_settings
  */
 #pragma once
 
-/** @addtogroup lib @{ */
+/**
+ * @addtogroup lib_settings
+ * @{
+ */
 
 /**
  * @brief SETTING_TIME_FORMAT choices.
@@ -19,10 +22,10 @@
 typedef enum
 {
     TIME_FORMAT_SYSTEM      = 0,
-    TIME_FORMAT_12H         = 1,  // 12 hour with a leading zero  06:30
+    TIME_FORMAT_12H         = 1,  ///< 12 hour with a leading zero like 06:30
     TIME_FORMAT_24H         = 2,
-    TIME_FORMAT_BEATS       = 3,  // kept for the wire format. not offered in the config
-    TIME_FORMAT_12H_NO_LEAD = 4,  // 12 hour without a leading zero  6:30
+    TIME_FORMAT_BEATS       = 3,  ///< Kept for the wire format. Not offered in the config
+    TIME_FORMAT_12H_NO_LEAD = 4,  ///< 12 hour without a leading zero like 6:30
     TIME_FORMAT_COUNT
 } TimeFormat;
 
@@ -65,9 +68,9 @@ typedef enum
  */
 typedef enum
 {
-    BATTERY_DISPLAY_BOTH    = 0,  // icon + percent
-    BATTERY_DISPLAY_ICON    = 1,  // icon only
-    BATTERY_DISPLAY_PERCENT = 2,  // percent only
+    BATTERY_DISPLAY_BOTH    = 0,  ///< Icon and percent
+    BATTERY_DISPLAY_ICON    = 1,  ///< Icon only
+    BATTERY_DISPLAY_PERCENT = 2,  ///< Percent only
     BATTERY_DISPLAY_COUNT
 } BatteryDisplay;
 

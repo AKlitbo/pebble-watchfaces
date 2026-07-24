@@ -7,19 +7,27 @@
 #include "ui/icon_cache.h"
 #include <string.h>
 
-// upper bound on how many distinct icons the cache holds at once. 64 leaves plenty of
-// headroom for a face's fixed icons plus its wind-direction and weather-condition glyphs
+// how many distinct icons the cache holds at once. a face's reachable set runs well past this
+// (the moon panel alone rotates 28 small and 28 large glyphs through a lunar month, and the
+// forecast strip adds a day and night glyph per condition), so the cache drops its coldest entry
+// to make room rather than filling up and turning every later icon into a blank
 #define ICON_CACHE_MAX 64
 
 typedef struct
 {
     uint32_t    res;
     GBitmap    *bmp;
-    IconMargins margin; // measured once when the icon is first cached
+    IconMargins margin; ///< Measured once when the icon is first cached
+    GColor      tint;   ///< Last colour written into the palette
+    bool        tinted; ///< False until the first tint so the first draw always writes
+    uint32_t    used;   ///< Stamp of the last time anything asked for this icon
 } IconEntry;
 
 static IconEntry s_cache[ICON_CACHE_MAX];
 static uint8_t   s_cache_count;
+// ticks once per lookup and gets stamped onto whichever entry was touched, so the entry holding
+// the lowest stamp is the one nothing has wanted for the longest
+static uint32_t  s_use_clock;
 
 // paints an icon the given colour while keeping its see-through bits see-through so the
 // smooth edges stay smooth. lets one white master icon take any theme colour. does
@@ -35,6 +43,22 @@ void icon_tint(GBitmap *bmp, GColor color)
     if (!palette)
     {
         return;
+    }
+
+    // the palette sticks on the cached picture between draws, so once an icon already
+    // carries this colour skip the rewrite. a cached entry remembers its last tint
+    for (uint8_t i = 0; i < s_cache_count; i++)
+    {
+        if (s_cache[i].bmp == bmp)
+        {
+            if (s_cache[i].tinted && gcolor_equal(s_cache[i].tint, color))
+            {
+                return;
+            }
+            s_cache[i].tint = color;
+            s_cache[i].tinted = true;
+            break;
+        }
     }
 
     int entries;
@@ -126,26 +150,49 @@ IconMargins icon_margins_of(GBitmap *bmp)
     return m;
 }
 
-GBitmap *icon_get(uint32_t res)
+// find-or-load the cache entry for res, or NULL when it can't be cached. one scan feeds
+// icon_get/icon_margins/icon_size so callers don't each re-scan the same icon on every panel
+// repaint (without it icon_margins would scan twice, icon_visible_width three times)
+static IconEntry *icon_entry(uint32_t res)
 {
     for (uint8_t i = 0; i < s_cache_count; i++)
     {
         if (s_cache[i].res == res)
         {
-            return s_cache[i].bmp;
+            s_cache[i].used = ++s_use_clock;
+            return &s_cache[i];
         }
     }
 
-    if (s_cache_count >= ICON_CACHE_MAX)
+    // load before freeing anything, so a resource that will not load costs nothing and a later
+    // call can still try it again
+    GBitmap *bmp = gbitmap_create_with_resource(res);
+    if (!bmp)
     {
         return NULL;
     }
 
-    GBitmap *bmp = gbitmap_create_with_resource(res);
-    if (!bmp)
+    IconEntry *entry;
+    if (s_cache_count < ICON_CACHE_MAX)
     {
-        // a bad load does not take a cache slot so a later call can try it again
-        return NULL;
+        entry = &s_cache[s_cache_count++];
+    }
+    else
+    {
+        // full, so the coldest entry gives up its slot.
+        // this is safe only because a caller never holds a bitmap from one icon across a lookup
+        // of a different one: it draws what it asked for, and the only call it makes in between
+        // is icon_margins for the SAME res, which hits and evicts nothing. keep it that way, or
+        // a caller could end up drawing a bitmap that was freed underneath it
+        entry = &s_cache[0];
+        for (uint8_t i = 1; i < ICON_CACHE_MAX; i++)
+        {
+            if (s_cache[i].used < entry->used)
+            {
+                entry = &s_cache[i];
+            }
+        }
+        gbitmap_destroy(entry->bmp);
     }
 
     IconMargins margin = icon_margins_of(bmp);
@@ -153,27 +200,28 @@ GBitmap *icon_get(uint32_t res)
     APP_LOG(APP_LOG_LEVEL_DEBUG, "icon res=%lu fmt=%d N=%d E=%d S=%d W=%d",
             (unsigned long)res, (int)gbitmap_get_format(bmp), margin.n, margin.e, margin.s, margin.w);
 #endif
-    s_cache[s_cache_count++] = (IconEntry){ .res = res, .bmp = bmp, .margin = margin };
-    return bmp;
+    // the fresh value clears tint and tinted too, so a reused slot never carries the old icon's
+    // colour and the first draw always writes the palette
+    *entry = (IconEntry){ .res = res, .bmp = bmp, .margin = margin, .used = ++s_use_clock };
+    return entry;
+}
+
+GBitmap *icon_get(uint32_t res)
+{
+    IconEntry *entry = icon_entry(res);
+    return entry ? entry->bmp : NULL;
 }
 
 IconMargins icon_margins(uint32_t res)
 {
-    icon_get(res); // make sure it is cached and measured
-    for (uint8_t i = 0; i < s_cache_count; i++)
-    {
-        if (s_cache[i].res == res)
-        {
-            return s_cache[i].margin;
-        }
-    }
-    return (IconMargins){ 0, 0, 0, 0 };
+    IconEntry *entry = icon_entry(res);
+    return entry ? entry->margin : (IconMargins){ 0, 0, 0, 0 };
 }
 
 GSize icon_size(uint32_t res)
 {
-    GBitmap *bmp = icon_get(res);
-    return bmp ? gbitmap_get_bounds(bmp).size : GSize(0, 0);
+    IconEntry *entry = icon_entry(res);
+    return entry ? gbitmap_get_bounds(entry->bmp).size : GSize(0, 0);
 }
 
 void icon_align_trim(GAlign align, IconMargins m, int *trim_dx, int *trim_dy)
@@ -205,4 +253,5 @@ void icons_cleanup(void)
     }
 
     s_cache_count = 0;
+    s_use_clock = 0;
 }
