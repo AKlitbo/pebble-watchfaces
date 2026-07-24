@@ -8,7 +8,16 @@ themes selectable from a Clay settings page.
 | :--- | :--- |
 | **LCARS Stardate**<br>[changelog](watchfaces/lcars-stardate/CHANGELOG.md) | <img src=".github/images/lcars-stardate/theme_classic.png" width="100" title="Classic"> <img src=".github/images/lcars-stardate/theme_nemesis-blue.png" width="100" title="Nemesis Blue"> <img src=".github/images/lcars-stardate/theme_mono.png" width="100" title="Classic Mono"> <img src=".github/images/lcars-stardate/theme_lower-decks.png" width="100" title="Lower Decks"> <img src=".github/images/lcars-stardate/theme_lower-decks-mono.png" width="100" title="Lower Decks Mono"> <img src=".github/images/lcars-stardate/theme_lower-decks-padd.png" width="100" title="Lower Decks PADD"> <img src=".github/images/lcars-stardate/theme_lower-decks-padd-mono.png" width="100" title="Lower Decks PADD Mono"> |
 | **Radar Array**<br>[changelog](watchfaces/radar-array/CHANGELOG.md) | <img src=".github/images/radar-array/theme_default.png" width="100" title="Default"> <img src=".github/images/radar-array/theme_crimson.png" width="100" title="Crimson"> <img src=".github/images/radar-array/theme_neon.png" width="100" title="Neon"> <img src=".github/images/radar-array/theme_phosphor.png" width="100" title="Phosphor"> <img src=".github/images/radar-array/theme_rescue.png" width="100" title="Rescue"> <img src=".github/images/radar-array/theme_stealth.png" width="100" title="Stealth"> <img src=".github/images/radar-array/theme_mono.png" width="100" title="Mono"> |
-| **IDE / VS Code**<br>[changelog](watchfaces/ide-vscode/CHANGELOG.md) | <img src=".github/images/ide-vscode/theme_dark.png" width="100" title="Dark"> <img src=".github/images/ide-vscode/theme_light.png" width="100" title="Light"> <img src=".github/images/ide-vscode/theme_terminal.png" width="100" title="Terminal"> <img src=".github/images/ide-vscode/theme_cyberpunk.png" width="100" title="Cyberpunk"> <img src=".github/images/ide-vscode/theme_synthwave.png" width="100" title="Synthwave"> <img src=".github/images/ide-vscode/theme_mono.png" width="100" title="Mono"> |
+| **IDE VSCode**<br>[changelog](watchfaces/ide-vscode/CHANGELOG.md) | <img src=".github/images/ide-vscode/theme_dark.png" width="100" title="Dark"> <img src=".github/images/ide-vscode/theme_light.png" width="100" title="Light"> <img src=".github/images/ide-vscode/theme_terminal.png" width="100" title="Terminal"> <img src=".github/images/ide-vscode/theme_cyberpunk.png" width="100" title="Cyberpunk"> <img src=".github/images/ide-vscode/theme_synthwave.png" width="100" title="Synthwave"> <img src=".github/images/ide-vscode/theme_mono.png" width="100" title="Mono"> |
+
+## Install
+
+Download a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and
+open it with the Pebble app on your phone.
+
+Faces version independently, so releases are tagged per face as `<face>-v<version>` and each carries
+one `.pbw`. Release notes are that version's `CHANGELOG.md` entry. A face built for a single watch
+names its platform in the asset, so `lcars-stardate-emery-1.5.0.pbw` is Emery only.
 
 ## Project Structure
 
@@ -86,8 +95,30 @@ Three providers, selectable in Settings:
 - **WeatherAPI**: free tier, needs an account and API key.
 - **OpenWeatherMap**: free tier, needs an account and API key.
 
-All three cover the basics the faces show: current temperature and conditions, with a night-specific
-icon after dark. Where a provider leaves a reading out, the phone backfills it from Open-Meteo.
+All three cover the basics: temperature, conditions, wind, humidity, pressure, feels like, and sunrise/sunset. OpenWeatherMap's free tier leaves out UV index, dew point, today's high/low, and chance of rain, so those are backfilled from Open-Meteo.
+
+## Calendar (iCal)
+
+On a face that supports it, calendar comes from a private iCal (`.ics`) feed, so any service that publishes one works (Google Calendar's secret address is the usual choice). Paste the feed URL into Settings and upcoming events are fetched automatically.
+
+Only event time, title, and location are sent to the watch, and events more than a week away are ignored.
+
+Feeds are parsed with [ical.js](https://github.com/kewisch/ical.js), including recurring events, exceptions, cancellations, and time zones. It is licensed under MPL 2.0 and included as a separate file. See [NOTICES](NOTICES.md).
+
+Alarms and attendees are currently ignored.
+
+## Stock Providers
+
+On a face that supports it, four providers are selectable in Settings. All are free, and all except Yahoo need an account and API key. Set your ticker(s) and key there too.
+
+- **Finnhub** *(recommended)*: real-time US quotes, follows your refresh interval.
+- **Yahoo**: real-time, no API key, and the widest coverage (US and international stocks, ETFs, indices, and crypto). Unofficial feed, so it can break without notice.
+- **Twelve Data**: global markets. Follows your interval while markets are open, no faster than every 15 minutes, then slows down after hours to stay within daily limits.
+- **Alpha Vantage**: one end-of-day quote after the close, with a small daily request allowance.
+
+All four return the same core quote data: last price, price change, percentage change, and latest trading day.
+
+---
 
 ## Credits
 
@@ -127,7 +158,7 @@ hobby projects, study, and the like. See [LICENSE](LICENSE) for the full terms.
 trademarks of CBS / Paramount Global. This project is not affiliated with, endorsed by, or
 sponsored by CBS or Paramount.
 
-Visual Studio Code is a trademark of Microsoft. The **IDE / VS Code** face is an unaffiliated,
+Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an unaffiliated,
 noncommercial homage and is not endorsed by or associated with Microsoft.
 
 ## AI Training Notice
