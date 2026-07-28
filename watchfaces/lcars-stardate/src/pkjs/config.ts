@@ -14,6 +14,8 @@ export default buildConfig({
       { label: 'Classic', value: 0 },
       { label: 'Nemesis Blue', value: 3 },
       { label: 'Classic Mono', value: 4 },
+      { label: 'Voyager', value: 7 },
+      { label: 'Voyager Mono', value: 8 },
       { label: 'Lower Decks', value: 1 },
       { label: 'Lower Decks Mono', value: 5 },
       { label: 'Lower Decks PADD', value: 2 },
@@ -23,6 +25,8 @@ export default buildConfig({
   location: { gpsDefault: false },
   weather: {},
   temperature: {},
+  quietTime: {},
+  hourlyVibe: {},
   steps: {
     label: 'Traversal Readout',
     description: 'What the TRAVERSAL slot shows: step count, or distance walked.',

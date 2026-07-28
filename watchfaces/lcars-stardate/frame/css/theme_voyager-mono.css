@@ -1,0 +1,13 @@
+@charset "utf-8";
+/*
+  Voyager Mono palette. Loads after theme_voyager.css and only repoints the five
+  Voyager palette vars at grayscale Pebble cells, so all the structure (bars,
+  cut-outs, blockhead box) is inherited and just renders in mono.
+*/
+:root {
+  --v-silver:       var(--GColorLightGray);   /* frame + sidebars + most bars */
+  --v-gold:         var(--GColorWhite);        /* banner, top corner, wide top bar */
+  --v-science-blue: var(--GColorDarkGray);     /* blue picks + accent lines */
+  --v-frost:        var(--GColorWhite);         /* blockhead box + upper accent */
+  --v-pumpkin:      var(--GColorWhite);         /* wide bottom bar */
+}

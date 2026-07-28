@@ -36,7 +36,8 @@ void widgets_draw_labels(GContext *ctx);
 void widgets_draw_battery(GContext *ctx, int level);
 
 /**
- * @brief Draw the weather / thermometer / heart / feet glyphs, plus the bluetooth glyph.
+ * @brief Draw the weather / thermometer / heart / feet glyphs, plus the bluetooth and
+ * quiet-time glyphs.
  *
  * The glyphs come from the shared icon cache, so each one loads a single time.
  *
@@ -44,7 +45,10 @@ void widgets_draw_battery(GContext *ctx, int level);
  * @param condition The weather condition token (drives the weather glyph).
  * @param bt_show True to draw the bluetooth glyph (the show/hide setting).
  * @param bt_connected True when the phone link is up (connected vs slashed glyph).
+ * @param qt_show True to allow the quiet-time glyph (the show/hide setting).
+ * @param qt_active True while Quiet Time holds (draws the muted speaker; nothing otherwise).
  */
-void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, bool bt_connected);
+void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, bool bt_connected,
+                         bool qt_show, bool qt_active);
 
 /** @} */

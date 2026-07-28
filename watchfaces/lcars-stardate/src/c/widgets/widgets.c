@@ -175,7 +175,8 @@ void widgets_draw_battery(GContext *ctx, int level)
     lcars_battery_gauge(ctx, GRect(6, 4, 32, 12), level, accent, fill);
 }
 
-void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, bool bt_connected)
+void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, bool bt_connected,
+                         bool qt_show, bool qt_active)
 {
     // the cache loads each glyph once and hands back the same picture on later paints
     draw_icon(ctx, icon_get(wx_resource_for(condition)), WX_ICON);
@@ -188,6 +189,14 @@ void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, boo
         GBitmap *bt = icon_get(bt_connected ? RESOURCE_ID_ICON_BLUETOOTH : RESOURCE_ID_ICON_BLUETOOTH_SLASH);
         icon_tint(bt, GColorBlack);  // the master glyph is white so paint it black to match the panel text
         draw_icon(ctx, bt, BT_ICON);
+    }
+
+    if (qt_show && qt_active)
+    {
+        // a muted speaker while Quiet Time holds, and nothing when sound is on
+        GBitmap *qt = icon_get(RESOURCE_ID_ICON_VOLUME_MUTED);
+        icon_tint(qt, GColorBlack);  // white master glyph, tinted black to match the panel like BT
+        draw_icon(ctx, qt, QT_ICON);
     }
 }
 

@@ -5,6 +5,17 @@ All notable changes to the IDE VSCode watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-07-27
+
+### Added
+
+- Added an Hourly Vibration option that vibrates at the top of every hour and stays silent during Quiet Time.
+
+### Changed
+
+- Reorganized settings into Clock, Health, and Weather sections.
+- Replaced the Fahrenheit toggle with a Temperature Unit dropdown.
+
 ## [1.2.0] - 2026-07-23
 
 > [!IMPORTANT]

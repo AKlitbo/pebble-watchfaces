@@ -32,7 +32,7 @@
 typedef struct RadarSettings
 {
     uint8_t version;
-    bool    temperature_unit;
+    uint8_t temperature_unit;
     char    date_format[16];
     uint8_t theme;
     uint8_t steps_mode;
@@ -40,6 +40,7 @@ typedef struct RadarSettings
     bool    bluetooth_icon;
     uint8_t vibe_connect;
     uint8_t vibe_disconnect;
+    uint8_t hourly_vibe;
 } RadarSettings;
 
 static RadarSettings s_settings;
@@ -47,10 +48,11 @@ static RadarSettings s_settings;
 // radar subscribes to every known setting. it shows a readout-style date
 // ("SAT 19 JUN") in place of the library's numeric default
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_BOOL. a °F toggle on the config page
-    // the shared KNOWN_ macro does not cover it since other faces send it as a select
+    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
+    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
     { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_BOOL, .offset = offsetof(RadarSettings, temperature_unit), .affects_weather = true },
+      .type = SETTING_ENUM_U8, .offset = offsetof(RadarSettings, temperature_unit),
+      .enum_count = 2, .default_num = 0, .affects_weather = true },
     KNOWN_DATE_FORMAT(offsetof(RadarSettings, date_format), "%a %d %b"),
     KNOWN_THEME(offsetof(RadarSettings, theme), 7),
     KNOWN_STEPS_MODE(offsetof(RadarSettings, steps_mode), STEPS_MODE_COUNT),
@@ -58,6 +60,7 @@ static const SettingField s_fields[] = {
     KNOWN_BLUETOOTH_ICON(offsetof(RadarSettings, bluetooth_icon)),
     KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(RadarSettings, vibe_connect), VIBE_COUNT),
     KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(RadarSettings, vibe_disconnect), VIBE_COUNT),
+    KNOWN_HOURLY_VIBE(offsetof(RadarSettings, hourly_vibe), VIBE_COUNT),
 };
 
 static const SettingsSchema s_schema = {

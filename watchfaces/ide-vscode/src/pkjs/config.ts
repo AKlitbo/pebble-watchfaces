@@ -26,6 +26,7 @@ export default buildConfig({
   location: { gpsDefault: false },
   weather: {},
   temperature: {},
+  hourlyVibe: {},
   date: {
     default: '%b %d',
   },

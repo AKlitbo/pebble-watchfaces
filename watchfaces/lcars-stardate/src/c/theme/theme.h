@@ -14,7 +14,7 @@
 
 /**
  * @brief Maps the Theme setting (0=Classic, 1=Lower Decks, 2=PADD, 3=Nemesis Blue,
- * 4=Classic Mono, 5=Lower Decks Mono, 6=PADD Mono) to
+ * 4=Classic Mono, 5=Lower Decks Mono, 6=PADD Mono, 7=Voyager, 8=Voyager Mono) to
  * its baked LCARS background resource.
  *
  * @param theme The theme setting value.

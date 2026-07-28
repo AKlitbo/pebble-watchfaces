@@ -20,6 +20,10 @@ uint32_t bg_resource_for_theme(uint8_t theme)
             return RESOURCE_ID_IMAGE_BG_LOWER_DECKS_MONO;
         case 6:
             return RESOURCE_ID_IMAGE_BG_LOWER_DECKS_PADD_MONO;
+        case 7:
+            return RESOURCE_ID_IMAGE_BG_VOYAGER;
+        case 8:
+            return RESOURCE_ID_IMAGE_BG_VOYAGER_MONO;
         default:
             return RESOURCE_ID_IMAGE_BG_CLASSIC;
     }
@@ -32,6 +36,7 @@ GColor label_color_for_theme(uint8_t theme)
         case 4:  // Classic Mono
         case 5:  // Lower Decks Mono
         case 6:  // PADD Mono
+        case 8:  // Voyager Mono
             return GColorLightGray;
         default:
             return GColorChromeYellow;
@@ -54,6 +59,10 @@ GColor panel_accent_for_theme(uint8_t theme)
             return GColorWhite;
         case 6:  // PADD Mono (white)
             return GColorWhite;
+        case 7:  // Voyager (command gold #FFAA00)
+            return GColorChromeYellow;
+        case 8:  // Voyager Mono (white)
+            return GColorWhite;
         default: // african-violet (#AAAAFF)
             return GColorBabyBlueEyes;
     }
@@ -70,6 +79,7 @@ GColor battery_fill_for_theme(uint8_t theme, int level)
         case 4:  // Classic Mono
         case 5:  // Lower Decks Mono
         case 6:  // PADD Mono
+        case 8:  // Voyager Mono
             return healthy;
         default:
             break;

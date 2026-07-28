@@ -9,7 +9,7 @@
  * The build does not bake frames; the PNGs under resources/images/ are committed. Run this
  * by hand to re-bake one during design:
  *   npm run gen:frame -- lower-decks
- *   npm run gen:frame -- classic-standard --scale 4 --out resources/images/background.png
+ *   npm run gen:frame -- classic --scale 4 --out resources/images/background.png
  */
 import path from 'node:path';
 import fs from 'node:fs';
@@ -147,7 +147,7 @@ export function outFor(
     return path.resolve(ROOT, opts.outOverride);
   }
 
-  const base = opts.frame.replace(/-standard$/, '');
+  const base = opts.frame;
   let name: string;
   if (themeName) {
     name = `background-${themeName}.png`;

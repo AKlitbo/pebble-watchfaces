@@ -74,6 +74,14 @@
       .type = SETTING_BOOL, .offset = (off), .default_num = 1 }
 
 /**
+ * @brief Setting definition for the Quiet Time Icon.
+ * @param off Offset into the face's settings struct.
+ */
+#define KNOWN_QUIET_TIME_ICON(off) \
+    { .id = SETTING_QUIET_TIME_ICON, .message_key = &MESSAGE_KEY_APPEARANCE_QUIET_TIME_ICON, \
+      .type = SETTING_BOOL, .offset = (off), .default_num = 0 }
+
+/**
  * @brief Setting definition for Bluetooth Vibe Connect.
  * @param off Offset into the face's settings struct.
  * @param count The number of enum values.
@@ -89,6 +97,15 @@
  */
 #define KNOWN_BLUETOOTH_VIBE_DISCONNECT(off, count) \
     { .id = SETTING_BLUETOOTH_VIBE_DISCONNECT, .message_key = &MESSAGE_KEY_CONNECTION_VIBE_DISCONNECT, \
+      .type = SETTING_ENUM_U8, .offset = (off), .enum_count = (count) }
+
+/**
+ * @brief Setting definition for the Hourly Vibration (a VibeChoice fired at the top of each hour).
+ * @param off Offset into the face's settings struct.
+ * @param count The number of enum values.
+ */
+#define KNOWN_HOURLY_VIBE(off, count) \
+    { .id = SETTING_HOURLY_VIBE, .message_key = &MESSAGE_KEY_CLOCK_HOURLY_VIBE, \
       .type = SETTING_ENUM_U8, .offset = (off), .enum_count = (count) }
 
 /**

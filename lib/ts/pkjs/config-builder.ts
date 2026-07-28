@@ -18,6 +18,8 @@ interface ConfigBuilderOptions {
   intro?: string;
   theme?: { label?: string; description?: string; options?: Array<{ label: string; value: string | number }> };
   bluetooth?: { description?: string };
+  quietTime?: { description?: string };
+  hourlyVibe?: { label?: string; description?: string };
   date?: { label?: string; description?: string; default?: string; options?: Array<{ label: string; value: string | number }> };
   steps?: { label?: string; description?: string };
   location?: { gpsDefault?: boolean };
@@ -70,8 +72,8 @@ const vibeOptions = [
  *
  * Optional sections (present = included, omitted = excluded):
  *   location    { gpsDefault? }
- *   weather     {}                               marker, no fields to override yet
- *   temperature {}                               marker, adds the °F toggle to preferences
+ *   weather     {}                               marker, adds the provider picker to the Weather section
+ *   temperature {}                               marker, adds the unit dropdown to the Weather section
  */
 function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
   const theme = options.theme || {};
@@ -103,6 +105,13 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
           'defaultValue': 0,
           'options': theme.options,
         },
+        ...(options.quietTime ? [{
+          'type': 'toggle',
+          'messageKey': 'APPEARANCE_QUIET_TIME_ICON',
+          'label': 'Show Quiet Time Icon',
+          'description': options.quietTime.description || 'Show a muted-speaker glyph next to bluetooth while Quiet Time is on.',
+          'defaultValue': false,
+        }] : []),
       ],
     },
   ];
@@ -145,6 +154,89 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
     ],
   });
 
+  const clockItems: ClayConfigItem[] = [
+    {
+      'type': 'heading',
+      'defaultValue': 'Clock',
+    },
+    {
+      'type': 'select',
+      'messageKey': 'CLOCK_DATE_FORMAT',
+      'label': date.label || 'Date Format',
+      'description': date.description || 'How the date line is written.',
+      'defaultValue': date.default || '%Y.%m%d',
+      'options': date.options || defaultDateOptions,
+    },
+    {
+      'type': 'select',
+      'messageKey': 'CLOCK_TIME_FORMAT',
+      'label': 'Time Format',
+      'description': 'How the main time is shown. .beats is Swatch Internet Time (Biel Mean Time).',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'System Default', 'value': 0 },
+        { 'label': '12-hour', 'value': 1 },
+        { 'label': '24-hour', 'value': 2 },
+        { 'label': '.beats (Swatch Internet Time)', 'value': 3 },
+      ],
+    },
+  ];
+
+  if (options.hourlyVibe) {
+    clockItems.push({
+      'type': 'select',
+      'messageKey': 'CLOCK_HOURLY_VIBE',
+      'label': options.hourlyVibe.label || 'Hourly Vibration',
+      'description': options.hourlyVibe.description || 'Buzz at the top of every hour. Silenced automatically during Quiet Time.',
+      'defaultValue': 0,
+      'options': vibeOptions,
+    });
+  }
+
+  config.push({
+    'type': 'section',
+    'items': clockItems,
+  });
+
+  const healthItems: ClayConfigItem[] = [
+    {
+      'type': 'heading',
+      'defaultValue': 'Health',
+    },
+    {
+      'type': 'select',
+      'messageKey': 'HEALTH_STEPS_MODE',
+      'label': steps.label || 'Stats Readout',
+      'description': steps.description || 'What the stats slot shows: step count, or distance walked.',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'Steps', 'value': 0 },
+        { 'label': 'Distance (Miles)', 'value': 1 },
+        { 'label': 'Distance (Kilometers)', 'value': 2 },
+      ],
+    },
+  ];
+
+  if (options.battery) {
+    healthItems.push({
+      'type': 'select',
+      'messageKey': 'BATTERY_DISPLAY',
+      'label': options.battery.label || 'Battery',
+      'description': options.battery.description || 'What the battery readout shows.',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'Icon + Percent', 'value': 0 },
+        { 'label': 'Icon Only', 'value': 1 },
+        { 'label': 'Percent Only', 'value': 2 },
+      ],
+    });
+  }
+
+  config.push({
+    'type': 'section',
+    'items': healthItems,
+  });
+
   if (options.location) {
     config.push({
       'type': 'section',
@@ -179,14 +271,29 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
     });
   }
 
-  if (options.weather) {
-    config.push({
-      'type': 'section',
-      'items': [
-        {
-          'type': 'heading',
-          'defaultValue': 'Weather Provider',
-        },
+  if (options.weather || options.temperature) {
+    const weatherItems: ClayConfigItem[] = [
+      {
+        'type': 'heading',
+        'defaultValue': 'Weather',
+      },
+    ];
+
+    if (options.temperature) {
+      weatherItems.push({
+        'type': 'select',
+        'messageKey': 'WEATHER_TEMPERATURE_UNIT',
+        'label': 'Temperature Unit',
+        'defaultValue': 0,
+        'options': [
+          { 'label': 'Celsius (°C)', 'value': 0 },
+          { 'label': 'Fahrenheit (°F)', 'value': 1 },
+        ],
+      });
+    }
+
+    if (options.weather) {
+      weatherItems.push(
         {
           'type': 'text',
           'defaultValue': 'Choose where your watch pulls its weather data. Open-Meteo works right out of the box with no setup required.',
@@ -211,81 +318,15 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
             'placeholder': 'Paste your private API key here...',
             'limit': 64,
           },
-        },
-      ],
+        }
+      );
+    }
+
+    config.push({
+      'type': 'section',
+      'items': weatherItems,
     });
   }
-
-  const prefsItems: ClayConfigItem[] = [
-    {
-      'type': 'heading',
-      'defaultValue': 'General Preferences',
-    },
-    {
-      'type': 'select',
-      'messageKey': 'CLOCK_DATE_FORMAT',
-      'label': date.label || 'Date Format',
-      'description': date.description || 'How the date line is written.',
-      'defaultValue': date.default || '%Y.%m%d',
-      'options': date.options || defaultDateOptions,
-    },
-    {
-      'type': 'select',
-      'messageKey': 'CLOCK_TIME_FORMAT',
-      'label': 'Time Format',
-      'description': 'How the main time is shown. .beats is Swatch Internet Time (Biel Mean Time).',
-      'defaultValue': 0,
-      'options': [
-        { 'label': 'System Default', 'value': 0 },
-        { 'label': '12-hour', 'value': 1 },
-        { 'label': '24-hour', 'value': 2 },
-        { 'label': '.beats (Swatch Internet Time)', 'value': 3 },
-      ],
-    },
-  ];
-
-  if (options.temperature) {
-    prefsItems.push({
-      'type': 'toggle',
-      'messageKey': 'WEATHER_TEMPERATURE_UNIT',
-      'label': 'Display in Fahrenheit (°F)',
-      'description': 'Leave unchecked to use Celsius (°C).',
-      'defaultValue': false,
-    });
-  }
-
-  prefsItems.push({
-    'type': 'select',
-    'messageKey': 'HEALTH_STEPS_MODE',
-    'label': steps.label || 'Stats Readout',
-    'description': steps.description || 'What the stats slot shows: step count, or distance walked.',
-    'defaultValue': 0,
-    'options': [
-      { 'label': 'Steps', 'value': 0 },
-      { 'label': 'Distance (Miles)', 'value': 1 },
-      { 'label': 'Distance (Kilometers)', 'value': 2 },
-    ],
-  });
-
-  if (options.battery) {
-    prefsItems.push({
-      'type': 'select',
-      'messageKey': 'BATTERY_DISPLAY',
-      'label': options.battery.label || 'Battery',
-      'description': options.battery.description || 'What the battery readout shows.',
-      'defaultValue': 0,
-      'options': [
-        { 'label': 'Icon + Percent', 'value': 0 },
-        { 'label': 'Icon Only', 'value': 1 },
-        { 'label': 'Percent Only', 'value': 2 },
-      ],
-    });
-  }
-
-  config.push({
-    'type': 'section',
-    'items': prefsItems,
-  });
 
   config.push({
     'type': 'submit',

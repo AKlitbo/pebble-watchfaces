@@ -54,6 +54,29 @@ static void on_settings_changed(bool time_or_date_changed)
     time_store_reconfigure(time_cfg());  // swaps to the .beats ticker if the format changed
 }
 
+/**
+ * @brief Buzz once at the top of the hour with the pattern the user picked.
+ *
+ * The minute tick drives this so it lands exactly when tm_min hits 0, and vibe_choice stays
+ * silent during quiet time (and for VIBE_NONE).
+ */
+static void hourly_vibe(void)
+{
+    if (time_store_tm()->tm_min == 0)
+    {
+        vibe_choice(settings_u8(SETTING_HOURLY_VIBE));
+    }
+}
+
+/**
+ * @brief Minute-tick callback: repaint the slots and fire the hourly vibe.
+ */
+static void on_time_tick(void)
+{
+    engine_mark_dirty();
+    hourly_vibe();
+}
+
 static void init(void)
 {
     settings_init(vscode_settings_schema());
@@ -73,8 +96,9 @@ static void init(void)
     engine_init(s_window, vscode_build); // build the slot layers over the frame
     window_stack_push(s_window, true);
 
-    // any store change repaints all slots (no location store: this face shows no coords)
-    time_store_subscribe(engine_mark_dirty);
+    // any store change repaints all slots (no location store: this face shows no coords).
+    // the time tick also drives the hourly vibe
+    time_store_subscribe(on_time_tick);
     health_store_subscribe(engine_mark_dirty);
     weather_store_subscribe(engine_mark_dirty);
     system_store_subscribe(engine_mark_dirty);

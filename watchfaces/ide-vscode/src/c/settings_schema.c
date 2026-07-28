@@ -32,7 +32,7 @@
 typedef struct VscodeSettings
 {
     uint8_t version;
-    bool    temperature_unit;
+    uint8_t temperature_unit;
     char    date_format[16];
     uint8_t theme;
     uint8_t steps_mode;
@@ -41,6 +41,7 @@ typedef struct VscodeSettings
     uint8_t vibe_connect;
     uint8_t vibe_disconnect;
     uint8_t battery_display;
+    uint8_t hourly_vibe;
 } VscodeSettings;
 
 static VscodeSettings s_settings;
@@ -48,10 +49,11 @@ static VscodeSettings s_settings;
 // the date defaults to a compact single line ("JUN 18") to fit the terminal panel
 // 6 themes: Dark+ / Light / Terminal / Cyberpunk / Synthwave / Mono
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_BOOL. a °F toggle on the config page
-    // the shared KNOWN_ macro does not cover it since other faces send it as a select
+    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
+    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
     { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_BOOL, .offset = offsetof(VscodeSettings, temperature_unit), .affects_weather = true },
+      .type = SETTING_ENUM_U8, .offset = offsetof(VscodeSettings, temperature_unit),
+      .enum_count = 2, .default_num = 0, .affects_weather = true },
     KNOWN_DATE_FORMAT(offsetof(VscodeSettings, date_format), "%b %d"),
     KNOWN_THEME(offsetof(VscodeSettings, theme), 6),
     KNOWN_STEPS_MODE(offsetof(VscodeSettings, steps_mode), STEPS_MODE_COUNT),
@@ -60,6 +62,7 @@ static const SettingField s_fields[] = {
     KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(VscodeSettings, vibe_connect), VIBE_COUNT),
     KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(VscodeSettings, vibe_disconnect), VIBE_COUNT),
     KNOWN_BATTERY_DISPLAY(offsetof(VscodeSettings, battery_display), BATTERY_DISPLAY_COUNT),
+    KNOWN_HOURLY_VIBE(offsetof(VscodeSettings, hourly_vibe), VIBE_COUNT),
 };
 
 static const SettingsSchema s_schema = {

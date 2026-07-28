@@ -24,6 +24,7 @@ export default buildConfig({
   location: { gpsDefault: true },
   weather: {},
   temperature: {},
+  hourlyVibe: {},
   steps: {
     label: 'Range Readout',
     description: 'What the RANGE slot shows: step count, or distance walked.',

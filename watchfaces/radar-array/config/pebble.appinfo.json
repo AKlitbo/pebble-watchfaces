@@ -1,7 +1,7 @@
 {
   "name": "radar-array",
   "displayName": "Radar Array",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "watchface": true,
   "uuid": "bad9fa8c-1dde-4314-ba22-68d8806c6fb3",
   "sdkVersion": "3",
@@ -32,6 +32,7 @@
     "APPEARANCE_THEME",
     "HEALTH_STEPS_MODE",
     "CLOCK_TIME_FORMAT",
+    "CLOCK_HOURLY_VIBE",
     "CONNECTION_BLUETOOTH_ICON",
     "CONNECTION_VIBE_CONNECT",
     "CONNECTION_VIBE_DISCONNECT"

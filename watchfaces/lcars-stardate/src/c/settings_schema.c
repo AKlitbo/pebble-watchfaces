@@ -15,7 +15,7 @@
 #include <string.h>
 
 #define LCARS_SETTINGS_KEY 5
-#define LCARS_SETTINGS_VERSION 2
+#define LCARS_SETTINGS_VERSION 4
 // smallest versioned blob accepted. fields are append-only so this never changes
 #define LCARS_SETTINGS_V1_SIZE 21
 
@@ -34,7 +34,7 @@
 typedef struct LcarsSettings
 {
     uint8_t version;
-    bool    temperature_unit;
+    uint8_t temperature_unit;
     char    date_format[16];
     uint8_t theme;
     uint8_t steps_mode;
@@ -42,9 +42,11 @@ typedef struct LcarsSettings
     bool    bluetooth_icon;
     uint8_t vibe_connect;
     uint8_t vibe_disconnect;
+    bool    quiet_time_icon;
+    uint8_t hourly_vibe;
 } LcarsSettings;
 
-_Static_assert(sizeof(LcarsSettings) == 24, "lcars blob size is frozen at 24 bytes (v2)");
+_Static_assert(sizeof(LcarsSettings) == 26, "lcars blob size is frozen at 26 bytes (v4)");
 _Static_assert(offsetof(LcarsSettings, bluetooth_icon) == LCARS_SETTINGS_V1_SIZE,
                "lcars v1 floor is frozen; the v2 fields must stay appended after it");
 
@@ -53,17 +55,20 @@ static LcarsSettings s_settings;
 // lcars subscribes to every known setting in its frozen struct order. "%Y.%m%d" is
 // its numeric stardate-style date default
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_BOOL. a °F toggle on the config page
-    // the shared KNOWN_ macro does not cover it since other faces send it as a select
+    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
+    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
     { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_BOOL, .offset = offsetof(LcarsSettings, temperature_unit), .affects_weather = true },
+      .type = SETTING_ENUM_U8, .offset = offsetof(LcarsSettings, temperature_unit),
+      .enum_count = 2, .default_num = 0, .affects_weather = true },
     KNOWN_DATE_FORMAT(offsetof(LcarsSettings, date_format), "%Y.%m%d"),
-    KNOWN_THEME(offsetof(LcarsSettings, theme), 7),
+    KNOWN_THEME(offsetof(LcarsSettings, theme), 9),
     KNOWN_STEPS_MODE(offsetof(LcarsSettings, steps_mode), STEPS_MODE_COUNT),
     KNOWN_TIME_FORMAT(offsetof(LcarsSettings, time_format), TIME_FORMAT_COUNT),
     KNOWN_BLUETOOTH_ICON(offsetof(LcarsSettings, bluetooth_icon)),
     KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(LcarsSettings, vibe_connect), VIBE_COUNT),
     KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(LcarsSettings, vibe_disconnect), VIBE_COUNT),
+    KNOWN_QUIET_TIME_ICON(offsetof(LcarsSettings, quiet_time_icon)),
+    KNOWN_HOURLY_VIBE(offsetof(LcarsSettings, hourly_vibe), VIBE_COUNT),
 };
 
 /**

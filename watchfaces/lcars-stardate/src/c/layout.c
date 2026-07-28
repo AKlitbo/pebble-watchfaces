@@ -96,9 +96,12 @@ static void draw_overlays(GContext *ctx, GRect bounds, const void *data)
     widgets_draw_battery(ctx, system_store_battery());
     widgets_draw_labels(ctx);
 
-    // honour the show/hide setting. the store owns the connect/disconnect vibe
+    // honour the show/hide settings. the store owns the connect/disconnect vibe, and the
+    // quiet-time glyph reads the live SDK state (no change event, so it refreshes on the tick)
     bool bt_show = settings_u8(SETTING_BLUETOOTH_ICON);
-    widgets_draw_glyphs(ctx, weather_store_cond(), bt_show, system_store_bluetooth());
+    bool qt_show = settings_u8(SETTING_QUIET_TIME_ICON);
+    widgets_draw_glyphs(ctx, weather_store_cond(), bt_show, system_store_bluetooth(),
+                        qt_show, quiet_time_is_active());
 }
 
 void stardate_setup(Window *window)

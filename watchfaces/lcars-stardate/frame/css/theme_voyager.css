@@ -1,0 +1,159 @@
+@charset "utf-8";
+/*
+  Voyager LCARS frame palette plus the theme's own seam divider. The Voyager 26
+  stylesheet rebuilds the whole layout and breaks the Pebble frame, so this reuses
+  the classic vendor sheet as the base, repaints its vars with Pebble-64 GColors,
+  and rebuilds the details Voyager is known for: wide gold/cream bars with a short
+  science-blue pick, the frost blockhead, and the two cut-out accent lines.
+*/
+:root {
+  /* Voyager palette, each pinned to a Pebble-64 cell so nothing dithers */
+  --v-silver:       var(--GColorLiberty);       /* slate frame + sidebars */
+  --v-gold:         var(--GColorChromeYellow);   /* banner, top corner, gold bar */
+  --v-science-blue: var(--GColorBlueMoon);       /* short blue pick + lower accent */
+  --v-frost:        var(--GColorBabyBlueEyes);   /* blockhead + upper accent */
+  --v-pumpkin:      var(--GColorMelon);          /* pale cream bar */
+
+  /* Voyager's elbow curve is the lower-decks radius, tighter than classic's 160/60 */
+  --radius-top:            0 0 0 100px;
+  --radius-bottom:         100px 0 0 0;
+  --radius-content-top:    0 0 0 44px;
+  --radius-content-bottom: 44px 0 0 0;
+
+  /* repaint the classic vendor vars the frame actually renders with */
+  --left-frame-top-color: var(--v-silver);
+  --left-frame-color:     var(--v-silver);
+  --corner-color-top:     var(--v-silver);
+  --corner-color-bottom:  var(--v-silver);
+  --panel-6-color:        var(--v-silver);
+  --banner-color:         var(--v-gold);
+
+  /* readout header bars (Stardate / Sensors / Vitals / Traversal) */
+  --lcars-bar-color:       var(--v-silver);
+  --lcars-bar-start-color: var(--v-science-blue);
+  --lcars-bar-end-color:   var(--v-science-blue);
+  --lcars-bar-text-color:  var(--v-gold);
+
+  /* background-* utility classes the HTML uses for the corner and seam accents */
+  --gold:   var(--v-gold);
+  --almond: var(--v-pumpkin);
+
+  /* Voyager bar proportions: a wide gold/cream segment, a short blue pick */
+  --bar-1-6-width: 14%;
+  --bar-2-7-width: 20%;
+  --bar-3-8-width: 5%;
+
+  /* segmented bars: silver base, wide gold/cream, short science-blue pick */
+  --bar-1-color: var(--v-silver);
+  --bar-2-color: var(--v-gold);
+  --bar-3-color: var(--v-science-blue);
+  --bar-4-color: var(--v-silver);
+  --bar-6-color: var(--v-silver);
+  --bar-7-color: var(--v-pumpkin);
+  --bar-8-color: var(--v-science-blue);
+  --bar-9-color: var(--v-silver);
+
+  /* how far the thin-start notch and its accent lines run before blending to thick */
+  --v-cut-length: 34%;
+}
+
+/*
+  The long silver bars step from thin to thick near the seam, the Voyager (and
+  lower-decks) cut-out move: ::after blacks out the inner half of the bar's first
+  stretch so it reads as a thin line at the start, then blends up to full height.
+  ::before floats a short accent line past the cut - frost above the top bar,
+  science-blue below the bottom one. The blockhead box parks in the thinned zone.
+*/
+/* classic leaves bar-8 without a height, so force the blue pick to full height */
+.watch #gap .bar-panel .bar-8 {
+  height: var(--bar-height);
+}
+
+.watch .first-bar-panel .bar-4,
+.watch #gap .bar-panel .bar-9 {
+  position: relative;
+}
+
+.watch .first-bar-panel .bar-4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--bar-height) + var(--bar-height) / 2);
+  width: var(--v-cut-length);
+  height: calc(var(--bar-height) / 3);
+  background-color: var(--v-frost);
+}
+
+.watch .first-bar-panel .bar-4::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--v-cut-length);
+  height: 48%;
+  background-color: #000;
+}
+
+.watch #gap .bar-panel .bar-9::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--bar-height) + var(--bar-height) / 2);
+  width: var(--v-cut-length);
+  height: calc(var(--bar-height) / 3);
+  background-color: var(--v-science-blue);
+}
+
+.watch #gap .bar-panel .bar-9::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--v-cut-length);
+  height: 48%;
+  background-color: #000;
+}
+
+/*
+  Voyager's seam divider. It carries no bar of its own; it is the gap band
+  between the frames, and it parks the frost blockhead box in that gap, lined up
+  with the start of the long silver bar (after the silver, gold, and blue picks).
+  The divider owns the whole seam here, so #gap drops its generic margin.
+*/
+.watch #gap {
+  margin-top: 0;
+}
+
+.watch .divider {
+  display: flex;
+  height: 20px;
+  margin-top: 0;
+  /* lift above #gap so the box paints over the bottom bar's carve, not under it */
+  position: relative;
+  z-index: 5;
+}
+
+.watch .divider .block-left {
+  width: var(--lfw);
+}
+
+.watch .divider .block-right {
+  flex: 1;
+  position: relative;
+}
+
+/*
+  The box bridges the tight gap: it reaches up into the carved bottom of the top
+  bar and down into the carved top of the bottom bar, so the two full-height bars
+  stay only the seam apart while the box still reads as a solid block between them.
+  It sits at the start of the notch (left-aligned with the silver bars) and is
+  centred vertically in the carved void - top:-12px splits its overhang evenly.
+*/
+.watch .divider .blockhead {
+  position: absolute;
+  top: -10px;
+  left: calc(var(--bar-1-6-width) + var(--bar-2-7-width) + var(--bar-3-8-width));
+  width: 52px;
+  height: 44px;
+  background-color: var(--v-frost);
+}

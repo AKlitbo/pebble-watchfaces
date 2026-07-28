@@ -56,6 +56,7 @@ enum
 #define HR_ICON GRect(128, 179, 14, 14)
 #define FEET_ICON GRect(128, 210, 14, 14)
 #define BT_ICON GRect(30, 95, 14, 14)       // bluetooth status in the first left-rail block
+#define QT_ICON GRect(15, 95, 14, 14)       // quiet-time status, just left of the bluetooth glyph
 
 // --- LCARS Bar Labels ---
 // left-aligned in black holder boxes on colored bars
