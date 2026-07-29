@@ -88,63 +88,21 @@ input[type='text'], input[type='email'], input[type='url'], input[type='search']
   border-color: #e85e15 !important;
 }
 
-/* the layout builder's size tabs. colour + square only, never their padding/flex, so the
-   drag-and-drop keeps its proportions (the standing constraint) */
-.lb-tab {
-  border-radius: 0 !important;
-  background: #14161a !important;
-  color: #a3a9b3 !important;
+/* the location search's suggestion dropdown. it ships light because it lives in lib, which
+   stays skin-agnostic, so the gridlock palette is painted on from here instead. this sheet is
+   injected after the component's own style, so plain declarations are enough */
+.loc-search .loc-list {
+  background: #171a1f;
+  color: #eceef2;
+  border: 2px solid #3d434d;
+  border-radius: 0;
 }
 
-.lb-tab.active {
-  background: #ff6a1f !important;
-  color: #1a0c03 !important;
+.loc-search .loc-item {
+  border-bottom: 1px solid #2c3038;
 }
 
-/* the builder's action buttons. colour + square only (they are box-sizing:border-box, so a 1px
-   border keeps their size). presets read as graphite chips, Import/Export is neutral, Clear is danger */
-.lb-btn {
-  border-radius: 0 !important;
-}
-
-.lb-preset {
-  background: #14161a !important;
-  color: #a3a9b3 !important;
-  border: 1px solid #3d434d !important;
-}
-
-.lb-preset:hover {
-  border-color: #ff6a1f !important;
-  color: #ff6a1f !important;
-}
-
-.lb-btn-io {
-  background: #23262c !important;
-  color: #eceef2 !important;
-  border: 1px solid #3d434d !important;
-}
-
-.lb-btn-io:hover {
-  border-color: #ff6a1f !important;
-}
-
-.lb-btn-io:active {
-  background: #2c3038 !important;
-}
-
-.lb-btn-clear {
-  background: #c53a2c !important;
-  color: #fff !important;
-  border: 1px solid #c53a2c !important;
-}
-
-.lb-btn-clear:active {
-  background: #a82f24 !important;
-}
-
-/* square the rest of the builder to match the theme editor: the panel chips, placed blocks,
-   drag ghost, drawer container, bezel/grid/cell and the popups. border-radius only, never
-   padding/flex (the standing constraint), so the drag-and-drop keeps its proportions */
-.lb-bezel, .lb-grid, .lb-cell, .lb-drawer-panes, .lb-pal-item, .lb-block, .lb-ghost, .lb-panel, .lb-ctx-opt, .lb-mod-opt, .lb-io-textarea, .lb-io-btn {
-  border-radius: 0 !important;
+.loc-search .loc-item:hover, .loc-search .loc-item:active {
+  background: #ff6a1f;
+  color: #1a0c03;
 }

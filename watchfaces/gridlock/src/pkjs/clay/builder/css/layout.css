@@ -1,7 +1,15 @@
+/* the layout builder, painted in the same gridlock palette as the appearance editor:
+   #171a1f panels behind 2px #3d434d borders, #14161a insets, #ff6a1f for the one signal
+   colour and a mono voice throughout. the popups here (Import/Export Layout and Saved
+   Layouts) share their markup with the theme editor's via ts/shared, so .lb-panel and
+   .lb-io-* deliberately mirror .tb-pick and .tb-io-* in theme.css.
+   standing constraint: colour, border, border-radius and font only. the drag and drop
+   measures real boxes, so never touch padding/flex/gap/width on the bezel, grid, cells,
+   palette items, blocks or the ghost */
 .lb {
   padding: 12px 0;
   user-select: none;
-  font-family: -apple-system, sans-serif;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
 }
 
 .lb-header {
@@ -11,7 +19,7 @@
 
 .lb-desc {
   font-size: 11px;
-  color: #888;
+  color: #6a707a;
   line-height: 1.4;
   margin: 0;
 }
@@ -26,11 +34,11 @@
 }
 
 .lb-bezel {
-  background: #333;
-  border-radius: 18px;
+  background: #191c22;
+  border-radius: 0;
   padding: 8px;
-  border: 2px solid #ddd;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 2px solid #3d434d;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   display: flex;
   align-items: stretch;
   gap: 8px;
@@ -43,7 +51,7 @@
   gap: 2px;
   width: 74px;
   box-sizing: border-box;
-  border-left: 1px solid #444;
+  border-left: 1px solid #2c3038;
   padding-left: 8px;
 }
 
@@ -64,19 +72,21 @@
   font-size: 11px;
 }
 
+/* box-sizing is border-box, so the 1px border costs the button no width */
 .lb-btn {
   padding: 5px !important;
   margin: 0 !important;
   box-sizing: border-box;
   min-width: 0 !important;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 9px;
   font-weight: 700;
-  border: none;
+  border: 1px solid #3d434d;
   cursor: pointer;
-  background: #ddd;
-  color: #333;
+  background: #23262c;
+  color: #eceef2;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -84,18 +94,36 @@
 }
 
 .lb-btn:active {
-  background: #ccc;
+  background: #2c3038;
+}
+
+/* presets read as recessed graphite chips so the eye lands on the grid first */
+.lb-preset {
+  background: #14161a;
+  color: #a3a9b3;
+}
+
+.lb-preset:hover {
+  border-color: #ff6a1f;
+  color: #ff6a1f;
+}
+
+.lb-btn-io:hover, .lb-btn-slots:hover {
+  border-color: #ff6a1f;
 }
 
 .lb-btn-clear {
-  background: #e74c3c;
-  color: white;
+  background: #c53a2c;
+  border-color: #c53a2c;
+  color: #fff;
 }
 
 .lb-btn-clear:active {
-  background: #c0392b;
+  background: #a82f24;
+  border-color: #a82f24;
 }
 
+/* the grid is the watch screen, so it stays black no matter what the page does */
 .lb-grid {
   position: relative;
   display: grid;
@@ -104,14 +132,14 @@
   gap: 3px;
   padding: 5px;
   background: #000;
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
 }
 
 .lb-cell {
-  background: #1a1a1a;
-  border: 1px dashed #333;
-  border-radius: 4px;
+  background: #14161a;
+  border: 1px dashed #3d434d;
+  border-radius: 0;
   transition: background 0.12s;
   display: flex;
   align-items: center;
@@ -125,8 +153,8 @@
 }
 
 .lb-cell.selecting {
-  background: #ff572230;
-  border: 1px solid #ff5722;
+  background: #ff6a1f30;
+  border: 1px solid #ff6a1f;
 }
 
 .lb-drawer-wrap {
@@ -148,27 +176,30 @@
   min-width: 0;
   padding: 9px 4px;
   border: none;
-  border-radius: 8px 8px 0 0;
-  background: #1a1a1a;
-  color: #777;
+  border-radius: 0;
+  background: #14161a;
+  color: #a3a9b3;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
   cursor: pointer;
   margin-bottom: -1px;
 }
 
 .lb-tab.active {
-  background: #222;
-  color: #fff;
+  background: #ff6a1f;
+  color: #1a0c03;
 }
 
+/* 1px border, not the 2px elsewhere: this box is content-box, so a wider border would
+   grow the drawer under the tabs */
 .lb-drawer-panes {
-  background: #222;
-  border-radius: 0 0 12px 12px;
+  background: #1d2128;
+  border-radius: 0;
   padding: 10px 8px;
-  border: 1px solid #333;
+  border: 1px solid #3d434d;
 }
 
 .lb-drawer-pane {
@@ -192,7 +223,7 @@
   flex-shrink: 0;
   box-sizing: border-box;
   padding: 3px;
-  border-radius: 8px;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -234,7 +265,7 @@
 }
 
 .lb-block {
-  border-radius: 6px;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -280,8 +311,8 @@
   z-index: 99999;
   opacity: 0.9;
   transform: translate(-50%, -50%);
-  border-radius: 6px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  border-radius: 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -294,17 +325,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(8,9,11,0.8);
   z-index: 50000;
 }
 
+/* the twin of .tb-pick in theme.css: both popups sit on the page at the same weight */
 .lb-panel {
   position: fixed;
   z-index: 50001;
-  background: #fff;
-  border-radius: 12px;
+  background: #171a1f;
+  border: 2px solid #3d434d;
+  border-radius: 0;
   padding: 14px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px -20px rgba(0,0,0,0.9);
   min-width: 240px;
   max-width: 300px;
   left: 50%;
@@ -316,35 +350,28 @@
 }
 
 .lb-title {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: #666;
-  margin-bottom: 12px;
-}
-
-.lb-btn-io {
-  background: #3498db;
-  color: white;
-}
-
-.lb-btn-io:active {
-  background: #2980b9;
+  letter-spacing: 1px;
+  color: #ff6a1f;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  margin-bottom: 10px;
 }
 
 .lb-io-textarea {
   width: 100%;
   height: 100px;
   padding: 8px;
-  font-family: monospace;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 11px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 2px solid #3d434d;
+  border-radius: 0;
   margin-bottom: 12px;
   resize: none;
   box-sizing: border-box;
-  color: #333;
+  background: #14161a;
+  color: #eceef2;
 }
 
 .lb-io-btns {
@@ -358,33 +385,48 @@
   margin: 0 !important;
   min-width: 0 !important;
   flex: 1;
-  border-radius: 6px;
+  box-sizing: border-box;
+  border-radius: 0;
   font-size: 12px;
-  font-weight: 600;
-  border: none;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 2px solid #3d434d;
   cursor: pointer;
-  background: #eee;
-  color: #333;
+  background: #23262c;
+  color: #eceef2;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+}
+
+.lb-io-btn:active {
+  background: #2c3038;
 }
 
 .lb-io-btn.primary {
-  background: #2ecc71;
-  color: white;
+  background: #ff6a1f;
+  border-color: #ff6a1f;
+  color: #1a0c03;
 }
 
 .lb-io-btn.primary:active {
-  background: #27ae60;
+  background: #e85e15;
+  border-color: #e85e15;
 }
 
-.lb-io-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-/* a slot button primed for its confirming second tap (overwrite or load) */
+/* a slot button primed for its confirming second tap (overwrite or load). red, not the
+   signal orange, so an armed button never reads as the ordinary primary one */
 .lb-io-btn.armed {
-  background: #e67e22;
-  color: white;
+  background: #c53a2c;
+  border-color: #c53a2c;
+  color: #fff;
+}
+
+/* after .primary so a disabled Load drops out of orange instead of being a dimmed one */
+.lb-io-btn:disabled {
+  background: #1d2128;
+  border-color: #2c3038;
+  color: #6a707a;
+  cursor: default;
 }
 
 /* the saved-layout slots: each slot's name plus a muted status on one line,
@@ -402,13 +444,15 @@
 
 .lb-slot-name {
   font-size: 12px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #eceef2;
 }
 
 .lb-slot-status {
   font-size: 11px;
-  color: #999;
+  color: #6a707a;
 }
 
 .platform-ios .button, .platform-ios button {
