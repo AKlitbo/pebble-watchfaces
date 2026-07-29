@@ -49,6 +49,12 @@ notice each font declares in its own metadata.
   Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. Licence text in
   [OFL.txt](watchfaces/radar-array/resources/fonts/OFL.txt)
 
+### Ridgeline
+
+- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012
+  Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in
+  [OFL.txt](watchfaces/ridgeline/resources/fonts/OFL.txt)
+
 ### IDE VSCode
 
 Both fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a
@@ -65,14 +71,14 @@ regenerate the icons, and only the rendered PNGs are bundled. The bluetooth SVGs
 bundled under `vendor/svgrepo/`.
 
 Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`.
-Radar Array draws no weather icons, so it bundles only the bluetooth glyphs.
+Radar Array and Ridgeline draw no weather icons, so they bundle only the bluetooth glyphs.
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font
   License 1.1 for the font, MIT for the code. Rendered PNGs bundled by LCARS Stardate and IDE / VS Code
 - **[UXWing](https://uxwing.com)** (heart, step, thermometer glyphs): the
   [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not
   allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled
-  by LCARS Stardate
+  by LCARS Stardate and Ridgeline
 - **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs):
   [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources bundled
   under `vendor/svgrepo/`, rendered PNGs bundled by every face

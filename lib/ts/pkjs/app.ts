@@ -590,6 +590,10 @@ function startPebbleApp(options: StartOptions): void {
         console.log('Weather info sent to Pebble successfully!');
       },
       () => {
+        // the send never landed, so the watch does not hold this reading after all. drop the
+        // signature or the next fetch of the same reading would be skipped as already-sent and
+        // the face would sit blank until the values happened to move
+        lastWeatherKey = null;
         console.error('Error sending weather info to Pebble!');
       }
     );
@@ -718,6 +722,8 @@ function startPebbleApp(options: StartOptions): void {
         console.log('Stock info sent to Pebble successfully!');
       },
       () => {
+        // same as the weather send: a strip that never landed must not count as delivered
+        lastStockBytes = null;
         console.error('Error sending stock info to Pebble!');
       }
     );
@@ -832,7 +838,11 @@ function startPebbleApp(options: StartOptions): void {
       queueSend(
         { [messageKeys.CALENDAR_STRIP]: bytes },
         () => { console.log('Calendar sent to Pebble'); },
-        () => { console.error('Error sending calendar to Pebble'); }
+        () => {
+          // same as the weather send: a strip that never landed must not count as delivered
+          lastCalendarBytes = null;
+          console.error('Error sending calendar to Pebble');
+        }
       );
     });
   }
