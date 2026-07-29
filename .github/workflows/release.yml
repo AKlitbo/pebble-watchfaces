@@ -1,5 +1,10 @@
 name: Release
 
+# name the run after the commit being released. left unset, GitHub only falls back to the commit
+# message when the tag sits on the branch tip, and shows the workflow name ("Release") for a tag
+# on any older commit, which tells you nothing about what shipped
+run-name: ${{ github.event.head_commit.message }}
+
 # faces version independently, so a release is tagged per face: <face>-v<version>, e.g.
 # lcars-stardate-v1.5.0. pushing that tag is the whole release process
 on:
