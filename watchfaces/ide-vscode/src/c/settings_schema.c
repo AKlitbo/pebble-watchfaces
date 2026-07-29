@@ -11,10 +11,10 @@
 #include "settings_schema.h"
 #include "system/settings/settings_catalog.h"
 #include "system/settings/setting_values.h"
+#include "persist_keys.h"
 
 #include <stddef.h>
 
-#define VSCODE_SETTINGS_KEY 1
 #define VSCODE_SETTINGS_VERSION 1
 
 /**

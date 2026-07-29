@@ -14,10 +14,15 @@
 #include "io/stores/weather_store.h"
 #include "dev/dev.h"
 #include "layout.h"
+#include "persist_keys.h"
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
 #include "settings_schema.h"
 #include "system/vibe/vibe.h"
+
+// weather polls the phone this often. the reconnect catch-up reuses it as the staleness gate so
+// the two cadences can never drift apart
+#define WEATHER_POLL_MIN 30
 
 static Window *s_window;
 
@@ -74,6 +79,34 @@ static void on_time_tick(void)
     hourly_vibe();
 }
 
+/**
+ * @brief Whether a reading is worth re-requesting: it never synced, or it is at least its own
+ * poll interval old. Polling turned off (poll_min 0) is left alone, same as its store.
+ */
+static bool reconnect_should_refresh(int age_s, int poll_min)
+{
+    if (poll_min <= 0)
+    {
+        return false;
+    }
+    return age_s < 0 || age_s >= poll_min * 60;
+}
+
+/**
+ * @brief The phone app just reconnected, so catch up a reading that went stale while it was away.
+ *
+ * The phone's pkjs may have been closed for the whole gap, and the store's own poll is 30 min, so
+ * without this the face sits on an old reading. Gating on age means bluetooth flapping cannot
+ * re-fetch faster than the normal cadence.
+ */
+static void on_phone_reconnected(void)
+{
+    if (reconnect_should_refresh(weather_store_age_s(), WEATHER_POLL_MIN))
+    {
+        appmessage_request_weather();
+    }
+}
+
 static void init(void)
 {
     settings_init(lcars_settings_schema());
@@ -83,9 +116,10 @@ static void init(void)
     if (!dev_seed_stores())
     {
         system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
-        health_store_init((HealthConfig){.enabled = true, .live = true}, NULL);
+        health_store_init((HealthConfig){.enabled = true, .live = true, .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
-        weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = 30}, NULL);
+        weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = WEATHER_POLL_MIN,
+                                           .persist_key = WEATHER_STORE_KEY}, NULL);
         location_store_init((LocationConfig){.enabled = true, .live = true}, NULL);
     }
 
@@ -100,6 +134,7 @@ static void init(void)
     weather_store_subscribe(engine_mark_dirty);
     location_store_subscribe(engine_mark_dirty);
     system_store_subscribe(engine_mark_dirty);
+    system_store_on_reconnect(on_phone_reconnected);
 
     // weather_store + location_store own their channels. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

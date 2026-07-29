@@ -10,11 +10,11 @@
 #include "settings_schema.h"
 #include "system/settings/settings_catalog.h"
 #include "system/settings/setting_values.h"
+#include "persist_keys.h"
 
 #include <stddef.h>
 #include <string.h>
 
-#define LCARS_SETTINGS_KEY 5
 #define LCARS_SETTINGS_VERSION 4
 // smallest versioned blob accepted. fields are append-only so this never changes
 #define LCARS_SETTINGS_V1_SIZE 21

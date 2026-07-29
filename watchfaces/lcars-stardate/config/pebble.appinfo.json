@@ -1,7 +1,7 @@
 {
   "name": "lcars-stardate",
   "displayName": "LCARS Stardate",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "watchface": true,
   "uuid": "68b0e2fe-b970-4cb2-8b4c-45ea9c13d968",
   "sdkVersion": "3",
