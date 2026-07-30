@@ -23,16 +23,16 @@
 // grid (weather condition / temp on the left and heart rate / steps on the right). colours
 // are seeded with the Dark+ palette and re-set per theme by apply_theme_colors
 static Zone s_zones[ZONE_COUNT] = {
-    [ZONE_TIME]    = {.rect = SLOT_TIME, .font_id = FONT_TIME,  .align = GTextAlignmentCenter, .color = GColorVividCerulean,
+    [ZONE_TIME]    = {.rect = SLOT_TIME,  .font_id = FONT_TEKO_78, .align = GTextAlignmentCenter, .color = GColorVividCerulean,
                       // the @beats token is wider than HH:MM and overflows Teko 78. drop to 72 so it fits
-                      .font_id_fallback = FONT_TIME_SM, .rect_fallback = SLOT_TIME},
-    [ZONE_DATE]    = {.rect = SLOT_DATE,  .font_id = FONT_DATE, .align = GTextAlignmentCenter, .color = GColorRajah,
-                      .font_id_fallback = FONT_VALUE, .rect_fallback = SLOT_DATE},
-    [ZONE_COND]    = {.rect = SLOT_COND,  .font_id = FONT_VALUE, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine,
-                      .font_id_fallback = FONT_DATE_SM, .rect_fallback = SLOT_COND},
-    [ZONE_WEATHER] = {.rect = SLOT_TEMP,  .font_id = FONT_VALUE, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine},
-    [ZONE_HR]      = {.rect = SLOT_HR,    .font_id = FONT_VALUE, .align = GTextAlignmentLeft, .color = GColorRed},
-    [ZONE_STEPS]   = {.rect = SLOT_STEPS, .font_id = FONT_VALUE, .align = GTextAlignmentLeft, .color = GColorCeleste},
+                      .font_id_fallback = FONT_TEKO_72, .rect_fallback = SLOT_TIME},
+    [ZONE_DATE]    = {.rect = SLOT_DATE,  .font_id = FONT_STM_20, .align = GTextAlignmentCenter, .color = GColorRajah,
+                      .font_id_fallback = FONT_STM_14, .rect_fallback = SLOT_DATE},
+    [ZONE_COND]    = {.rect = SLOT_COND,  .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine,
+                      .font_id_fallback = FONT_STM_12, .rect_fallback = SLOT_COND},
+    [ZONE_WEATHER] = {.rect = SLOT_TEMP,  .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine},
+    [ZONE_HR]      = {.rect = SLOT_HR,    .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorRed},
+    [ZONE_STEPS]   = {.rect = SLOT_STEPS, .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorCeleste},
 };
 
 /**
@@ -56,11 +56,11 @@ static void apply_theme_colors(uint8_t theme)
  */
 static void load_fonts(void)
 {
-    fonts_register(FONT_TIME,    fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_78)));
-    fonts_register(FONT_TIME_SM, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_72)));
-    fonts_register(FONT_DATE,    fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_20)));
-    fonts_register(FONT_VALUE,   fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_14)));
-    fonts_register(FONT_DATE_SM, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_12)));
+    fonts_register(FONT_TEKO_78, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_78)));
+    fonts_register(FONT_TEKO_72, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_72)));
+    fonts_register(FONT_STM_20, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_20)));
+    fonts_register(FONT_STM_14, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_14)));
+    fonts_register(FONT_STM_12, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_12)));
 }
 
 // --- Baked VS Code frame ---

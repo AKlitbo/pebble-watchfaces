@@ -91,7 +91,7 @@ void widgets_draw_battery(GContext *ctx, int level)
         GRect rect = (display == BATTERY_DISPLAY_PERCENT) ? BATT_RECT_WIDE : BATT_RECT;
 
         graphics_context_set_text_color(ctx, color);
-        graphics_draw_text(ctx, buffer, fonts_get(FONT_VALUE), rect,
+        graphics_draw_text(ctx, buffer, fonts_get(FONT_STM_14), rect,
             GTextOverflowModeFill, GTextAlignmentRight, NULL);
     }
 }
