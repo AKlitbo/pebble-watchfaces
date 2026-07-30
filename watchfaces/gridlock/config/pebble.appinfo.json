@@ -90,7 +90,11 @@
     "CALENDAR_STRIP",
     "CALENDAR_REQUEST",
     "CLOCK_WEEK_START",
-    "LAYOUT_SLOTS"
+    "LAYOUT_SLOTS",
+    "LAYOUT_NIGHT",
+    "LAYOUT_NIGHT_MODE",
+    "LAYOUT_NIGHT_START",
+    "LAYOUT_NIGHT_END"
   ],
   "resources": {
     "media": [

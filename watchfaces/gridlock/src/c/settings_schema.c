@@ -16,6 +16,7 @@
 #include "system/settings/settings_catalog.h"
 #include "system/settings/setting_values.h"
 #include "units/wind.h"
+#include "clock/nightsched.h"
 #include "engine/layouts.h"
 #include "engine/catalog.h"
 #include "draw/header_fonts.h" // HEADER_FONT_COUNT for the header font enum bound
@@ -99,6 +100,20 @@
 // fields keep their defaults
 #define GRIDLOCK_CALENDAR_V1_SIZE 2
 
+// the night layout rides its own key rather than the core blob. core is already 131 bytes and a
+// second 128-byte layout would take it to 259, past the 256 a persist key holds, and
+// persist_write_data does not report that: it simply writes nothing, so every core setting would
+// stop persisting at once. min_versioned_size is pinned to the v1 size from the first release so
+// appending a field later cannot wipe a night layout in the field
+#define GRIDLOCK_NIGHT_VERSION 1
+#define GRIDLOCK_NIGHT_SIZE    132
+#define GRIDLOCK_NIGHT_V1_SIZE 132
+
+// the wire value for "no night layout". an empty string cannot say this: settings_apply_inbox
+// skips an empty cstring rather than storing it, so a cleared grid would never reach the watch.
+// the same sentinel the custom colours use for their own empty state
+#define GRIDLOCK_NO_LAYOUT "0"
+
 // four themes. 0 mono. 1 vibrant. 2 custom. 3 mono inverse (see theme.h GridlockTheme)
 #define GRIDLOCK_THEME_COUNT 4
 
@@ -121,6 +136,22 @@ typedef struct GridlockCore
     uint8_t header_font; // Header Font pick (index into the header_fonts table)
 } GridlockCore;
 _Static_assert(sizeof(GridlockCore) == GRIDLOCK_CORE_SIZE, "core blob size is frozen; fields append only");
+
+/**
+ * @brief The night layout and when to show it.
+ *
+ * Scalars first and the string last, so a field appended later lands after the layout rather than
+ * shifting it.
+ */
+typedef struct GridlockNight
+{
+    uint8_t version;
+    uint8_t mode;       // a NightSchedMode: off, follow the sun, or the fixed pair
+    uint8_t start_slot; // half-hour slot 0..47, so 21:00 is 42
+    uint8_t end_slot;
+    char    layout[128];
+} GridlockNight;
+_Static_assert(sizeof(GridlockNight) == GRIDLOCK_NIGHT_SIZE, "night blob size is frozen; fields append only");
 
 /** @brief Weather settings. */
 typedef struct GridlockWeather
@@ -215,6 +246,7 @@ static GridlockStocks    s_stocks;
 static GridlockAnalog    s_analog;
 static GridlockCalendar  s_calendar;
 static GridlockGoalVibe  s_goal_vibe;
+static GridlockNight     s_night;
 
 // goal option values looked up by the saved menu choice
 static const int16_t s_steps_goals[]   = {5000, 7500, 10000, 12500, 15000, 20000, 25000};
@@ -244,6 +276,18 @@ static const SettingField s_core_fields[] = {
     { .id = SETTING_HEADER_FONT, .message_key = &MESSAGE_KEY_APPEARANCE_HEADER_FONT,
       .type = SETTING_ENUM_U8, .offset = offsetof(GridlockCore, header_font),
       .enum_count = HEADER_FONT_COUNT, .default_num = 0 },
+};
+
+// --- night (key 12) ---
+// the times are half-hour slots rather than an "HH:MM" string: one byte instead of six, no parse,
+// and the framework's enum_count clamp sanitises them for free
+static const SettingField s_night_fields[] = {
+    FACE_ENUM(GridlockNight, mode, LAYOUT_NIGHT_MODE, NIGHT_SCHED_COUNT, NIGHT_SCHED_OFF),
+    FACE_ENUM(GridlockNight, start_slot, LAYOUT_NIGHT_START, 48, 42), // 21:00
+    FACE_ENUM(GridlockNight, end_slot, LAYOUT_NIGHT_END, 48, 14),     // 07:00
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_NIGHT, .type = SETTING_CSTRING,
+      .offset = offsetof(GridlockNight, layout), .size = sizeof(s_night.layout),
+      .default_str = GRIDLOCK_NO_LAYOUT },
 };
 
 // --- weather (key 3) ---
@@ -475,6 +519,21 @@ static const SettingsSchema s_goal_vibe_schema = {
     .companion = &s_custom_theme_schema,
 };
 
+// chained straight after core on purpose: settings_serialize walks the chain in order and stops
+// at the first dict failure, so keeping both layouts at the front keeps the night one out of the
+// tail that a squeezed outbox would drop
+static const SettingsSchema s_night_schema = {
+    .key = GRIDLOCK_NIGHT_KEY,
+    .version = GRIDLOCK_NIGHT_VERSION,
+    .min_versioned_size = GRIDLOCK_NIGHT_V1_SIZE,
+    .blob = &s_night,
+    .blob_size = sizeof(s_night),
+    .fields = s_night_fields,
+    .field_count = ARRAY_LENGTH(s_night_fields),
+    .migrate = NULL,
+    .companion = &s_goal_vibe_schema,
+};
+
 static const SettingsSchema s_core_schema = {
     .key = GRIDLOCK_CORE_KEY,
     .version = GRIDLOCK_CORE_VERSION,
@@ -484,7 +543,7 @@ static const SettingsSchema s_core_schema = {
     .fields = s_core_fields,
     .field_count = ARRAY_LENGTH(s_core_fields),
     .migrate = NULL,
-    .companion = &s_goal_vibe_schema,
+    .companion = &s_night_schema,
 };
 
 const SettingsSchema *gridlock_settings_schema(void)
@@ -501,6 +560,7 @@ const SettingsSchema *gridlock_settings_schema(void)
 static GridlockBlock s_blocks[GRIDLOCK_MAX_CELLS];
 static uint8_t s_block_count;
 static char s_parsed_src[sizeof(s_core.layout)]; // last string we parsed so we can skip doing it twice
+static bool s_night_active;                      // which of the two layouts the parser is reading
 
 /**
  * @brief Reads a run of digits and moves the cursor past them.
@@ -521,20 +581,65 @@ static int parse_int(const char **p)
 }
 
 /**
+ * @brief Whether a layout string holds at least one placeable block.
+ *
+ * One test covers the three ways a layout can be nothing: the "0" sentinel, an empty string, and
+ * whatever a corrupt blob left behind.
+ *
+ * @param layout The wire string.
+ * @return True when at least one record names a real module.
+ */
+static bool layout_has_any_block(const char *layout)
+{
+    for (const char *p = layout; p && *p; )
+    {
+        int type = parse_int(&p);
+        if (type > 0 && type < MOD_TYPE_COUNT)
+        {
+            return true;
+        }
+
+        while (*p && *p != ';')
+        {
+            p++;
+        }
+        if (*p == ';')
+        {
+            p++;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief The layout the block cache should be reading.
+ *
+ * The night one only wins while it is switched on and actually holds blocks, so a cleared or
+ * corrupt night grid quietly falls back to the day layout rather than showing an empty screen.
+ */
+static const char *active_layout(void)
+{
+    return (s_night_active && layout_has_any_block(s_night.layout)) ? s_night.layout : s_core.layout;
+}
+
+/**
  * @brief Parses the layout string into the block cache, unless the cache is already up to date.
  */
 static void ensure_parsed(void)
 {
-    if (strncmp(s_parsed_src, s_core.layout, sizeof(s_parsed_src)) == 0)
+    const char *layout = active_layout();
+
+    if (strncmp(s_parsed_src, layout, sizeof(s_parsed_src)) == 0)
     {
         return;
     }
 
-    strncpy(s_parsed_src, s_core.layout, sizeof(s_parsed_src) - 1);
+    strncpy(s_parsed_src, layout, sizeof(s_parsed_src) - 1);
     s_parsed_src[sizeof(s_parsed_src) - 1] = '\0';
 
     s_block_count = 0;
-    const char *p = s_core.layout;
+    const char *p = layout;
 
     while (*p && s_block_count < GRIDLOCK_MAX_CELLS)
     {
@@ -609,6 +714,83 @@ bool gridlock_has_module(uint8_t type)
         }
     }
     return false;
+}
+
+/** @brief Whether a layout string places a module, without disturbing the block cache. */
+static bool layout_string_has_module(const char *layout, uint8_t type)
+{
+    for (const char *p = layout; p && *p; )
+    {
+        if (parse_int(&p) == type)
+        {
+            return true;
+        }
+
+        while (*p && *p != ';')
+        {
+            p++;
+        }
+        if (*p == ';')
+        {
+            p++;
+        }
+    }
+
+    return false;
+}
+
+bool gridlock_has_module_either(uint8_t type)
+{
+    return gridlock_has_module(type)
+        || layout_string_has_module(s_core.layout, type)
+        || layout_string_has_module(s_night.layout, type);
+}
+
+uint8_t gridlock_night_mode(void)
+{
+    return s_night.mode;
+}
+
+int gridlock_night_start_min(void)
+{
+    return s_night.start_slot * 30;
+}
+
+int gridlock_night_end_min(void)
+{
+    return s_night.end_slot * 30;
+}
+
+bool gridlock_night_layout_set(void)
+{
+    return layout_has_any_block(s_night.layout);
+}
+
+bool gridlock_active_layout_is_night(void)
+{
+    return s_night_active;
+}
+
+void gridlock_set_active_layout(bool night)
+{
+    s_night_active = night;
+}
+
+void gridlock_set_night_layout(const char *layout)
+{
+    if (layout)
+    {
+        strncpy(s_night.layout, layout, sizeof(s_night.layout) - 1);
+        s_night.layout[sizeof(s_night.layout) - 1] = '\0';
+    }
+}
+
+void gridlock_set_night_mode(uint8_t mode)
+{
+    if (mode < NIGHT_SCHED_COUNT)
+    {
+        s_night.mode = mode;
+    }
 }
 
 // --- custom colour string parsing ---

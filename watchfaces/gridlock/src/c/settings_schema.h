@@ -44,6 +44,62 @@ const GridlockBlock *gridlock_block(uint8_t index);
 bool gridlock_has_module(uint8_t type);
 
 /**
+ * @brief Whether a module is placed in *either* layout, day or night.
+ *
+ * For the things that should not go quiet just because the other layout is showing. The calendar
+ * reminders are the case that matters: gating them on the layout on screen would silence every
+ * overnight reminder for anyone whose night grid has no Calendar panel, which is exactly the hours
+ * an early meeting needs one. Drawing still asks gridlock_has_module, which is about what is on
+ * screen right now.
+ *
+ * @param type A ModuleType.
+ * @return True when either layout places it.
+ */
+bool gridlock_has_module_either(uint8_t type);
+
+/**
+ * @brief When the night layout takes over.
+ *
+ * @return A NightSchedMode.
+ */
+uint8_t gridlock_night_mode(void);
+
+/** @brief The minute of the day the night window opens, from the user's own setting. */
+int gridlock_night_start_min(void);
+
+/** @brief And the minute it closes. */
+int gridlock_night_end_min(void);
+
+/** @brief Whether there is a night layout worth switching to, rather than an empty or junk one. */
+bool gridlock_night_layout_set(void);
+
+/** @brief Whether the night layout is the one currently being drawn. */
+bool gridlock_active_layout_is_night(void);
+
+/**
+ * @brief Pick which layout the face draws from. In memory only, so neither stored layout moves.
+ *
+ * @param night True to draw the night layout.
+ */
+void gridlock_set_active_layout(bool night);
+
+/**
+ * @brief Sets the night layout in memory only (it is not saved). The dev harness uses this to
+ * force one without going through the config page.
+ *
+ * @param layout A LAYOUT wire string.
+ */
+void gridlock_set_night_layout(const char *layout);
+
+/**
+ * @brief Sets the night schedule mode in memory only (it is not saved). The dev harness pins this
+ * off so a fixture with real sun times cannot flip a screenshot half way through.
+ *
+ * @param mode A NightSchedMode.
+ */
+void gridlock_set_night_mode(uint8_t mode);
+
+/**
  * @brief One module's custom colours, plus a flag per channel saying whether it was set.
  *
  * A channel the user never picked keeps its flag false so the engine leaves it mono. The

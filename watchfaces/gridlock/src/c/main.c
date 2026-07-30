@@ -23,6 +23,7 @@
 #include "system/settings/setting_values.h"
 #include "settings_schema.h"
 #include "goal_vibe.h"
+#include "night.h"
 #include "persist_keys.h"
 #include "theme/theme.h"
 #include "system/vibe/vibe.h"
@@ -97,6 +98,9 @@ static void load_fonts(void)
  */
 static void on_settings_changed(bool time_or_date_changed)
 {
+    // the night schedule may have changed, so settle the flag before the rebuild below reads it
+    night_layout_settings_changed();
+
     // the theme may have changed so re-apply the window background, and the header font may have
     // changed so swap it (a no-op when unchanged) before rebuilding the cells
     window_set_background_color(s_window, theme_background(settings_u8(SETTING_THEME)));
@@ -127,9 +131,9 @@ static void hourly_vibe(void)
 // never buzzes for an event already past the mark. vibe_pulse stays silent during quiet time
 static void calendar_vibe(void)
 {
-    if (!gridlock_has_module(MOD_CALENDAR_COUNTDOWN) &&
-        !gridlock_has_module(MOD_CALENDAR_AGENDA) &&
-        !gridlock_has_module(MOD_CALENDAR_FREEBUSY))
+    if (!gridlock_has_module_either(MOD_CALENDAR_COUNTDOWN) &&
+        !gridlock_has_module_either(MOD_CALENDAR_AGENDA) &&
+        !gridlock_has_module_either(MOD_CALENDAR_FREEBUSY))
     {
         return;
     }
@@ -182,8 +186,8 @@ static void calendar_vibe(void)
 // from it instead of the whole grid
 // the minute tick lives on the time store, so ride it to sample the heart rate once a minute.
 // that keeps the graph a continuous line instead of the stray dots the sparse hr events leave
-static void on_time_changed(void)    { health_store_poll_hr(); hourly_vibe(); calendar_vibe(); engine_mark_dirty_tags(FEATURE_TIME); }
-static void on_weather_changed(void) { engine_mark_dirty_tags(FEATURE_WEATHER); }
+static void on_time_changed(void)    { health_store_poll_hr(); hourly_vibe(); calendar_vibe(); night_layout_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
+static void on_weather_changed(void) { night_layout_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
 static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }
 static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR); }
 static void on_health_changed(void)  { goal_vibe_update(); engine_mark_dirty_tags(FEATURE_HEALTH); }
@@ -256,6 +260,10 @@ static void init(void)
     window_stack_push(s_window, true);
 
     load_fonts();
+
+    // settle day or night before the first build, so a watchface launched after dark comes up on
+    // the night layout instead of flashing the day one
+    night_layout_init();
     engine_init(s_window, gridlock_build);
 
     // a store change repaints only the cells that read from that hub (see the wrappers above)

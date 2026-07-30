@@ -25,6 +25,10 @@
 #define GRIDLOCK_ANALOG_KEY       9
 #define GRIDLOCK_CALENDAR_KEY     10
 #define GRIDLOCK_GOAL_VIBE_KEY    11
+// the night layout keeps its own key rather than riding the core blob: core is already 131 bytes
+// and a second 128-byte layout would push it past the 256 a persist key holds, which
+// persist_write_data reports by writing nothing at all
+#define GRIDLOCK_NIGHT_KEY        12
 
 // --- store snapshots (high band, handed to each store's init) ---
 // 253 is the location store's slot, left reserved: this face doesn't wire location
@@ -34,4 +38,4 @@
 #define WEATHER_STORE_KEY  255
 
 // a stray edit that lets the two bands meet breaks the build instead of a watch in the field
-_Static_assert(GRIDLOCK_GOAL_VIBE_KEY < CALENDAR_STORE_KEY, "settings keys must stay below the store keys");
+_Static_assert(GRIDLOCK_NIGHT_KEY < CALENDAR_STORE_KEY, "settings keys must stay below the store keys");
