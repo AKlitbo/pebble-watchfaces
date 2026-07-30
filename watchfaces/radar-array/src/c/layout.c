@@ -22,14 +22,14 @@
 // and colour. colours are seeded with the Default palette and re-set per theme by
 // apply_theme_colors: readouts take the primary phosphor and the date/meridiem the chrome accent
 static Zone s_zones[ZONE_COUNT] = {
-    [ZONE_TIME]     = {.rect = SLOT_TIME,     .font_id = FONT_TIME,  .align = GTextAlignmentCenter, .color = GColorGreen},
-    [ZONE_MERIDIEM] = {.rect = SLOT_MERIDIEM, .font_id = FONT_XS,    .align = GTextAlignmentCenter, .color = GColorChromeYellow},
-    [ZONE_DATE]     = {.rect = SLOT_BANNER,   .font_id = FONT_DATE,  .align = GTextAlignmentCenter, .color = GColorChromeYellow,
-                       .font_id_fallback = FONT_DATE_SM, .rect_fallback = SLOT_BANNER_SM},
-    [ZONE_WEATHER]  = {.rect = SLOT_WEATHER,  .font_id = FONT_SM,    .align = GTextAlignmentCenter, .color = GColorGreen},
-    [ZONE_HR]       = {.rect = SLOT_HR,       .font_id = FONT_VALUE, .align = GTextAlignmentCenter, .color = GColorGreen},
-    [ZONE_STEPS]    = {.rect = SLOT_STEPS,    .font_id = FONT_VALUE, .align = GTextAlignmentCenter, .color = GColorGreen},
-    [ZONE_LAT]      = {.rect = SLOT_COORD,    .font_id = FONT_COORD, .align = GTextAlignmentCenter, .color = COORD_TEXT_COLOR},
+    [ZONE_TIME]     = {.rect = SLOT_TIME,     .font_id = FONT_STM_40, .align = GTextAlignmentCenter, .color = GColorGreen},
+    [ZONE_MERIDIEM] = {.rect = SLOT_MERIDIEM, .font_id = FONT_STM_12, .align = GTextAlignmentCenter, .color = GColorChromeYellow},
+    [ZONE_DATE]     = {.rect = SLOT_BANNER,   .font_id = FONT_STM_18, .align = GTextAlignmentCenter, .color = GColorChromeYellow,
+                       .font_id_fallback = FONT_STM_17, .rect_fallback = SLOT_BANNER_SM},
+    [ZONE_WEATHER]  = {.rect = SLOT_WEATHER,  .font_id = FONT_STM_18, .align = GTextAlignmentCenter, .color = GColorGreen},
+    [ZONE_HR]       = {.rect = SLOT_HR,       .font_id = FONT_STM_18, .align = GTextAlignmentCenter, .color = GColorGreen},
+    [ZONE_STEPS]    = {.rect = SLOT_STEPS,    .font_id = FONT_STM_18, .align = GTextAlignmentCenter, .color = GColorGreen},
+    [ZONE_LAT]      = {.rect = SLOT_COORD,    .font_id = FONT_STM_14, .align = GTextAlignmentCenter, .color = COORD_TEXT_COLOR},
     // ZONE_COND and ZONE_LON are omitted: no condition glyph and the coordinate readout is
     // a single combined lat/lon string the phone sends in ZONE_LAT
 };
@@ -58,13 +58,11 @@ static void apply_theme_colors(uint8_t theme)
  */
 static void load_fonts(void)
 {
-    fonts_register(FONT_TIME,    fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_40)));
-    fonts_register(FONT_DATE,    fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_18)));
-    fonts_register(FONT_DATE_SM, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_17)));
-    fonts_register(FONT_SM,      fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_18)));
-    fonts_register(FONT_VALUE,   fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_18)));
-    fonts_register(FONT_COORD,   fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_14)));
-    fonts_register(FONT_XS,      fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_12)));
+    fonts_register(FONT_STM_40, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_40)));
+    fonts_register(FONT_STM_18, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_18)));
+    fonts_register(FONT_STM_17, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_17)));
+    fonts_register(FONT_STM_14, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_14)));
+    fonts_register(FONT_STM_12, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_12)));
 }
 
 // --- Baked radar-array frame ---

@@ -30,7 +30,7 @@ typedef struct
 
 void widgets_draw_labels(GContext *ctx)
 {
-    GFont font = fonts_get(FONT_XS);
+    GFont font = fonts_get(FONT_STM_12);
     GColor accent = panel_accent_for_theme(settings_u8(SETTING_THEME));
 
     const Label labels[] = {
