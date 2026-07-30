@@ -38,10 +38,48 @@ enum
 #define SLOT_TIME GRect(4, 108, 192, 86)      // big clock over the mountains (Hand 72)
 #define SLOT_TIME_SM GRect(4, 112, 192, 86)   // nudged down so the smaller tier keeps the baseline
 #define SLOT_DATE GRect(4, 179, 192, 28)      // date under the clock (Hand 22)
-// AM/PM tucks into the top-right corner of the clock, so it reads as part of the time rather
-// than as another item in the chrome row
-#define MERIDIEM_GAP 4    ///< Air between the last digit and the marker
-#define MERIDIEM_TOP 129  ///< Puts the marker's cap line level with the digits'
+// AM/PM goes where there is room for it, and that differs by layout.
+//
+// On the standard clock it sits beside the digits, AM to their left and PM to their right, so
+// the half of the day shows in its position as well as its letters. Hand 72 leaves about 30px
+// spare either side of a centred clock, which is enough for both.
+//
+// The two bigger layouts have no room at all: Hand 96 puts the digits within 12px of the bezel,
+// and clock plus marker comes to more than the screen is wide. There the marker drops into the
+// channel above the colon instead, which is empty because a colon is two dots on the middle line.
+#define MERIDIEM_GAP 4         ///< Air between the digits and a marker beside them
+#define MERIDIEM_BESIDE_W 34   ///< The box a beside-the-clock marker is pulled to the near end of
+#define MERIDIEM_W 40          ///< The box an above-the-colon marker is centred in
+#define MERIDIEM_TOP 129       ///< Its cap line on the standard clock, level with the digits'
+
+// --- Date Top ---
+// the middle layout: the date moves up onto the strip but the readouts stay where they are, so
+// the clock grows into the band the date left behind rather than into the whole lower half. it
+// takes the same Hand 96 as the big clock, just higher up and with less room under it
+#define SLOT_TIME_DATETOP GRect(4, 105, 192, 100)
+#define SLOT_TIME_DATETOP_SM GRect(4, 121, 192, 100)
+// the same channel, on this layout's own digits
+#define MERIDIEM_TOP_DATETOP 138
+
+// --- Big Clock ---
+// the layout for someone who wants the time and nothing else. the readouts go entirely, the
+// date moves up onto the strip, and the clock takes everything they leave behind. it is the
+// same scene underneath: only what is printed on it changes
+// the land runs from the near ridge's lowest crest (y=126, see scene.c) to the bottom of the
+// screen, so that band is the space the clock has to itself. these boxes put the digits' own
+// middle on the middle of it: a text layer hangs its text from the top of its box, and Hand 96
+// drops it 32px, so the box sits that far above where the digits should start
+#define SLOT_TIME_BIG GRect(4, 113, 192, 100)    // the clock, filling the land (Hand 96)
+#define SLOT_TIME_BIG_SM GRect(4, 129, 192, 100) // the .beats token drops a tier and keeps that middle
+
+// the date is centred on the screen rather than on what is left of the strip, so it lines up
+// with the clock under it. Hand 18 hangs 5px below its box, and the strip is 20 tall, so the box
+// starts above the screen to land the lettering on the strip's own middle. it runs the full
+// clear span between the battery and the status glyphs, so a long format has room before it
+// has to drop a size
+#define SLOT_DATE_TOP GRect(34, -2, 132, 20)
+// the same channel again, on the big clock's digits
+#define MERIDIEM_TOP_BIG 146
 
 // --- Stats Row ---
 // temp grows rightwards off its glyph, heart rate grows out from the screen's centre line, and

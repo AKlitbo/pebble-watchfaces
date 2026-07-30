@@ -2,9 +2,9 @@
  * @file settings_schema.c
  * @brief Ridgeline settings schema.
  *
- * This face has never shipped without any of these fields, so it owns version 1 with no
- * legacy migration. It keeps its own struct and persist key, so its blob and versioning are
- * independent of any other face.
+ * It keeps its own struct and persist key, so its blob and versioning are independent of any
+ * other face. Version 1 is what 1.0.0 shipped and version 2 appends the layout choice, which a
+ * watch updating from 1.0.0 picks up as a short read rather than as a reset.
  *
  * @ingroup watchface-ridgeline
  */
@@ -16,7 +16,13 @@
 
 #include <stddef.h>
 
-#define RIDGELINE_SETTINGS_VERSION 1
+#define RIDGELINE_SETTINGS_VERSION 2
+
+/// The byte count v1 shipped with, frozen now that it has. A watch updating from 1.0.0 holds a
+/// blob this size, and the loader accepts a short read and leaves the fields added since on the
+/// defaults it just applied. Never change this: it is the size of a blob already in the field,
+/// not the size of the struct below
+#define RIDGELINE_SETTINGS_V1_SIZE 26
 
 /**
  * @addtogroup watchface-ridgeline
@@ -26,9 +32,10 @@
 /**
  * @brief Ridgeline's persisted settings.
  *
- * Version 1 carries every field, so there is no older layout to bring forward. Fields only
- * ever get added to the end from here. A new one bumps the version and a blob already on the
- * watch still reads back fine.
+ * Fields are only ever appended, never reordered or removed. A watch that has 1.0.0 on it holds
+ * a v1 blob ending at quiet_time_icon, and everything after that line was added in v2. The
+ * loader reads the short blob, leaves the newer fields on their defaults, and re-saves at the
+ * current version, so an update keeps the settings the user already chose.
  */
 typedef struct RidgelineSettings
 {
@@ -43,18 +50,29 @@ typedef struct RidgelineSettings
     uint8_t vibe_disconnect;
     uint8_t hourly_vibe;
     bool    quiet_time_icon;
+    // --- added in v2 ---
+    uint8_t layout;
+    bool    meridiem;
 } RidgelineSettings;
 
+// the frozen size has to still describe the blob 1.0.0 wrote. every member is a single byte and
+// the struct needs no padding, so v1 is the count of the fields above the marker
+_Static_assert(offsetof(RidgelineSettings, layout) == RIDGELINE_SETTINGS_V1_SIZE,
+    "v1 ended at quiet_time_icon; RIDGELINE_SETTINGS_V1_SIZE no longer matches that blob");
+
 static RidgelineSettings s_settings;
+
+// this face's own setting, numbered past the shared ones. the library defaults, sanitises and
+// serialises it like any other field but will not index it for a typed read, which is why the
+// accessor below reaches into the struct directly. it is cast to SettingId because the field
+// table's id is one, and the build treats mixing two enum types as an error
+#define SETTING_LAYOUT   ((SettingId)(SETTING_COUNT))
+#define SETTING_MERIDIEM ((SettingId)(SETTING_COUNT + 1))
 
 // ridgeline subscribes to every known setting. the date shows as a readout-style "SAT 19 JUN"
 // rather than the library's numeric default, which suits the hand-drawn lettering
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
-    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
-    { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(RidgelineSettings, temperature_unit),
-      .enum_count = 2, .default_num = 0, .affects_weather = true },
+    KNOWN_TEMPERATURE_UNIT(offsetof(RidgelineSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(RidgelineSettings, date_format), "%a %d %b"),
     KNOWN_THEME(offsetof(RidgelineSettings, theme), THEME_COUNT),
     KNOWN_STEPS_MODE(offsetof(RidgelineSettings, steps_mode), STEPS_MODE_COUNT),
@@ -64,24 +82,42 @@ static const SettingField s_fields[] = {
     KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(RidgelineSettings, vibe_disconnect), VIBE_COUNT),
     KNOWN_HOURLY_VIBE(offsetof(RidgelineSettings, hourly_vibe), VIBE_COUNT),
     KNOWN_QUIET_TIME_ICON(offsetof(RidgelineSettings, quiet_time_icon)),
+
+    // --- this face's own ---
+    { .id = SETTING_LAYOUT, .message_key = &MESSAGE_KEY_APPEARANCE_LAYOUT,
+      .type = SETTING_ENUM_U8, .offset = offsetof(RidgelineSettings, layout),
+      .enum_count = LAYOUT_COUNT, .default_num = LAYOUT_STANDARD, .affects_layout = true },
+    { .id = SETTING_MERIDIEM, .message_key = &MESSAGE_KEY_CLOCK_MERIDIEM,
+      .type = SETTING_BOOL, .offset = offsetof(RidgelineSettings, meridiem),
+      .default_num = 1 },
 };
 
 static const SettingsSchema s_schema = {
     .key = RIDGELINE_SETTINGS_KEY,
     .version = RIDGELINE_SETTINGS_VERSION,
-    // ridgeline is unshipped so its v1 is the current struct. once it ships freeze this to a
-    // literal byte count and bump the version on any further field append
-    .min_versioned_size = sizeof(RidgelineSettings),
+    // frozen at what 1.0.0 shipped, so a blob from a watch running it is still accepted
+    .min_versioned_size = RIDGELINE_SETTINGS_V1_SIZE,
     .blob = &s_settings,
     .blob_size = sizeof(RidgelineSettings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
-    .migrate = NULL,  // no legacy blobs. this face never existed without these fields
+    // nothing to migrate: v1 and v2 differ only by an appended field, which the loader handles
+    .migrate = NULL,
 };
 
 const SettingsSchema *ridgeline_settings_schema(void)
 {
     return &s_schema;
+}
+
+uint8_t ridgeline_layout(void)
+{
+    return s_settings.layout;
+}
+
+bool ridgeline_show_meridiem(void)
+{
+    return s_settings.meridiem;
 }
 
 /** @} */

@@ -6,6 +6,8 @@
  */
 #include "widgets.h"
 
+#include <string.h>
+
 #include "layout.h"
 #include "draw/fonts.h"
 #include "ui/fonts.h"
@@ -193,31 +195,104 @@ void widgets_draw_stat_glyphs(GContext *ctx, const Palette *pal)
     draw_glyph(ctx, RESOURCE_ID_ICON_FEET, glyph_before(RESOURCE_ID_ICON_FEET, steps_left), pal->dim);
 }
 
-void widgets_draw_meridiem(GContext *ctx, GColor color)
+/** @brief How wide @p text renders in @p font. */
+static int text_width(const char *text, GFont font)
+{
+    return graphics_text_layout_get_content_size(text, font, GRect(0, 0, 1000, 200),
+        GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft).w;
+}
+
+/**
+ * @brief The marker text and the clock it has to be placed against, or false when there is no
+ * marker to draw.
+ *
+ * Both placements need the same two strings and the same font, so they ask for them the same way.
+ *
+ * @param marker Receives the AM/PM text.
+ * @param marker_size Its buffer size.
+ * @param clock Receives the clock text.
+ * @param clock_size Its buffer size.
+ * @return False on a 24-hour or .beats clock, which is the only time nothing is drawn.
+ */
+static bool meridiem_strings(char *marker, size_t marker_size, char *clock, size_t clock_size)
+{
+    readout_meridiem(marker, marker_size);
+    if (!marker[0])
+    {
+        return false;
+    }
+
+    readout_time(clock, clock_size);
+    return true;
+}
+
+void widgets_draw_meridiem_beside(GContext *ctx, GColor color, GRect clock_slot, FontId clock_font, int top)
 {
     char marker[4];
-    readout_meridiem(marker, sizeof(marker));
-
-    // empty on a 24-hour or .beats clock, which is the only reason this ever draws nothing
-    if (!marker[0])
+    char clock[12];
+    if (!meridiem_strings(marker, sizeof(marker), clock, sizeof(clock)))
     {
         return;
     }
 
-    char clock[12];
-    readout_time(clock, sizeof(clock));
+    // the clock is centred, so where its edges land moves with the format. measuring it is what
+    // keeps the marker tucked against the digits instead of floating off to one side
+    int clock_w = text_width(clock, fonts_get(clock_font));
+    int centre = clock_slot.origin.x + clock_slot.size.w / 2;
 
-    // the clock is centred, so where its last digit lands moves with the format. measuring it
-    // is what keeps the marker tucked against the digits instead of floating off to one side
-    GRect slot = SLOT_TIME;
-    int clock_w = graphics_text_layout_get_content_size(clock, fonts_get(FONT_TIME),
-        GRect(0, 0, 1000, 200), GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft).w;
-    int right = slot.origin.x + slot.size.w / 2 + clock_w / 2;
+    graphics_context_set_text_color(ctx, color);
+
+    // afternoon to the right of the time and morning to its left, so the day reads left to right.
+    // the box is pinned to the digits' edge and the text pulled to the near end of it, which is
+    // what keeps the gap even on both sides
+    if (marker[0] == 'P')
+    {
+        graphics_draw_text(ctx, marker, fonts_get(FONT_XS),
+            GRect(centre + clock_w / 2 + MERIDIEM_GAP, top, MERIDIEM_BESIDE_W, 20),
+            GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+    }
+    else
+    {
+        graphics_draw_text(ctx, marker, fonts_get(FONT_XS),
+            GRect(centre - clock_w / 2 - MERIDIEM_GAP - MERIDIEM_BESIDE_W, top, MERIDIEM_BESIDE_W, 20),
+            GTextOverflowModeFill, GTextAlignmentRight, NULL);
+    }
+}
+
+void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, FontId clock_font, int top)
+{
+    char marker[4];
+    char clock[12];
+    if (!meridiem_strings(marker, sizeof(marker), clock, sizeof(clock)))
+    {
+        return;
+    }
+
+    const char *colon = strchr(clock, ':');
+    if (!colon)
+    {
+        return;  // no colon means no channel to sit in
+    }
+
+    // the hours are what stand between the clock's left edge and the colon, so measuring them is
+    // what finds the gap. it moves with the time: "08" is wider than "10"
+    char hours[8];
+    size_t len = (size_t)(colon - clock);
+    if (len >= sizeof(hours))
+    {
+        return;
+    }
+    memcpy(hours, clock, len);
+    hours[len] = '\0';
+
+    GFont font = fonts_get(clock_font);
+    int left = clock_slot.origin.x + clock_slot.size.w / 2 - text_width(clock, font) / 2;
+    int colon_cx = left + text_width(hours, font) + text_width(":", font) / 2;
 
     graphics_context_set_text_color(ctx, color);
     graphics_draw_text(ctx, marker, fonts_get(FONT_XS),
-        GRect(right + MERIDIEM_GAP, MERIDIEM_TOP, 34, 20),
-        GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+        GRect(colon_cx - MERIDIEM_W / 2, top, MERIDIEM_W, 20),
+        GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 }
 
 void widgets_draw_qt(GContext *ctx, GColor color)

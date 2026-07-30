@@ -12,6 +12,7 @@
 #include <pebble.h>
 
 #include "theme/theme.h"
+#include "ui/fonts.h"  // FontId, for the clock font the marker is measured against
 
 /**
  * @addtogroup watchface-ridgeline
@@ -59,16 +60,41 @@ void widgets_draw_bt(GContext *ctx, bool connected);
 void widgets_draw_stat_glyphs(GContext *ctx, const Palette *pal);
 
 /**
- * @brief Draw the AM/PM marker in the clock's top-right corner.
+ * @brief Draw the AM/PM marker beside the clock: AM on its left, PM on its right.
  *
- * Painted rather than given its own zone: the clock is centred, so its right edge moves with
- * the time format, and the marker measures it each paint to stay tucked against the last
- * digit. Draws nothing on a 24-hour or .beats clock.
+ * Morning to the left and afternoon to the right reads like a day running left to right, so the
+ * half of the day shows in the marker's position as well as its letters.
+ *
+ * The clock is centred, so where its edges land moves with the format and the time. It is
+ * measured each paint to keep the marker against the digits rather than floating.
+ *
+ * Only fits where the clock leaves room beside it. Draws nothing on a 24-hour or .beats clock.
  *
  * @param ctx The graphics context.
  * @param color The colour to paint it.
+ * @param clock_slot The box the clock is drawn in.
+ * @param clock_font The font the clock is drawn in, for measuring its width.
+ * @param top Where the marker's own cap line sits.
  */
-void widgets_draw_meridiem(GContext *ctx, GColor color);
+void widgets_draw_meridiem_beside(GContext *ctx, GColor color, GRect clock_slot, FontId clock_font, int top);
+
+/**
+ * @brief Draw the AM/PM marker in the gap above the clock's colon.
+ *
+ * For a clock too wide to have anything beside it. A colon is two dots on the middle line, so
+ * the channel between the digit pairs is clear above them and the marker sits in it. Where that
+ * channel falls is measured rather than assumed: a wide hour like "08" pushes the colon somewhere
+ * a narrow one like "10" does not, and a fixed column would put the marker through a digit.
+ *
+ * Draws nothing on a 24-hour or .beats clock.
+ *
+ * @param ctx The graphics context.
+ * @param color The colour to paint it.
+ * @param clock_slot The box the clock is drawn in, for finding its centred left edge.
+ * @param clock_font The font the clock is drawn in, for measuring where the colon lands.
+ * @param top Where the marker's own cap line sits.
+ */
+void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, FontId clock_font, int top);
 
 /**
  * @brief Draw the muted-speaker glyph that marks Quiet Time, left of the bluetooth glyph.

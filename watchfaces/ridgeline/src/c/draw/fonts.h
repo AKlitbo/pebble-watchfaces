@@ -20,6 +20,7 @@ enum
 {
     FONT_TIME,     // Patrick Hand 72 - clock
     FONT_TIME_SM,  // Patrick Hand 64 - clock fallback for the wider .beats token
+    FONT_TIME_BIG, // Patrick Hand 96 - the clock in big-clock mode, where nothing shares the screen
     FONT_DATE,     // Patrick Hand 22 - date under the clock
     FONT_DATE_SM,  // Patrick Hand 18 - date fallback for the long formats
     FONT_VALUE,    // Patrick Hand 18 - stats row

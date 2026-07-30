@@ -1,7 +1,7 @@
 {
   "name": "ridgeline",
   "displayName": "Ridgeline",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "watchface": true,
   "uuid": "69730192-3ffe-4489-a5f2-35ae26f87a06",
   "sdkVersion": "3",
@@ -36,6 +36,8 @@
     "CLOCK_DATE_FORMAT",
     "APPEARANCE_THEME",
     "APPEARANCE_QUIET_TIME_ICON",
+    "APPEARANCE_LAYOUT",
+    "CLOCK_MERIDIEM",
     "HEALTH_STEPS_MODE",
     "CLOCK_TIME_FORMAT",
     "CLOCK_HOURLY_VIBE",
@@ -60,6 +62,12 @@
       {
         "type": "font",
         "name": "FONT_HAND_64",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_96",
         "file": "fonts/PatrickHand-Regular.ttf",
         "characterRegex": "[0-9:@]"
       },

@@ -24,6 +24,29 @@ export default buildConfig({
       { label: 'Mono (Black & White)', value: 5 },
     ],
   },
+  appearanceItems: [
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_LAYOUT',
+      'label': 'Layout',
+      'description': 'Controls how much space the clock takes. Larger layouts move the date into the top bar and remove the readouts to give the time more room.',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'Balanced', 'value': 0 },
+        { 'label': 'Time Focused', 'value': 1 },
+        { 'label': 'Clock Only', 'value': 2 },
+      ],
+    },
+  ],
+  clockItems: [
+    {
+      'type': 'toggle',
+      'messageKey': 'CLOCK_MERIDIEM',
+      'label': 'Show AM/PM',
+      'description': 'Show the AM/PM marker above the colon. Only applies to a 12-hour clock, since the other formats have no marker to show.',
+      'defaultValue': true,
+    },
+  ],
   quietTime: {
     description: 'Show a muted-speaker glyph next to bluetooth while Quiet Time is on.',
   },
