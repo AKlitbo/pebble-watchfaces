@@ -55,11 +55,7 @@ static LcarsSettings s_settings;
 // lcars subscribes to every known setting in its frozen struct order. "%Y.%m%d" is
 // its numeric stardate-style date default
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
-    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
-    { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(LcarsSettings, temperature_unit),
-      .enum_count = 2, .default_num = 0, .affects_weather = true },
+    KNOWN_TEMPERATURE_UNIT(offsetof(LcarsSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(LcarsSettings, date_format), "%Y.%m%d"),
     KNOWN_THEME(offsetof(LcarsSettings, theme), 9),
     KNOWN_STEPS_MODE(offsetof(LcarsSettings, steps_mode), STEPS_MODE_COUNT),
