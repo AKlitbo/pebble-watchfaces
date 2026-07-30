@@ -32,15 +32,24 @@ void readout_time(char *out, size_t n)
         || (time_format == TIME_FORMAT_SYSTEM && clock_is_24h_style());
 
     strftime(out, n, h24 ? "%H:%M" : "%I:%M", time_store_tm());
+
+    // the no-lead 12-hour clock is the same reading with its padding zero taken off. it is
+    // trimmed here rather than asking strftime for %l, which is a POSIX extension this SDK's
+    // library is not guaranteed to carry
+    if (time_format == TIME_FORMAT_12H_NO_LEAD && out[0] == '0')
+    {
+        memmove(out, out + 1, strlen(out));
+    }
 }
 
 void readout_meridiem(char *out, size_t n)
 {
     uint8_t time_format = settings_u8(SETTING_TIME_FORMAT);
 
-    // AM/PM only makes sense on a 12-hour clock (explicit 12-hour or System when the
-    // watch isn't in 24h mode). empty otherwise so it never shows on 24h/.beats
+    // AM/PM only makes sense on a 12-hour clock (either of the explicit twelves, or System when
+    // the watch isn't in 24h mode). empty otherwise so it never shows on 24h/.beats
     bool h12 = (time_format == TIME_FORMAT_12H)
+        || (time_format == TIME_FORMAT_12H_NO_LEAD)
         || (time_format == TIME_FORMAT_SYSTEM && !clock_is_24h_style());
 
     if (h12)

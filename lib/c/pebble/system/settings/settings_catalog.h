@@ -19,6 +19,20 @@
  */
 
 /**
+ * @brief Setting definition for Temperature Unit (Celsius or Fahrenheit).
+ *
+ * Every face wires this the same way, so it takes no count: there are two units and there is
+ * never going to be a third. Changing it asks for fresh weather rather than converting what is
+ * already there, because the phone is what does the conversion.
+ *
+ * @param off Offset into the face's settings struct.
+ */
+#define KNOWN_TEMPERATURE_UNIT(off) \
+    { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT, \
+      .type = SETTING_ENUM_U8, .offset = (off), .enum_count = 2, .default_num = 0, \
+      .affects_weather = true }
+
+/**
  * @brief Setting definition for Date Format.
  * @param off Offset into the face's settings struct.
  * @param dflt The default format string.

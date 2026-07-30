@@ -17,6 +17,12 @@ interface ConfigBuilderOptions {
   heading?: string;
   intro?: string;
   theme?: { label?: string; description?: string; options?: Array<{ label: string; value: string | number }> };
+  /** Extra controls to sit inside the Appearance section, under the theme picker. For a setting
+   * that belongs with the look of the face rather than in a section of its own. */
+  appearanceItems?: ClayConfigItem[];
+  /** Extra controls to sit inside the Clock section, under the time format. For a setting that
+   * qualifies how the time itself is written. */
+  clockItems?: ClayConfigItem[];
   bluetooth?: { description?: string };
   quietTime?: { description?: string };
   hourlyVibe?: { label?: string; description?: string };
@@ -66,6 +72,8 @@ const vibeOptions = [
  *
  * Section objects (each section is customised through its own fields):
  *   theme    { label?, description?, options }   options is the theme list (required)
+ *   appearanceItems [ClayConfigItem]            extra controls inside the Appearance section
+ *   clockItems      [ClayConfigItem]            extra controls inside the Clock section
  *   bluetooth { description? }                   always shown
  *   date     { label?, description?, default?, options? }
  *   steps    { label?, description? }
@@ -105,6 +113,9 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
           'defaultValue': 0,
           'options': theme.options,
         },
+        // a face's own appearance controls sit with the theme picker rather than in a section
+        // of their own, because a section per setting reads as a longer page than it is
+        ...(options.appearanceItems || []),
         ...(options.quietTime ? [{
           'type': 'toggle',
           'messageKey': 'APPEARANCE_QUIET_TIME_ICON',
@@ -174,12 +185,15 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
       'description': 'How the main time is shown. .beats is Swatch Internet Time (Biel Mean Time).',
       'defaultValue': 0,
       'options': [
-        { 'label': 'System Default', 'value': 0 },
-        { 'label': '12-hour', 'value': 1 },
-        { 'label': '24-hour', 'value': 2 },
+        { label: 'System Default', value: 0 },
+        { label: '12-hour (08:30)', value: 1 },
+        { label: '12-hour (8:30)', value: 4 },
+        { label: '24-hour (20:30)', value: 2 },
         { 'label': '.beats (Swatch Internet Time)', 'value': 3 },
       ],
     },
+    // a face's own clock controls follow the time format, since that is what they usually qualify
+    ...(options.clockItems || []),
   ];
 
   if (options.hourlyVibe) {
