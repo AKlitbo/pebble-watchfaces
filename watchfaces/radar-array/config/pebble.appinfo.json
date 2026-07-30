@@ -1,7 +1,7 @@
 {
   "name": "radar-array",
   "displayName": "Radar Array",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "watchface": true,
   "uuid": "bad9fa8c-1dde-4314-ba22-68d8806c6fb3",
   "sdkVersion": "3",

@@ -48,11 +48,7 @@ static RadarSettings s_settings;
 // radar subscribes to every known setting. it shows a readout-style date
 // ("SAT 19 JUN") in place of the library's numeric default
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
-    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
-    { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(RadarSettings, temperature_unit),
-      .enum_count = 2, .default_num = 0, .affects_weather = true },
+    KNOWN_TEMPERATURE_UNIT(offsetof(RadarSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(RadarSettings, date_format), "%a %d %b"),
     KNOWN_THEME(offsetof(RadarSettings, theme), 7),
     KNOWN_STEPS_MODE(offsetof(RadarSettings, steps_mode), STEPS_MODE_COUNT),
