@@ -49,11 +49,7 @@ static VscodeSettings s_settings;
 // the date defaults to a compact single line ("JUN 18") to fit the terminal panel
 // 6 themes: Dark+ / Light / Terminal / Cyberpunk / Synthwave / Mono
 static const SettingField s_fields[] = {
-    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
-    // page shows a Celsius/Fahrenheit dropdown, so Clay sends a select (a cstring "0"/"1")
-    { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(VscodeSettings, temperature_unit),
-      .enum_count = 2, .default_num = 0, .affects_weather = true },
+    KNOWN_TEMPERATURE_UNIT(offsetof(VscodeSettings, temperature_unit)),
     KNOWN_DATE_FORMAT(offsetof(VscodeSettings, date_format), "%b %d"),
     KNOWN_THEME(offsetof(VscodeSettings, theme), 6),
     KNOWN_STEPS_MODE(offsetof(VscodeSettings, steps_mode), STEPS_MODE_COUNT),

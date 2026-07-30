@@ -1,7 +1,7 @@
 {
   "name": "ide-vscode",
   "displayName": "IDE VSCode",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "watchface": true,
   "uuid": "1ab9dff0-f6fd-4e0a-8e23-bc9ff80d45f2",
   "sdkVersion": "3",
