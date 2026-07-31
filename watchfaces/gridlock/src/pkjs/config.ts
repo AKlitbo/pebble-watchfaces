@@ -390,7 +390,7 @@ const config = [
       heading('Layout'),
       {
         type: 'text',
-        defaultValue: 'Build the screen top to bottom. Drag a row by its handle to reorder, pick each row\'s shape, and choose the module in every cell. A "stacked pair" is two small panels in one column, the height of one big panel. Use the side buttons to load presets, clear the layout, or import/export your layout to share with others.',
+        defaultValue: 'Build up to four layouts and pick which two the watch uses. Tap a number to edit that layout, then drag panels in from below to place them, or drag a placed one to move or remove it. Every edit is kept as you go. Day is the layout you normally see; Night takes over on the schedule you set underneath.',
       },
       {
         type: 'layoutBuilder',

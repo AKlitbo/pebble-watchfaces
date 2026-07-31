@@ -24,7 +24,8 @@
     "gen:gridlock": "npm run gen:gridlock:clay && npm run gen:gridlock:vibrant && npm run gen:gridlock:thumbnails",
     "gen:gridlock:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/clay-components/generate-components.ts",
     "gen:gridlock:vibrant": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/vibrant/generate-vibrant.ts",
-    "gen:gridlock:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/thumbnails/generate-thumbnails.ts"
+    "gen:gridlock:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/thumbnails/generate-thumbnails.ts",
+    "dev:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/dev/clay-preview.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

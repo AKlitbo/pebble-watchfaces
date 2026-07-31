@@ -28,8 +28,16 @@ export default {
 
   manipulator: 'val',
 
-  /** Stamps on the caller's own class, so several stores on one page stay tellable apart. */
-  initialize(this: HiddenStoreContext): void {
+  /**
+   * Stamps on the caller's own class, so several stores on one page stay tellable apart.
+   *
+   * A `function` expression, never shorthand method syntax. Clay serialises a registered
+   * component by writing `key:` followed by the function's own toString, and a shorthand method
+   * stringifies with its name attached — which comes out as `initialize:initialize() {` and stops
+   * the whole settings page parsing. Every component on the page shares that fate, so the symptom
+   * is a config screen that never opens at all.
+   */
+  initialize: function (this: HiddenStoreContext): void {
     const extra = this.config && this.config.storeClass;
     const element = this.$element && this.$element[0];
     if (extra && element) {

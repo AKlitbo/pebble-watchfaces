@@ -48,3 +48,6 @@ site/
 # Includes the TheLCARS.com template: please go to https://www.thelcars.com/
 # to download and support the creator.
 vendor/
+
+# the local Clay settings preview, rebuilt by tools/dev/clay-preview.ts on demand
+clay-preview.html
