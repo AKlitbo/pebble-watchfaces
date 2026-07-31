@@ -11,7 +11,7 @@
     "../tools/**/*.ts",
     "../lib/tools/**/*.ts",
     "../config/**/*.ts",
-    "../watchfaces/*/src/pkjs/clay/builder/*.manifest.ts"
+    "../watchfaces/**/src/pkjs/clay/builder/*.manifest.ts"
   ],
   "exclude": ["../node_modules", "../targets", "../**/*.spec.ts"]
 }

@@ -55,15 +55,79 @@ def stage_shared_sources(ctx):
     """
     repo_root = ctx.path.parent.parent.abspath()
     face = ctx.path.name
-    face_root = os.path.join(repo_root, 'watchfaces', face)
+    face_root = _face_root(repo_root, face)
+    if not face_root:
+        ctx.fatal('No source for face "{}" under watchfaces/.'.format(face))
+
     sources = {
         'src': os.path.join(face_root, 'src'),
         'resources': os.path.join(face_root, 'resources'),
         'lib': os.path.join(repo_root, 'lib'),
     }
+
+    # a face nested inside a family folder also gets that family's core: code shared by a handful
+    # of related faces but not by all of them, so it cannot live in lib/. it is staged under the
+    # family's own name, and that name is a path segment the build synthesises rather than one
+    # anybody types, which is what keeps a family header from colliding with a face-local folder
+    family = _face_family(repo_root, face_root)
+    if family:
+        sources[os.path.join('family', family)] = os.path.join(
+            repo_root, 'watchfaces', family, 'core', 'c')
+
     for name, src_dir in sources.items():
         if os.path.isdir(src_dir):
             _mirror_tree(src_dir, os.path.join(ctx.path.abspath(), name))
+
+    _drop_stale_families(ctx.path.abspath(), family)
+
+
+def _face_root(repo_root, face):
+    """
+    A face's source directory, by name.
+
+    Faces sit either straight under watchfaces/ or one deeper inside a family folder that also
+    holds the code those faces share. A face is a directory carrying config/pebble.appinfo.json,
+    which is what keeps a family's core/ from being taken for one.
+    """
+    watchfaces = os.path.join(repo_root, 'watchfaces')
+    for candidate in (os.path.join(watchfaces, face),
+                      *(os.path.join(watchfaces, group, face)
+                        for group in sorted(os.listdir(watchfaces))
+                        if os.path.isdir(os.path.join(watchfaces, group)))):
+        if os.path.isfile(os.path.join(candidate, 'config', 'pebble.appinfo.json')):
+            return candidate
+
+    return None
+
+
+def _face_family(repo_root, face_root):
+    """
+    The family a face belongs to, which is simply the folder it sits in.
+
+    Nothing declares it: a face nested beside a core/ is in that family, and one straight under
+    watchfaces/ is in none. Positional rather than configured, so the two can never disagree.
+    """
+    parent = os.path.dirname(face_root)
+    if os.path.samefile(parent, os.path.join(repo_root, 'watchfaces')):
+        return None
+
+    return os.path.basename(parent)
+
+
+def _drop_stale_families(sandbox, family):
+    """
+    Drop any staged family that is not this face's any more.
+
+    _mirror_tree only prunes inside the one root it is handed, so a face that changed families
+    or left one would keep the old tree staged and the build would go on compiling it.
+    """
+    staged = os.path.join(sandbox, 'family')
+    if not os.path.isdir(staged):
+        return
+
+    for name in os.listdir(staged):
+        if name != family:
+            shutil.rmtree(os.path.join(staged, name), ignore_errors=True)
 
 
 def _mirror_tree(src, dst):
@@ -137,11 +201,22 @@ def build_face(ctx, extra_cflags=None):
         local_c.abspath()
     ]
 
+    # the family root, for a face that belongs to one (see stage_shared_sources). it goes on
+    # last so a face-local header always wins, and family headers carry the family's name as
+    # their first path segment (e.g. "line/sky/sky.h") so they cannot shadow the face's own
+    # scene/, theme/ or widgets/
+    family_dir = ctx.path.find_dir('family')
+    if family_dir:
+        include_paths.append(family_dir.abspath())
+
     # one glob recurses the whole shared tree: lib/c/core/ (pure) + lib/c/pebble/ (SDK).
     # drop the colocated host tests (*.spec.c) and the vendored test harness (spec/) so
     # they never spend a byte on the watch
     c_sources = ctx.path.ant_glob('src/c/**/*.c') + lib_c.ant_glob(
         '**/*.c', excl=['**/*.spec.c', 'spec/**'])
+
+    if family_dir:
+        c_sources += family_dir.ant_glob('**/*.c', excl=['**/*.spec.c'])
 
     # emit/ is build:pkjs output and holds nothing but the JS the watch ships: the specs
     # and the clay/builder pieces are dropped at the tsc level (config/tsconfig.pkjs.json),
@@ -200,10 +275,13 @@ def build_face(ctx, extra_cflags=None):
 
     ctx.env = cached_env
 
-    # emit/ keeps the source tree's shape, so the entry sits under the face's pkjs path.
-    # the sandbox is named after the face (ctx.path.name)
-    face = ctx.path.name
-    js_entry = 'emit/watchfaces/{}/src/pkjs/index.js'.format(face)
+    # emit/ keeps the source tree's shape, so the entry sits wherever the face's pkjs does. that
+    # is one folder deep for a face of its own and two for one inside a family, so it is found
+    # rather than assumed
+    entries = ctx.path.ant_glob('emit/watchfaces/**/src/pkjs/index.js')
+    if not entries:
+        ctx.fatal('No pkjs entry in emit/: did build:pkjs run for this face?')
+    js_entry = entries[0].path_from(ctx.path)
 
     ctx.set_group('bundle')
     ctx.pbl_bundle(

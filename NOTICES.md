@@ -49,11 +49,13 @@ notice each font declares in its own metadata.
   Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. Licence text in
   [OFL.txt](watchfaces/radar-array/resources/fonts/OFL.txt)
 
-### Ridgeline
+### Sketchbook
+
+The faces in this family all set their type in the same face, and each bundles its own copy.
 
 - **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012
-  Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in
-  [OFL.txt](watchfaces/ridgeline/resources/fonts/OFL.txt)
+  Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's
+  [OFL.txt](watchfaces/sketchbook/ridgeline/resources/fonts/OFL.txt)
 
 ### IDE VSCode
 
@@ -71,14 +73,15 @@ regenerate the icons, and only the rendered PNGs are bundled. The bluetooth SVGs
 bundled under `vendor/svgrepo/`.
 
 Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`.
-Radar Array and Ridgeline draw no weather icons, so they bundle only the bluetooth glyphs.
+Radar Array and the Sketchbook faces draw no weather icons, so they bundle only the bluetooth
+glyphs.
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font
   License 1.1 for the font, MIT for the code. Rendered PNGs bundled by LCARS Stardate and IDE / VS Code
-- **[UXWing](https://uxwing.com)** (heart, step, thermometer glyphs): the
+- **[UXWing](https://uxwing.com)** (heart, step, thermometer and muted-speaker glyphs): the
   [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not
   allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled
-  by LCARS Stardate and Ridgeline
+  by LCARS Stardate and the Sketchbook faces
 - **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs):
   [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources bundled
   under `vendor/svgrepo/`, rendered PNGs bundled by every face

@@ -27,6 +27,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { faceRelative } from '../faces.ts';
 
 const requireHost = createRequire(import.meta.url);
 
@@ -51,14 +52,15 @@ export interface FacePaths {
 }
 
 export function facePaths(face: string): FacePaths {
-  const faceSrc = path.join(ROOT, 'watchfaces', face, 'src', 'pkjs');
+  const rel = faceRelative(face);
+  const faceSrc = path.join(ROOT, 'watchfaces', rel, 'src', 'pkjs');
   const sandbox = path.join(ROOT, 'targets', face);
   const emit = path.join(sandbox, 'emit');
   return {
     faceSrc,
     sandbox,
     emit,
-    emitPkjs: path.join(emit, 'watchfaces', face, 'src', 'pkjs'),
+    emitPkjs: path.join(emit, 'watchfaces', ...rel.split('/'), 'src', 'pkjs'),
     icaljsTo: path.join(emit, 'lib', 'ts', 'calendar', 'icaljs.js'),
     tsconfig: path.join(sandbox, 'tsconfig.pkjs.json'),
     skipDir: path.join(faceSrc, 'clay', 'builder'),
@@ -77,11 +79,14 @@ export function cleanEmit(p: FacePaths): void {
  * into the sandbox's emit/. All paths are relative to the sandbox where the file is written.
  */
 export function writeTsconfig(face: string, p: FacePaths): void {
+  // a face may sit one level deeper, inside a family folder, so the globs follow its real path
+  // rather than assuming the name is the folder
+  const rel = faceRelative(face);
   const tsconfig = {
     extends: path.relative(p.sandbox, PKJS_BASE_TSCONFIG).split(path.sep).join('/'),
     compilerOptions: { rootDir: '../..', outDir: 'emit' },
-    include: [`../../watchfaces/${face}/src/pkjs/**/*.ts`, '../../lib/ts/**/*.ts'],
-    exclude: [`../../watchfaces/${face}/src/pkjs/clay/builder/**`, '../../**/*.spec.ts'],
+    include: [`../../watchfaces/${rel}/src/pkjs/**/*.ts`, '../../lib/ts/**/*.ts'],
+    exclude: [`../../watchfaces/${rel}/src/pkjs/clay/builder/**`, '../../**/*.spec.ts'],
   };
   fs.mkdirSync(p.sandbox, { recursive: true });
   fs.writeFileSync(p.tsconfig, JSON.stringify(tsconfig, null, 2) + '\n');

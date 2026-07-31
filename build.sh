@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build watchface(s) (.pbw) from source under watchfaces/<face>/. Run from WSL.
+# Build watchface(s) (.pbw) from source under watchfaces/. A face may sit at the top level
+# or one deeper inside a family folder. Run from WSL.
 # Regenerates the manifest from watchfaces/<face>/config/pebble.appinfo.json and compiles
 # the TypeScript pkjs into targets/<face>/emit/, then runs pebble build in that sandbox.
 #   ./build.sh <face>            build a face (e.g. ./build.sh lcars-stardate)
@@ -44,15 +45,22 @@ build_face() {
   )
 }
 
+# a face is any directory under watchfaces/ carrying an appinfo, at the top level or one deeper
+# inside a family folder that also holds the code its faces share. that rule is what keeps a
+# family's core/ from being built as a face, with nothing to register anywhere
+face_dirs() {
+  find "$here/watchfaces" -mindepth 3 -maxdepth 4 -name pebble.appinfo.json -path '*/config/*'     | sed 's#/config/pebble.appinfo.json$##' | sort
+}
+
 if [[ "$face" == "all" ]]; then
-  for dir in "$here"/watchfaces/*/; do
+  while IFS= read -r dir; do
     build_face "$(basename "$dir")"
-  done
+  done < <(face_dirs)
   exit 0
 fi
 
-if [[ ! -d "$here/watchfaces/$face" ]]; then
-  echo "no such face: watchfaces/$face" >&2
+if ! face_dirs | grep -qx ".*/$face"; then
+  echo "no such face: nothing under watchfaces/ carries $face/config/pebble.appinfo.json" >&2
   exit 1
 fi
 

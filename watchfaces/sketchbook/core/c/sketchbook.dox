@@ -1,0 +1,23 @@
+/**
+ * @defgroup family-sketchbook The Sketchbook Family
+ * @brief The scene engine Ridgeline, Shoreline and Treeline share: the sky and its sun and moon,
+ * the weather laid over them, the painted chrome, and the palette contract they all answer to.
+ *
+ * A tier between lib and a face. lib is skin-agnostic and reaches into no face; this is the
+ * opposite by design, and it is why this code is not in lib: it knows there is a `Palette` with
+ * a sky in it, and it is compiled only into the faces that say so in their `family` file.
+ *
+ * What it may reach back into is fixed and short:
+ *
+ * - `sketchbook_config.h` — the face's geometry, and only through config.h, which errors on any gap
+ * - `theme/theme.h` — the face's `Palette` type, whose first nine fields this tier defines
+ * - `layout.h` — widgets only, for the chrome anchors every face in the family agrees on
+ * - anything from lib, the same as any face
+ *
+ * Nothing else. A face's landscape, its palette tables, its persisted settings and its tuned
+ * slot geometry stay with the face, because those are what make it that face rather than
+ * another one.
+ *
+ * @{
+ * @}
+ */

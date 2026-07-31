@@ -29,10 +29,10 @@ jobs:
           tag="$GITHUB_REF_NAME"
           version="${tag##*-v}"
           face="${tag%-v$version}"
-          appinfo="watchfaces/$face/config/pebble.appinfo.json"
+          appinfo=$(find watchfaces -mindepth 3 -maxdepth 4 -path "*/$face/config/pebble.appinfo.json" | head -1)
 
           if [ ! -f "$appinfo" ]; then
-            echo "tag $tag names face '$face', which has no watchfaces/$face/" >&2
+            echo "tag $tag names face '$face', which has no appinfo under watchfaces/" >&2
             exit 1
           fi
 

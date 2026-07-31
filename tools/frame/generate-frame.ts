@@ -15,6 +15,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { firefox } from 'playwright';
 import sharp from 'sharp';
+import { faceDir } from '../faces.ts';
 
 /** Native screen size per Pebble platform (px). */
 interface Dims {
@@ -62,7 +63,7 @@ interface FaceDirs {
 }
 
 function faceDirs(face: string): FaceDirs {
-  const base = path.join(ROOT, 'watchfaces', face);
+  const base = faceDir(face);
   return {
     appinfo: path.join(base, 'config', 'pebble.appinfo.json'),
     frameDir: path.join(base, 'frame'),

@@ -11,6 +11,7 @@ targets/*/tsconfig.pkjs.json
 targets/*/wscript
 targets/*/src/
 targets/*/lib/
+targets/*/family/
 targets/*/resources/
 targets/*/emit/
 

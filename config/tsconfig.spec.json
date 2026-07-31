@@ -14,7 +14,7 @@
   "include": [
     "../**/*.spec.ts",
     "../lib/ts/pkjs/pebble.d.ts",
-    "../watchfaces/*/src/pkjs/generated.d.ts"
+    "../watchfaces/**/src/pkjs/generated.d.ts"
   ],
   "exclude": [
     "../node_modules",

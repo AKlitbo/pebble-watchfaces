@@ -16,6 +16,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { faceDir } from '../faces.ts';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..');
 const ROOT_PKG = path.join(ROOT, 'package.json');
@@ -26,7 +27,7 @@ const WSCRIPT_TEMPLATE = path.join(ROOT, 'tools', 'waf', 'wscript.template');
 
 /** watchfaces/<face>/config/pebble.appinfo.json for a face. */
 function appinfoPath(face: string): string {
-  return path.join(ROOT, 'watchfaces', face, 'config', 'pebble.appinfo.json');
+  return path.join(faceDir(face), 'config', 'pebble.appinfo.json');
 }
 
 /**

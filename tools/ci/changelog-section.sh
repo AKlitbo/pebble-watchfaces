@@ -28,7 +28,7 @@ version="$2"
 mode="${3:-body}"
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-changelog="$here/watchfaces/$face/CHANGELOG.md"
+changelog=$(find "$here/watchfaces" -mindepth 2 -maxdepth 3 -path "*/$face/CHANGELOG.md" | head -1)
 
 [[ -f "$changelog" ]] || die "Error: No changelog at watchfaces/$face/CHANGELOG.md"
 

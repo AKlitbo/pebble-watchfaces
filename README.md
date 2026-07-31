@@ -9,7 +9,7 @@ themes selectable from a Clay settings page.
 | **LCARS Stardate**<br>[changelog](watchfaces/lcars-stardate/CHANGELOG.md) | <img src=".github/images/lcars-stardate/theme_classic.png" width="100" title="Classic"> <img src=".github/images/lcars-stardate/theme_nemesis-blue.png" width="100" title="Nemesis Blue"> <img src=".github/images/lcars-stardate/theme_mono.png" width="100" title="Classic Mono"> <img src=".github/images/lcars-stardate/theme_voyager.png" width="100" title="Voyager"> <img src=".github/images/lcars-stardate/theme_voyager-mono.png" width="100" title="Voyager Mono"> <img src=".github/images/lcars-stardate/theme_lower-decks.png" width="100" title="Lower Decks"> <img src=".github/images/lcars-stardate/theme_lower-decks-mono.png" width="100" title="Lower Decks Mono"> <img src=".github/images/lcars-stardate/theme_lower-decks-padd.png" width="100" title="Lower Decks PADD"> <img src=".github/images/lcars-stardate/theme_lower-decks-padd-mono.png" width="100" title="Lower Decks PADD Mono"> |
 | **Radar Array**<br>[changelog](watchfaces/radar-array/CHANGELOG.md) | <img src=".github/images/radar-array/theme_default.png" width="100" title="Default"> <img src=".github/images/radar-array/theme_crimson.png" width="100" title="Crimson"> <img src=".github/images/radar-array/theme_neon.png" width="100" title="Neon"> <img src=".github/images/radar-array/theme_phosphor.png" width="100" title="Phosphor"> <img src=".github/images/radar-array/theme_rescue.png" width="100" title="Rescue"> <img src=".github/images/radar-array/theme_stealth.png" width="100" title="Stealth"> <img src=".github/images/radar-array/theme_mono.png" width="100" title="Mono"> |
 | **IDE VSCode**<br>[changelog](watchfaces/ide-vscode/CHANGELOG.md) | <img src=".github/images/ide-vscode/theme_dark.png" width="100" title="Dark"> <img src=".github/images/ide-vscode/theme_light.png" width="100" title="Light"> <img src=".github/images/ide-vscode/theme_terminal.png" width="100" title="Terminal"> <img src=".github/images/ide-vscode/theme_cyberpunk.png" width="100" title="Cyberpunk"> <img src=".github/images/ide-vscode/theme_synthwave.png" width="100" title="Synthwave"> <img src=".github/images/ide-vscode/theme_mono.png" width="100" title="Mono"> |
-| **Ridgeline**<br>[changelog](watchfaces/ridgeline/CHANGELOG.md) | <img src=".github/images/ridgeline/theme_sketchbook.png" width="100" title="Sketchbook (Day)"> <img src=".github/images/ridgeline/theme_daybreak.png" width="100" title="Daybreak (Day)"> <img src=".github/images/ridgeline/theme_alpenglow.png" width="100" title="Alpenglow (Day)"> <img src=".github/images/ridgeline/theme_blueprint.png" width="100" title="Blueprint (Day)"> <img src=".github/images/ridgeline/theme_forest.png" width="100" title="Forest (Day)"> <img src=".github/images/ridgeline/theme_mono.png" width="100" title="Mono (Day)"> <img src=".github/images/ridgeline/theme_cyberpunk.png" width="100" title="Cyberpunk (Day)"> <img src=".github/images/ridgeline/theme_neo-tokyo.png" width="100" title="Neo Tokyo (Day)"><br><img src=".github/images/ridgeline/theme_sketchbook_night.png" width="100" title="Sketchbook (Night)"> <img src=".github/images/ridgeline/theme_daybreak_night.png" width="100" title="Daybreak (Night)"> <img src=".github/images/ridgeline/theme_alpenglow_night.png" width="100" title="Alpenglow (Night)"> <img src=".github/images/ridgeline/theme_blueprint_night.png" width="100" title="Blueprint (Night)"> <img src=".github/images/ridgeline/theme_forest_night.png" width="100" title="Forest (Night)"> <img src=".github/images/ridgeline/theme_mono_night.png" width="100" title="Mono (Night)"> <img src=".github/images/ridgeline/theme_cyberpunk_night.png" width="100" title="Cyberpunk (Night)"> <img src=".github/images/ridgeline/theme_neo-tokyo_night.png" width="100" title="Neo Tokyo (Night)"> |
+| **Ridgeline**<br>[changelog](watchfaces/sketchbook/ridgeline/CHANGELOG.md) | <img src=".github/images/ridgeline/theme_sketchbook.png" width="100" title="Sketchbook (Day)"> <img src=".github/images/ridgeline/theme_daybreak.png" width="100" title="Daybreak (Day)"> <img src=".github/images/ridgeline/theme_alpenglow.png" width="100" title="Alpenglow (Day)"> <img src=".github/images/ridgeline/theme_blueprint.png" width="100" title="Blueprint (Day)"> <img src=".github/images/ridgeline/theme_forest.png" width="100" title="Forest (Day)"> <img src=".github/images/ridgeline/theme_mono.png" width="100" title="Mono (Day)"> <img src=".github/images/ridgeline/theme_cyberpunk.png" width="100" title="Cyberpunk (Day)"> <img src=".github/images/ridgeline/theme_neo-tokyo.png" width="100" title="Neo Tokyo (Day)"><br><img src=".github/images/ridgeline/theme_sketchbook_night.png" width="100" title="Sketchbook (Night)"> <img src=".github/images/ridgeline/theme_daybreak_night.png" width="100" title="Daybreak (Night)"> <img src=".github/images/ridgeline/theme_alpenglow_night.png" width="100" title="Alpenglow (Night)"> <img src=".github/images/ridgeline/theme_blueprint_night.png" width="100" title="Blueprint (Night)"> <img src=".github/images/ridgeline/theme_forest_night.png" width="100" title="Forest (Night)"> <img src=".github/images/ridgeline/theme_mono_night.png" width="100" title="Mono (Night)"> <img src=".github/images/ridgeline/theme_cyberpunk_night.png" width="100" title="Cyberpunk (Night)"> <img src=".github/images/ridgeline/theme_neo-tokyo_night.png" width="100" title="Neo Tokyo (Night)"> |
 
 ## Install
 
@@ -31,6 +31,9 @@ The shared engine lives at the root. Each face owns only what makes it that face
   * **`CHANGELOG.md`**: that face's release history. Faces version independently.
   * **`frame/`**: the HTML/CSS chrome the background bitmaps are baked from, plus `frame.config.json`.
   * **`resources/`**: bundled fonts, baked background PNGs, and rendered icon PNGs.
+* **`watchfaces/<family>/`**: a group of related faces plus the code only they share.
+  * **`<face>/`**: laid out exactly as above. A face is any directory carrying a `config/pebble.appinfo.json`, so it is found whether it sits here or at the top level.
+  * **`core/c/`**: the family's shared device code, staged into each member's build and reached as `<family>/...`.
 * **`lib/`**: the reusable base every face shares (`c/` device engine, `ts/` PebbleKit JS, `py/` waf helpers, `tools/` generators, `css/` the Pebble-64 gamut every frame links).
 * **`config/`**: shared tooling config (tsconfigs, eslint, vitest).
 * **`tools/`**: build and dev tooling (icon rasterizer, manifest generator, pkjs build, frame baker, waf template, CI scripts).
@@ -46,6 +49,10 @@ Anything with a `.g.` in the name is generated and should not be hand-edited: re
 Create `watchfaces/<name>/` with the layout above, then build it. The sandbox, manifest, and waf
 entry point are all generated from the face's name and appinfo. Add `<name>` to the CI matrix in
 [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
+
+To join a family instead, create it at `watchfaces/<family>/<name>/`. Nothing else changes: the
+name still has to be unique, the sandbox is still `targets/<name>/`, and the family's `core/` is
+compiled in automatically because of where the face sits.
 
 ## Releasing
 
@@ -126,13 +133,14 @@ All four return the same core quote data: last price, price change, percentage c
 * **LCARS Stardate**
   * **LCARS Design**: LCARS Inspired Website Template by [TheLCARS.com](https://www.thelcars.com), with modifications.
   * **Typography**: [Antonio](https://fonts.google.com/specimen/Antonio).
-  * **Glyphs**: Heart, step, and thermometer icons from [UXWing](https://uxwing.com).
+  * **Glyphs**: Heart, step, thermometer, and muted-speaker icons from [UXWing](https://uxwing.com).
 * **Radar Array**
   * **Typography**: [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono).
 * **IDE VSCode**
   * **Typography**: [Teko](https://fonts.google.com/specimen/Teko) and [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono).
-* **Ridgeline**
+* **Sketchbook faces**
   * **Typography**: [Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand).
+  * **Glyphs**: Heart, step, thermometer, and muted-speaker icons from [UXWing](https://uxwing.com).
 * **General**
   * **Weather Icons**: [Erik Flowers](https://github.com/erikflowers/weather-icons).
   * **Bluetooth Icons**: Bluetooth on / slash icons from [SVG Repo](https://www.svgrepo.com).
