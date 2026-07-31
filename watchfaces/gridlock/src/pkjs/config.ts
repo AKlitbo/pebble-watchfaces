@@ -304,12 +304,14 @@ const CALENDAR_VIBE_MODE_OPTIONS: ClayOption[] = [
   { label: 'Start Only', value: 3 },
 ];
 
-// when the night layout takes over. the two clocks below double as the fixed schedule and as the
-// fallback whenever the watch has no sunset reading, so nobody has to be asked what happens then
+// the swap runs both ways, so the labels name both ends of it: naming only sunset reads as a
+// one-way trip into night with no way back. the two clocks below double as the fixed schedule and
+// as the fallback whenever the watch has no sun readings, so nobody has to be asked what happens
+// when the weather has not arrived
 const NIGHT_MODE_OPTIONS: ClayOption[] = [
   { label: 'Never', value: 0 },
-  { label: 'At sunset', value: 1 },
-  { label: 'At a set time', value: 2 },
+  { label: 'At Sunset & Sunrise', value: 1 },
+  { label: 'At Custom Times', value: 2 },
 ];
 
 // half-hour steps, matching the slot the watch stores. a free-text time would need its own
@@ -416,12 +418,12 @@ const config = [
         storeClass: 'gl-night',
         defaultValue: '0',
       },
-      select('LAYOUT_NIGHT_MODE', 'Switch to Night Layout', NIGHT_MODE_OPTIONS, 0,
-        'When the watch swaps to your night layout. At sunset follows the sunrise and sunset your weather provider reports, and falls back to the times below when it has none yet.'),
+      select('LAYOUT_NIGHT_MODE', 'Swap Day & Night Layouts', NIGHT_MODE_OPTIONS, 0,
+        'When the watch swaps between your two layouts. At Sunset & Sunrise follows the times your weather provider reports, and falls back to the times below whenever it has none yet.'),
       select('LAYOUT_NIGHT_START', 'Night Starts', HALF_HOURS, 42,
-        'Used for a set-time schedule, and whenever the watch has no sunset reading.'),
+        'When the night layout takes over. Used for custom times, and as the fallback whenever the watch has no sunset reading.'),
       select('LAYOUT_NIGHT_END', 'Night Ends', HALF_HOURS, 14,
-        'The same, for the morning.'),
+        'And when the day layout comes back.'),
     ],
   },
   // --- Bluetooth ---
