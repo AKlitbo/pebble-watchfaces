@@ -429,32 +429,79 @@
   cursor: default;
 }
 
-/* the saved-layout slots: each slot's name plus a muted status on one line,
-   the Save/Load pair below */
-.lb-slot-row {
-  margin-top: 12px;
-}
 
-.lb-slot-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 6px;
-}
 
-.lb-slot-name {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #eceef2;
-}
 
-.lb-slot-status {
-  font-size: 11px;
-  color: #6a707a;
-}
 
 .platform-ios .button, .platform-ios button {
   padding: 0px;
+}
+
+/* the layout tabs: one per layout in the library, marked with the sun and moon for whichever two
+   are in use. same voice as the drawer's size tabs but their own class, so drag.ts's handlers
+   cannot pick them up by accident */
+.lb-ltabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.lb-ltab {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px;
+  border: 2px solid #3d434d;
+  border-radius: 0;
+  background: #14161a;
+  color: #6a707a;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.lb-ltab.active {
+  background: #ff6a1f;
+  border-color: #ff6a1f;
+  color: #171a1f;
+}
+
+/* which layout the watch shows by day, and which after dark */
+.lb-assign {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px;
+  margin-bottom: 10px;
+}
+
+.lb-assign-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lb-assign-lbl {
+  flex-shrink: 0;
+  color: #6a707a;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lb-assign-sel {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 4px;
+  border: 2px solid #3d434d;
+  border-radius: 0;
+  background: #14161a;
+  color: #eceef2;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
 }

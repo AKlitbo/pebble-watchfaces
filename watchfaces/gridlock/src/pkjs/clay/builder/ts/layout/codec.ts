@@ -11,8 +11,18 @@ import { GRID_ROWS } from './geometry';
 import type { Block } from '../types';
 
 /**
+ * What an empty grid sends instead of an empty string.
+ *
+ * The watch discards an empty cstring rather than storing it (see
+ * settings_apply_inbox), so "" cannot say "I cleared this" — the old layout
+ * would just stay. A single character that parses to no blocks can.
+ */
+export const EMPTY_LAYOUT = '0';
+
+/**
  * Dumps the placed blocks to the wire string, sorted by row then column so
- * the same layout always writes the same text.
+ * the same layout always writes the same text. An empty grid writes the
+ * sentinel, which is the only form of "nothing" that survives the trip.
  */
 export function serializeLayout(blocks: Block[]): string {
   const sorted = blocks.slice().sort(function (a, b) {
@@ -25,7 +35,7 @@ export function serializeLayout(blocks: Block[]): string {
     out.push(block.module + ',' + block.row + ',' + block.col + ',' + block.w + ',' + block.h);
   }
 
-  return out.join(';');
+  return out.length ? out.join(';') : EMPTY_LAYOUT;
 }
 
 /**

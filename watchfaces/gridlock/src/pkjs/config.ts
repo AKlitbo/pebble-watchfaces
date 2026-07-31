@@ -304,6 +304,22 @@ const CALENDAR_VIBE_MODE_OPTIONS: ClayOption[] = [
   { label: 'Start Only', value: 3 },
 ];
 
+// when the night layout takes over. the two clocks below double as the fixed schedule and as the
+// fallback whenever the watch has no sunset reading, so nobody has to be asked what happens then
+const NIGHT_MODE_OPTIONS: ClayOption[] = [
+  { label: 'Never', value: 0 },
+  { label: 'At sunset', value: 1 },
+  { label: 'At a set time', value: 2 },
+];
+
+// half-hour steps, matching the slot the watch stores. a free-text time would need its own
+// validation and would hit the empty-string problem the layout sentinel exists for
+const HALF_HOURS: ClayOption[] = Array.from({ length: 48 }, (_, slot) => {
+  const hour = Math.floor(slot / 2);
+  const minute = slot % 2 ? '30' : '00';
+  return { label: (hour < 10 ? '0' : '') + hour + ':' + minute, value: slot };
+});
+
 const GOAL_STEPS = [5000, 7500, 10000, 12500, 15000, 20000, 25000].map((n, i) => ({ label: n.toLocaleString(), value: i }));
 const GOAL_CALORIES = [500, 1000, 1500, 2000, 2500, 3000].map((n, i) => ({ label: n + ' kcal', value: i }));
 const GOAL_SLEEP = [6, 7, 8, 9, 10].map((n, i) => ({ label: n + ' h', value: i }));
@@ -383,14 +399,29 @@ const config = [
         moduleOptions: MODULE_OPTIONS,
         moduleThumbnails: moduleThumbnails,
       },
-      // invisible store for the two saved layout slots. lives here so its value
-      // saves and restores with the rest of the settings, since the config
-      // webview will not let the slots keep their own localStorage
+      // invisible store for the layout library: the four grids and which two are in use. lives
+      // here so its value saves and restores with the rest of the settings, since the config
+      // webview will not let it keep its own localStorage. the watch never reads this key
       {
         type: 'hiddenStore',
         messageKey: 'LAYOUT_SLOTS',
+        storeClass: 'gl-library',
         defaultValue: '',
       },
+      // and the night layout itself, which the builder writes from whichever library entry is
+      // assigned. this one the watch does read
+      {
+        type: 'hiddenStore',
+        messageKey: 'LAYOUT_NIGHT',
+        storeClass: 'gl-night',
+        defaultValue: '0',
+      },
+      select('LAYOUT_NIGHT_MODE', 'Switch to Night Layout', NIGHT_MODE_OPTIONS, 0,
+        'When the watch swaps to your night layout. At sunset follows the sunrise and sunset your weather provider reports, and falls back to the times below when it has none yet.'),
+      select('LAYOUT_NIGHT_START', 'Night Starts', HALF_HOURS, 42,
+        'Used for a set-time schedule, and whenever the watch has no sunset reading.'),
+      select('LAYOUT_NIGHT_END', 'Night Ends', HALF_HOURS, 14,
+        'The same, for the morning.'),
     ],
   },
   // --- Bluetooth ---

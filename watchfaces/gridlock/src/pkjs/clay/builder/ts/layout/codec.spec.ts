@@ -6,7 +6,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { serializeLayout, parseLayoutString } from './codec';
+import { serializeLayout, parseLayoutString, EMPTY_LAYOUT } from './codec';
 
 describe('serializeLayout', () => {
   /** An unsorted wire string would make the same layout save as different texts. */
@@ -22,11 +22,25 @@ describe('serializeLayout', () => {
     expect(result).toBe('2,0,0,2,2;3,0,2,2,1;1,2,0,4,1');
   });
 
-  /** An empty grid has to write the empty string the watch treats as no layout. */
-  test('writes an empty string for no blocks', () => {
+  /**
+   * An empty grid has to write something, not nothing.
+   *
+   * settings_apply_inbox on the watch skips an empty cstring rather than storing it, so a cleared
+   * grid that serialised to '' would leave the old layout in place forever. The sentinel is the
+   * only way "I cleared this" survives the trip.
+   */
+  test('writes the sentinel for no blocks, not an empty string', () => {
     const result = serializeLayout([]);
 
-    expect(result).toBe('');
+    expect(result).toBe(EMPTY_LAYOUT);
+    expect(result).not.toBe('');
+  });
+
+  /** And it has to read back as nothing, or clearing would place a phantom block. */
+  test('the sentinel parses back to no blocks', () => {
+    const result = parseLayoutString(EMPTY_LAYOUT);
+
+    expect(result).toEqual([]);
   });
 });
 

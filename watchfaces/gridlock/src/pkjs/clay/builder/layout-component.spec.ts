@@ -25,6 +25,23 @@ function mountLayout() {
   return mounted;
 }
 
+/**
+ * The two hidden stores the config page renders beside the builder.
+ *
+ * The library keeps the four layouts; the night one carries whichever is assigned. They are
+ * separate inputs because a single .gl-store lookup would keep finding the first of the two.
+ */
+function mountStores(): { library: HTMLInputElement; night: HTMLInputElement } {
+  function input(extra: string): HTMLInputElement {
+    const element = document.createElement('input');
+    element.type = 'hidden';
+    element.className = 'gl-store ' + extra;
+    document.body.appendChild(element);
+    return element;
+  }
+  return { library: input('gl-library'), night: input('gl-night') };
+}
+
 /** A pointer style event jsdom can dispatch (MouseEvent carries the client coords). */
 function pointer(type: string, clientX: number, clientY: number): MouseEvent {
   return new MouseEvent(type, { clientX: clientX, clientY: clientY, bubbles: true });
@@ -110,15 +127,20 @@ describe('preset buttons', () => {
 });
 
 describe('actions bar', () => {
-  /** A broken Clear would leave stale blocks the user cannot get rid of. */
-  test('Clear empties the layout', () => {
+  /**
+   * A broken Clear would leave stale blocks the user cannot get rid of.
+   *
+   * It has to come out as the sentinel rather than an empty string: the watch discards an empty
+   * cstring instead of storing it, so '' would leave the old layout in place forever.
+   */
+  test('Clear empties the layout to the sentinel', () => {
     const { ctx, root } = mountLayout();
     ctx.set('2,0,0,2,1;3,0,2,2,1');
 
     root.querySelector<HTMLElement>('.lb-btn-clear').click();
     const result = ctx.get();
 
-    expect(result).toBe('');
+    expect(result).toBe('0');
   });
 
   /** A dead import path would strand users who share layouts as text. */
@@ -165,7 +187,7 @@ describe('drag and drop', () => {
     document.dispatchEvent(pointer('pointerup', 500, 500));
     const result = ctx.get();
 
-    expect(result).toBe('');
+    expect(result).toBe('0');
     expect(document.querySelector<HTMLElement>('.lb-ghost')).toBeNull();
   });
 
@@ -193,7 +215,71 @@ describe('drag and drop', () => {
     document.dispatchEvent(pointer('pointerup', 5, 5));
     const result = ctx.get();
 
-    expect(result).toBe('');
+    expect(result).toBe('0');
     expect(document.querySelector<HTMLElement>('.lb-ghost')).toBeNull();
+  });
+});
+
+describe('the layout library', () => {
+  /**
+   * The rule the whole feature rests on.
+   *
+   * The grid shows one of four layouts, but LAYOUT must always carry the one assigned to day.
+   * Publishing whatever happens to be on screen would ship the wrong layout to the watch the
+   * moment somebody tabbed away to edit their night grid.
+   */
+  test('LAYOUT stays the day layout while another tab is being edited', () => {
+    const stores = mountStores();
+    const { ctx, root } = mountLayout();
+    ctx.set('2,0,0,2,1');
+
+    // move to layout 2 and build something different there
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[1].click();
+    root.querySelector<HTMLElement>('.lb-btn-clear').click();
+
+    expect(ctx.get()).toBe('2,0,0,2,1');
+    expect(JSON.parse(stores.library.value).layouts[1]).toBe('0');
+  });
+
+  /** Assigning a layout to night has to publish it, or the watch never sees one. */
+  test('assigning night publishes that layout to the night store', () => {
+    const stores = mountStores();
+    const { ctx, root } = mountLayout();
+    ctx.set('2,0,0,2,1');
+
+    // build something on layout 3, then come back so the day grid is the one on screen
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[2].click();
+    root.querySelector<HTMLElement>('.lb-btn-clear').click();
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[0].click();
+    const night = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[1];
+    night.value = '2';
+    night.dispatchEvent(new Event('change'));
+
+    expect(stores.night.value).toBe('0');
+    expect(JSON.parse(stores.library.value).night).toBe(2);
+  });
+
+  /** And clearing the assignment has to turn it off rather than leave a stale layout behind. */
+  test('setting night back to none empties the night store', () => {
+    const stores = mountStores();
+    const { root } = mountLayout();
+
+    const night = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[1];
+    night.value = '1';
+    night.dispatchEvent(new Event('change'));
+    night.value = '-1';
+    night.dispatchEvent(new Event('change'));
+
+    expect(stores.night.value).toBe('0');
+    expect(JSON.parse(stores.library.value).night).toBe(-1);
+  });
+
+  /** Without a store the page must still work, since Clay may render it after the builder. */
+  test('builds with no stores on the page at all', () => {
+    const { ctx } = mountLayout();
+
+    ctx.set('2,0,0,2,1');
+
+    expect(ctx.get()).toBe('2,0,0,2,1');
   });
 });

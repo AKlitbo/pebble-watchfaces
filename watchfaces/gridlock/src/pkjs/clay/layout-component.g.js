@@ -14,9 +14,9 @@
 module.exports = {
   name: "layoutBuilder",
 
-  template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Tap a size tab to browse modules. Drag icons to place.<br>Drag blocks to move or remove.</p>  </div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Activity</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Data</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Sleep</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"5\">Creator</button>      </div>    </div>  </div>  <div class=\"lb-actions-bar\">    <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>    <button type=\"button\" class=\"lb-btn lb-btn-slots\">Saved Layouts</button>    <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
+  template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Pick a layout, then drag icons in to place them.<br>Drag blocks to move or remove. Every edit is kept.</p>  </div>  <div class=\"lb-modes\"></div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Activity</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Data</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Sleep</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"5\">Creator</button>      </div>    </div>  </div>  <div class=\"lb-actions-bar\">    <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>    <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
 
-  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;color:#6a707a;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid #3d434d;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-bar{display:flex;gap:8px;justify-content:center;width:100%;box-sizing:border-box;padding:0 8px;margin-bottom:12px}.lb-actions-bar .lb-btn{flex:1;max-width:130px;padding:9px !important;font-size:11px}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;font-weight:700;border:1px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-btn:active{background:#2c3038}.lb-preset{background:#14161a;color:#a3a9b3}.lb-preset:hover{border-color:#ff6a1f;color:#ff6a1f}.lb-btn-io:hover,.lb-btn-slots:hover{border-color:#ff6a1f}.lb-btn-clear{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-btn-clear:active{background:#a82f24;border-color:#a82f24}.lb-grid{position:relative;display:grid;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:#14161a;border:1px dashed #3d434d;border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-drawer-wrap{padding:0 12px;margin-top:8px;width:100%;box-sizing:border-box}.lb-tabs{display:flex;gap:4px;position:relative;z-index:1}.lb-tab{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;background:#14161a;color:#a3a9b3;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;cursor:pointer;margin-bottom:-1px}.lb-tab.active{background:#ff6a1f;color:#1a0c03}.lb-drawer-panes{background:#1d2128;border-radius:0;padding:10px 8px;border:1px solid #3d434d}.lb-drawer-pane{display:none}.lb-drawer-pane.active{display:block}.lb-drawer{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.lb-pal-item{width:42px;height:42px;flex-shrink:0;box-sizing:border-box;padding:3px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.lb-pal-item:active{opacity:0.7}.lb-pal-item.placed{opacity:0.3;pointer-events:none}.lb-pal-icon{font-size:20px;line-height:1;color:#fff}.lb-pal-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:#171a1f;border:2px solid #3d434d;border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid #3d434d;border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:#14161a;color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:2px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-io-btn:active{background:#2c3038}.lb-io-btn.primary{background:#ff6a1f;border-color:#ff6a1f;color:#1a0c03}.lb-io-btn.primary:active{background:#e85e15;border-color:#e85e15}.lb-io-btn.armed{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-io-btn:disabled{background:#1d2128;border-color:#2c3038;color:#6a707a;cursor:default}.lb-slot-row{margin-top:12px}.lb-slot-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.lb-slot-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#eceef2}.lb-slot-status{font-size:11px;color:#6a707a}.platform-ios .button,.platform-ios button{padding:0px}",
+  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;color:#6a707a;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid #3d434d;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-bar{display:flex;gap:8px;justify-content:center;width:100%;box-sizing:border-box;padding:0 8px;margin-bottom:12px}.lb-actions-bar .lb-btn{flex:1;max-width:130px;padding:9px !important;font-size:11px}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;font-weight:700;border:1px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-btn:active{background:#2c3038}.lb-preset{background:#14161a;color:#a3a9b3}.lb-preset:hover{border-color:#ff6a1f;color:#ff6a1f}.lb-btn-io:hover,.lb-btn-slots:hover{border-color:#ff6a1f}.lb-btn-clear{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-btn-clear:active{background:#a82f24;border-color:#a82f24}.lb-grid{position:relative;display:grid;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:#14161a;border:1px dashed #3d434d;border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-drawer-wrap{padding:0 12px;margin-top:8px;width:100%;box-sizing:border-box}.lb-tabs{display:flex;gap:4px;position:relative;z-index:1}.lb-tab{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;background:#14161a;color:#a3a9b3;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;cursor:pointer;margin-bottom:-1px}.lb-tab.active{background:#ff6a1f;color:#1a0c03}.lb-drawer-panes{background:#1d2128;border-radius:0;padding:10px 8px;border:1px solid #3d434d}.lb-drawer-pane{display:none}.lb-drawer-pane.active{display:block}.lb-drawer{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.lb-pal-item{width:42px;height:42px;flex-shrink:0;box-sizing:border-box;padding:3px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.lb-pal-item:active{opacity:0.7}.lb-pal-item.placed{opacity:0.3;pointer-events:none}.lb-pal-icon{font-size:20px;line-height:1;color:#fff}.lb-pal-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:#171a1f;border:2px solid #3d434d;border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid #3d434d;border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:#14161a;color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:2px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-io-btn:active{background:#2c3038}.lb-io-btn.primary{background:#ff6a1f;border-color:#ff6a1f;color:#1a0c03}.lb-io-btn.primary:active{background:#e85e15;border-color:#e85e15}.lb-io-btn.armed{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-io-btn:disabled{background:#1d2128;border-color:#2c3038;color:#6a707a;cursor:default}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid #3d434d;border-radius:0;background:#14161a;color:#6a707a;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:11px;font-weight:700;letter-spacing:0.5px;cursor:pointer}.lb-ltab.active{background:#ff6a1f;border-color:#ff6a1f;color:#171a1f}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;align-items:center;gap:6px;min-width:0}.lb-assign-lbl{flex-shrink:0;color:#6a707a;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{flex:1;min-width:0;padding:6px 4px;border:2px solid #3d434d;border-radius:0;background:#14161a;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:11px}",
 
   manipulator: {
     set: function (value) {
@@ -246,6 +246,7 @@ module.exports = {
       // watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/codec.ts
       var codec_exports = {};
       __export(codec_exports, {
+        EMPTY_LAYOUT: () => EMPTY_LAYOUT,
         parseLayoutString: () => parseLayoutString,
         serializeLayout: () => serializeLayout
       });
@@ -258,7 +259,7 @@ module.exports = {
           const block = sorted[i];
           out.push(block.module + "," + block.row + "," + block.col + "," + block.w + "," + block.h);
         }
-        return out.join(";");
+        return out.length ? out.join(";") : EMPTY_LAYOUT;
       }
       function parseLayoutString(str) {
         const blocks = [];
@@ -290,10 +291,12 @@ module.exports = {
         }
         return blocks;
       }
+      var EMPTY_LAYOUT;
       var init_codec = __esm({
         "watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/codec.ts"() {
           "use strict";
           init_geometry();
+          EMPTY_LAYOUT = "0";
         }
       });
 
@@ -592,155 +595,169 @@ module.exports = {
         }
       });
 
-      // watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/slots.ts
-      var slots_exports = {};
-      __export(slots_exports, {
-        buildSlotsPanel: () => buildSlotsPanel
+      // watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/modes.ts
+      var modes_exports = {};
+      __export(modes_exports, {
+        LAYOUT_COUNT: () => LAYOUT_COUNT,
+        NIGHT_NONE: () => NIGHT_NONE,
+        buildModesBar: () => buildModesBar,
+        readLibrary: () => readLibrary,
+        seedLibrary: () => seedLibrary,
+        writeLibrary: () => writeLibrary
       });
+      function clampIndex(value, fallback) {
+        const index = typeof value === "number" ? value : parseInt(String(value), 10);
+        if (isNaN(index) || index < 0 || index >= LAYOUT_COUNT) {
+          return fallback;
+        }
+        return index;
+      }
       function storeInput() {
-        return document.querySelector(".gl-store");
+        return document.querySelector(".gl-library");
       }
-      function readSlots() {
+      function readLibrary() {
         const input = storeInput();
-        if (!input) {
-          return {};
+        let raw = {};
+        if (input) {
+          try {
+            raw = JSON.parse(input.value || "") || {};
+          } catch (error) {
+            raw = {};
+          }
         }
-        try {
-          return JSON.parse(input.value || "") || {};
-        } catch (error) {
-          return {};
+        const layouts = [];
+        for (let i = 0; i < LAYOUT_COUNT; i++) {
+          const value = raw.layouts && raw.layouts[i];
+          layouts.push(typeof value === "string" && value ? value : EMPTY_LAYOUT);
         }
+        return {
+          layouts,
+          day: clampIndex(raw.day, 0),
+          night: clampIndex(raw.night, NIGHT_NONE)
+        };
       }
-      function writeSlots(store) {
+      function writeLibrary(library) {
         const input = storeInput();
         if (!input) {
           return false;
         }
-        input.value = JSON.stringify(store);
+        input.value = JSON.stringify(library);
         input.dispatchEvent(new Event("change"));
         return true;
       }
-      function stamp(ms) {
-        const date = new Date(ms);
-        function pad(value) {
-          return value < 10 ? "0" + value : String(value);
-        }
-        return pad(date.getMonth() + 1) + "/" + pad(date.getDate()) + " " + pad(date.getHours()) + ":" + pad(date.getMinutes());
-      }
-      function buildSlotRow(panel, key, label, opts) {
-        const row = document.createElement("div");
-        row.className = "lb-slot-row";
-        const head = document.createElement("div");
-        head.className = "lb-slot-head";
-        const name = document.createElement("span");
-        name.className = "lb-slot-name";
-        name.textContent = label;
-        head.appendChild(name);
-        const status = document.createElement("span");
-        status.className = "lb-slot-status";
-        head.appendChild(status);
-        row.appendChild(head);
-        const buttons = document.createElement("div");
-        buttons.className = "lb-io-btns";
-        const saveButton = document.createElement("button");
-        saveButton.type = "button";
-        saveButton.className = "lb-io-btn";
-        saveButton.textContent = "Save";
-        buttons.appendChild(saveButton);
-        const loadButton = document.createElement("button");
-        loadButton.type = "button";
-        loadButton.className = "lb-io-btn primary";
-        loadButton.textContent = "Load";
-        buttons.appendChild(loadButton);
-        row.appendChild(buttons);
-        panel.appendChild(row);
-        let armed = null;
-        let armTimer = null;
-        function refresh() {
-          const slot = readSlots()[key];
-          if (slot) {
-            status.textContent = "saved " + stamp(slot.ts);
-            loadButton.disabled = false;
-          } else {
-            status.textContent = "empty";
-            loadButton.disabled = true;
-          }
-        }
-        function arm(button, prompt) {
-          disarm();
-          armed = button;
-          button.textContent = prompt;
-          button.classList.add("armed");
-          armTimer = setTimeout(disarm, ARM_RESET_MS);
-        }
-        function disarm() {
-          if (armTimer) {
-            clearTimeout(armTimer);
-            armTimer = null;
-          }
-          if (armed) {
-            armed.classList.remove("armed");
-            armed = null;
-          }
-          saveButton.textContent = "Save";
-          loadButton.textContent = "Load";
-        }
-        function flash(button, text) {
-          const original = button.textContent;
-          button.textContent = text;
-          setTimeout(function() {
-            button.textContent = original;
-          }, 1200);
-        }
-        function doSave() {
-          const store = readSlots();
-          store[key] = { layout: opts.getCurrent(), ts: Date.now() };
-          if (writeSlots(store)) {
-            refresh();
-            flash(saveButton, "Saved");
-          } else {
-            status.textContent = "storage unavailable";
-          }
-        }
-        saveButton.addEventListener("click", function() {
-          if (armed === saveButton) {
-            disarm();
-            doSave();
-          } else if (readSlots()[key]) {
-            arm(saveButton, "Overwrite?");
-          } else {
-            doSave();
-          }
+      function seedLibrary(library, existing) {
+        const untouched = library.layouts.every(function(layout) {
+          return layout === EMPTY_LAYOUT;
         });
-        loadButton.addEventListener("click", function() {
-          if (!readSlots()[key]) {
-            return;
-          }
-          if (armed === loadButton) {
-            disarm();
-            const slot = readSlots()[key];
-            if (slot) {
-              opts.onLoad(slot.layout);
+        if (!untouched || !existing || existing === EMPTY_LAYOUT) {
+          return library;
+        }
+        const layouts = library.layouts.slice();
+        layouts[0] = existing;
+        return { layouts, day: 0, night: library.night };
+      }
+      function buildModesBar(host, library, opts) {
+        let selected = library.day;
+        const tabs = document.createElement("div");
+        tabs.className = "lb-ltabs";
+        const assignments = document.createElement("div");
+        assignments.className = "lb-assign";
+        function keep() {
+          library.layouts[selected] = opts.getCurrent();
+          writeLibrary(library);
+        }
+        function label(index) {
+          const marks = (library.day === index ? "\u2600" : "") + (library.night === index ? "\u263D" : "");
+          return marks ? index + 1 + " " + marks : String(index + 1);
+        }
+        function redraw() {
+          const buttons = tabs.querySelectorAll(".lb-ltab");
+          for (let i = 0; i < buttons.length; i++) {
+            buttons[i].textContent = label(i);
+            if (i === selected) {
+              buttons[i].classList.add("active");
+            } else {
+              buttons[i].classList.remove("active");
             }
-          } else {
-            arm(loadButton, "Load?");
           }
-        });
-        refresh();
+          const selects = assignments.querySelectorAll("select");
+          if (selects.length === 2) {
+            selects[0].value = String(library.day);
+            selects[1].value = String(library.night);
+          }
+        }
+        for (let i = 0; i < LAYOUT_COUNT; i++) {
+          (function(index) {
+            const tab = document.createElement("button");
+            tab.type = "button";
+            tab.className = "lb-ltab";
+            tab.addEventListener("click", function() {
+              if (index === selected) {
+                return;
+              }
+              keep();
+              selected = index;
+              opts.onSelect(library.layouts[index], index);
+              redraw();
+            });
+            tabs.appendChild(tab);
+          })(i);
+        }
+        function assignRow(name, night) {
+          const row = document.createElement("div");
+          row.className = "lb-assign-row";
+          const caption = document.createElement("span");
+          caption.className = "lb-assign-lbl";
+          caption.textContent = name;
+          const select = document.createElement("select");
+          select.className = "lb-assign-sel";
+          if (night) {
+            const none = document.createElement("option");
+            none.value = String(NIGHT_NONE);
+            none.textContent = "None";
+            select.appendChild(none);
+          }
+          for (let i = 0; i < LAYOUT_COUNT; i++) {
+            const option = document.createElement("option");
+            option.value = String(i);
+            option.textContent = "Layout " + (i + 1);
+            select.appendChild(option);
+          }
+          select.addEventListener("change", function() {
+            keep();
+            const index = clampIndex(select.value, night ? NIGHT_NONE : 0);
+            if (night) {
+              library.night = index;
+            } else {
+              library.day = index;
+            }
+            writeLibrary(library);
+            redraw();
+            opts.onAssign();
+          });
+          row.appendChild(caption);
+          row.appendChild(select);
+          assignments.appendChild(row);
+        }
+        assignRow("Day", false);
+        assignRow("Night", true);
+        host.appendChild(tabs);
+        host.appendChild(assignments);
+        redraw();
+        return {
+          selected: function() {
+            return selected;
+          },
+          refresh: redraw
+        };
       }
-      function buildSlotsPanel(panel, opts) {
-        const title = document.createElement("div");
-        title.className = "lb-title";
-        title.textContent = "Saved Layouts";
-        panel.appendChild(title);
-        buildSlotRow(panel, "a", "Slot A", opts);
-        buildSlotRow(panel, "b", "Slot B", opts);
-      }
-      var ARM_RESET_MS;
-      var init_slots = __esm({
-        "watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/slots.ts"() {
+      var LAYOUT_COUNT, NIGHT_NONE;
+      var init_modes = __esm({
+        "watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/modes.ts"() {
           "use strict";
-          ARM_RESET_MS = 2500;
+          init_codec();
+          LAYOUT_COUNT = 4;
+          NIGHT_NONE = -1;
         }
       });
 
@@ -758,7 +775,27 @@ module.exports = {
         const hidden = root.querySelector(".lb-value");
         const gridEl = root.querySelector(".lb-grid");
         const paletteContainer = root.querySelector(".lb-palette-container");
+        const modesHost = root.querySelector(".lb-modes");
         let blocks = [];
+        const library = seedLibrary(readLibrary(), hidden.value || "");
+        function publish() {
+          library.layouts[selected()] = serializeLayout(blocks);
+          writeLibrary(library);
+          hidden.value = library.layouts[library.day] || EMPTY_LAYOUT;
+          self.trigger("change");
+          const nightInput = document.querySelector(".gl-night");
+          if (nightInput) {
+            const value = library.night === NIGHT_NONE ? EMPTY_LAYOUT : library.layouts[library.night] || EMPTY_LAYOUT;
+            if (nightInput.value !== value) {
+              nightInput.value = value;
+              nightInput.dispatchEvent(new Event("change"));
+            }
+          }
+        }
+        let modes = null;
+        function selected() {
+          return modes ? modes.selected() : library.day;
+        }
         const MODULES = buildModuleList(rawModules);
         function render() {
           gridEl.innerHTML = "";
@@ -789,8 +826,7 @@ module.exports = {
               gridEl.appendChild(el);
             })(i);
           }
-          hidden.value = serializeLayout(blocks);
-          self.trigger("change");
+          publish();
           const placedModules = blocks.map(function(b) {
             return b.module;
           });
@@ -903,6 +939,20 @@ module.exports = {
             }
           });
         }
+        if (modesHost) {
+          modes = buildModesBar(modesHost, library, {
+            getCurrent: function() {
+              return serializeLayout(blocks);
+            },
+            onSelect: function(layout) {
+              blocks = parseLayoutString(layout);
+              render();
+            },
+            onAssign: function() {
+              publish();
+            }
+          });
+        }
         const overlay = createOverlayHost("lb-overlay", "lb-panel", true);
         const ioBtn = root.querySelector(".lb-btn-io");
         if (ioBtn) {
@@ -921,30 +971,20 @@ module.exports = {
             });
           });
         }
-        const slotsBtn = root.querySelector(".lb-btn-slots");
-        if (slotsBtn) {
-          slotsBtn.addEventListener("click", function() {
-            const panel = overlay.open();
-            buildSlotsPanel(panel, {
-              getCurrent: function() {
-                return serializeLayout(blocks);
-              },
-              onLoad: function(text) {
-                blocks = parseLayoutString(text);
-                render();
-                overlay.close();
-              }
-            });
-          });
-        }
         root._lbSet = function(value) {
-          blocks = parseLayoutString(value);
-          render();
+          library.layouts[library.day] = value || EMPTY_LAYOUT;
+          if (selected() === library.day) {
+            blocks = parseLayoutString(library.layouts[library.day]);
+            render();
+          } else {
+            publish();
+          }
         };
         root._lbGet = function() {
-          return serializeLayout(blocks);
+          return library.layouts[library.day] || EMPTY_LAYOUT;
         };
-        root._lbSet(hidden.value || "");
+        blocks = parseLayoutString(library.layouts[library.day]);
+        render();
       }
       var init_init = __esm({
         "watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/init.ts"() {
@@ -956,7 +996,7 @@ module.exports = {
           init_drag();
           init_overlay();
           init_io_panel();
-          init_slots();
+          init_modes();
         }
       });
 
@@ -971,7 +1011,7 @@ module.exports = {
           init_presets();
           init_visuals();
           init_drag();
-          init_slots();
+          init_modes();
           init_init();
           module.exports = (init_init(), __toCommonJS(init_exports));
         }

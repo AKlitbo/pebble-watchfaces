@@ -23,7 +23,7 @@ export default {
     'ts/layout/presets',
     'ts/layout/visuals',
     'ts/layout/drag',
-    'ts/layout/slots',
+    'ts/layout/modes',
     'ts/layout/init',
   ],
   output: 'src/pkjs/clay/layout-component.g.js',

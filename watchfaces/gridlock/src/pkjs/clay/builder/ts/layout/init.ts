@@ -9,13 +9,14 @@
  */
 
 import { GRID_ROWS, GRID_COLS, sizeKey, occupancyGrid } from './geometry';
-import { serializeLayout, parseLayoutString } from './codec';
+import { serializeLayout, parseLayoutString, EMPTY_LAYOUT } from './codec';
 import { LAYOUT_PRESETS } from './presets';
 import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from './visuals';
 import { createDragEngine } from './drag';
 import { createOverlayHost } from '../shared/overlay';
 import { buildIoPanel } from '../shared/io-panel';
-import { buildSlotsPanel } from './slots';
+import { buildModesBar, readLibrary, seedLibrary, writeLibrary, NIGHT_NONE } from './modes';
+import type { ModesBar } from './modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../types';
 
 /** The set/get handles init hangs on the root element for the manipulator. */
@@ -40,8 +41,48 @@ export function init(this: ClayComponentInstance): void {
   const hidden = root.querySelector('.lb-value') as HTMLInputElement;
   const gridEl = root.querySelector('.lb-grid') as HTMLElement;
   const paletteContainer = root.querySelector('.lb-palette-container') as HTMLElement;
+  const modesHost = root.querySelector('.lb-modes') as HTMLElement;
 
   let blocks: Block[] = [];
+
+  // the four layouts and the day/night assignments. seeded from whatever the watch already had,
+  // so an upgrade finds its existing design sitting in layout 1
+  const library = seedLibrary(readLibrary(), hidden.value || '');
+
+  /**
+   * Push both wire values out: the day layout into the hidden input the manipulator reads, and
+   * the night one into the page item the watch takes LAYOUT_NIGHT from.
+   *
+   * Called on every render whichever layout is being edited, because the grid on screen is only
+   * one of four and the two that ship are whichever the assignments name. Writing only the
+   * selected one would publish the wrong layout the moment you tabbed away from the day grid.
+   */
+  function publish(): void {
+    library.layouts[selected()] = serializeLayout(blocks);
+    writeLibrary(library);
+
+    hidden.value = library.layouts[library.day] || EMPTY_LAYOUT;
+    self.trigger('change');
+
+    const nightInput = document.querySelector('.gl-night') as HTMLInputElement | null;
+    if (nightInput) {
+      const value = library.night === NIGHT_NONE
+        ? EMPTY_LAYOUT
+        : library.layouts[library.night] || EMPTY_LAYOUT;
+      // only when it moved, so dragging around the day grid does not spam Clay with saves
+      if (nightInput.value !== value) {
+        nightInput.value = value;
+        nightInput.dispatchEvent(new Event('change'));
+      }
+    }
+  }
+
+  // the modes bar owns which layout is being edited. asking it, rather than keeping a second copy
+  // here, is what stops the two drifting apart and writing an edit into the wrong layout
+  let modes: ModesBar | null = null;
+  function selected(): number {
+    return modes ? modes.selected() : library.day;
+  }
 
   const MODULES = buildModuleList(rawModules);
 
@@ -80,8 +121,7 @@ export function init(this: ClayComponentInstance): void {
       })(i);
     }
 
-    hidden.value = serializeLayout(blocks);
-    self.trigger('change');
+    publish();
 
     const placedModules = blocks.map(function (b) {
       return b.module;
@@ -217,6 +257,21 @@ export function init(this: ClayComponentInstance): void {
     });
   }
 
+  if (modesHost) {
+    modes = buildModesBar(modesHost, library, {
+      getCurrent: function () {
+        return serializeLayout(blocks);
+      },
+      onSelect: function (layout) {
+        blocks = parseLayoutString(layout);
+        render();
+      },
+      onAssign: function () {
+        publish();
+      },
+    });
+  }
+
   const overlay = createOverlayHost('lb-overlay', 'lb-panel', true);
 
   const ioBtn = root.querySelector('.lb-btn-io');
@@ -237,31 +292,23 @@ export function init(this: ClayComponentInstance): void {
     });
   }
 
-  const slotsBtn = root.querySelector('.lb-btn-slots');
-  if (slotsBtn) {
-    slotsBtn.addEventListener('click', function () {
-      const panel = overlay.open();
-      buildSlotsPanel(panel, {
-        getCurrent: function () {
-          return serializeLayout(blocks);
-        },
-        onLoad: function (text) {
-          blocks = parseLayoutString(text);
-          render();
-          overlay.close();
-        },
-      });
-    });
-  }
-
-  // expose set/get to the manipulator
+  // the manipulator speaks the day layout only, which is what LAYOUT has always meant. setting it
+  // writes into whichever layout is assigned to day rather than whatever happens to be on screen
   root._lbSet = function (value) {
-    blocks = parseLayoutString(value);
-    render();
+    library.layouts[library.day] = value || EMPTY_LAYOUT;
+    // only follow it onto the grid while the day layout is the one being edited. Clay seeds this
+    // at open, and yanking the user off the tab they were on would be its own small betrayal
+    if (selected() === library.day) {
+      blocks = parseLayoutString(library.layouts[library.day]);
+      render();
+    } else {
+      publish();
+    }
   };
   root._lbGet = function () {
-    return serializeLayout(blocks);
+    return library.layouts[library.day] || EMPTY_LAYOUT;
   };
 
-  root._lbSet(hidden.value || '');
+  blocks = parseLayoutString(library.layouts[library.day]);
+  render();
 }

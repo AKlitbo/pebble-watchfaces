@@ -9,6 +9,10 @@ import clayConfig from './config';
 // because it is a select and not a bool
 const seedKeys = [
   'LAYOUT',
+  'LAYOUT_NIGHT',
+  'LAYOUT_NIGHT_MODE',
+  'LAYOUT_NIGHT_START',
+  'LAYOUT_NIGHT_END',
   'HEALTH_GOAL_STEPS',
   'HEALTH_GOAL_CALORIES',
   'HEALTH_GOAL_SLEEP',
