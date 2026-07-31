@@ -282,4 +282,36 @@ describe('the layout library', () => {
 
     expect(ctx.get()).toBe('2,0,0,2,1');
   });
+
+  /**
+   * The ordering trap, and the most expensive bug the feature can have.
+   *
+   * Clay builds page items one at a time and only attaches each after setting it, so the builder
+   * can run before the stores beside it exist. Reading nothing is survivable. Writing that nothing
+   * back is not: it replaces four saved layouts with blanks, silently, on the first tab switch.
+   */
+  test('does not blank a saved library it was built too early to read', async () => {
+    const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,0,0,4,1'], day: 0, night: -1 });
+    const { root } = mountLayout(); // no stores yet, exactly as Clay would have it
+    const stores = mountStores();
+    stores.library.value = saved;
+
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[1].click();
+
+    expect(JSON.parse(stores.library.value).layouts).toEqual(JSON.parse(saved).layouts);
+  });
+
+  /** And once the store does turn up, the layouts in it are the ones being edited. */
+  test('picks up a library that arrives after it was built', async () => {
+    const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,0,0,4,1'], day: 2, night: 3 });
+    const { root } = mountLayout();
+    const stores = mountStores();
+    stores.library.value = saved;
+
+    await new Promise((resolve) => { setTimeout(resolve, 0); }); // let the deferred re-read run
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[3].click();
+
+    expect(JSON.parse(stores.library.value).layouts[2]).toBe('6,0,0,2,1');
+    expect(JSON.parse(stores.library.value).day).toBe(2);
+  });
 });

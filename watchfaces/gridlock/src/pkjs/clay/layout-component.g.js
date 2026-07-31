@@ -603,6 +603,7 @@ module.exports = {
         buildModesBar: () => buildModesBar,
         readLibrary: () => readLibrary,
         seedLibrary: () => seedLibrary,
+        storePresent: () => storePresent,
         writeLibrary: () => writeLibrary
       });
       function clampIndex(value, fallback) {
@@ -614,6 +615,9 @@ module.exports = {
       }
       function storeInput() {
         return document.querySelector(".gl-library");
+      }
+      function storePresent() {
+        return storeInput() !== null;
       }
       function readLibrary() {
         const input = storeInput();
@@ -664,7 +668,7 @@ module.exports = {
         assignments.className = "lb-assign";
         function keep() {
           library.layouts[selected] = opts.getCurrent();
-          writeLibrary(library);
+          opts.save();
         }
         function label(index) {
           const marks = (library.day === index ? "\u2600" : "") + (library.night === index ? "\u263D" : "");
@@ -731,7 +735,7 @@ module.exports = {
             } else {
               library.day = index;
             }
-            writeLibrary(library);
+            opts.save();
             redraw();
             opts.onAssign();
           });
@@ -778,9 +782,15 @@ module.exports = {
         const modesHost = root.querySelector(".lb-modes");
         let blocks = [];
         const library = seedLibrary(readLibrary(), hidden.value || "");
+        let loaded = storePresent();
+        function save() {
+          if (loaded) {
+            writeLibrary(library);
+          }
+        }
         function publish() {
           library.layouts[selected()] = serializeLayout(blocks);
-          writeLibrary(library);
+          save();
           hidden.value = library.layouts[library.day] || EMPTY_LAYOUT;
           self.trigger("change");
           const nightInput = document.querySelector(".gl-night");
@@ -950,7 +960,8 @@ module.exports = {
             },
             onAssign: function() {
               publish();
-            }
+            },
+            save
           });
         }
         const overlay = createOverlayHost("lb-overlay", "lb-panel", true);
@@ -985,6 +996,27 @@ module.exports = {
         };
         blocks = parseLayoutString(library.layouts[library.day]);
         render();
+        if (!loaded) {
+          setTimeout(function() {
+            if (!storePresent()) {
+              return;
+            }
+            const saved = readLibrary();
+            if (saved.layouts.some(function(layout) {
+              return layout !== EMPTY_LAYOUT;
+            })) {
+              library.layouts = saved.layouts;
+              library.day = saved.day;
+              library.night = saved.night;
+              blocks = parseLayoutString(library.layouts[library.day]);
+              if (modes) {
+                modes.refresh();
+              }
+            }
+            loaded = true;
+            render();
+          }, 0);
+        }
       }
       var init_init = __esm({
         "watchfaces/gridlock/src/pkjs/clay/builder/ts/layout/init.ts"() {

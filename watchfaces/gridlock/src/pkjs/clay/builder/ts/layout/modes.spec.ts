@@ -132,7 +132,7 @@ describe('buildModesBar', () => {
     const host = document.createElement('div');
     const library = { layouts: ['a', 'b', 'c', 'd'], day: 0, night: NIGHT_NONE };
 
-    buildModesBar(host, library, { getCurrent: () => 'a', onSelect: () => {}, onAssign: () => {} });
+    buildModesBar(host, library, { getCurrent: () => 'a', onSelect: () => {}, onAssign: () => {}, save: () => {} });
 
     expect(host.querySelectorAll('.lb-ltab')).toHaveLength(LAYOUT_COUNT);
     expect(host.querySelectorAll('select')).toHaveLength(2);
@@ -154,6 +154,7 @@ describe('buildModesBar', () => {
       getCurrent: () => 'edited',
       onSelect: (layout) => { loaded = layout; },
       onAssign: () => {},
+      save: () => {},
     });
     host.querySelectorAll<HTMLElement>('.lb-ltab')[2].click();
 
@@ -168,7 +169,7 @@ describe('buildModesBar', () => {
     const library = { layouts: ['a', 'b', 'c', 'd'], day: 0, night: 2 };
     let assigned = 0;
 
-    buildModesBar(host, library, { getCurrent: () => 'a', onSelect: () => {}, onAssign: () => { assigned++; } });
+    buildModesBar(host, library, { getCurrent: () => 'a', onSelect: () => {}, onAssign: () => { assigned++; }, save: () => {} });
     const night = host.querySelectorAll<HTMLSelectElement>('select')[1];
     night.value = String(NIGHT_NONE);
     night.dispatchEvent(new Event('change'));

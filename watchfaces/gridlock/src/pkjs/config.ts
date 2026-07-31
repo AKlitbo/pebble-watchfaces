@@ -394,13 +394,10 @@ const config = [
         type: 'text',
         defaultValue: 'Build up to four layouts and pick which two the watch uses. Tap a number to edit that layout, then drag panels in from below to place them, or drag a placed one to move or remove it. Every edit is kept as you go. Day is the layout you normally see; Night takes over on the schedule you set underneath.',
       },
-      {
-        type: 'layoutBuilder',
-        messageKey: 'LAYOUT',
-        defaultValue: '2,0,0,2,2;12,0,2,2,1;13,1,2,2,1;1,2,0,4,1;3,3,0,2,2;6,3,2,2,2',
-        moduleOptions: MODULE_OPTIONS,
-        moduleThumbnails: moduleThumbnails,
-      },
+      // the two invisible stores come first on purpose. Clay builds each item in order and only
+      // attaches it after setting its value, so a store declared after the builder does not exist
+      // yet when the builder initialises and goes looking for it.
+      //
       // invisible store for the layout library: the four grids and which two are in use. lives
       // here so its value saves and restores with the rest of the settings, since the config
       // webview will not let it keep its own localStorage. the watch never reads this key
@@ -417,6 +414,13 @@ const config = [
         messageKey: 'LAYOUT_NIGHT',
         storeClass: 'gl-night',
         defaultValue: '0',
+      },
+      {
+        type: 'layoutBuilder',
+        messageKey: 'LAYOUT',
+        defaultValue: '2,0,0,2,2;12,0,2,2,1;13,1,2,2,1;1,2,0,4,1;3,3,0,2,2;6,3,2,2,2',
+        moduleOptions: MODULE_OPTIONS,
+        moduleThumbnails: moduleThumbnails,
       },
       select('LAYOUT_NIGHT_MODE', 'Swap Day & Night Layouts', NIGHT_MODE_OPTIONS, 0,
         'When the watch swaps between your two layouts. At Sunset & Sunrise follows the times your weather provider reports, and falls back to the times below whenever it has none yet.'),

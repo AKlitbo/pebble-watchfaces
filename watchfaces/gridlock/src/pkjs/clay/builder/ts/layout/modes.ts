@@ -40,6 +40,9 @@ export interface ModesOpts {
   onSelect: (layout: string, index: number) => void;
   /** Called whenever an assignment changes, so the builder can re-publish both wire values. */
   onAssign: () => void;
+  /** Persist the library. The builder owns this because it is the only thing that knows whether
+   *  the library has been read yet, and writing before then would save four blank grids. */
+  save: () => void;
 }
 
 /** What the builder gets back: the one place that knows which layout is being edited. */
@@ -64,6 +67,11 @@ function storeInput(): HTMLInputElement | null {
   // by its own class, not .gl-store: the night layout is a hidden store too, and a plain
   // .gl-store lookup would keep finding whichever of the two Clay rendered first
   return document.querySelector('.gl-library');
+}
+
+/** Whether the page has a library store yet, which it may not during the build. */
+export function storePresent(): boolean {
+  return storeInput() !== null;
 }
 
 /**
@@ -151,7 +159,7 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   /** Stash whatever is on the grid into the layout it belongs to. */
   function keep(): void {
     library.layouts[selected] = opts.getCurrent();
-    writeLibrary(library);
+    opts.save();
   }
 
   function label(index: number): string {
@@ -229,7 +237,7 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
       } else {
         library.day = index;
       }
-      writeLibrary(library);
+      opts.save();
       redraw();
       opts.onAssign();
     });

@@ -15,7 +15,7 @@ import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from './visuals';
 import { createDragEngine } from './drag';
 import { createOverlayHost } from '../shared/overlay';
 import { buildIoPanel } from '../shared/io-panel';
-import { buildModesBar, readLibrary, seedLibrary, writeLibrary, NIGHT_NONE } from './modes';
+import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, NIGHT_NONE } from './modes';
 import type { ModesBar } from './modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../types';
 
@@ -49,6 +49,25 @@ export function init(this: ClayComponentInstance): void {
   // so an upgrade finds its existing design sitting in layout 1
   const library = seedLibrary(readLibrary(), hidden.value || '');
 
+  // whether the library above came from the page or is just the empty default. Clay builds page
+  // items in order and attaches each only after setting it, so if this component is ever built
+  // before its stores the read above finds nothing — and writing that back would wipe four saved
+  // layouts on the first edit. so: no writing until a read has actually worked
+  let loaded = storePresent();
+
+  /**
+   * The only place the library is written, so the guard above cannot be routed around.
+   *
+   * Everything that changes the library — dragging, the presets, an import, a tab switch, an
+   * assignment — comes through here. Before the store has been read, a write would be four blank
+   * grids landing on top of the user's real ones.
+   */
+  function save(): void {
+    if (loaded) {
+      writeLibrary(library);
+    }
+  }
+
   /**
    * Push both wire values out: the day layout into the hidden input the manipulator reads, and
    * the night one into the page item the watch takes LAYOUT_NIGHT from.
@@ -59,7 +78,7 @@ export function init(this: ClayComponentInstance): void {
    */
   function publish(): void {
     library.layouts[selected()] = serializeLayout(blocks);
-    writeLibrary(library);
+    save();
 
     hidden.value = library.layouts[library.day] || EMPTY_LAYOUT;
     self.trigger('change');
@@ -269,6 +288,7 @@ export function init(this: ClayComponentInstance): void {
       onAssign: function () {
         publish();
       },
+      save: save,
     });
   }
 
@@ -311,4 +331,28 @@ export function init(this: ClayComponentInstance): void {
 
   blocks = parseLayoutString(library.layouts[library.day]);
   render();
+
+  // and once the page has finished building, pick up anything that arrived late. this is the
+  // safety net for the ordering above: if the stores were not there at initialize, they are now
+  if (!loaded) {
+    setTimeout(function () {
+      if (!storePresent()) {
+        return; // no store on this page at all, so there is nothing to lose
+      }
+
+      const saved = readLibrary();
+      if (saved.layouts.some(function (layout) { return layout !== EMPTY_LAYOUT; })) {
+        library.layouts = saved.layouts;
+        library.day = saved.day;
+        library.night = saved.night;
+        blocks = parseLayoutString(library.layouts[library.day]);
+        if (modes) {
+          modes.refresh();
+        }
+      }
+
+      loaded = true;
+      render();
+    }, 0);
+  }
 }
