@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        face: [lcars-stardate, radar-array, ide-vscode, ridgeline, shoreline]
+        face: [lcars-stardate, radar-array, ide-vscode, ridgeline, shoreline, treeline]
     steps:
       - uses: actions/checkout@v7
 
