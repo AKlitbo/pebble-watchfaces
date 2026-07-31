@@ -9,8 +9,13 @@
  *
  * Run once:   node tools/dev/clay-preview.ts <face>
  * Keep fresh: node tools/dev/clay-preview.ts <face> --watch   (then refresh the browser)
+ * As a user:  node tools/dev/clay-preview.ts <face> --settings=saved.json
  *
  * Opens to: tools/dev/clay-preview.html
+ *
+ * --settings seeds the page from a { messageKey: value } file, which is what "open the settings on
+ * a watch you have already configured" actually means. Without it every preview is a brand new
+ * install, and a bug that only bites returning users renders perfectly.
  *
  * The Save button does nothing here: it talks to the phone. This is for eyeballing the page.
  */
@@ -52,8 +57,15 @@ if (typeof host.Pebble === 'undefined') {
     getActiveWatchInfo: function () { return {}; },
   };
 }
+// clay reads the values it seeds the page with straight out of localStorage under this key, so
+// pre-loading it is all "open the settings again later" takes
+const seed = process.argv.slice(3).find((arg) => arg.startsWith('--settings='));
+
 if (typeof host.localStorage === 'undefined') {
   const store: Record<string, string> = {};
+  if (seed) {
+    store['clay-settings'] = fs.readFileSync(seed.slice('--settings='.length), 'utf8');
+  }
   host.localStorage = {
     getItem: function (key: string) { return key in store ? store[key] : null; },
     setItem: function (key: string, value: string) { store[key] = String(value); },
