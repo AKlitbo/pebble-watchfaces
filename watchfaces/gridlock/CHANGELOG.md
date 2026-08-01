@@ -5,6 +5,23 @@ All notable changes to the Gridlock watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-07-31
+
+### Added
+
+- Added a library of four layouts in place of the single one, built in the same editor and reached from the tabs above the grid. Everything you place is kept as you go, so moving between them never asks you to save first.
+- Added Day and Night assignments, so two of the four layouts can be the ones the watch actually shows. Anything you have not assigned stays in the library as a design you can come back to.
+- Added an automatic swap between the two, either at the sunset and sunrise your weather provider reports or at times you set yourself. Your own times are also the fallback whenever the watch has no sun reading yet, so the swap still happens on a day with no weather.
+
+### Changed
+
+- The two Saved Layout slots have been replaced by the layout library. The slots only ever existed on the phone and the watch could not read them, which is what the 0.14.0 notes meant by calling them experimental.
+- A panel keeps its colour, header, and border everywhere it appears. Two layouts holding the same panel show it the same way, so styling it once is enough.
+
+### Fixed
+
+- Fixed clearing a layout and saving leaving the previous one on the watch.
+
 ## [0.14.1] - 2026-07-28
 
 ### Fixed

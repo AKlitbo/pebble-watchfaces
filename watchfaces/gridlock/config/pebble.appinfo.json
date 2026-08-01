@@ -1,6 +1,6 @@
 {
   "displayName": "Gridlock",
-  "version": "0.14.1",
+  "version": "1.0.0",
   "uuid": "85ee3144-1c42-486a-b2a4-a74a1efaeb69",
   "sdkVersion": "3",
   "enableMultiJS": true,

@@ -8,6 +8,16 @@ layout from the settings page, then set its colour, header, and border on its ow
 
 For what a finished screen looks like, see the layouts in the [README](../../README.md).
 
+## Day and Night
+
+There are four layouts, not one. The tabs above the grid move between them and everything you place
+is kept as you go, so they are four designs you hold at once rather than one you keep rebuilding.
+
+Two of them are assigned as Day and Night, and those are the pair the watch shows. Gridlock swaps
+between them at the sunset and sunrise your weather provider reports, or at times you set yourself.
+Those times are also the fallback for a day the weather has not arrived, so the swap still happens.
+A panel keeps its colour, header, and border in every layout it appears in.
+
 ## Starter Layouts
 
 Six preset buttons on the settings page, so there is something on screen before you have placed

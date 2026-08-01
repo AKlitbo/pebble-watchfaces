@@ -20,6 +20,9 @@ per-panel colours the settings page offers. Eight of them run as a
 [loop](.github/images/gridlock/layouts.gif) alongside a couple of the starter presets, and
 every panel it can draw is listed in [MODULES](watchfaces/gridlock/MODULES.md).
 
+You build four of these rather than one, and pick two of them as your day and night screens.
+Gridlock swaps between the pair on its own, at sunset and sunrise or at times you set.
+
 ## Install
 
 Download a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and
