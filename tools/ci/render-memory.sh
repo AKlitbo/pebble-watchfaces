@@ -52,7 +52,7 @@ report=$(printf '%s\n' "$rows" | sort -t$'\t' -k3,3nr | awk -F'\t' '
     print "**App Image** is the build limit. Pebble enforces a 64 KB maximum"
     print "(`MAX_APP_BINARY_SIZE = 0x10000`), even though emery lists 128 KB of app storage."
     print ""
-    print "**Free Heap** is the RAM left over from the watch's 128 KB after the app,"
+    print "**Free Heap** is the RAM left over from the 128 KB on the watch after the app,"
     print "system allocations and resources."
   }
 ')
