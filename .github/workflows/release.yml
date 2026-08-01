@@ -46,7 +46,6 @@ jobs:
             echo "face=$face"
             echo "version=$version"
             echo "display=$(jq -r .displayName "$appinfo")"
-            echo "asset=$face-emery-$version.pbw"
           } >> "$GITHUB_OUTPUT"
 
       # a re-pushed or moved tag would otherwise build for minutes and only then hit "release
@@ -75,15 +74,26 @@ jobs:
       - name: Build Watchface
         run: bash build.sh ${{ steps.face.outputs.face }}
 
-      # build.sh emits <face>.pbw, unversioned. the release asset carries the version so a
-      # downloaded file is still identifiable months later
-      - name: Name The Asset
-        run: cp targets/${{ steps.face.outputs.face }}/build/${{ steps.face.outputs.face }}.pbw ${{ steps.face.outputs.asset }}
+      # build.sh emits one <target>.pbw per target, unversioned. a face usually has one target,
+      # but gridlock ships two (a watchface and a watchapp), so name each target's pbw with the
+      # version (still identifiable months later) and collect them all as release assets
+      - name: Name The Assets
+        id: assets
+        run: |
+          face='${{ steps.face.outputs.face }}'
+          version='${{ steps.face.outputs.version }}'
+          assets=""
+          for target in $(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/manifest/build-manifests.ts --targets "$face"); do
+            asset="$target-emery-$version.pbw"
+            cp "targets/$target/build/$target.pbw" "$asset"
+            assets="$assets $asset"
+          done
+          echo "assets=${assets# }" >> "$GITHUB_OUTPUT"
 
       - name: Publish Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "${{ steps.face.outputs.asset }}" \
+          gh release create "$GITHUB_REF_NAME" ${{ steps.assets.outputs.assets }} \
             --title "${{ steps.face.outputs.display }} ${{ steps.face.outputs.version }}" \
             --notes-file notes.md

@@ -40,21 +40,28 @@ const PKJS_BASE_TSCONFIG = path.join(ROOT, 'config', 'tsconfig.pkjs.json');
 // says it does. keeping it a file of its own is also what MPL 2.0 asks of a larger work
 const ICALJS_FROM = path.join(ROOT, 'node_modules', 'ical.js', 'dist', 'ical.es5.min.cjs');
 
-/** The per-face paths this tool reads and writes, all derived from the face name. */
+/**
+ * The paths this tool reads and writes. The sandbox is named after the build target; its
+ * sources live under the source face. For a face with one target the two names match, but a
+ * face that ships several targets (a watchface and a watchapp, say) compiles the same source
+ * face into each target's sandbox.
+ */
 export interface FacePaths {
-  faceSrc: string;   // watchfaces/<face>/src/pkjs
-  sandbox: string;   // targets/<face>
-  emit: string;      // targets/<face>/emit
-  emitPkjs: string;  // targets/<face>/emit/watchfaces/<face>/src/pkjs
-  icaljsTo: string;  // targets/<face>/emit/lib/ts/calendar/icaljs.js
-  tsconfig: string;  // targets/<face>/tsconfig.pkjs.json (generated)
-  skipDir: string;   // watchfaces/<face>/src/pkjs/clay/builder
+  faceSrc: string;   // watchfaces/<sourceFace>/src/pkjs
+  sandbox: string;   // targets/<target>
+  emit: string;      // targets/<target>/emit
+  emitPkjs: string;  // targets/<target>/emit/watchfaces/<sourceFace>/src/pkjs
+  icaljsTo: string;  // targets/<target>/emit/lib/ts/calendar/icaljs.js
+  tsconfig: string;  // targets/<target>/tsconfig.pkjs.json (generated)
+  skipDir: string;   // watchfaces/<sourceFace>/src/pkjs/clay/builder
 }
 
-export function facePaths(face: string): FacePaths {
-  const rel = faceRelative(face);
+export function facePaths(target: string, sourceFace: string = target): FacePaths {
+  // the sandbox is named after the target, but the sources are the source face's, and that face
+  // may sit one level deeper inside a family folder, so its real path is looked up
+  const rel = faceRelative(sourceFace);
   const faceSrc = path.join(ROOT, 'watchfaces', rel, 'src', 'pkjs');
-  const sandbox = path.join(ROOT, 'targets', face);
+  const sandbox = path.join(ROOT, 'targets', target);
   const emit = path.join(sandbox, 'emit');
   return {
     faceSrc,
@@ -78,10 +85,10 @@ export function cleanEmit(p: FacePaths): void {
  * It roots at the repo root (so lib/ts, shared across faces, stays inside rootDir) and emits
  * into the sandbox's emit/. All paths are relative to the sandbox where the file is written.
  */
-export function writeTsconfig(face: string, p: FacePaths): void {
+export function writeTsconfig(sourceFace: string, p: FacePaths): void {
   // a face may sit one level deeper, inside a family folder, so the globs follow its real path
   // rather than assuming the name is the folder
-  const rel = faceRelative(face);
+  const rel = faceRelative(sourceFace);
   const tsconfig = {
     extends: path.relative(p.sandbox, PKJS_BASE_TSCONFIG).split(path.sep).join('/'),
     compilerOptions: { rootDir: '../..', outDir: 'emit' },
@@ -156,21 +163,24 @@ export function copyIcalJs(p: FacePaths): void {
 }
 
 function main(): void {
-  const face = process.argv[2];
-  if (!face) {
-    console.error('usage: build-pkjs.ts <face>');
+  const target = process.argv[2];
+  // the sandbox is the target; its sources are the source face. they match for a single-target
+  // face, so the second arg is optional and defaults to the target name
+  const sourceFace = process.argv[3] || target;
+  if (!target) {
+    console.error('usage: build-pkjs.ts <target> [sourceFace]');
     process.exit(1);
   }
 
-  const p = facePaths(face);
+  const p = facePaths(target, sourceFace);
   cleanEmit(p);
-  writeTsconfig(face, p);
+  writeTsconfig(sourceFace, p);
   compile(p);
   const names = copyGenerated(p);
   copyIcalJs(p);
 
   const where = path.relative(ROOT, p.emitPkjs).split(path.sep).join('/');
-  console.log(`built ${face} emit/ and copied ${names.length} generated components into ${where}/, plus ical.js`);
+  console.log(`built ${target} emit/ and copied ${names.length} generated components into ${where}/, plus ical.js`);
 }
 
 if (import.meta.main) {

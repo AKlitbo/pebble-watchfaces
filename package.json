@@ -15,12 +15,17 @@
     "test:coverage": "vitest run --config config/vitest.config.ts --coverage",
     "lint": "eslint . --config config/eslint.config.ts",
     "lint:fix": "eslint . --fix --config config/eslint.config.ts",
-    "typecheck": "tsc -p tsconfig.json && tsc -p config/tsconfig.tools.json && tsc -p config/tsconfig.spec.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p config/tsconfig.builder.json && tsc -p config/tsconfig.tools.json && tsc -p config/tsconfig.spec.json",
     "build:pkjs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/pkjs/build-pkjs.ts",
     "build:conditions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/build-conditions.ts",
     "build:manifests": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/manifest/build-manifests.ts",
     "gen:icons": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/icons/generate-icons.ts",
-    "gen:frame": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/frame/generate-frame.ts"
+    "gen:frame": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/frame/generate-frame.ts",
+    "gen:gridlock": "npm run gen:gridlock:clay && npm run gen:gridlock:vibrant && npm run gen:gridlock:thumbnails",
+    "gen:gridlock:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/clay-components/generate-components.ts",
+    "gen:gridlock:vibrant": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/vibrant/generate-vibrant.ts",
+    "gen:gridlock:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/thumbnails/generate-thumbnails.ts",
+    "dev:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/dev/clay-preview.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -29,6 +34,7 @@
     "@types/node": "^24.13.3",
     "@vitest/coverage-v8": "^4.1.8",
     "dotenv": "^17.4.2",
+    "esbuild": "^0.28.1",
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
     "ical.js": "^2.2.1",

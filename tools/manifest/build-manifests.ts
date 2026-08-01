@@ -56,11 +56,34 @@ export type SharedAppinfo = {
 };
 
 /**
+ * A face's build identity is either a single target inlined at the top level (the common case:
+ * one .pbw per face) or a targets map naming several — Gridlock ships a watchface and a watchapp
+ * from one source, so it lists both here.
+ */
+type TargetsMap = Record<string, Target>;
+
+/**
  * The whole appinfo file: the shared Pebble fields plus this face's build identity and its
  * own version. Faces version independently (each keeps its own CHANGELOG.md), so the version
- * lives here rather than in the root package.json.
+ * lives here rather than in the root package.json. A face declares its identity one of two ways:
+ * the single-target fields (name/watchface/menuIcon) inline, or a `targets` map for many.
  */
-type Appinfo = SharedAppinfo & Target & { version?: string };
+type Appinfo = SharedAppinfo & Partial<Target> & { version?: string; targets?: TargetsMap };
+
+/**
+ * The build targets a face declares, as a flat list. A `targets` map wins; otherwise the inline
+ * single target is the whole list. One source face (watchfaces/<face>/) can produce several .pbw
+ * targets, each with its own sandbox under targets/<target name>/.
+ */
+export function resolveTargets(config: Appinfo): Target[] {
+  if (config.targets) {
+    return Object.values(config.targets);
+  }
+  if (!config.name) {
+    throw new Error('appinfo declares neither a targets map nor a top-level name');
+  }
+  return [{ name: config.name, watchface: config.watchface ?? false, menuIcon: config.menuIcon }];
+}
 
 /** The facts each manifest copies out of the root package.json. */
 type RootPkg = { author: string; version: string };
@@ -99,32 +122,55 @@ export function buildManifest(config: SharedAppinfo, rootPkg: RootPkg, target: T
   };
 }
 
-/** Writes targets/<face>/package.json from that face's appinfo. */
-function main() {
-  const face = process.argv[2];
-  if (!face) {
-    console.error('usage: build-manifests.ts <face>');
-    process.exit(1);
-  }
-
-  const config: Appinfo = JSON.parse(fs.readFileSync(appinfoPath(face), 'utf8'));
-  const rootPkg: RootPkg = JSON.parse(fs.readFileSync(ROOT_PKG, 'utf8'));
-
-  const target: Target = { name: config.name, watchface: config.watchface, menuIcon: config.menuIcon };
+/** Writes one target's sandbox: targets/<target name>/{package.json,wscript,.source-face}. */
+function writeTarget(face: string, config: Appinfo, rootPkg: RootPkg, target: Target): void {
   // the face's own version wins. the root package.json is the fallback and still owns the author
   const version = config.version || rootPkg.version;
   const manifest = buildManifest(config, { author: rootPkg.author, version }, target);
 
-  const outDir = path.join(ROOT, 'targets', face);
+  const outDir = path.join(ROOT, 'targets', target.name);
   fs.mkdirSync(outDir, { recursive: true });
-  const out = path.join(outDir, 'package.json');
-  fs.writeFileSync(out, JSON.stringify(manifest, null, 2) + '\n');
+  fs.writeFileSync(path.join(outDir, 'package.json'), JSON.stringify(manifest, null, 2) + '\n');
 
   // the waf entry point has to exist before `pebble build` runs in this sandbox
-  const wscript = path.join(outDir, 'wscript');
-  fs.copyFileSync(WSCRIPT_TEMPLATE, wscript);
+  fs.copyFileSync(WSCRIPT_TEMPLATE, path.join(outDir, 'wscript'));
 
-  console.log(`Wrote ${path.relative(ROOT, out)} and wscript (${target.name} ${version}, watchface=${target.watchface}).`);
+  // the sandbox is named after the target, but its sources live under watchfaces/<face>/. one
+  // face can feed several targets, so waf_helpers and build.sh read this marker to map the
+  // sandbox back to its source face rather than assuming sandbox name == face name
+  fs.writeFileSync(path.join(outDir, '.source-face'), face + '\n');
+
+  console.log(`Wrote targets/${target.name}/package.json and wscript (source face ${face} ${version}, watchface=${target.watchface}).`);
+}
+
+/**
+ * Writes every target sandbox for a face, or with --targets prints their sandbox names (one per
+ * line) so build.sh can loop over them. The face is the watchfaces/<face>/ source dir; each
+ * target it declares gets its own targets/<target name>/ sandbox.
+ */
+function main() {
+  const args = process.argv.slice(2);
+  const listOnly = args[0] === '--targets';
+  const face = listOnly ? args[1] : args[0];
+  if (!face) {
+    console.error('usage: build-manifests.ts [--targets] <face>');
+    process.exit(1);
+  }
+
+  const config: Appinfo = JSON.parse(fs.readFileSync(appinfoPath(face), 'utf8'));
+  const targets = resolveTargets(config);
+
+  if (listOnly) {
+    for (const target of targets) {
+      console.log(target.name);
+    }
+    return;
+  }
+
+  const rootPkg: RootPkg = JSON.parse(fs.readFileSync(ROOT_PKG, 'utf8'));
+  for (const target of targets) {
+    writeTarget(face, config, rootPkg, target);
+  }
 }
 
 if (import.meta.main) {

@@ -39,7 +39,11 @@ export default defineConfig({
       reportsDirectory: 'coverage',
       // every tree that has specs so the number covers the whole suite
       // not just the runtime
-      include: ['lib/ts/**', 'lib/tools/**', 'watchfaces/**/src/pkjs/**', 'tools/**'],
+      include: [
+        'lib/ts/**', 'lib/tools/**',
+        'watchfaces/**/src/pkjs/**', 'watchfaces/**/src/tools/**',
+        'tools/**',
+      ],
       exclude: [
         '**/*.spec.ts',
         '**/*.d.ts',

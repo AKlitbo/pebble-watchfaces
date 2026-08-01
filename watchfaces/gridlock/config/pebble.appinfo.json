@@ -1,0 +1,972 @@
+{
+  "displayName": "Gridlock",
+  "version": "1.0.0",
+  "uuid": "85ee3144-1c42-486a-b2a4-a74a1efaeb69",
+  "sdkVersion": "3",
+  "enableMultiJS": true,
+  "targetPlatforms": [
+    "emery"
+  ],
+  "capabilities": [
+    "location",
+    "configurable",
+    "health"
+  ],
+  "targets": {
+    "watchface": {
+      "name": "gridlock-face",
+      "watchface": true
+    },
+    "watchapp": {
+      "name": "gridlock-app",
+      "watchface": false,
+      "menuIcon": "ICON_SYSTEM_GLOBE"
+    }
+  },
+  "messageKeys": [
+    "WEATHER_TEMPERATURE",
+    "WEATHER_CONDITIONS",
+    "WEATHER_REQUEST",
+    "SETTINGS_REQUEST",
+    "SETTINGS_FRESH",
+    "WEATHER_OK",
+    "WEATHER_HUMIDITY",
+    "WEATHER_WIND_SPEED",
+    "WEATHER_WIND_DIR",
+    "WEATHER_WIND_UNIT",
+    "WEATHER_SUNRISE",
+    "WEATHER_SUNSET",
+    "WEATHER_UV_INDEX",
+    "WEATHER_TEMP_MAX",
+    "WEATHER_TEMP_MIN",
+    "WEATHER_PRECIP_CHANCE",
+    "WEATHER_FEELS_LIKE",
+    "WEATHER_PRESSURE",
+    "WEATHER_DEW_POINT",
+    "WEATHER_FORECAST_HOURLY",
+    "WEATHER_FORECAST_DAILY",
+    "LOCATION_LATITUDE",
+    "LOCATION_LONGITUDE",
+    "LOCATION_NAME",
+    "LOCATION_USE_GPS",
+    "LOCATION_GPS_FALLBACK",
+    "WEATHER_PROVIDER",
+    "WEATHER_API_KEY",
+    "WEATHER_TEMPERATURE_UNIT",
+    "CLOCK_DATE_FORMAT",
+    "APPEARANCE_THEME",
+    "APPEARANCE_HEADER_FONT",
+    "APPEARANCE_ANALOG_STYLE",
+    "APPEARANCE_CUSTOM_COLORS",
+    "HEALTH_STEPS_MODE",
+    "HEALTH_DISTANCE_UNIT",
+    "CLOCK_TIME_FORMAT",
+    "CLOCK_HOURLY_VIBE",
+    "CONNECTION_BLUETOOTH_ICON",
+    "CONNECTION_VIBE_CONNECT",
+    "CONNECTION_VIBE_DISCONNECT",
+    "LAYOUT",
+    "HEALTH_GOAL_STEPS",
+    "HEALTH_GOAL_CALORIES",
+    "HEALTH_GOAL_SLEEP",
+    "HEALTH_GOAL_ACTIVE",
+    "HEALTH_GOAL_HR",
+    "HEALTH_GOAL_DISTANCE",
+    "HEALTH_GOAL_VIBE",
+    "HEALTH_GOAL_VIBE_CUSTOM",
+    "CLOCK_TIMEZONE_1",
+    "STOCK_PROVIDER",
+    "STOCK_API_KEY",
+    "STOCK_SYMBOLS",
+    "STOCK_POLL",
+    "STOCK_STRIP",
+    "STOCK_REQUEST",
+    "CALENDAR_ICS_URL",
+    "CALENDAR_POLL",
+    "CALENDAR_VIBE_MODE",
+    "CALENDAR_VIBE_15MIN",
+    "CALENDAR_VIBE_5MIN",
+    "CALENDAR_VIBE_START",
+    "CALENDAR_STRIP",
+    "CALENDAR_REQUEST",
+    "CLOCK_WEEK_START",
+    "LAYOUT_SLOTS",
+    "LAYOUT_NIGHT",
+    "LAYOUT_NIGHT_MODE",
+    "LAYOUT_NIGHT_START",
+    "LAYOUT_NIGHT_END"
+  ],
+  "resources": {
+    "media": [
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S0_TALL",
+        "file": "analog/ANALOG_S0_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S0_SHORT",
+        "file": "analog/ANALOG_S0_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S1_TALL",
+        "file": "analog/ANALOG_S1_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S1_SHORT",
+        "file": "analog/ANALOG_S1_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S2_TALL",
+        "file": "analog/ANALOG_S2_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S2_SHORT",
+        "file": "analog/ANALOG_S2_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S3_TALL",
+        "file": "analog/ANALOG_S3_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S3_SHORT",
+        "file": "analog/ANALOG_S3_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S4_TALL",
+        "file": "analog/ANALOG_S4_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S4_SHORT",
+        "file": "analog/ANALOG_S4_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S5_TALL",
+        "file": "analog/ANALOG_S5_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S5_SHORT",
+        "file": "analog/ANALOG_S5_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S6_TALL",
+        "file": "analog/ANALOG_S6_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S6_SHORT",
+        "file": "analog/ANALOG_S6_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S7_TALL",
+        "file": "analog/ANALOG_S7_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S7_SHORT",
+        "file": "analog/ANALOG_S7_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S8_TALL",
+        "file": "analog/ANALOG_S8_TALL.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ANALOG_S8_SHORT",
+        "file": "analog/ANALOG_S8_SHORT.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_CLEAR",
+        "file": "icons/weather-now-clear.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_CLEAR",
+        "file": "icons/weather-now-night-clear.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_CLOUDY",
+        "file": "icons/weather-now-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_FOG",
+        "file": "icons/weather-now-fog.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_DRIZZLE",
+        "file": "icons/weather-now-drizzle.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_RAIN",
+        "file": "icons/weather-now-rain.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_SLEET",
+        "file": "icons/weather-now-sleet.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_SNOW",
+        "file": "icons/weather-now-snow.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_SHOWERS",
+        "file": "icons/weather-now-showers.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_SNOW_WIND",
+        "file": "icons/weather-now-snow-wind.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_THUNDERSTORM",
+        "file": "icons/weather-now-thunderstorm.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NA",
+        "file": "icons/weather-now-na.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_PARTLY_CLOUDY",
+        "file": "icons/weather-now-partly-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_CLEAR",
+        "file": "icons/weather-fc-clear.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_PARTLY_CLOUDY",
+        "file": "icons/weather-fc-partly-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_CLOUDY",
+        "file": "icons/weather-fc-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_FOG",
+        "file": "icons/weather-fc-fog.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_DRIZZLE",
+        "file": "icons/weather-fc-drizzle.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_SLEET",
+        "file": "icons/weather-fc-sleet.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_RAIN",
+        "file": "icons/weather-fc-rain.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_SNOW",
+        "file": "icons/weather-fc-snow.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_SHOWERS",
+        "file": "icons/weather-fc-showers.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_SNOW_WIND",
+        "file": "icons/weather-fc-snow-wind.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_THUNDERSTORM",
+        "file": "icons/weather-fc-thunderstorm.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NA",
+        "file": "icons/weather-fc-na.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_CLEAR",
+        "file": "icons/weather-fc-night-clear.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_PARTLY_CLOUDY",
+        "file": "icons/weather-fc-night-partly-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_CLOUDY",
+        "file": "icons/weather-fc-night-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_FOG",
+        "file": "icons/weather-fc-night-fog.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_DRIZZLE",
+        "file": "icons/weather-fc-night-drizzle.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_SLEET",
+        "file": "icons/weather-fc-night-sleet.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_RAIN",
+        "file": "icons/weather-fc-night-rain.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_SNOW",
+        "file": "icons/weather-fc-night-snow.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_SHOWERS",
+        "file": "icons/weather-fc-night-showers.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_SNOW_WIND",
+        "file": "icons/weather-fc-night-snow-wind.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_FC_NIGHT_THUNDERSTORM",
+        "file": "icons/weather-fc-night-thunderstorm.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_PARTLY_CLOUDY",
+        "file": "icons/weather-now-night-partly-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_CLOUDY",
+        "file": "icons/weather-now-night-cloudy.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_FOG",
+        "file": "icons/weather-now-night-fog.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_DRIZZLE",
+        "file": "icons/weather-now-night-drizzle.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_SLEET",
+        "file": "icons/weather-now-night-sleet.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_RAIN",
+        "file": "icons/weather-now-night-rain.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_SNOW",
+        "file": "icons/weather-now-night-snow.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_SHOWERS",
+        "file": "icons/weather-now-night-showers.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_SNOW_WIND",
+        "file": "icons/weather-now-night-snow-wind.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_NOW_NIGHT_THUNDERSTORM",
+        "file": "icons/weather-now-night-thunderstorm.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_SUNRISE",
+        "file": "icons/weather-sunrise.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_SUNSET",
+        "file": "icons/weather-sunset.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_HUMIDITY",
+        "file": "icons/weather-humidity.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND",
+        "file": "icons/weather-wind.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_N",
+        "file": "icons/weather-wind-n.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_NE",
+        "file": "icons/weather-wind-ne.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_E",
+        "file": "icons/weather-wind-e.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_SE",
+        "file": "icons/weather-wind-se.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_S",
+        "file": "icons/weather-wind-s.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_SW",
+        "file": "icons/weather-wind-sw.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_W",
+        "file": "icons/weather-wind-w.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_WIND_NW",
+        "file": "icons/weather-wind-nw.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_HEALTH_HEART",
+        "file": "icons/health-heart.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_UV",
+        "file": "icons/weather-uv.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_HILO_UP",
+        "file": "icons/weather-hilo-up.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_HILO_DOWN",
+        "file": "icons/weather-hilo-down.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_WEATHER_THERMOMETER",
+        "file": "icons/weather-thermometer.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_HEALTH_CALORIES",
+        "file": "icons/health-calories.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_SYSTEM_SNOOZE",
+        "file": "icons/system-snooze.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_LATE",
+        "file": "icons/time-late.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_HEALTH_STEPS",
+        "file": "icons/health-steps.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_HEALTH_DISTANCE",
+        "file": "icons/health-distance.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_CLOCK",
+        "file": "icons/time-clock.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_DATE_TIME",
+        "file": "icons/date-time.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_SYSTEM_GLOBE",
+        "file": "icons/system-globe.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_CONNECTION_BLUETOOTH_ON",
+        "file": "icons/connection-bluetooth-on.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_CONNECTION_BLUETOOTH_OFF",
+        "file": "icons/connection-bluetooth-off.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_CONNECTION_BLUETOOTH_ON_SM",
+        "file": "icons/connection-bluetooth-on-sm.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_CONNECTION_BLUETOOTH_OFF_SM",
+        "file": "icons/connection-bluetooth-off-sm.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_0",
+        "file": "icons/time-moon-0.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_1",
+        "file": "icons/time-moon-1.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_2",
+        "file": "icons/time-moon-2.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_3",
+        "file": "icons/time-moon-3.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_4",
+        "file": "icons/time-moon-4.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_5",
+        "file": "icons/time-moon-5.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_6",
+        "file": "icons/time-moon-6.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_7",
+        "file": "icons/time-moon-7.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_8",
+        "file": "icons/time-moon-8.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_9",
+        "file": "icons/time-moon-9.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_10",
+        "file": "icons/time-moon-10.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_11",
+        "file": "icons/time-moon-11.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_12",
+        "file": "icons/time-moon-12.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_13",
+        "file": "icons/time-moon-13.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_14",
+        "file": "icons/time-moon-14.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_15",
+        "file": "icons/time-moon-15.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_16",
+        "file": "icons/time-moon-16.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_17",
+        "file": "icons/time-moon-17.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_18",
+        "file": "icons/time-moon-18.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_19",
+        "file": "icons/time-moon-19.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_20",
+        "file": "icons/time-moon-20.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_21",
+        "file": "icons/time-moon-21.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_22",
+        "file": "icons/time-moon-22.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_23",
+        "file": "icons/time-moon-23.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_24",
+        "file": "icons/time-moon-24.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_25",
+        "file": "icons/time-moon-25.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_26",
+        "file": "icons/time-moon-26.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_27",
+        "file": "icons/time-moon-27.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_0",
+        "file": "icons/time-moon-lg-0.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_1",
+        "file": "icons/time-moon-lg-1.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_2",
+        "file": "icons/time-moon-lg-2.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_3",
+        "file": "icons/time-moon-lg-3.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_4",
+        "file": "icons/time-moon-lg-4.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_5",
+        "file": "icons/time-moon-lg-5.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_6",
+        "file": "icons/time-moon-lg-6.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_7",
+        "file": "icons/time-moon-lg-7.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_8",
+        "file": "icons/time-moon-lg-8.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_9",
+        "file": "icons/time-moon-lg-9.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_10",
+        "file": "icons/time-moon-lg-10.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_11",
+        "file": "icons/time-moon-lg-11.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_12",
+        "file": "icons/time-moon-lg-12.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_13",
+        "file": "icons/time-moon-lg-13.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_14",
+        "file": "icons/time-moon-lg-14.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_15",
+        "file": "icons/time-moon-lg-15.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_16",
+        "file": "icons/time-moon-lg-16.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_17",
+        "file": "icons/time-moon-lg-17.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_18",
+        "file": "icons/time-moon-lg-18.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_19",
+        "file": "icons/time-moon-lg-19.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_20",
+        "file": "icons/time-moon-lg-20.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_21",
+        "file": "icons/time-moon-lg-21.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_22",
+        "file": "icons/time-moon-lg-22.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_23",
+        "file": "icons/time-moon-lg-23.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_24",
+        "file": "icons/time-moon-lg-24.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_25",
+        "file": "icons/time-moon-lg-25.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_26",
+        "file": "icons/time-moon-lg-26.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_TIME_MOON_LG_27",
+        "file": "icons/time-moon-lg-27.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_SYSTEM_VOLUME_MUTED",
+        "file": "icons/system-volume-muted.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ICON_SYSTEM_VOLUME_FULL",
+        "file": "icons/system-volume-full.png"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_96",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_88",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_72",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_54",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:@APM ]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_46",
+        "file": "fonts/Teko-SemiBold.ttf",
+        "characterRegex": "[0-9:@APM ]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_34",
+        "file": "fonts/Teko-SemiBold.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_26",
+        "file": "fonts/Teko-SemiBold.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_24",
+        "file": "fonts/Teko-SemiBold.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_22",
+        "file": "fonts/Teko-SemiBold.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_14",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_STM_12",
+        "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_LECO_12",
+        "file": "fonts/LECO2014-Regular.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 12
+      },
+      {
+        "type": "font",
+        "name": "FONT_PRESS_8",
+        "file": "fonts/PressStart2P-Regular.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 8
+      },
+      {
+        "type": "font",
+        "name": "FONT_PIXELIFY_12",
+        "file": "fonts/PixelifySans.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 12
+      },
+      {
+        "type": "font",
+        "name": "FONT_ALDRICH_11",
+        "file": "fonts/Aldrich-Regular.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 11
+      },
+      {
+        "type": "font",
+        "name": "FONT_KODEMONO_12",
+        "file": "fonts/KodeMono-SemiBold.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 12
+      },
+      {
+        "type": "font",
+        "name": "FONT_ELECTRO_12",
+        "file": "fonts/Electrolize-Regular.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 12
+      },
+      {
+        "type": "font",
+        "name": "FONT_QUANTICO_11",
+        "file": "fonts/Quantico-Bold.ttf",
+        "characterRegex": "[A-Z0-9 /.'-]",
+        "pixelHeight": 11
+      },
+      {
+        "type": "raw",
+        "name": "NOTICE",
+        "file": "notice.txt"
+      }
+    ]
+  }
+}

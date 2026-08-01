@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        face: [lcars-stardate, radar-array, ide-vscode, ridgeline, shoreline, treeline]
+        face: [lcars-stardate, radar-array, ide-vscode, gridlock, ridgeline, shoreline, treeline]
     steps:
       - uses: actions/checkout@v7
 
@@ -26,15 +26,53 @@ jobs:
       # build.sh <face> regenerates the manifest, compiles watchfaces/<face>/src/pkjs + lib/ts
       # into targets/<face>/emit/, then runs `pebble build`. node (setup-node) and pebble (uv,
       # on GITHUB_PATH) are both available here.
+      # tee'd because the SDK's memory report is printed during the link and is the only place
+      # the heap figure exists. shell: bash for pipefail, or a failed build would pass as long as
+      # tee succeeded
       - name: Build Watchface
-        run: bash build.sh ${{ matrix.face }}
+        shell: bash
+        run: bash build.sh ${{ matrix.face }} | tee build-${{ matrix.face }}.log
 
+      # one row per target, collected by the memory job below. GITHUB_STEP_SUMMARY is per job, so
+      # a table written here would be one of seven scattered across the matrix
+      - name: Collect Memory Usage
+        if: always()
+        run: bash tools/ci/report-memory.sh build-${{ matrix.face }}.log ${{ matrix.face }} mem-${{ matrix.face }}.tsv
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mem-${{ matrix.face }}
+          path: mem-${{ matrix.face }}.tsv
+          if-no-files-found: warn
+
+      # a face usually builds one sandbox (targets/<face>/), but gridlock builds two
+      # (targets/gridlock-face/ and targets/gridlock-app/). the <face>* glob catches both
+      # while still matching the single sandbox for every other face
       - uses: actions/upload-artifact@v7
         with:
           name: pbw-${{ matrix.face }}
           path: |
-            targets/${{ matrix.face }}/build/*.pbw
+            targets/${{ matrix.face }}*/build/*.pbw
           if-no-files-found: error
+
+  # every face's memory in one table, which is the only shape that answers "which one is closest
+  # to the edge". always() so a single face failing to build still reports the rest
+  memory:
+    runs-on: ubuntu-latest
+    needs: pebble
+    if: always()
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: mem-*
+          path: mem
+          merge-multiple: true
+
+      - name: Memory Summary
+        run: bash tools/ci/render-memory.sh mem
 
   vitest:
     runs-on: ubuntu-latest
