@@ -30,8 +30,8 @@ rows=$(find "$dir" -name '*.tsv' -exec cat {} + 2>/dev/null | grep -v '^[[:space
 report=$(printf '%s\n' "$rows" | sort -t$'\t' -k3,3nr | awk -F'\t' '
   BEGIN {
     limit = 65536   # inject_metadata.py MAX_APP_BINARY_SIZE, not the platform config
-    print "## Watchface memory\n"
-    print "| Face | Target | App image | of 64 KB | Free heap | Resources |"
+    print "## Watchface Memory\n"
+    print "| Face | Target | App Image | of 64 KB | Free Heap | Resources |"
     print "| :--- | :--- | ---: | ---: | ---: | ---: |"
   }
   {
@@ -49,13 +49,11 @@ report=$(printf '%s\n' "$rows" | sort -t$'\t' -k3,3nr | awk -F'\t' '
   }
   END {
     print ""
-    print "**App image** is what fails a build. `inject_metadata.py` carries its own"
-    print "`MAX_APP_BINARY_SIZE = 0x10000` and nothing overrides it from the platform config, so the"
-    print "cap is 64 KB even though emery is listed at 128 KB. Going over raises"
-    print "_\"App image size is N ... Must be smaller than 65536 bytes\"_ at link time."
+    print "**App Image** is the build limit. Pebble enforces a 64 KB maximum"
+    print "(`MAX_APP_BINARY_SIZE = 0x10000`), even though emery lists 128 KB of app storage."
     print ""
-    print "**Free heap** is what is left of 128 KB of RAM for everything allocated while it runs:"
-    print "layers, fonts, the icon cache and the settings blobs."
+    print "**Free Heap** is the RAM left over from the watch's 128 KB after the app,"
+    print "system allocations and resources."
   }
 ')
 

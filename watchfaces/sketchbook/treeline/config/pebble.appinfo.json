@@ -1,7 +1,7 @@
 {
   "name": "treeline",
   "displayName": "Treeline",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "watchface": true,
   "uuid": "c368770c-05ea-41ed-8100-5cb19af657df",
   "sdkVersion": "3",

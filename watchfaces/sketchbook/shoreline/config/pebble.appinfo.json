@@ -1,7 +1,7 @@
 {
   "name": "shoreline",
   "displayName": "Shoreline",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "watchface": true,
   "uuid": "6847af9e-09fa-499a-8ac4-319253568339",
   "sdkVersion": "3",

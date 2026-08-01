@@ -95,6 +95,46 @@ GPoint sketchbook_sky_arc_point(int progress)
 }
 
 /**
+ * @brief Whether the lower sky has taken over at this pixel of the stippled blend.
+ *
+ * The one place the dither pattern is decided, so anything drawing over the sky can ask for the
+ * same answer the sky itself gave.
+ *
+ * @param x The pixel's column.
+ * @param y The pixel's row, inside the blend band.
+ * @return True when the lower sky shows through here.
+ */
+static bool sky_blend_takes_over(int x, int y)
+{
+    int level = ((y - SKETCHBOOK_SKY_BAND_Y) * 8) / SKETCHBOOK_SKY_BLEND_H;
+
+    // offsetting the pattern per row stops the kept pixels stacking into columns
+    return (x + (y - SKETCHBOOK_SKY_BAND_Y) * 3) % 8 < level;
+}
+
+/**
+ * @brief The sky colour at one pixel, blend and all.
+ *
+ * @param pal The palette in use.
+ * @param x The pixel's column.
+ * @param y The pixel's row.
+ * @return The colour the sky is painted there.
+ */
+static GColor sky_colour_at(const Palette *pal, int x, int y)
+{
+    if (y < SKETCHBOOK_SKY_BAND_Y)
+    {
+        return pal->sky_hi;
+    }
+    if (y >= SKETCHBOOK_SKY_BAND_Y + SKETCHBOOK_SKY_BLEND_H)
+    {
+        return pal->sky_lo;
+    }
+
+    return sky_blend_takes_over(x, y) ? pal->sky_lo : pal->sky_hi;
+}
+
+/**
  * @brief Fill the sky: the upper band, the lower band, and a stippled blend between them.
  *
  * @param ctx The graphics context.
@@ -116,11 +156,9 @@ void sketchbook_sky_draw_bands(GContext *ctx, GRect bounds, const Palette *pal)
     graphics_context_set_stroke_color(ctx, pal->sky_lo);
     for (int y = SKETCHBOOK_SKY_BAND_Y; y < blend_end; y++)
     {
-        int level = ((y - SKETCHBOOK_SKY_BAND_Y) * 8) / SKETCHBOOK_SKY_BLEND_H;
         for (int x = 0; x < bounds.size.w; x++)
         {
-            // offsetting the pattern per row stops the kept pixels stacking into columns
-            if ((x + (y - SKETCHBOOK_SKY_BAND_Y) * 3) % 8 < level)
+            if (sky_blend_takes_over(x, y))
             {
                 graphics_draw_pixel(ctx, GPoint(x, y));
             }
@@ -216,11 +254,47 @@ static void draw_sun(GContext *ctx, const Palette *pal, GPoint at)
 }
 
 /**
+ * @brief Whether the shadow covers this pixel, which is what carves the lit shape.
+ *
+ * The dark part of a crescent or gibbous is a second circle laid over the disc, and how far it
+ * is offset is what decides the phase. The quarters are a straight half instead, since an
+ * offset circle can only ever give a curved edge.
+ *
+ * @param phase The glyph index, 0 new through 4 full to 7 waning crescent.
+ * @param at The disc's centre.
+ * @param x The pixel's column.
+ * @param y The pixel's row.
+ * @return True when this pixel is in shadow.
+ */
+static bool moon_shadow_covers(int phase, GPoint at, int x, int y)
+{
+    int dx;
+    int dy = y - at.y;
+
+    switch (phase)
+    {
+        case 0: return true;        // new: nothing lit, so only the outline is left behind
+        case 2: return x < at.x;    // first quarter: the left half is dark
+        case 6: return x > at.x;    // last quarter: the right half is dark
+        case 1: dx = x - (at.x - (SKETCHBOOK_DISC_R * 6) / 10); break;   // waxing crescent
+        case 3: dx = x - (at.x - (SKETCHBOOK_DISC_R * 14) / 10); break;  // waxing gibbous
+        case 5: dx = x - (at.x + (SKETCHBOOK_DISC_R * 14) / 10); break;  // waning gibbous
+        case 7: dx = x - (at.x + (SKETCHBOOK_DISC_R * 6) / 10); break;   // waning crescent
+        default: return false;      // full: the whole disc stays lit
+    }
+
+    return dx * dx + dy * dy <= SKETCHBOOK_DISC_R * SKETCHBOOK_DISC_R;
+}
+
+/**
  * @brief Draw the moon at tonight's phase.
  *
- * The lit shape is carved rather than drawn: the whole disc goes down first, then a
- * sky-coloured circle (or half-rect at the quarters) is laid over it, and how far that
- * overlay is offset is what turns a crescent into a gibbous.
+ * The lit shape is carved rather than drawn: the whole disc goes down first, then the shadow is
+ * painted back over it in whatever the sky behind it is.
+ *
+ * That last part is per pixel rather than one flat fill. The disc sits over the stippled blend
+ * between the two sky bands for most of its arc, and no single colour matches a dither, so a
+ * flat shadow reads as a patch of the wrong blue floating on the moon.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
@@ -228,39 +302,30 @@ static void draw_sun(GContext *ctx, const Palette *pal, GPoint at)
  */
 static void draw_moon(GContext *ctx, const Palette *pal, GPoint at)
 {
-    // the overlay has to match whatever sky is behind the disc, or the shadow shows as a patch
-    GColor behind = at.y < SKETCHBOOK_SKY_BAND_Y ? pal->sky_hi : pal->sky_lo;
     int phase = moon_glyph_index(time(NULL), 8);
 
     graphics_context_set_fill_color(ctx, pal->disc);
     graphics_fill_circle(ctx, at, SKETCHBOOK_DISC_R);
 
-    graphics_context_set_fill_color(ctx, behind);
-    switch (phase)
+    for (int y = at.y - SKETCHBOOK_DISC_R; y <= at.y + SKETCHBOOK_DISC_R; y++)
     {
-        case 0:  // new: nothing lit, so only the outline is left behind
-            graphics_fill_circle(ctx, at, SKETCHBOOK_DISC_R);
-            break;
-        case 1:  // waxing crescent: lit down the right edge
-            graphics_fill_circle(ctx, GPoint(at.x - (SKETCHBOOK_DISC_R * 6) / 10, at.y), SKETCHBOOK_DISC_R);
-            break;
-        case 2:  // first quarter: the left half is dark
-            graphics_fill_rect(ctx, GRect(at.x - SKETCHBOOK_DISC_R, at.y - SKETCHBOOK_DISC_R, SKETCHBOOK_DISC_R, SKETCHBOOK_DISC_R * 2 + 1), 0, GCornerNone);
-            break;
-        case 3:  // waxing gibbous: only a sliver of the left edge is dark
-            graphics_fill_circle(ctx, GPoint(at.x - (SKETCHBOOK_DISC_R * 14) / 10, at.y), SKETCHBOOK_DISC_R);
-            break;
-        case 5:  // waning gibbous
-            graphics_fill_circle(ctx, GPoint(at.x + (SKETCHBOOK_DISC_R * 14) / 10, at.y), SKETCHBOOK_DISC_R);
-            break;
-        case 6:  // last quarter: the right half is dark
-            graphics_fill_rect(ctx, GRect(at.x + 1, at.y - SKETCHBOOK_DISC_R, SKETCHBOOK_DISC_R, SKETCHBOOK_DISC_R * 2 + 1), 0, GCornerNone);
-            break;
-        case 7:  // waning crescent: lit down the left edge
-            graphics_fill_circle(ctx, GPoint(at.x + (SKETCHBOOK_DISC_R * 6) / 10, at.y), SKETCHBOOK_DISC_R);
-            break;
-        default: // full: the whole disc stays lit
-            break;
+        for (int x = at.x - SKETCHBOOK_DISC_R; x <= at.x + SKETCHBOOK_DISC_R; x++)
+        {
+            int dx = x - at.x;
+            int dy = y - at.y;
+
+            if (dx * dx + dy * dy > SKETCHBOOK_DISC_R * SKETCHBOOK_DISC_R)
+            {
+                continue; // outside the disc, so it is sky already
+            }
+            if (!moon_shadow_covers(phase, at, x, y))
+            {
+                continue; // lit, so leave the disc colour showing
+            }
+
+            graphics_context_set_stroke_color(ctx, sky_colour_at(pal, x, y));
+            graphics_draw_pixel(ctx, GPoint(x, y));
+        }
     }
 
     graphics_context_set_stroke_color(ctx, pal->ink);
