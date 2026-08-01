@@ -280,8 +280,14 @@ def build_face(ctx, extra_cflags=None):
 
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
 
+        # a copy per platform, because the SDK appends to whatever list it is handed:
+        # setup_pebble_cprogram adds appinfo.auto.c, resource_ids.auto.c and message_keys.auto.c
+        # through append_to_attr, which extends the list in place. the first two are per-platform
+        # nodes, but message_keys.auto.c lives at build/src/ and is shared, so handing the same
+        # list to both platforms leaves it in there twice and the link fails on multiple
+        # definitions of every MESSAGE_KEY_*
         ctx.pbl_build(
-            source=c_sources,
+            source=list(c_sources),
             target=app_elf,
             bin_type='app'
         )
