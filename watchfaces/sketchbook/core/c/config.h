@@ -30,7 +30,7 @@
 
 // --- what the family fixes ---
 // these do not vary, so they are not the face's to decide
-#define SKETCHBOOK_ARC_CX 100  ///< The arc is centred on the screen for every face in the family
+#define SKETCHBOOK_ARC_CX (PBL_DISPLAY_WIDTH / 2)  ///< The arc is centred on the screen for every face in the family
 #define SKETCHBOOK_DISC_R  12  ///< And every face's sun and moon are the same size
 
 // --- what the face owes us ---
