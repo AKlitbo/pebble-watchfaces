@@ -20,20 +20,21 @@
  */
 
 // --- Scene geometry ---
-#define SKY_BAND_Y 46   ///< Where the upper sky starts giving way to the lower
-#define SKY_BLEND_H 24  ///< How far it takes to get there, stippled so there is no hard seam
-#define HORIZON_Y 108   ///< The arc's baseline, behind the trees, so the sun sets into the forest
-#define ARC_CX 100      ///< Centre of the sun's arc across the sky
-#define ARC_RX 86       ///< How far the arc reaches either side of centre
-#define ARC_RY 72       ///< How high the arc climbs, kept under the status bar
-#define DISC_R 12       ///< Radius of the sun and moon
-
-#define FAR_BASE 113    ///< Where the back treeline stands
-#define NEAR_BASE 129   ///< Where the front treeline and the cabin stand
-#define GROUND_Y 123    ///< Top of the clearing floor. the near trunks stand down into it
-
-#define MIST_TOP 81     ///< Where the mist wash starts thinning out
-#define MIST_BOTTOM 129 ///< Where it stops, just above the clock
+// where the sky, the weather and the arc sit is in sketchbook_config.h, which is what the shared
+// drawing code reads. only what this face draws for itself lives here
+//
+// the round screen is 30% wider and only 14% taller, so the forest is not a straight scale of the
+// rectangle: the treelines spread to the new width and drop far enough that the clearing still
+// has the clock's whole band under them
+#if defined(PBL_ROUND)
+#define FAR_BASE 126    ///< Where the back treeline stands
+#define NEAR_BASE 145   ///< Where the front treeline and the cabin stand
+#define GROUND_Y 138    ///< Top of the clearing floor. the near trunks stand down into it
+#else
+#define FAR_BASE 113
+#define NEAR_BASE 129
+#define GROUND_Y 123
+#endif
 
 /**
  * @brief Paint the whole scene: sky, stars, arc, disc, treelines, cabin, smoke and weather.

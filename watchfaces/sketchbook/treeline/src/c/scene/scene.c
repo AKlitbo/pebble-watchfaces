@@ -12,14 +12,17 @@
 #include "weather/wind_dir.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
+#include "ui/readouts.h"
+#include "ui/fonts.h"
+#include "sketchbook/draw/fonts.h"
 
 /**
  * @addtogroup watchface-treeline
  * @{
  */
 
-// the platform says how wide it is, so the sea and the shore run to whichever screen they are on
-// rather than stopping at 200 and leaving a straight edge partway across a round one
+// the platform says how wide it is, so the treelines and the clearing run to whichever screen
+// they are on rather than stopping at 200 and leaving a straight edge partway across a round one
 #define SCREEN_W PBL_DISPLAY_WIDTH
 
 // the wind speed at which the plume is bent as far over as it goes. past this it is already
@@ -28,12 +31,37 @@
 
 // the cabin, measured off the treeline it stands in rather than pinned to rows of its own, so
 // moving the treeline moves the whole building instead of squashing it
+#if defined(PBL_ROUND)
+#define CABIN_LEFT 20
+#define CABIN_RIGHT 96
+#define CABIN_WALL_TOP (NEAR_BASE - 38)
+#define CABIN_RIDGE (CABIN_WALL_TOP - 18)
+#define STACK_X 78
+#define CABIN_DOOR_DX 12
+#define CABIN_DOOR_W 14
+#define CABIN_DOOR_H 18
+#define CABIN_WIN_DX 42
+#define CABIN_WIN_W 20
+#define CABIN_WIN_H 14
+// the board the temperature is lettered on, nailed across the front above the door and window.
+// the cabin is this face's one built thing, so the reading rides it the way shoreline's rides
+// the boat rather than standing on a post of its own
+#define CABIN_BOARD_INSET 4
+#define CABIN_BOARD_H 17
+#else
 #define CABIN_LEFT 14
 #define CABIN_RIGHT 74
-#define CABIN_MID ((CABIN_LEFT + CABIN_RIGHT) / 2)
 #define CABIN_WALL_TOP (NEAR_BASE - 26)
 #define CABIN_RIDGE (CABIN_WALL_TOP - 15)
 #define STACK_X 60
+#define CABIN_DOOR_DX 8
+#define CABIN_DOOR_W 11
+#define CABIN_DOOR_H 15
+#define CABIN_WIN_DX 30
+#define CABIN_WIN_W 16
+#define CABIN_WIN_H 13
+#endif
+#define CABIN_MID ((CABIN_LEFT + CABIN_RIGHT) / 2)
 #define STACK_TOP (CABIN_RIDGE - 5)
 #define STACK_BOTTOM (CABIN_WALL_TOP - 1)
 
@@ -58,19 +86,35 @@ static const SketchbookStar s_stars[] = {
 };
 
 // the back treeline: small, crowded and even, which is what makes it read as distance
+#if defined(PBL_ROUND)
+static const Fir s_far[] = {
+    {8, 22, 7, 0},   {26, 26, 8, 2},  {43, 20, 7, -1}, {60, 28, 9, 1},  {78, 23, 7, 0},
+    {95, 27, 8, 2},  {112, 21, 7, -1}, {129, 29, 9, 1}, {146, 24, 8, 0}, {163, 27, 8, 2},
+    {180, 22, 7, -1}, {197, 28, 9, 1}, {213, 23, 7, 0}, {230, 26, 8, 2}, {246, 21, 7, -1},
+    {258, 24, 8, 1},
+};
+#else
 static const Fir s_far[] = {
     {6, 20, 6, 0},  {20, 24, 7, 2},  {33, 18, 6, -1}, {46, 26, 8, 1},  {60, 21, 6, 0},
     {73, 25, 7, 2}, {86, 19, 6, -1}, {99, 27, 8, 1},  {112, 22, 7, 0}, {125, 25, 7, 2},
     {138, 20, 6, -1}, {151, 26, 8, 1}, {164, 21, 6, 0}, {177, 24, 7, 2}, {190, 19, 6, -1},
     {198, 23, 7, 1},
 };
+#endif
 
 // the front treeline: bigger, sparser and staggered, and it leaves the left third clear for the
 // cabin to stand in
+#if defined(PBL_ROUND)
+static const Fir s_near[] = {
+    {4, 48, 16, 2},    {104, 50, 17, 1}, {130, 54, 18, -1}, {156, 46, 15, 3},
+    {182, 56, 19, -2}, {208, 48, 16, 2}, {232, 54, 17, 0},  {256, 45, 15, 3},
+};
+#else
 static const Fir s_near[] = {
     {2, 44, 15, 2},   {62, 46, 16, 1},  {86, 50, 17, -1}, {110, 42, 14, 3},
     {134, 52, 18, -2}, {158, 44, 15, 2}, {180, 50, 16, 0}, {198, 41, 14, 3},
 };
+#endif
 
 // snow lies where snow falls, so it rides the two snow rows and nothing else. sleet is
 // left off: it does not settle on a fir
@@ -246,12 +290,13 @@ static void draw_cabin(GContext *ctx, const Palette *pal, bool night, bool snow)
 
     // the door
     graphics_context_set_fill_color(ctx, pal->roof);
-    graphics_fill_rect(ctx, GRect(left + 8, base - 15, 11, 15), 0, GCornerNone);
+    GRect door = GRect(left + CABIN_DOOR_DX, base - CABIN_DOOR_H, CABIN_DOOR_W, CABIN_DOOR_H);
+    graphics_fill_rect(ctx, door, 0, GCornerNone);
     graphics_context_set_stroke_color(ctx, pal->ink);
-    graphics_draw_rect(ctx, GRect(left + 8, base - 15, 11, 15));
+    graphics_draw_rect(ctx, door);
 
     // and the window, which is the whole point of the cabin after dark
-    GRect pane = GRect(left + 30, base - 17, 16, 13);
+    GRect pane = GRect(left + CABIN_WIN_DX, base - CABIN_WIN_H - 4, CABIN_WIN_W, CABIN_WIN_H);
     graphics_context_set_fill_color(ctx, night ? pal->glow : pal->roof);
     graphics_fill_rect(ctx, pane, 0, GCornerNone);
     graphics_context_set_stroke_color(ctx, pal->ink);
@@ -260,6 +305,46 @@ static void draw_cabin(GContext *ctx, const Palette *pal, bool night, bool snow)
                             GPoint(pane.origin.x + pane.size.w / 2, pane.origin.y + pane.size.h - 1));
     graphics_draw_line(ctx, GPoint(pane.origin.x, pane.origin.y + pane.size.h / 2),
                             GPoint(pane.origin.x + pane.size.w - 1, pane.origin.y + pane.size.h / 2));
+
+#if defined(PBL_ROUND)
+    // the reading, lettered on a board nailed across the front. filled with the sky and lettered
+    // in ink, because ink over sky is the one pairing the palette guarantees. filling it with the
+    // wall instead would ride on cabin-against-ink holding up in every theme, which is the sort of
+    // assumption that leaves a reading invisible on half of them
+    char temp[16];
+    readout_weather_temp(temp, sizeof(temp));
+
+    // sized to the reading rather than the wall, so it reads as a plaque over the door and leaves
+    // the logs either side of it showing. a floor keeps a short reading from looking like a chip,
+    // and a ceiling keeps "120F" from running into the eaves
+    GFont font = fonts_get(FONT_HAND_16);
+    GSize reading = graphics_text_layout_get_content_size(temp, font,
+        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
+
+    int board_w = reading.w + 14;
+    if (board_w < 44)
+    {
+        board_w = 44;
+    }
+    if (board_w > (right - left) - CABIN_BOARD_INSET * 2)
+    {
+        board_w = (right - left) - CABIN_BOARD_INSET * 2;
+    }
+
+    GRect board = GRect(CABIN_MID - board_w / 2, wall_top + 3, board_w, CABIN_BOARD_H);
+
+    graphics_context_set_fill_color(ctx, pal->sky_hi);
+    graphics_context_set_stroke_color(ctx, pal->ink);
+    graphics_fill_rect(ctx, board, 0, GCornerNone);
+    graphics_draw_rect(ctx, board);
+
+    // the hand font hangs low in its line box, so the text starts above the board to land the
+    // lettering in the middle of it
+    graphics_context_set_text_color(ctx, pal->ink);
+    graphics_draw_text(ctx, temp, font,
+        GRect(board.origin.x, board.origin.y - 2, board.size.w, CABIN_BOARD_H + 8),
+        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+#endif
 }
 
 /**
@@ -320,6 +405,46 @@ static void draw_ground(GContext *ctx, GRect bounds, const Palette *pal)
     graphics_fill_rect(ctx, GRect(0, GROUND_Y, bounds.size.w, bounds.size.h - GROUND_Y), 0, GCornerNone);
 }
 
+#if defined(PBL_ROUND)
+// fallen needles on the clearing floor, lying flat rather than standing up, which is what keeps
+// them reading as forest litter instead of grass. a fixed scatter, so the floor is the same every
+// time you look at it
+//
+// nothing sits below the clock's cap line across the middle, or the litter comes up between the
+// digits. out at the sides the digits never reach, so the floor carries on down the edges there
+static const GPoint s_litter[] = {
+    {16, 150}, {38, 146}, {58, 151}, {78, 148}, {100, 151}, {120, 147}, {140, 151},
+    {160, 148}, {180, 151}, {200, 146}, {220, 150}, {240, 148},
+    {22, 164}, {40, 172}, {16, 179},
+    {228, 163}, {244, 171}, {220, 178},
+};
+
+/**
+ * @brief Scatter fallen needles across the clearing.
+ *
+ * Drawn in the colour the palette guarantees over the ground rather than the ink the trees take,
+ * because this lies on the floor rather than against the sky.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ */
+static void draw_litter(GContext *ctx, const Palette *pal)
+{
+    graphics_context_set_stroke_color(ctx, pal->dim);
+    graphics_context_set_stroke_width(ctx, 1);
+
+    for (unsigned i = 0; i < ARRAY_LENGTH(s_litter); i++)
+    {
+        GPoint at = s_litter[i];
+
+        // alternating lie, so the scatter does not comb one way
+        int tilt = (i & 1) ? 2 : -2;
+        graphics_draw_line(ctx, GPoint(at.x - 3, at.y - tilt), GPoint(at.x + 3, at.y + tilt));
+        graphics_draw_line(ctx, GPoint(at.x + 1, at.y + 3), GPoint(at.x + 5, at.y + 1));
+    }
+}
+#endif
+
 void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
 {
     bool night = sketchbook_sky_night();
@@ -363,6 +488,10 @@ void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
     draw_cabin(ctx, pal, night, snowy(cond));
 
     draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, pal->tree, pal->ink, snowy(cond));
+
+#if defined(PBL_ROUND)
+    draw_litter(ctx, pal);
+#endif
 
     // rain falls in front of everything: it is the nearest thing to you
     sketchbook_fx_draw_precip(ctx, pal, &sky, minute);
