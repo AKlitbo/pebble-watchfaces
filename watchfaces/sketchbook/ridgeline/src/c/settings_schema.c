@@ -108,7 +108,15 @@ const SettingsSchema *ridgeline_settings_schema(void)
 
 uint8_t ridgeline_layout(void)
 {
+    // a round screen ships one layout. the settings store lives on the phone per app, so a value
+    // set on emery follows the user across to a gabbro, and the other two layouts exist in the
+    // code without ever having been laid out for a circle. hiding the picker in the config page
+    // is cosmetic, this is the part that holds
+#if defined(PBL_ROUND)
+    return LAYOUT_STANDARD;
+#else
     return s_settings.layout;
+#endif
 }
 
 bool ridgeline_show_meridiem(void)

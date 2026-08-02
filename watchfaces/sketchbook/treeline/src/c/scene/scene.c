@@ -372,6 +372,13 @@ static void draw_smoke(GContext *ctx, const Palette *pal, int lean, int strength
  */
 static void draw_temp_board(GContext *ctx, const Palette *pal)
 {
+    // no location and no reading means no board at all, rather than a plaque lettered "--".
+    // a blank cabin front is a cabin, an empty sign is a fault
+    if (weather_store_temp() == WEATHER_NO_TEMP)
+    {
+        return;
+    }
+
     const int left = CABIN_LEFT, right = CABIN_RIGHT;
     const int wall_top = CABIN_WALL_TOP;
 

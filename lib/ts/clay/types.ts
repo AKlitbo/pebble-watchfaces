@@ -22,6 +22,11 @@ export interface ClayConfigItem {
   options?: Array<{ label: string; value: string | number }>;
   items?: ClayConfigItem[];
   attributes?: Record<string, unknown>;
+  /** Clay's own per-item filter, resolved against the watch the page was opened from. Names come
+   * from Clay's capability map (PLATFORM_GABBRO, BW, HEALTH and so on) and take a NOT_ prefix to
+   * invert, so ['NOT_PLATFORM_GABBRO'] drops the item on a round watch and keeps it everywhere
+   * else. An item with none declared is always shown. */
+  capabilities?: string[];
   // custom components (layoutBuilder / themeBuilder) carry these
   moduleOptions?: unknown;
   moduleThumbnails?: unknown;

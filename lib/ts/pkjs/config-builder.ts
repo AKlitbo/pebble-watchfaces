@@ -27,7 +27,10 @@ interface ConfigBuilderOptions {
   quietTime?: { description?: string };
   hourlyVibe?: { label?: string; description?: string };
   date?: { label?: string; description?: string; default?: string; options?: Array<{ label: string; value: string | number }> };
-  steps?: { label?: string; description?: string };
+  /** capabilities is Clay's own item filter. A face that shows no step count on some watch
+   * passes e.g. ['NOT_PLATFORM_GABBRO'] and Clay drops the control on that platform for it,
+   * rather than every face losing it. */
+  steps?: { label?: string; description?: string; capabilities?: string[] };
   location?: { gpsDefault?: boolean };
   weather?: unknown;
   temperature?: unknown;
@@ -212,10 +215,16 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
     'items': clockItems,
   });
 
+  // when the steps control is the only thing in this section and it is filtered out, the heading
+  // goes with it. a lone section title with nothing under it reads as a control that failed to
+  // load rather than one that does not apply
+  const healthHeadingCapabilities = steps.capabilities && !options.battery ? steps.capabilities : undefined;
+
   const healthItems: ClayConfigItem[] = [
     {
       'type': 'heading',
       'defaultValue': 'Health',
+      ...(healthHeadingCapabilities ? { 'capabilities': healthHeadingCapabilities } : {}),
     },
     {
       'type': 'select',
@@ -228,6 +237,7 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
         { 'label': 'Distance (Miles)', 'value': 1 },
         { 'label': 'Distance (Kilometers)', 'value': 2 },
       ],
+      ...(steps.capabilities ? { 'capabilities': steps.capabilities } : {}),
     },
   ];
 

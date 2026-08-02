@@ -474,6 +474,13 @@ static void draw_pennant(GContext *ctx, const Palette *pal, int base, int level,
     graphics_context_set_stroke_width(ctx, 1);
     graphics_draw_line(ctx, GPoint(x, mast_top), GPoint(x, y - 4));
 
+    // no location and no reading leaves the mast bare rather than flying a pennant lettered
+    // "--". a boat under bare poles is still a boat
+    if (weather_store_temp() == WEATHER_NO_TEMP)
+    {
+        return;
+    }
+
     // the pennant sits square over the hull rather than hanging off one side of the mast, which
     // read as a sign held out sideways. drawn after the mast, so the mast disappears behind it
     // and shows only in the gap down to the deck

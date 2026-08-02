@@ -33,7 +33,7 @@ const OUT = path.join(import.meta.dirname, 'clay-preview.html');
 
 const face = process.argv[2];
 if (!face || face.startsWith('--')) {
-  console.error('usage: node tools/dev/clay-preview.ts <face> [--watch]');
+  console.error('usage: node tools/dev/clay-preview.ts <face> [--watch] [--platform=emery|gabbro]');
   process.exit(1);
 }
 
@@ -48,13 +48,22 @@ const host = global as unknown as Record<string, unknown>;
 
 if (typeof host.navigator === 'undefined') { host.navigator = { userAgent: 'node' }; }
 if (typeof host.window === 'undefined') { host.window = {}; }
+// which watch the page should think it was opened from. Clay filters items by their declared
+// capabilities against this, so it is what shows the round build losing its rectangle-only
+// controls without a watch in hand. firmware is stubbed alongside the platform because Clay
+// reads both when it resolves a capability
+const platformArg = process.argv.slice(3).find((arg) => arg.startsWith('--platform='));
+const platform = platformArg ? platformArg.slice('--platform='.length) : 'emery';
+
 if (typeof host.Pebble === 'undefined') {
   host.Pebble = {
-    platform: 'emery',
+    platform,
     addEventListener: function () {},
     getAccountToken: function () { return ''; },
     getWatchToken: function () { return ''; },
-    getActiveWatchInfo: function () { return {}; },
+    getActiveWatchInfo: function () {
+      return { platform, firmware: { major: 4, minor: 3, patch: 0 } };
+    },
   };
 }
 // clay reads the values it seeds the page with straight out of localStorage under this key, so
@@ -155,6 +164,16 @@ function build(): void {
   for (const component of components(paths.emit)) {
     clay.registerComponent(component);
   }
+
+  // Clay only fills meta inside its showConfiguration handler, and generateUrl is called here
+  // without one, so the page would carry activeWatchInfo: null and show every item whatever
+  // --platform said. filling it is what makes the capability filter testable off-watch
+  (clay as { meta?: unknown }).meta = {
+    activeWatchInfo: { platform, firmware: { major: 4, minor: 3, patch: 0 } },
+    accountToken: '',
+    watchToken: '',
+    userData: {},
+  };
 
   const html = htmlFromDataUrl(clay.generateUrl());
   fs.writeFileSync(OUT, html);

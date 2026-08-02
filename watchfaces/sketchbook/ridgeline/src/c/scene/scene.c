@@ -369,6 +369,13 @@ static void draw_trail(GContext *ctx, const Palette *pal)
  */
 static void draw_trail_sign(GContext *ctx, const Palette *pal)
 {
+    // no location and no reading means no sign at all, post included, rather than a board
+    // lettered "--". a trail with nothing to say carries no sign
+    if (weather_store_temp() == WEATHER_NO_TEMP)
+    {
+        return;
+    }
+
     char temp[16];
     readout_weather_temp(temp, sizeof(temp));
 
