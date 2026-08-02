@@ -4,6 +4,7 @@
  * It owns the service accessors too so it is the single point of truth for health.
  */
 #include "io/stores/health_store.h"
+#include "io/stores/store_cadence.h"
 #include "io/stores/store_persist.h"
 
 #include <string.h>
@@ -405,6 +406,28 @@ static void on_health_event(HealthEventType event, void *context)
     if (changed && s_cb) s_cb();
 }
 
+/**
+ * @brief The store's turn on the face's cadence, registered at init so no face wires it by hand.
+ *
+ * The health events on their own are not enough to keep the numbers honest. The watch raises a
+ * heart rate event only now and then, which would leave the graph a few stray dots rather than a
+ * line, and movement events stop the moment the wearer goes still, which would strand the step
+ * count on whatever the last one happened to catch. Riding the cadence covers both, and the gates
+ * inside the two refreshes make it free on a turn an event already dealt with.
+ */
+static void cadence_poll(void)
+{
+    if (!s_live)
+    {
+        return;
+    }
+
+    refresh_hr();
+    refresh_activity(false);
+
+    if (s_cb) s_cb();
+}
+
 // --- public API ---
 
 void health_store_subscribe(void (*cb)(void))
@@ -421,6 +444,11 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
     s_active = cfg.active;
     s_calories = cfg.calories;
     s_persist_key = cfg.persist_key;
+
+    // the events alone leave gaps, so take a turn on the face's cadence as well. registering here
+    // rather than leaving it to the face means every face gets it, and the call is idempotent so
+    // the screenshot walk re-initialising the store does not stack them up
+    store_cadence_register(cadence_poll);
 
     // -1 means no reading yet so a panel shows a placeholder until data turns up
     s_state.hr = -1;
@@ -499,27 +527,6 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
         refresh_hr();
         refresh_activity(true);
     }
-}
-
-void health_store_poll_minute(void)
-{
-    if (!s_live)
-    {
-        return;
-    }
-
-    // sample the live heart rate every minute so the graph draws a continuous line. the watch
-    // only raises a heart rate event now and then, which would leave the chart as a few stray
-    // dots, but peeking the filtered value each minute fills the window minute by minute
-    refresh_hr();
-
-    // the activity numbers ride the minute tick too. movement events are what usually refresh
-    // them, but those stop the moment the wearer goes still, which would leave the step count
-    // and anything watching it sitting on whatever the last event happened to catch. the gate
-    // inside makes this free on any minute an event already covered
-    refresh_activity(false);
-
-    if (s_cb) s_cb();
 }
 
 uint8_t *health_store_hr_history(void) { return s_state.hr_history; }

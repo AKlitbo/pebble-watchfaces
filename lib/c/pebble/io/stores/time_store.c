@@ -3,6 +3,7 @@
  * @brief The active time store: holds the current time and owns the tickers that update it.
  */
 #include "io/stores/time_store.h"
+#include "io/stores/store_cadence.h"
 
 #include <time.h>
 
@@ -25,6 +26,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
 static void set(const struct tm *t)
 {
     s_tm = *t;
+
+    // the other stores ride this ticker rather than each running one of their own, so give them
+    // their turn before the face is told, and it repaints once off the fresh numbers
+    store_cadence_fire();
+
     if (s_cb) s_cb();
 }
 
