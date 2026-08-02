@@ -58,6 +58,15 @@
       { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png" },
       {
         "type": "font",
+        "name": "FONT_HAND_82",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]",
+        "targetPlatforms": [
+          "gabbro"
+        ]
+      },
+      {
+        "type": "font",
         "name": "FONT_HAND_92",
         "file": "fonts/PatrickHand-Regular.ttf",
         "characterRegex": "[0-9:@]"

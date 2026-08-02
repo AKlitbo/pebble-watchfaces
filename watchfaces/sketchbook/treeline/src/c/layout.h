@@ -44,8 +44,8 @@ enum
 // sits under it with the whole width still to itself. the temperature comes off this stack
 // entirely and goes into the scene, because a third line down here does not fit
 #if defined(PBL_ROUND)
-#define SLOT_TIME GRect(20, 136, 220, 100)    // clock on the clearing (Hand 92 here, not 72)
-#define SLOT_TIME_SM GRect(20, 152, 220, 100) // nudged down so the smaller tier keeps the baseline
+#define SLOT_TIME GRect(20, 143, 220, 100)    // clock on the clearing (Hand 92 here, not 72)
+#define SLOT_TIME_SM GRect(20, 159, 220, 100) // nudged down so the smaller tier keeps the baseline
 #define SLOT_DATE GRect(20, 225, 220, 28)     // date under the clock (Hand 22)
 #else
 #define SLOT_TIME GRect(4, 108, 192, 86)      // clock on the clearing (Hand 72)
@@ -60,7 +60,7 @@ enum
 #define MERIDIEM_W 40          ///< Box an above-the-colon marker is centred in
 // the round clock is Hand 92, and at the widest time a marker beside it lands hard against the
 // bezel, so there it takes the colon channel like the bigger layouts do
-#define MERIDIEM_TOP PBL_IF_ROUND_ELSE(163, 131)  ///< 2px under the digits' cap line
+#define MERIDIEM_TOP PBL_IF_ROUND_ELSE(169, 131)  ///< 2px under the digits' cap line
 
 // --- Date Top ---
 // the date moves onto the strip but the readouts stay, so the clock only grows into the band the

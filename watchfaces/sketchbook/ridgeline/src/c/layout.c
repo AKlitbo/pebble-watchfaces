@@ -122,23 +122,23 @@ static void apply_layout(void)
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME_BIG;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_BIG_SM;
-        s_zones[ZONE_TIME].font_id = FONT_HAND_92;
+        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_92);
         s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
     }
     else if (layout == LAYOUT_DATE_TOP)
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME_DATETOP;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_DATETOP_SM;
-        s_zones[ZONE_TIME].font_id = FONT_HAND_92;
+        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_92);
         s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
     }
     else
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_SM;
-        // a round screen has the whole mountainside for this layout, so the clock takes the
-        // bigger size and fills the band between the crest and the date rather than floating
-        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_92, FONT_HAND_72);
+        // 82 on the circle rather than 92: at 92 the widest time runs 197px and the glass down
+        // there is only 172 wide, so the outer digits ran into the bezel
+        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_72);
         s_zones[ZONE_TIME].font_id_fallback = PBL_IF_ROUND_ELSE(FONT_HAND_72, FONT_HAND_64);
     }
 }
@@ -167,7 +167,13 @@ static int meridiem_above_top(void)
  */
 static void load_fonts(void)
 {
+    // one clock size per platform: the rectangle draws 92 on its roomier layouts, the circle
+    // draws 82 on its only one, and loading both would hold a font in heap that never renders
+#if defined(PBL_ROUND)
+    fonts_register(FONT_HAND_82, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_82)));
+#else
     fonts_register(FONT_HAND_92, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_92)));
+#endif
     fonts_register(FONT_HAND_72, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_72)));
     fonts_register(FONT_HAND_64, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_64)));
     fonts_register(FONT_HAND_22, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_22)));

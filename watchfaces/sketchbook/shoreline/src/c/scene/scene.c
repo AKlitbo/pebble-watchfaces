@@ -445,7 +445,7 @@ static void draw_surf(GContext *ctx, const Palette *pal, int base)
 
 #if defined(PBL_ROUND)
 /**
- * @brief Fly the temperature from the boat's masthead.
+ * @brief Fly the temperature from the boat's masthead, or a sail when there is no reading.
  *
  * Drawn after the weather rather than with the hull, because the reading is the one thing on the
  * face that has to stay readable in every condition. Painted with the boat it sits behind the
@@ -455,9 +455,10 @@ static void draw_surf(GContext *ctx, const Palette *pal, int base)
  * @param pal The palette in use.
  * @param base The tide base.
  * @param level How far in the tide has come, 0 to 100.
+ * @param rising True while the tide is flooding, which is the way the sail leans.
  * @param minute The current minute.
  */
-static void draw_pennant(GContext *ctx, const Palette *pal, int base, int level, int minute)
+static void draw_pennant(GContext *ctx, const Palette *pal, int base, int level, bool rising, int minute)
 {
     GPoint at = boat_anchor(base, level, minute);
     int x = at.x, y = at.y;
@@ -474,10 +475,24 @@ static void draw_pennant(GContext *ctx, const Palette *pal, int base, int level,
     graphics_context_set_stroke_width(ctx, 1);
     graphics_draw_line(ctx, GPoint(x, mast_top), GPoint(x, y - 4));
 
-    // no location and no reading leaves the mast bare rather than flying a pennant lettered
-    // "--". a boat under bare poles is still a boat
+    // no location and no reading means no pennant, but a mast on its own is a stick rather than
+    // a boat, so it carries a sail instead. the rectangle's boat sails the same way
     if (weather_store_temp() == WEATHER_NO_TEMP)
     {
+        int lean = rising ? 1 : -1;
+        int rows = BOAT_MAST_H - 7;
+
+        graphics_context_set_stroke_color(ctx, pal->foam);
+        for (int row = 1; row <= rows; row++)
+        {
+            int width = (row * 13) / rows;
+            graphics_draw_line(ctx, GPoint(x + lean, mast_top + row),
+                                    GPoint(x + lean * (1 + width), mast_top + row));
+        }
+
+        // the luff back over the fill, so the sail has an edge against the water behind it
+        graphics_context_set_stroke_color(ctx, pal->ink);
+        graphics_draw_line(ctx, GPoint(x + lean * 14, mast_top + rows), GPoint(x, mast_top));
         return;
     }
 
@@ -575,7 +590,7 @@ void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
     // the pennant goes last, after the weather. the reading is the one thing on the face that has
     // to stay readable in every condition, and painted with the hull it sits behind the rain
 #if defined(PBL_ROUND)
-    draw_pennant(ctx, pal, base, level, minute);
+    draw_pennant(ctx, pal, base, level, tide_rising(minutes), minute);
 #endif
 }
 

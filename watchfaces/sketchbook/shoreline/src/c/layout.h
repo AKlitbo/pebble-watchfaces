@@ -44,8 +44,8 @@ enum
 // bottom and the bezel closes in on their ends. the clock and date then space off that row with
 // the same gaps they keep on the rectangle
 #if defined(PBL_ROUND)
-#define SLOT_TIME GRect(20, 136, 220, 100)     // clock on the beach (Hand 92 here, not 72)
-#define SLOT_TIME_SM GRect(20, 152, 220, 100) // nudged down so the smaller tier keeps the baseline
+#define SLOT_TIME GRect(20, 143, 220, 100)     // clock on the beach (Hand 92 here, not 72)
+#define SLOT_TIME_SM GRect(20, 159, 220, 100) // nudged down so the smaller tier keeps the baseline
 #define SLOT_DATE GRect(20, 225, 220, 28)     // date under the clock (Hand 22)
 #else
 #define SLOT_TIME GRect(4, 108, 192, 86)      // clock on the beach (Hand 72)
