@@ -244,7 +244,9 @@ static void init(void)
     if (!dev_seed_stores())
     {
         system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
-        health_store_init((HealthConfig){.enabled = true, .live = true, .persist_key = HEALTH_STORE_KEY}, NULL);
+        // the only face with the two health graphs, so the only one that keeps their history
+        health_store_init((HealthConfig){.enabled = true, .live = true, .hr_history = true,
+                                         .step_history = true, .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick
         time_store_init((TimeConfig){.enabled = true, .live = true, .minute_tick = true, .beats = false}, NULL);
         weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = WEATHER_POLL_MIN, .persist_key = WEATHER_STORE_KEY}, NULL);

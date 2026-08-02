@@ -16,7 +16,6 @@
 
 static struct
 {
-    uint8_t  tag; // STORE_TAG_HEALTH, so a restore can tell this blob from another shape
     int      hr;
     uint8_t  hr_history[HR_HISTORY_MINUTES];
     time_t   hr_last_min; // wall-clock minute of the last history write, so the window can slide
@@ -28,10 +27,25 @@ static struct
     uint16_t step_hourly[HOURS_PER_DAY]; // steps in each hour of today, midnight first
     int      step_hours;                 // how many of those hours are real (0 to 24)
 } s_state;
-_Static_assert(sizeof(s_state) <= PERSIST_DATA_MAX_LENGTH, "health state must fit one persist key");
+
+// the heart rate graph is the only part of the state worth keeping across a relaunch. every other
+// number is read back off the health service before the first paint, so saving those would be
+// write only. the graph is the exception because it cannot be rebuilt the same way: the watch
+// logs a per-minute heart rate too rarely, which is why the store peeks the live value instead
+typedef struct
+{
+    uint8_t tag; // STORE_TAG_HEALTH, so a restore can tell this blob from another shape
+    uint8_t hr_history[HR_HISTORY_MINUTES];
+    time_t  hr_last_min;
+} HealthSaved;
+_Static_assert(sizeof(HealthSaved) <= PERSIST_DATA_MAX_LENGTH, "health blob must fit one persist key");
 
 static void (*s_cb)(void);
 static bool s_live; // true once subscribed to the live health service, so the minute poll is a no-op in seed mode
+// the two history series cost real work to keep, so only a face that graphs one asks for it. the
+// current readings are always tracked, they are cheap and every face shows at least one of them
+static bool s_hr_history;
+static bool s_step_history;
 static uint32_t s_persist_key; // the slot the face handed us for the saved history
 
 // --- health service reads (no-op stubs without PBL_HEALTH) ---
@@ -221,7 +235,14 @@ static void persist_save(void)
     }
     s_saved_min = now_min;
 
-    store_save(s_persist_key, &s_state, sizeof(s_state), STORE_TAG_HEALTH);
+    // zeroed first so the padding between the fields goes to flash as something settled rather
+    // than whatever was on the stack
+    HealthSaved saved;
+    memset(&saved, 0, sizeof(saved));
+    memcpy(saved.hr_history, s_state.hr_history, sizeof(saved.hr_history));
+    saved.hr_last_min = s_state.hr_last_min;
+
+    store_save(s_persist_key, &saved, sizeof(saved), STORE_TAG_HEALTH);
 }
 
 /**
@@ -266,6 +287,14 @@ static void refresh_hr(void)
 {
     int hr = read_hr();
     s_state.hr = hr > 0 ? hr : -1;
+
+    // the reading above is what a face showing a plain heart rate number wants, and that is all
+    // it wants. building the window behind it and writing that to flash is only worth it for a
+    // face that draws the graph
+    if (!s_hr_history)
+    {
+        return;
+    }
 
     hr_history_advance(time(NULL) / SECONDS_PER_MINUTE);
     if (hr > 0)
@@ -312,7 +341,13 @@ static bool refresh_activity(bool force)
     s_state.calories = read_sum_today(HealthMetricActiveKCalories, -1);
     s_state.distance_m = read_sum_today(HealthMetricWalkedDistanceMeters, 0);
 
-    read_step_hourly();
+    // the hourly buckets are the dearest thing in here, a blocking flash scan per hour read, so
+    // they are only built for a face that graphs them
+    if (s_step_history)
+    {
+        read_step_hourly();
+    }
+
     return true;
 }
 
@@ -362,6 +397,8 @@ void health_store_subscribe(void (*cb)(void))
 void health_store_init(HealthConfig cfg, const HealthSeed *seed)
 {
     s_live = false;
+    s_hr_history = cfg.hr_history;
+    s_step_history = cfg.step_history;
     s_persist_key = cfg.persist_key;
 
     // -1 means no reading yet so a panel shows a placeholder until data turns up
@@ -394,18 +431,16 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
             memcpy(s_state.step_hourly, seed->step_hourly, sizeof(s_state.step_hourly));
         }
     }
-    else if (cfg.live)
+    else if (cfg.live && s_hr_history)
     {
         // restore the last graph so a relaunch (navigating away and back) shows it right away.
         // the tag store_restore checks tells this blob apart from an older shape, so a struct
         // change drops the old one instead of reading it as the wrong thing
-        if (store_restore(s_persist_key, &s_state, sizeof(s_state), STORE_TAG_HEALTH))
+        HealthSaved saved;
+        if (store_restore(s_persist_key, &saved, sizeof(saved), STORE_TAG_HEALTH))
         {
-            // step_hours indexes the hourly array, so pin it to a real hour count off flash
-            if (s_state.step_hours < 0 || s_state.step_hours > HOURS_PER_DAY)
-            {
-                s_state.step_hours = 0;
-            }
+            memcpy(s_state.hr_history, saved.hr_history, sizeof(s_state.hr_history));
+            s_state.hr_last_min = saved.hr_last_min;
         }
     }
 
@@ -420,18 +455,23 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
 #if defined(PBL_HEALTH)
         health_service_events_subscribe(on_health_event, NULL);
 #endif
-        if (s_state.hr_last_min != 0)
+        // only a face that graphs the window pays for one. the backfill below is a blocking read
+        // of the watch's minute log, so it is worth skipping outright for a face that does not
+        if (s_hr_history)
         {
-            // restored an earlier graph, so just slide it forward over the time we were away
-            // (and it clears itself if that was over an hour)
-            hr_history_advance(time(NULL) / SECONDS_PER_MINUTE);
-        }
-        else
-        {
-            // first launch with nothing saved: backfill from whatever the watch already logged
-            // so the chart is not empty, then let the live readings extend it from here
-            s_state.hr_last_min = time(NULL) / SECONDS_PER_MINUTE;
-            read_hr_history(s_state.hr_history, HR_HISTORY_MINUTES);
+            if (s_state.hr_last_min != 0)
+            {
+                // restored an earlier graph, so just slide it forward over the time we were away
+                // (and it clears itself if that was over an hour)
+                hr_history_advance(time(NULL) / SECONDS_PER_MINUTE);
+            }
+            else
+            {
+                // first launch with nothing saved: backfill from whatever the watch already logged
+                // so the chart is not empty, then let the live readings extend it from here
+                s_state.hr_last_min = time(NULL) / SECONDS_PER_MINUTE;
+                read_hr_history(s_state.hr_history, HR_HISTORY_MINUTES);
+            }
         }
 
         // seed the first reading before any event lands

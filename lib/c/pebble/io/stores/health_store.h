@@ -19,9 +19,11 @@
  */
 typedef struct
 {
-    bool     enabled;     ///< False makes the store do nothing
-    bool     live;        ///< True subscribes the health service and false just keeps the fake data for screenshots
-    uint32_t persist_key; ///< Slot for the saved history so the face owns the key instead of the store
+    bool     enabled;      ///< False makes the store do nothing
+    bool     live;         ///< True subscribes the health service and false just keeps the fake data for screenshots
+    bool     hr_history;   ///< Keep the rolling minute by minute heart rate window, for a face that graphs it
+    bool     step_history; ///< Keep the hour by hour step buckets, for a face that graphs them
+    uint32_t persist_key;  ///< Slot for the saved history so the face owns the key instead of the store
 } HealthConfig;
 
 /**
