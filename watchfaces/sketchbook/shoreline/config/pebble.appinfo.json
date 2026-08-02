@@ -1,13 +1,14 @@
 {
   "name": "shoreline",
   "displayName": "Shoreline",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "watchface": true,
   "uuid": "6847af9e-09fa-499a-8ac4-319253568339",
   "sdkVersion": "3",
   "enableMultiJS": true,
   "targetPlatforms": [
-    "emery"
+    "emery",
+    "gabbro"
   ],
   "capabilities": [
     "location",
@@ -50,9 +51,20 @@
       { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
       { "type": "bitmap", "name": "ICON_VOLUME_MUTED", "file": "icons/volume-muted.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_OFF", "file": "icons/quiet-off.png" },
       { "type": "bitmap", "name": "ICON_HEART", "file": "icons/heart.png" },
       { "type": "bitmap", "name": "ICON_FEET", "file": "icons/feet.png" },
       { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png" },
+      {
+        "type": "font",
+        "name": "FONT_HAND_82",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]",
+        "targetPlatforms": [
+          "gabbro"
+        ]
+      },
       {
         "type": "font",
         "name": "FONT_HAND_92",

@@ -1,13 +1,14 @@
 {
   "name": "ridgeline",
   "displayName": "Ridgeline",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "watchface": true,
   "uuid": "69730192-3ffe-4489-a5f2-35ae26f87a06",
   "sdkVersion": "3",
   "enableMultiJS": true,
   "targetPlatforms": [
-    "emery"
+    "emery",
+    "gabbro"
   ],
   "capabilities": [
     "location",
@@ -50,6 +51,8 @@
       { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
       { "type": "bitmap", "name": "ICON_VOLUME_MUTED", "file": "icons/volume-muted.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_OFF", "file": "icons/quiet-off.png" },
       { "type": "bitmap", "name": "ICON_HEART", "file": "icons/heart.png" },
       { "type": "bitmap", "name": "ICON_FEET", "file": "icons/feet.png" },
       { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png" },
@@ -64,6 +67,15 @@
         "name": "FONT_HAND_64",
         "file": "fonts/PatrickHand-Regular.ttf",
         "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_82",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]",
+        "targetPlatforms": [
+          "gabbro"
+        ]
       },
       {
         "type": "font",

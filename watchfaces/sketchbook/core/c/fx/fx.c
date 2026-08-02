@@ -153,9 +153,15 @@ void sketchbook_fx_draw_precip(GContext *ctx, const Palette *pal, const Sketchbo
     // the two strides are coprime with the span, so the particles spread out instead of
     // lining up, and the minute slides the whole field along. the band stops short of the
     // clock's cap line, so the digits never have rain drawn through them
-    for (int i = 0; i < sky->drops; i++)
+    //
+    // the span follows the screen, and the count with it: the table's numbers are tuned for the
+    // rectangle, and spreading that many drops over a wider screen turns a downpour into drizzle
+    int span = PBL_DISPLAY_WIDTH - 12;
+    int drops = (sky->drops * PBL_DISPLAY_WIDTH) / 200;
+
+    for (int i = 0; i < drops; i++)
     {
-        int x = 6 + (i * 41 + minute * 13) % 188;
+        int x = 6 + (i * 41 + minute * 13) % span;
         int y = SKETCHBOOK_PRECIP_TOP + (i * 27 + minute * 19) % SKETCHBOOK_PRECIP_H;
         draw_particle(ctx, sky->precip, GPoint(x, y), i);
     }
@@ -179,7 +185,7 @@ void sketchbook_fx_draw_wash(GContext *ctx, const Palette *pal)
         }
 
         // the row's start shifts with y so the dots never stack into vertical stripes
-        for (int x = (y / 2) % step; x < 200; x += step)
+        for (int x = (y / 2) % step; x < PBL_DISPLAY_WIDTH; x += step)
         {
             graphics_draw_pixel(ctx, GPoint(x, y));
         }

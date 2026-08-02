@@ -25,6 +25,7 @@
 enum
 {
     FONT_HAND_92,  // the roomier layouts' clock, sized so the widest time fits and never shrinks
+    FONT_HAND_82,  // the round clock. 92 runs into the bezel down there, 72 reads small
     FONT_HAND_72,  // clock
     FONT_HAND_64,  // clock fallback for the wider .beats token
     FONT_HAND_22,  // date under the clock

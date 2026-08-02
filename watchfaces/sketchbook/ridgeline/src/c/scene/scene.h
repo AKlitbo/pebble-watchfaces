@@ -19,16 +19,19 @@
  * @{
  */
 
-// --- Scene geometry ---
-#define SKY_BAND_Y 48   ///< Where the upper sky starts giving way to the lower
-#define SKY_BLEND_H 24  ///< How far it takes to get there, stippled so there is no hard seam
-#define HORIZON_Y 124  ///< The arc's baseline, and the floor the precipitation falls to
-#define ARC_CX 100     ///< Centre of the sun's arc across the sky
-#define ARC_RX 86      ///< How far the arc reaches either side of centre
-#define ARC_RY 78      ///< How high the arc climbs above the horizon, kept under the status bar
-#define DISC_R 12      ///< Radius of the sun and moon
-#define FOG_TOP 82     ///< Where the fog wash starts thinning out
-#define FOG_BOTTOM 126 ///< Where it stops, just above the clock
+// --- Trail sign ---
+// a round screen has no room to stack a date and a reading under the clock, so the temperature
+// comes off that stack and onto a signpost planted in the saddle right of the main peak. the
+// board stands against the sky where it always has something to read against, and the post runs
+// down into the slope below the crest
+#if defined(PBL_ROUND)
+#define SIGN_X 178         ///< The post's centre line
+#define SIGN_BOARD_Y 108   ///< Top of the board
+#define SIGN_BOARD_H 17    ///< How tall the board is
+#define SIGN_BASE_Y 146    ///< Where the post meets the slope
+#define SIGN_PAD 6         ///< Air either side of the reading, inside the board
+
+#endif
 
 /**
  * @brief Allocate the ridge paths. Call once before the first draw.

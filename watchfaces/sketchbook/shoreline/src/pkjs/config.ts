@@ -28,6 +28,10 @@ export default buildConfig({
     {
       'type': 'select',
       'messageKey': 'APPEARANCE_LAYOUT',
+      // a round build ships the balanced layout only, so the picker has nothing to offer there.
+      // the firmware forces it too, so this is the tidy half of the pair rather than the load
+      // bearing one
+      'capabilities': ['NOT_PLATFORM_GABBRO'],
       'label': 'Layout',
       'description': 'Controls how much space the clock takes. Larger layouts move the date into the top bar and remove the readouts to give the time more room.',
       'defaultValue': 0,
@@ -60,5 +64,7 @@ export default buildConfig({
   steps: {
     label: 'Tracks Readout',
     description: 'What the tracks in the stats row show: step count, or distance walked.',
+    // a round build has no stats row, so there is nothing for this to pick
+    capabilities: ['NOT_PLATFORM_GABBRO'],
   },
 });

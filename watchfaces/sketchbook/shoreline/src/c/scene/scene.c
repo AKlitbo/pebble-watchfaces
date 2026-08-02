@@ -12,13 +12,18 @@
 #include "clock/tide.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
+#include "ui/readouts.h"
+#include "ui/fonts.h"
+#include "sketchbook/draw/fonts.h"
 
 /**
  * @addtogroup watchface-shoreline
  * @{
  */
 
-#define SCREEN_W 200
+// the platform says how wide it is, so the sea and the shore run to whichever screen they are on
+// rather than stopping at 200 and leaving a straight edge partway across a round one
+#define SCREEN_W PBL_DISPLAY_WIDTH
 #define WAVE_ROWS 4
 #define SEA_SPLIT_PCT 40  ///< How far down the water the far shade gives way to the near one
 #define WET_FADE_H 10     ///< How many rows the wet sand dries out over
@@ -324,31 +329,68 @@ static void draw_waves(GContext *ctx, const Palette *pal, int base, int minute, 
 }
 
 /**
+ * @brief Where the boat sits: its drift across the water and its bob on the swell.
+ *
+ * The hull and the pennant are drawn at different points in the frame, so they work their
+ * position out from here rather than each carrying its own copy of the sum.
+ *
+ * @param base The tide base.
+ * @param level How far in the tide has come, 0 to 100.
+ * @param minute The current minute, which is what the bob rides on.
+ * @return The boat's anchor point.
+ */
+static GPoint boat_anchor(int base, int level, int minute)
+{
+    // the drift spans the screen it is on, so a wider watch sails the whole width rather than
+    // stopping where a 200px one used to
+    int x = BOAT_MARGIN + (level * (SCREEN_W - BOAT_MARGIN * 2)) / 100;
+    int band = waterline_at(x, base) - HORIZON_Y;
+
+    // sat in the near water rather than on the line where the far water gives way to it, so the
+    // hull has one shade behind it instead of straddling two
+    return GPoint(x, HORIZON_Y + (band * 55) / 100 + ((minute % 3) - 1));
+}
+
+/**
  * @brief Draw the boat out on the water.
  *
  * It rides the tide: in with the flood, back out with the ebb, and it comes about at each turn
  * so it always faces the way it is going. Since the tide eases at the top and bottom of its
  * cycle, the boat slows and turns there too, without any of that being written twice.
  *
+ * This is the hull and, on the rectangle, its sail. The round face's mast and pennant are drawn
+ * separately in draw_pennant, after the weather, so the reading stays legible in the rain.
+ *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param base The waterline's baseline.
  * @param level How far in the tide is, 0 to 100.
- * @param rising True while the tide is flooding.
+ * @param rising True while the tide is flooding, which leans the rectangle's sail.
  * @param minute The clock minute, which bobs it a pixel.
  */
 static void draw_boat(GContext *ctx, const Palette *pal, int base, int level, bool rising, int minute)
 {
-    int x = 20 + (level * 160) / 100;
-    int band = waterline_at(x, base) - HORIZON_Y;
+    GPoint at = boat_anchor(base, level, minute);
+    int x = at.x, y = at.y;
+    (void)rising;  // only the rectangle's sail leans with the tide
 
-    // sat in the near water rather than on the line where the far water gives way to it, so the
-    // hull has one shade behind it instead of straddling two
-    int y = HORIZON_Y + (band * 55) / 100 + ((minute % 3) - 1);
-    int lean = rising ? 1 : -1;
+#if defined(PBL_ROUND)
+    // and a solid hull under it. the profile is held nearly straight down from the deck and only
+    // drawn in near the keel: tapering evenly from the widest row makes a triangle, and a triangle
+    // floating on water reads as a diamond rather than as a boat
+    static const int8_t hull[] = {16, 16, 15, 14, 12, 9, 5};
 
+    graphics_context_set_stroke_color(ctx, pal->ink);
+    for (unsigned row = 0; row < ARRAY_LENGTH(hull); row++)
+    {
+        graphics_draw_line(ctx, GPoint(x - hull[row], y - 4 + (int)row),
+                                GPoint(x + hull[row], y - 4 + (int)row));
+    }
+
+#else
     // the sail first, filled row by row so it needs no path and no allocation. a right triangle
     // hung off the mast, leaning whichever way the boat is pointed
+    int lean = rising ? 1 : -1;
     graphics_context_set_stroke_color(ctx, pal->foam);
     for (int row = 1; row <= 10; row++)
     {
@@ -365,6 +407,7 @@ static void draw_boat(GContext *ctx, const Palette *pal, int base, int level, bo
         int half = 6 - row * 2;
         graphics_draw_line(ctx, GPoint(x - half, y - 2 + row), GPoint(x + half, y - 2 + row));
     }
+#endif
 }
 
 /**
@@ -399,6 +442,85 @@ static void draw_surf(GContext *ctx, const Palette *pal, int base)
         }
     }
 }
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Fly the temperature from the boat's masthead, or a sail when there is no reading.
+ *
+ * Drawn after the weather rather than with the hull, because the reading is the one thing on the
+ * face that has to stay readable in every condition. Painted with the boat it sits behind the
+ * rain, and a heavy fall or a haze bank crosses straight over the number.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ * @param base The tide base.
+ * @param level How far in the tide has come, 0 to 100.
+ * @param rising True while the tide is flooding, which is the way the sail leans.
+ * @param minute The current minute.
+ */
+static void draw_pennant(GContext *ctx, const Palette *pal, int base, int level, bool rising, int minute)
+{
+    GPoint at = boat_anchor(base, level, minute);
+    int x = at.x, y = at.y;
+
+    // there is room out here for a proper boat, so it gets one: a taller mast flying a pennant
+    // with the temperature on it. that is the reading found somewhere it belongs rather than
+    // stacked under the date as a third line of text
+    char temp[8];
+    readout_weather_temp(temp, sizeof(temp));
+
+    int mast_top = y - BOAT_MAST_H;
+
+    graphics_context_set_stroke_color(ctx, pal->ink);
+    graphics_context_set_stroke_width(ctx, 1);
+    graphics_draw_line(ctx, GPoint(x, mast_top), GPoint(x, y - 4));
+
+    // no location and no reading means no pennant, but a mast on its own is a stick rather than
+    // a boat, so it carries a sail instead. the rectangle's boat sails the same way
+    if (weather_store_temp() == WEATHER_NO_TEMP)
+    {
+        int lean = rising ? 1 : -1;
+        int rows = BOAT_MAST_H - 7;
+
+        graphics_context_set_stroke_color(ctx, pal->foam);
+        for (int row = 1; row <= rows; row++)
+        {
+            int width = (row * 13) / rows;
+            graphics_draw_line(ctx, GPoint(x + lean, mast_top + row),
+                                    GPoint(x + lean * (1 + width), mast_top + row));
+        }
+
+        // the luff back over the fill, so the sail has an edge against the water behind it
+        graphics_context_set_stroke_color(ctx, pal->ink);
+        graphics_draw_line(ctx, GPoint(x + lean * 14, mast_top + rows), GPoint(x, mast_top));
+        return;
+    }
+
+    // the pennant sits square over the hull rather than hanging off one side of the mast, which
+    // read as a sign held out sideways. drawn after the mast, so the mast disappears behind it
+    // and shows only in the gap down to the deck
+    // filled with the upper sky, which is the one colour ink is guaranteed to read against: every
+    // line in this scene is drawn in ink over that sky, so the pennant inherits the same contrast
+    // in every theme. filling with the sea instead leaves the reading nearly invisible wherever a
+    // theme pairs dark water with dark linework, which several of them do
+    GRect flag = GRect(x - BOAT_FLAG_W / 2, mast_top, BOAT_FLAG_W, BOAT_FLAG_H);
+    graphics_context_set_fill_color(ctx, pal->sky_hi);
+    graphics_fill_rect(ctx, flag, 0, GCornerNone);
+    graphics_draw_rect(ctx, flag);
+
+    // the reading sits centred on the pennant. the hand font's line box is taller than the
+    // letters in it, so the height is measured and the difference split rather than guessed
+    GFont flag_font = fonts_get(FONT_HAND_16);
+    GSize reading = graphics_text_layout_get_content_size(temp, flag_font,
+        GRect(0, 0, BOAT_FLAG_W, 40), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
+
+    graphics_context_set_text_color(ctx, pal->ink);
+    graphics_draw_text(ctx, temp, flag_font,
+        GRect(flag.origin.x, flag.origin.y + (BOAT_FLAG_H - reading.h) / 2 - 3, flag.size.w, reading.h + 4),
+        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+
+}
+#endif
 
 void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
 {
@@ -464,6 +586,12 @@ void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
     {
         sketchbook_fx_draw_bolt(ctx, pal);
     }
+
+    // the pennant goes last, after the weather. the reading is the one thing on the face that has
+    // to stay readable in every condition, and painted with the hull it sits behind the rain
+#if defined(PBL_ROUND)
+    draw_pennant(ctx, pal, base, level, tide_rising(minutes), minute);
+#endif
 }
 
 /** @} */

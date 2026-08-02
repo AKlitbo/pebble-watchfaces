@@ -39,23 +39,40 @@ enum
 // --- Text Slots ---
 // the clock sits on the clearing floor, which starts above the digits whatever the trees are
 // doing, so there is always a strip of clear ground between the two
+//
+// a round screen narrows fastest at the bottom, so the clock takes the bigger size and the date
+// sits under it with the whole width still to itself. the temperature comes off this stack
+// entirely and goes into the scene, because a third line down here does not fit
+#if defined(PBL_ROUND)
+#define SLOT_TIME GRect(20, 143, 220, 100)    // clock on the clearing (Hand 92 here, not 72)
+#define SLOT_TIME_SM GRect(20, 159, 220, 100) // nudged down so the smaller tier keeps the baseline
+#define SLOT_DATE GRect(20, 225, 220, 28)     // date under the clock (Hand 22)
+#else
 #define SLOT_TIME GRect(4, 108, 192, 86)      // clock on the clearing (Hand 72)
 #define SLOT_TIME_SM GRect(4, 112, 192, 86)   // nudged down so the smaller tier keeps the baseline
 #define SLOT_DATE GRect(4, 179, 192, 28)      // date under the clock (Hand 22)
+#endif
 // AM/PM sits beside the digits here, AM left and PM right, so the half of the day shows in its
 // position as well as its letters. the bigger layouts have no room out there and put it above
 // the colon instead
 #define MERIDIEM_GAP 4         ///< Air between the digits and a marker beside them
 #define MERIDIEM_BESIDE_W 34   ///< Box a beside-the-clock marker is pulled to the near end of
 #define MERIDIEM_W 40          ///< Box an above-the-colon marker is centred in
-#define MERIDIEM_TOP 131       ///< 2px under the digits' cap line
+// the round clock is Hand 92, and at the widest time a marker beside it lands hard against the
+// bezel, so there it takes the colon channel like the bigger layouts do
+#define MERIDIEM_TOP PBL_IF_ROUND_ELSE(169, 131)  ///< 2px under the digits' cap line
 
 // --- Date Top ---
 // the date moves onto the strip but the readouts stay, so the clock only grows into the band the
 // date left. same Hand 92 as the big clock, just lower and with less room under it
+#if defined(PBL_ROUND)
+#define SLOT_TIME_DATETOP GRect(20, 99, 220, 100)
+#define SLOT_TIME_DATETOP_SM GRect(20, 115, 220, 100)
+#else
 #define SLOT_TIME_DATETOP GRect(0, 109, 200, 100)     // digits land at y 140..200, 4px clear of the readouts
 #define SLOT_TIME_DATETOP_SM GRect(0, 125, 200, 100)
-#define MERIDIEM_TOP_DATETOP 140  ///< The colon channel, on this layout's digits
+#endif
+#define MERIDIEM_TOP_DATETOP PBL_IF_ROUND_ELSE(130, 140)  ///< The colon channel, on this layout's digits
 
 // --- Big Clock ---
 // the readouts go entirely and the clock takes everything they leave. same scene underneath
@@ -65,15 +82,24 @@ enum
 // full-screen width is the fit budget, not the position: the text centres either way, so the
 // extra room only buys headroom against the tier dropping. the widest clock any format makes is
 // 190px against 198, so the fallback never fires and the size never changes
+#if defined(PBL_ROUND)
+#define SLOT_TIME_BIG GRect(20, 117, 220, 100)   // the clock, filling the clearing (Hand 92)
+#define SLOT_TIME_BIG_SM GRect(20, 133, 220, 100) // the tier this size never reaches
+#else
 #define SLOT_TIME_BIG GRect(0, 113, 200, 100)   // the clock, filling the clearing (Hand 92)
 #define SLOT_TIME_BIG_SM GRect(0, 129, 200, 100) // the tier this size never reaches
+#endif
 
 // centred on the screen rather than on what is left of the strip, so it lines up with the clock.
 // Hand 18 hangs 5px below its box and the strip is 20 tall, so the box starts above the screen to
 // land the lettering on the strip's middle. it spans the clear run between the battery and the
 // status glyphs, which is room enough for a long format
+#if defined(PBL_ROUND)
+#define SLOT_DATE_TOP GRect(45, 29, 170, 20)  // on the second strip, where the screen is 170 wide
+#else
 #define SLOT_DATE_TOP GRect(34, -2, 132, 20)
-#define MERIDIEM_TOP_BIG 145  ///< The colon channel, on the big clock's digits
+#endif
+#define MERIDIEM_TOP_BIG PBL_IF_ROUND_ELSE(149, 145)  ///< The colon channel, on the big clock's digits
 
 // --- Stats Row ---
 // temp grows rightwards off its glyph, heart rate grows out from the screen's centre line, and
@@ -95,24 +121,64 @@ enum
 #define SLOT_HR_SM GRect(84, 206, 60, 26)
 #define SLOT_STEPS_SM GRect(150, 206, 47, 26)
 
+// --- Stats Row, No Heart Rate ---
+// gabbro has no sensor, and an emery whose sensor cannot get a reading is in the same place, so
+// the row drops to two and re-centres rather than leaving a permanent "--" in the middle.
+//
+// both survivors take the treatment the heart rate had: text centred in its box with the glyph
+// riding in front, which is the only one of the three that was already placed as a *pair*. so
+// the two pairs sit either side of the centre line and stay centred whatever they read
+//
+// there is no round version. gabbro has no sensor, its steps went with the room they wanted, and
+// its temperature is painted into the scene, so no row is left down here to re-centre
+#if !defined(PBL_ROUND)
+#define SLOT_TEMP_PAIR GRect(35, 204, 60, 26)
+#define SLOT_STEPS_PAIR GRect(125, 204, 60, 26)
+#define SLOT_TEMP_PAIR_SM GRect(37, 206, 60, 26)
+#define SLOT_STEPS_PAIR_SM GRect(127, 206, 60, 26)
+#endif
+
 // --- Stats Row Anchors ---
 #define STAT_GLYPH_GAP 5     ///< Air between a glyph and the number it labels
 #define STAT_TEMP_GLYPH_X 4  ///< Left edge of the thermometer, the one glyph pinned to the bezel
 #define STAT_BASELINE 224    ///< The line every glyph and digit in the row sits on
+// a round layout can put the row at the sides or along the bottom, so a mark works its baseline
+// out from the box its number draws in rather than from one fixed line. 20px below the big tier's
+// box is where that tier's text lands, and the small tier's box is nudged to match
+#define STAT_ROW_BASELINE(big) ((big).origin.y + 20)
 
 // --- Status Bar ---
 // a dark strip across the top the chrome always sits on. without it the battery and bluetooth
 // have to read against whatever the sky is doing, which on a white-paper palette means white
 // on white. the strip costs 20px of sky and makes every theme legible up there
+#if defined(PBL_ROUND)
+// a round screen is 64px wide at y=4, so one strip cannot hold the icons and the date the way the
+// rectangle does. the three marks cluster in the middle where the circle is widest soonest, and
+// the date gets a second strip below on the layouts that move it up there
+#define TOP_BAR_H 24
+#define TOP_BAR2_Y 28         ///< Top of the date strip, with a slice of sky showing between
+#define TOP_BAR2_H 26
+#else
 #define TOP_BAR_H 20
+#endif
 
 // --- Chrome Icons ---
+#if defined(PBL_ROUND)
+// battery in the middle with a mark either side, so the group is 67 wide rather than 100
+#define BT_ICON GRect(150, 6, 14, 14)   // bluetooth flanks right
+#define QT_ICON GRect(94, 6, 18, 14)    // quiet time flanks left, 18 wide for the pair
+#else
 #define BT_ICON GRect(185, 3, 14, 14)
 #define QT_ICON GRect(167, 3, 14, 14)  // quiet time, just left of the bluetooth glyph
+#endif
 
 // --- Battery Gauge ---
 // 23px wide so 5 bars + 4 gaps fill the interior with a symmetric 1px margin both sides
+#if defined(PBL_ROUND)
+#define BATT_RECT GRect(118, 7, 23, 11)  // centred, with the two marks either side
+#else
 #define BATT_RECT GRect(4, 4, 23, 11)
+#endif
 
 /**
  * @brief Register fonts and pick the starting palette. Call after the window exists and before

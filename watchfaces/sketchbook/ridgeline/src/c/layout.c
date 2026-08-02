@@ -96,28 +96,50 @@ static void apply_layout(void)
         s_zones[ZONE_DATE].font_id_fallback = FONT_HAND_18;
     }
 
+    // with no heart rate to show, the row is two readouts rather than three, so both move to the
+    // centred boxes that keep each glyph and its number together as a pair
+    if (!sketchbook_has_hr())
+    {
+#if defined(PBL_ROUND)
+        // one reading, centred under the date
+        s_zones[ZONE_WEATHER].rect = SLOT_TEMP_PAIR;
+        s_zones[ZONE_WEATHER].rect_fallback = SLOT_TEMP_PAIR_SM;
+        s_zones[ZONE_WEATHER].align = GTextAlignmentCenter;
+#else
+        s_zones[ZONE_WEATHER].rect = SLOT_TEMP_PAIR_LOW;
+        s_zones[ZONE_WEATHER].rect_fallback = SLOT_TEMP_PAIR_LOW_SM;
+        s_zones[ZONE_WEATHER].align = GTextAlignmentCenter;
+
+        s_zones[ZONE_STEPS].rect = SLOT_STEPS_PAIR_LOW;
+        s_zones[ZONE_STEPS].rect_fallback = SLOT_STEPS_PAIR_LOW_SM;
+        s_zones[ZONE_STEPS].align = GTextAlignmentCenter;
+#endif
+    }
+
     // the clock is what actually differs: same Hand 92 for both roomier layouts, sitting higher
     // when the readouts are still under it
     if (layout == LAYOUT_BIG_CLOCK)
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME_BIG;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_BIG_SM;
-        s_zones[ZONE_TIME].font_id = FONT_HAND_92;
+        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_92);
         s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
     }
     else if (layout == LAYOUT_DATE_TOP)
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME_DATETOP;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_DATETOP_SM;
-        s_zones[ZONE_TIME].font_id = FONT_HAND_92;
+        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_92);
         s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
     }
     else
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_SM;
-        s_zones[ZONE_TIME].font_id = FONT_HAND_72;
-        s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_64;
+        // 82 on the circle rather than 92: at 92 the widest time runs 197px and the glass down
+        // there is only 172 wide, so the outer digits ran into the bezel
+        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_72);
+        s_zones[ZONE_TIME].font_id_fallback = PBL_IF_ROUND_ELSE(FONT_HAND_72, FONT_HAND_64);
     }
 }
 
@@ -128,7 +150,16 @@ static void apply_layout(void)
  */
 static int meridiem_above_top(void)
 {
-    return ridgeline_layout() == LAYOUT_BIG_CLOCK ? MERIDIEM_TOP_BIG : MERIDIEM_TOP_DATETOP;
+    if (ridgeline_layout() == LAYOUT_BIG_CLOCK)
+    {
+        return MERIDIEM_TOP_BIG;
+    }
+
+    // the round standard layout draws Hand 92 too, at its own height, so it gets its own channel
+    // rather than borrowing the date-top one
+    return PBL_IF_ROUND_ELSE(
+        ridgeline_layout() == LAYOUT_STANDARD ? MERIDIEM_TOP : MERIDIEM_TOP_DATETOP,
+        MERIDIEM_TOP_DATETOP);
 }
 
 /**
@@ -136,7 +167,13 @@ static int meridiem_above_top(void)
  */
 static void load_fonts(void)
 {
+    // one clock size per platform: the rectangle draws 92 on its roomier layouts, the circle
+    // draws 82 on its only one, and loading both would hold a font in heap that never renders
+#if defined(PBL_ROUND)
+    fonts_register(FONT_HAND_82, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_82)));
+#else
     fonts_register(FONT_HAND_92, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_92)));
+#endif
     fonts_register(FONT_HAND_72, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_72)));
     fonts_register(FONT_HAND_64, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_64)));
     fonts_register(FONT_HAND_22, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_22)));
@@ -169,12 +206,18 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
     uint8_t theme = settings_u8(SETTING_THEME);
 
     widgets_draw_top_bar(ctx, bounds);
+
+    // the date only earns its own strip on the layouts that move it up there
+    if (ridgeline_layout() != LAYOUT_STANDARD)
+    {
+        widgets_draw_date_bar(ctx, bounds);
+    }
     widgets_draw_battery(ctx, s_pal->bar_ink, theme, system_store_battery());
 
     // the row's marks go with the row, and only the big clock drops it
     if (ridgeline_layout() != LAYOUT_BIG_CLOCK)
     {
-        widgets_draw_stat_glyphs(ctx, s_pal);
+        widgets_draw_stat_glyphs(ctx, s_pal, &s_zones[ZONE_WEATHER], &s_zones[ZONE_STEPS]);
     }
 
     // measured onto the live clock, so it takes the same slot and font. a 24-hour clock has no
@@ -186,7 +229,10 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
 
         // the standard clock has room either side, so the marker goes beside the digits. the
         // bigger two have none and drop it into the channel above the colon
-        if (ridgeline_layout() == LAYOUT_STANDARD)
+        //
+        // on a round screen the standard clock is Hand 92 as well, and at the widest time a
+        // marker beside it lands hard against the bezel, so it joins the other two
+        if (PBL_IF_ROUND_ELSE(false, ridgeline_layout() == LAYOUT_STANDARD))
         {
             widgets_draw_meridiem_beside(ctx, s_pal->dim, slot, font, MERIDIEM_TOP);
         }
@@ -204,11 +250,11 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
         widgets_draw_bt(ctx, system_store_bluetooth());
     }
 
-    // the muted speaker only shows while Quiet Time is actually holding, so an empty slot
-    // beside bluetooth is the normal state
-    if (settings_u8(SETTING_QUIET_TIME_ICON) && quiet_time_is_active())
+    // the mark is drawn either way where the face bundles both states, so the strip keeps its
+    // shape whether or not Quiet Time is holding. the setting still decides if it shows at all
+    if (settings_u8(SETTING_QUIET_TIME_ICON))
     {
-        widgets_draw_qt(ctx, s_pal->bar_ink);
+        widgets_draw_qt_state(ctx, s_pal->bar_ink, quiet_time_is_active());
     }
 }
 
@@ -240,9 +286,20 @@ uint8_t ridgeline_build(EngineSlot *out, uint8_t max, GRect bounds)
     // pull, no fit
     if (ridgeline_layout() != LAYOUT_BIG_CLOCK)
     {
+        // on a round screen the temperature is written onto the mountainside with the scene, so
+        // it takes no slot here
+#if !defined(PBL_ROUND)
         out[i++] = (EngineSlot){.zone = &s_zones[ZONE_WEATHER],  .text = readout_weather_temp};
-        out[i++] = (EngineSlot){.zone = &s_zones[ZONE_HR],       .text = readout_hr};
+#endif
+
+        if (sketchbook_has_hr())
+        {
+            out[i++] = (EngineSlot){.zone = &s_zones[ZONE_HR],   .text = readout_hr};
+        }
+        // a round screen shows the temperature alone, so the steps never get a slot
+#if !defined(PBL_ROUND)
         out[i++] = (EngineSlot){.zone = &s_zones[ZONE_STEPS],    .text = readout_steps};
+#endif
     }
 
     return i;
