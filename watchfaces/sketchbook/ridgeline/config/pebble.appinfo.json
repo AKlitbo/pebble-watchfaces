@@ -1,7 +1,7 @@
 {
   "name": "ridgeline",
   "displayName": "Ridgeline",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "watchface": true,
   "uuid": "69730192-3ffe-4489-a5f2-35ae26f87a06",
   "sdkVersion": "3",

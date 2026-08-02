@@ -5,7 +5,7 @@ the time, date, weather and battery, wrapped in its own interface, with themes s
 Clay settings page. Most also show heart rate and steps where the watch has the sensors for them.
 
 The Sketchbook faces (Ridgeline, Shoreline, Treeline) run on both the Pebble Time 2 (**Emery**) and
-the round **Gabbro**. On the round screen they carry their reading in the scene rather than in a row
+the Round 2 (**Gabbro**). On the round screen they carry their reading in the scene rather than in a row
 of stats: on the boat's pennant, on a trail sign, on the cabin.
 
 | Watchface | Preview |
