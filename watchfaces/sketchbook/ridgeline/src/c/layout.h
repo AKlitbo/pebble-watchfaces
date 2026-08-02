@@ -93,10 +93,42 @@ enum
 #define SLOT_HR_SM GRect(84, 206, 60, 26)
 #define SLOT_STEPS_SM GRect(150, 206, 47, 26)
 
+// --- Stats Row, No Heart Rate ---
+// gabbro has no sensor, and an emery whose sensor cannot get a reading is in the same place, so
+// the row drops to two and re-centres rather than leaving a permanent "--" in the middle.
+//
+// both survivors take the treatment the heart rate had: text centred in its box with the glyph
+// riding in front, which is the only one of the three that was already placed as a *pair*. so
+// the two pairs sit either side of the centre line and stay centred whatever they read
+#if defined(PBL_ROUND)
+// latched to the middle and fanning outwards: the temperature's right edge and the steps' left
+// edge are fixed either side of the centre line, so the gap between them never changes and a
+// longer reading grows away from it. sitting this low the circle is only 180 wide, so the boxes
+// are cut to where a long reading trips the smaller tier rather than running into the bezel
+#define SLOT_TEMP_PAIR GRect(56, 214, 60, 26)      // number centred on 86, its mark above it
+#define SLOT_STEPS_PAIR GRect(144, 214, 60, 26)    // and on 174
+#define SLOT_TEMP_PAIR_SM GRect(56, 216, 60, 26)
+#define SLOT_STEPS_PAIR_SM GRect(144, 216, 60, 26)
+#else
+#define SLOT_TEMP_PAIR GRect(35, 204, 60, 26)
+#define SLOT_STEPS_PAIR GRect(125, 204, 60, 26)
+#define SLOT_TEMP_PAIR_SM GRect(37, 206, 60, 26)
+#define SLOT_STEPS_PAIR_SM GRect(127, 206, 60, 26)
+// one row here, so these are the same boxes: only a round screen splits them by layout
+#define SLOT_TEMP_PAIR_LOW SLOT_TEMP_PAIR
+#define SLOT_STEPS_PAIR_LOW SLOT_STEPS_PAIR
+#define SLOT_TEMP_PAIR_LOW_SM SLOT_TEMP_PAIR_SM
+#define SLOT_STEPS_PAIR_LOW_SM SLOT_STEPS_PAIR_SM
+#endif
+
 // --- Stats Row Anchors ---
 #define STAT_GLYPH_GAP 5     ///< Air between a glyph and the number it labels
 #define STAT_TEMP_GLYPH_X 4  ///< Left edge of the thermometer, the one glyph pinned to the bezel
 #define STAT_BASELINE 224    ///< The line every glyph and digit in the row sits on
+// a round layout can put the row at the sides or along the bottom, so a mark works its baseline
+// out from the box its number draws in rather than from one fixed line. 20px below the big tier's
+// box is where that tier's text lands, and the small tier's box is nudged to match
+#define STAT_ROW_BASELINE(big) ((big).origin.y + 20)
 
 // --- Status Bar ---
 // a dark strip across the top the chrome always sits on. without it the battery and bluetooth

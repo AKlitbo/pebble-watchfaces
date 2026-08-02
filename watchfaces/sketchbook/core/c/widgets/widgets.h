@@ -19,6 +19,7 @@
 #include "theme/theme.h"        // the face's Palette
 #include "sketchbook/theme/battery.h"
 #include "ui/fonts.h"  // FontId, for the clock font the marker is measured against
+#include "ui/zone.h"   // Zone, for the boxes the stats row landed in
 
 /**
  * @addtogroup family-sketchbook
@@ -55,15 +56,43 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds);
 void widgets_draw_bt(GContext *ctx, bool connected);
 
 /**
+ * @brief Draw the second status strip, the one the date sits on.
+ *
+ * Only a round screen needs it, and only for a layout that moves the date up top. Everywhere else
+ * this is a no-op, since the single strip already has the room.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ */
+void widgets_draw_date_bar(GContext *ctx, GRect bounds);
+
+/**
+ * @brief Whether this watch can report a heart rate, so the stats row knows how many to place.
+ *
+ * False on hardware with no sensor and on a watch whose wearer has turned theirs off. Either way
+ * the row drops to two readouts and re-centres rather than keeping a slot that can only ever say
+ * "--". Asked per draw, since a sensor can come and go while the face is up.
+ *
+ * @return True when a reading is obtainable.
+ */
+bool sketchbook_has_hr(void);
+
+/**
  * @brief Draw the stats row's marks: a thermometer, a heart, and a pair of tracks.
  *
  * The bundled glyphs are white masters, so each is recoloured to the palette on the way out
  * and reads in the same ink as the number beside it.
  *
+ * The two zones come in rather than being read off the face's macros, because a round layout can
+ * move that row: the standard one flanks the clock and the wider ones keep it along the bottom.
+ * Taking the boxes the numbers actually drew in is what keeps each mark with its own number.
+ *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param weather The temperature's zone.
+ * @param steps The steps zone.
  */
-void widgets_draw_stat_glyphs(GContext *ctx, const Palette *pal);
+void widgets_draw_stat_glyphs(GContext *ctx, const Palette *pal, const Zone *weather, const Zone *steps);
 
 /**
  * @brief Draw the AM/PM marker beside the clock: AM on its left, PM on its right.
@@ -107,5 +136,17 @@ void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, 
  * @param color The colour to paint it.
  */
 void widgets_draw_qt(GContext *ctx, GColor color);
+
+/**
+ * @brief Draw the Quiet Time mark for either state, where the face bundles a pair for it.
+ *
+ * Bluetooth already works this way, and an always-filled slot is what stops the strip looking
+ * lopsided half the time. Falls back to drawing only the muted mark where there is no pair.
+ *
+ * @param ctx The graphics context.
+ * @param color The colour to paint it.
+ * @param active True while Quiet Time is holding.
+ */
+void widgets_draw_qt_state(GContext *ctx, GColor color, bool active);
 
 /** @} */

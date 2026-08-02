@@ -18,7 +18,9 @@
  * @{
  */
 
-#define SCREEN_W 200
+// the platform says how wide it is, so the sea and the shore run to whichever screen they are on
+// rather than stopping at 200 and leaving a straight edge partway across a round one
+#define SCREEN_W PBL_DISPLAY_WIDTH
 
 // the wind speed at which the plume is bent as far over as it goes. past this it is already
 // flat, and a gale and a storm look the same from a chimney

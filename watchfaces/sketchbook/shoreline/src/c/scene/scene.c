@@ -12,13 +12,18 @@
 #include "clock/tide.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
+#include "ui/readouts.h"
+#include "ui/fonts.h"
+#include "sketchbook/draw/fonts.h"
 
 /**
  * @addtogroup watchface-shoreline
  * @{
  */
 
-#define SCREEN_W 200
+// the platform says how wide it is, so the sea and the shore run to whichever screen they are on
+// rather than stopping at 200 and leaving a straight edge partway across a round one
+#define SCREEN_W PBL_DISPLAY_WIDTH
 #define WAVE_ROWS 4
 #define SEA_SPLIT_PCT 40  ///< How far down the water the far shade gives way to the near one
 #define WET_FADE_H 10     ///< How many rows the wet sand dries out over
@@ -339,7 +344,9 @@ static void draw_waves(GContext *ctx, const Palette *pal, int base, int minute, 
  */
 static void draw_boat(GContext *ctx, const Palette *pal, int base, int level, bool rising, int minute)
 {
-    int x = 20 + (level * 160) / 100;
+    // the drift spans the screen it is on, so a wider watch sails the whole width rather than
+    // stopping where a 200px one used to
+    int x = BOAT_MARGIN + (level * (SCREEN_W - BOAT_MARGIN * 2)) / 100;
     int band = waterline_at(x, base) - HORIZON_Y;
 
     // sat in the near water rather than on the line where the far water gives way to it, so the
@@ -347,6 +354,56 @@ static void draw_boat(GContext *ctx, const Palette *pal, int base, int level, bo
     int y = HORIZON_Y + (band * 55) / 100 + ((minute % 3) - 1);
     int lean = rising ? 1 : -1;
 
+#if defined(PBL_ROUND)
+    // there is room out here for a proper boat, so it gets one: a taller mast flying a pennant
+    // with the temperature on it. that is the reading found somewhere it belongs rather than
+    // stacked under the date as a third line of text
+    char temp[8];
+    readout_weather_temp(temp, sizeof(temp));
+
+    int mast_top = y - BOAT_MAST_H;
+    (void)lean;  // the round boat carries its reading square, so it does not lean with the tide
+
+    graphics_context_set_stroke_color(ctx, pal->ink);
+    graphics_context_set_stroke_width(ctx, 1);
+    graphics_draw_line(ctx, GPoint(x, mast_top), GPoint(x, y - 4));
+
+    // the pennant sits square over the hull rather than hanging off one side of the mast, which
+    // read as a sign held out sideways. drawn after the mast, so the mast disappears behind it
+    // and shows only in the gap down to the deck
+    // filled with the upper sky, which is the one colour ink is guaranteed to read against: every
+    // line in this scene is drawn in ink over that sky, so the pennant inherits the same contrast
+    // in every theme. filling with the sea instead leaves the reading nearly invisible wherever a
+    // theme pairs dark water with dark linework, which several of them do
+    GRect flag = GRect(x - BOAT_FLAG_W / 2, mast_top, BOAT_FLAG_W, BOAT_FLAG_H);
+    graphics_context_set_fill_color(ctx, pal->sky_hi);
+    graphics_fill_rect(ctx, flag, 0, GCornerNone);
+    graphics_draw_rect(ctx, flag);
+
+    // the reading sits centred on the pennant. the hand font's line box is taller than the
+    // letters in it, so the height is measured and the difference split rather than guessed
+    GFont flag_font = fonts_get(FONT_HAND_16);
+    GSize reading = graphics_text_layout_get_content_size(temp, flag_font,
+        GRect(0, 0, BOAT_FLAG_W, 40), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
+
+    graphics_context_set_text_color(ctx, pal->ink);
+    graphics_draw_text(ctx, temp, flag_font,
+        GRect(flag.origin.x, flag.origin.y + (BOAT_FLAG_H - reading.h) / 2 - 3, flag.size.w, reading.h + 4),
+        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+
+    // and a solid hull under it. the profile is held nearly straight down from the deck and only
+    // drawn in near the keel: tapering evenly from the widest row makes a triangle, and a triangle
+    // floating on water reads as a diamond rather than as a boat
+    static const int8_t hull[] = {16, 16, 15, 14, 12, 9, 5};
+
+    graphics_context_set_stroke_color(ctx, pal->ink);
+    for (unsigned row = 0; row < ARRAY_LENGTH(hull); row++)
+    {
+        graphics_draw_line(ctx, GPoint(x - hull[row], y - 4 + (int)row),
+                                GPoint(x + hull[row], y - 4 + (int)row));
+    }
+
+#else
     // the sail first, filled row by row so it needs no path and no allocation. a right triangle
     // hung off the mast, leaning whichever way the boat is pointed
     graphics_context_set_stroke_color(ctx, pal->foam);
@@ -365,6 +422,7 @@ static void draw_boat(GContext *ctx, const Palette *pal, int base, int level, bo
         int half = 6 - row * 2;
         graphics_draw_line(ctx, GPoint(x - half, y - 2 + row), GPoint(x + half, y - 2 + row));
     }
+#endif
 }
 
 /**

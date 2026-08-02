@@ -174,7 +174,7 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
     // the row's marks go with the row, and only the big clock drops it
     if (treeline_layout() != LAYOUT_BIG_CLOCK)
     {
-        widgets_draw_stat_glyphs(ctx, s_pal);
+        widgets_draw_stat_glyphs(ctx, s_pal, &s_zones[ZONE_WEATHER], &s_zones[ZONE_STEPS]);
     }
 
     // measured onto the live clock, so it takes the same slot and font. a 24-hour clock has no

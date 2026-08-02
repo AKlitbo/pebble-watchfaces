@@ -7,6 +7,7 @@
 #include "sketchbook/widgets/widgets.h"
 
 #include <string.h>
+#include <time.h>
 
 #include "layout.h"
 #include "sketchbook/draw/fonts.h"
@@ -71,6 +72,17 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds)
 {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, TOP_BAR_H), 0, GCornerNone);
+}
+
+void widgets_draw_date_bar(GContext *ctx, GRect bounds)
+{
+#if defined(PBL_ROUND)
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_rect(ctx, GRect(0, TOP_BAR2_Y, bounds.size.w, TOP_BAR2_H), 0, GCornerNone);
+#else
+    (void)ctx;
+    (void)bounds;
+#endif
 }
 
 void widgets_draw_bt(GContext *ctx, bool connected)
@@ -154,13 +166,19 @@ static int glyph_art_width(uint32_t res)
  * @param art_left Where the visible art should start.
  * @return The box to draw the bitmap in.
  */
-static GRect glyph_on_baseline(uint32_t res, int art_left)
+static GRect glyph_on_line(uint32_t res, int art_left, int baseline)
 {
     GSize size = icon_size(res);
     IconMargins margins = icon_margins(res);
     int art_h = size.h - margins.n - margins.s;
 
-    return GRect(art_left - margins.w, STAT_BASELINE - art_h - margins.n, size.w, size.h);
+    return GRect(art_left - margins.w, baseline - art_h - margins.n, size.w, size.h);
+}
+
+/** @brief The row's own baseline, for a mark that sits beside its number. */
+static GRect glyph_on_baseline(uint32_t res, int art_left)
+{
+    return glyph_on_line(res, art_left, STAT_BASELINE);
 }
 
 /** @brief Sit a glyph's art on the baseline, ending a gap short of where its number starts. */
@@ -169,30 +187,89 @@ static GRect glyph_before(uint32_t res, int text_left)
     return glyph_on_baseline(res, text_left - STAT_GLYPH_GAP - glyph_art_width(res));
 }
 
-void widgets_draw_stat_glyphs(GContext *ctx, const Palette *pal)
+/** @brief The same, on a row that sits somewhere other than the face's default line. */
+static GRect glyph_before_on(uint32_t res, int text_left, int baseline)
+{
+    return glyph_on_line(res, text_left - STAT_GLYPH_GAP - glyph_art_width(res), baseline);
+}
+
+bool sketchbook_has_hr(void)
+{
+#if defined(PBL_PLATFORM_GABBRO)
+    // this watch has no sensor to ask. the health service still reports the metric as accessible
+    // on the emulator, so taking its word for it would leave a slot that can only say "--"
+    return false;
+#elif defined(PBL_HEALTH)
+    time_t now = time(NULL);
+    HealthServiceAccessibilityMask access =
+        health_service_metric_accessible(HealthMetricHeartRateBPM, now, now);
+    return access & HealthServiceAccessibilityMaskAvailable;
+#else
+    return false;
+#endif
+}
+
+void widgets_draw_stat_glyphs(GContext *ctx, const Palette *pal, const Zone *weather, const Zone *steps)
 {
     char text[16];
 
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
 
-    // the thermometer is the one fixed mark: its number is left-aligned off it, so it has
-    // nothing to follow
-    draw_glyph(ctx, RESOURCE_ID_ICON_THERMOMETER,
-        glyph_on_baseline(RESOURCE_ID_ICON_THERMOMETER, STAT_TEMP_GLYPH_X), pal->dim);
-
-    // both of these read their number's left edge back off the box it actually lands in, so the
-    // glyph follows the text through a font fallback instead of tracking its own copy of the
-    // geometry
     GRect slot;
-    readout_hr(text, sizeof(text));
-    int hr_w = stat_metrics(text, SLOT_HR, SLOT_HR_SM, &slot);
-    int hr_left = slot.origin.x + slot.size.w / 2 - hr_w / 2;  // centred
-    draw_glyph(ctx, RESOURCE_ID_ICON_HEART, glyph_before(RESOURCE_ID_ICON_HEART, hr_left), pal->dim);
+    bool has_hr = sketchbook_has_hr();
+
+#if defined(PBL_ROUND)
+    // the round faces carry a single unlabelled reading, so there is nothing to mark
+    if (!has_hr)
+    {
+        (void)slot;
+        (void)text;
+        return;
+    }
+#endif
+
+    // every mark reads its number's box back off the zone, so it follows both a font fallback and
+    // a layout that moved the whole row somewhere else
+    readout_weather_temp(text, sizeof(text));
+    if (has_hr)
+    {
+        // three across, and the thermometer is the fixed one: its number is left-aligned off it,
+        // so it has nothing to follow
+        draw_glyph(ctx, RESOURCE_ID_ICON_THERMOMETER,
+            glyph_on_baseline(RESOURCE_ID_ICON_THERMOMETER, STAT_TEMP_GLYPH_X), pal->dim);
+    }
+    else
+    {
+        int temp_w = stat_metrics(text, weather->rect, weather->rect_fallback, &slot);
+        int temp_mid = slot.origin.x + slot.size.w / 2;
+        int temp_base = STAT_ROW_BASELINE(weather->rect);
+        draw_glyph(ctx, RESOURCE_ID_ICON_THERMOMETER,
+            glyph_before_on(RESOURCE_ID_ICON_THERMOMETER, temp_mid - temp_w / 2, temp_base), pal->dim);
+    }
+
+    if (has_hr)
+    {
+        readout_hr(text, sizeof(text));
+        int hr_w = stat_metrics(text, SLOT_HR, SLOT_HR_SM, &slot);
+        int hr_left = slot.origin.x + slot.size.w / 2 - hr_w / 2;  // centred
+        draw_glyph(ctx, RESOURCE_ID_ICON_HEART, glyph_before(RESOURCE_ID_ICON_HEART, hr_left), pal->dim);
+    }
 
     readout_steps(text, sizeof(text));
-    int steps_w = stat_metrics(text, SLOT_STEPS, SLOT_STEPS_SM, &slot);
-    int steps_left = slot.origin.x + slot.size.w - steps_w;  // right-aligned
-    draw_glyph(ctx, RESOURCE_ID_ICON_FEET, glyph_before(RESOURCE_ID_ICON_FEET, steps_left), pal->dim);
+    if (has_hr)
+    {
+        int steps_w = stat_metrics(text, SLOT_STEPS, SLOT_STEPS_SM, &slot);
+        int steps_left = slot.origin.x + slot.size.w - steps_w;  // right-aligned
+        draw_glyph(ctx, RESOURCE_ID_ICON_FEET, glyph_before(RESOURCE_ID_ICON_FEET, steps_left), pal->dim);
+    }
+    else
+    {
+        int steps_w = stat_metrics(text, steps->rect, steps->rect_fallback, &slot);
+        int steps_mid = slot.origin.x + slot.size.w / 2;
+        int steps_base = STAT_ROW_BASELINE(steps->rect);
+        draw_glyph(ctx, RESOURCE_ID_ICON_FEET,
+            glyph_before_on(RESOURCE_ID_ICON_FEET, steps_mid - steps_w / 2, steps_base), pal->dim);
+    }
 }
 
 /** @brief How wide @p text renders in @p font. */
@@ -295,6 +372,21 @@ void widgets_draw_qt(GContext *ctx, GColor color)
 {
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
     draw_glyph(ctx, RESOURCE_ID_ICON_VOLUME_MUTED, QT_ICON, color);
+}
+
+void widgets_draw_qt_state(GContext *ctx, GColor color, bool active)
+{
+#if defined(HAS_QUIET_PAIR)
+    // a matched pair, the way bluetooth has one: the slot is filled either way so the strip keeps
+    // its shape instead of going lopsided whenever Quiet Time is off
+    graphics_context_set_compositing_mode(ctx, GCompOpSet);
+    draw_glyph(ctx, active ? RESOURCE_ID_ICON_QUIET_ON : RESOURCE_ID_ICON_QUIET_OFF, QT_ICON, color);
+#else
+    if (active)
+    {
+        widgets_draw_qt(ctx, color);
+    }
+#endif
 }
 
 /** @} */
