@@ -355,6 +355,9 @@ static void draw_trail(GContext *ctx, const Palette *pal)
 /**
  * @brief Plant a trail sign in the saddle and letter the temperature on its board.
  *
+ * Drawn after the weather rather than with the ridges, because the reading is the one thing on
+ * the face that has to stay readable in every condition.
+ *
  * The board is filled with the sky and lettered in ink, because ink over sky is the one pairing
  * the palette guarantees: every line in this scene is drawn that way. Filling with the land
  * instead leaves the reading nearly invisible wherever a theme pairs dark ground with dark
@@ -435,7 +438,6 @@ void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
 #if defined(PBL_ROUND)
     draw_meadow(ctx, pal);
     draw_trail(ctx, pal);
-    draw_trail_sign(ctx, pal);
 #endif
 
     // rain falls in front of everything: it is the nearest thing to you
@@ -450,6 +452,12 @@ void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
     {
         sketchbook_fx_draw_bolt(ctx, pal);
     }
+
+    // the sign goes last, after the weather. the reading is the one thing on the face that has to
+    // stay readable in every condition, and painted with the ridges it sits behind the rain
+#if defined(PBL_ROUND)
+    draw_trail_sign(ctx, pal);
+#endif
 }
 
 void scene_deinit(void)

@@ -37,7 +37,7 @@
 #define CABIN_WALL_TOP (NEAR_BASE - 38)
 #define CABIN_RIDGE (CABIN_WALL_TOP - 18)
 #define STACK_X 78
-#define CABIN_DOOR_DX 12
+#define CABIN_DOOR_DX 13
 #define CABIN_DOOR_W 14
 #define CABIN_DOOR_H 18
 #define CABIN_WIN_DX 42
@@ -306,45 +306,6 @@ static void draw_cabin(GContext *ctx, const Palette *pal, bool night, bool snow)
     graphics_draw_line(ctx, GPoint(pane.origin.x, pane.origin.y + pane.size.h / 2),
                             GPoint(pane.origin.x + pane.size.w - 1, pane.origin.y + pane.size.h / 2));
 
-#if defined(PBL_ROUND)
-    // the reading, lettered on a board nailed across the front. filled with the sky and lettered
-    // in ink, because ink over sky is the one pairing the palette guarantees. filling it with the
-    // wall instead would ride on cabin-against-ink holding up in every theme, which is the sort of
-    // assumption that leaves a reading invisible on half of them
-    char temp[16];
-    readout_weather_temp(temp, sizeof(temp));
-
-    // sized to the reading rather than the wall, so it reads as a plaque over the door and leaves
-    // the logs either side of it showing. a floor keeps a short reading from looking like a chip,
-    // and a ceiling keeps "120F" from running into the eaves
-    GFont font = fonts_get(FONT_HAND_16);
-    GSize reading = graphics_text_layout_get_content_size(temp, font,
-        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
-
-    int board_w = reading.w + 14;
-    if (board_w < 44)
-    {
-        board_w = 44;
-    }
-    if (board_w > (right - left) - CABIN_BOARD_INSET * 2)
-    {
-        board_w = (right - left) - CABIN_BOARD_INSET * 2;
-    }
-
-    GRect board = GRect(CABIN_MID - board_w / 2, wall_top + 3, board_w, CABIN_BOARD_H);
-
-    graphics_context_set_fill_color(ctx, pal->sky_hi);
-    graphics_context_set_stroke_color(ctx, pal->ink);
-    graphics_fill_rect(ctx, board, 0, GCornerNone);
-    graphics_draw_rect(ctx, board);
-
-    // the hand font hangs low in its line box, so the text starts above the board to land the
-    // lettering in the middle of it
-    graphics_context_set_text_color(ctx, pal->ink);
-    graphics_draw_text(ctx, temp, font,
-        GRect(board.origin.x, board.origin.y - 2, board.size.w, CABIN_BOARD_H + 8),
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
-#endif
 }
 
 /**
@@ -398,6 +359,61 @@ static void draw_smoke(GContext *ctx, const Palette *pal, int lean, int strength
     }
 }
 
+#if defined(PBL_ROUND)
+/**
+ * @brief Letter the temperature on the board nailed across the cabin front.
+ *
+ * Drawn after the weather rather than with the cabin, because the reading is the one thing on the
+ * face that has to stay readable in every condition. Painted with the building it sits behind the
+ * rain, and a heavy fall or a fog bank crosses straight over the number.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ */
+static void draw_temp_board(GContext *ctx, const Palette *pal)
+{
+    const int left = CABIN_LEFT, right = CABIN_RIGHT;
+    const int wall_top = CABIN_WALL_TOP;
+
+    // filled with the sky and lettered in ink, because ink over sky is the one pairing the palette
+    // guarantees. filling it with the wall instead would rest on cabin-against-ink holding up in
+    // every theme, which is the sort of assumption that leaves a reading invisible on half of them
+    char temp[16];
+    readout_weather_temp(temp, sizeof(temp));
+
+    // sized to the reading rather than the wall, so it reads as a plaque over the door and leaves
+    // the logs either side of it showing. a floor keeps a short reading from looking like a chip,
+    // and a ceiling keeps "120F" from running into the eaves
+    GFont font = fonts_get(FONT_HAND_16);
+    GSize reading = graphics_text_layout_get_content_size(temp, font,
+        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
+
+    int board_w = reading.w + 14;
+    if (board_w < 44)
+    {
+        board_w = 44;
+    }
+    if (board_w > (right - left) - CABIN_BOARD_INSET * 2)
+    {
+        board_w = (right - left) - CABIN_BOARD_INSET * 2;
+    }
+
+    GRect board = GRect(CABIN_MID - board_w / 2, wall_top + 2, board_w, CABIN_BOARD_H);
+
+    graphics_context_set_fill_color(ctx, pal->sky_hi);
+    graphics_context_set_stroke_color(ctx, pal->ink);
+    graphics_fill_rect(ctx, board, 0, GCornerNone);
+    graphics_draw_rect(ctx, board);
+
+    // the hand font hangs low in its line box, so the text starts above the board to land the
+    // lettering in the middle of it
+    graphics_context_set_text_color(ctx, pal->ink);
+    graphics_draw_text(ctx, temp, font,
+        GRect(board.origin.x, board.origin.y - 2, board.size.w, CABIN_BOARD_H + 8),
+        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+}
+#endif
+
 /** @brief Lay down the clearing floor the clock sits on. */
 static void draw_ground(GContext *ctx, GRect bounds, const Palette *pal)
 {
@@ -413,10 +429,16 @@ static void draw_ground(GContext *ctx, GRect bounds, const Palette *pal)
 // nothing sits below the clock's cap line across the middle, or the litter comes up between the
 // digits. out at the sides the digits never reach, so the floor carries on down the edges there
 static const GPoint s_litter[] = {
-    {16, 150}, {38, 146}, {58, 151}, {78, 148}, {100, 151}, {120, 147}, {140, 151},
+    {10, 152}, {100, 151}, {120, 147}, {140, 151},
     {160, 148}, {180, 151}, {200, 146}, {220, 150}, {240, 148},
     {22, 164}, {40, 172}, {16, 179},
     {228, 163}, {244, 171}, {220, 178},
+};
+
+// the track worn out of the doorway into the clearing. it starts at the foot of the door and
+// stops short of the clock's cap line, so it never runs in among the digits
+static const GPoint s_path[] = {
+    {40, 147}, {50, 150}, {62, 152}, {74, 153},
 };
 
 /**
@@ -441,6 +463,24 @@ static void draw_litter(GContext *ctx, const Palette *pal)
         int tilt = (i & 1) ? 2 : -2;
         graphics_draw_line(ctx, GPoint(at.x - 3, at.y - tilt), GPoint(at.x + 3, at.y + tilt));
         graphics_draw_line(ctx, GPoint(at.x + 1, at.y + 3), GPoint(at.x + 5, at.y + 1));
+    }
+
+    // the path, dashed along each leg so it reads as trodden ground rather than a drawn line
+    for (unsigned i = 0; i + 1 < ARRAY_LENGTH(s_path); i++)
+    {
+        GPoint from = s_path[i];
+        GPoint to = s_path[i + 1];
+        int dx = to.x - from.x;
+        int dy = to.y - from.y;
+        int span = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+
+        for (int at = 0; at < span; at += 6)
+        {
+            int end = at + 3 < span ? at + 3 : span;
+            graphics_draw_line(ctx,
+                GPoint(from.x + (dx * at) / span, from.y + (dy * at) / span),
+                GPoint(from.x + (dx * end) / span, from.y + (dy * end) / span));
+        }
     }
 }
 #endif
@@ -505,6 +545,10 @@ void scene_draw(GContext *ctx, GRect bounds, const Palette *pal)
     {
         sketchbook_fx_draw_bolt(ctx, pal);
     }
+
+#if defined(PBL_ROUND)
+    draw_temp_board(ctx, pal);
+#endif
 }
 
 /** @} */
