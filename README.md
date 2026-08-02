@@ -1,12 +1,8 @@
 # Pebble Watchfaces
 
-A collection of watchfaces for current Pebble hardware, built on one shared engine. Each face shows
-the time, date, weather and battery, wrapped in its own interface, with themes selectable from a
-Clay settings page. Most also show heart rate and steps where the watch has the sensors for them.
+A collection of watchfaces for current Pebble hardware, built on one shared engine. Each face shows the time, date, weather and battery, wrapped in its own interface, with themes selectable from a Clay settings page. Most also show heart rate and steps where the watch has the sensors for them.
 
-The Sketchbook faces (Ridgeline, Shoreline, Treeline) run on both the Pebble Time 2 (**Emery**) and
-the Round 2 (**Gabbro**). On the round screen they carry their reading in the scene rather than in a row
-of stats: on the boat's pennant, on a trail sign, on the cabin.
+The Sketchbook faces (Ridgeline, Shoreline, Treeline) run on both the Pebble Time 2 (**Emery**) and the Round 2 (**Gabbro**). On the round screen they carry their reading in the scene rather than in a row of stats: on the boat's pennant, on a trail sign, on the cabin.
 
 | Watchface | Preview |
 | :--- | :--- |
@@ -18,28 +14,17 @@ of stats: on the boat's pennant, on a trail sign, on the cabin.
 | **Shoreline**<br>[changelog](watchfaces/sketchbook/shoreline/CHANGELOG.md) | **Emery**<br><img src=".github/images/shoreline/emery_sketchbook.png" width="75" title="Sketchbook (Day)"> <img src=".github/images/shoreline/emery_daybreak.png" width="75" title="Daybreak (Day)"> <img src=".github/images/shoreline/emery_alpenglow.png" width="75" title="Alpenglow (Day)"> <img src=".github/images/shoreline/emery_blueprint.png" width="75" title="Blueprint (Day)"> <img src=".github/images/shoreline/emery_forest.png" width="75" title="Forest (Day)"> <img src=".github/images/shoreline/emery_mono.png" width="75" title="Mono (Day)"> <img src=".github/images/shoreline/emery_cyberpunk.png" width="75" title="Cyberpunk (Day)"> <img src=".github/images/shoreline/emery_neo-tokyo.png" width="75" title="Neo Tokyo (Day)"><br><img src=".github/images/shoreline/emery_sketchbook_night.png" width="75" title="Sketchbook (Night)"> <img src=".github/images/shoreline/emery_daybreak_night.png" width="75" title="Daybreak (Night)"> <img src=".github/images/shoreline/emery_alpenglow_night.png" width="75" title="Alpenglow (Night)"> <img src=".github/images/shoreline/emery_blueprint_night.png" width="75" title="Blueprint (Night)"> <img src=".github/images/shoreline/emery_forest_night.png" width="75" title="Forest (Night)"> <img src=".github/images/shoreline/emery_mono_night.png" width="75" title="Mono (Night)"> <img src=".github/images/shoreline/emery_cyberpunk_night.png" width="75" title="Cyberpunk (Night)"> <img src=".github/images/shoreline/emery_neo-tokyo_night.png" width="75" title="Neo Tokyo (Night)"><br>**Gabbro**<br><img src=".github/images/shoreline/gabbro_sketchbook.png" width="75" title="Sketchbook (Day)"> <img src=".github/images/shoreline/gabbro_daybreak.png" width="75" title="Daybreak (Day)"> <img src=".github/images/shoreline/gabbro_alpenglow.png" width="75" title="Alpenglow (Day)"> <img src=".github/images/shoreline/gabbro_blueprint.png" width="75" title="Blueprint (Day)"> <img src=".github/images/shoreline/gabbro_forest.png" width="75" title="Forest (Day)"> <img src=".github/images/shoreline/gabbro_mono.png" width="75" title="Mono (Day)"> <img src=".github/images/shoreline/gabbro_cyberpunk.png" width="75" title="Cyberpunk (Day)"> <img src=".github/images/shoreline/gabbro_neo-tokyo.png" width="75" title="Neo Tokyo (Day)"><br><img src=".github/images/shoreline/gabbro_sketchbook_night.png" width="75" title="Sketchbook (Night)"> <img src=".github/images/shoreline/gabbro_daybreak_night.png" width="75" title="Daybreak (Night)"> <img src=".github/images/shoreline/gabbro_alpenglow_night.png" width="75" title="Alpenglow (Night)"> <img src=".github/images/shoreline/gabbro_blueprint_night.png" width="75" title="Blueprint (Night)"> <img src=".github/images/shoreline/gabbro_forest_night.png" width="75" title="Forest (Night)"> <img src=".github/images/shoreline/gabbro_mono_night.png" width="75" title="Mono (Night)"> <img src=".github/images/shoreline/gabbro_cyberpunk_night.png" width="75" title="Cyberpunk (Night)"> <img src=".github/images/shoreline/gabbro_neo-tokyo_night.png" width="75" title="Neo Tokyo (Night)"> |
 | **Treeline**<br>[changelog](watchfaces/sketchbook/treeline/CHANGELOG.md) | **Emery**<br><img src=".github/images/treeline/emery_sketchbook.png" width="75" title="Sketchbook (Day)"> <img src=".github/images/treeline/emery_daybreak.png" width="75" title="Daybreak (Day)"> <img src=".github/images/treeline/emery_alpenglow.png" width="75" title="Alpenglow (Day)"> <img src=".github/images/treeline/emery_blueprint.png" width="75" title="Blueprint (Day)"> <img src=".github/images/treeline/emery_forest.png" width="75" title="Forest (Day)"> <img src=".github/images/treeline/emery_mono.png" width="75" title="Mono (Day)"> <img src=".github/images/treeline/emery_cyberpunk.png" width="75" title="Cyberpunk (Day)"> <img src=".github/images/treeline/emery_neo-tokyo.png" width="75" title="Neo Tokyo (Day)"><br><img src=".github/images/treeline/emery_sketchbook_night.png" width="75" title="Sketchbook (Night)"> <img src=".github/images/treeline/emery_daybreak_night.png" width="75" title="Daybreak (Night)"> <img src=".github/images/treeline/emery_alpenglow_night.png" width="75" title="Alpenglow (Night)"> <img src=".github/images/treeline/emery_blueprint_night.png" width="75" title="Blueprint (Night)"> <img src=".github/images/treeline/emery_forest_night.png" width="75" title="Forest (Night)"> <img src=".github/images/treeline/emery_mono_night.png" width="75" title="Mono (Night)"> <img src=".github/images/treeline/emery_cyberpunk_night.png" width="75" title="Cyberpunk (Night)"> <img src=".github/images/treeline/emery_neo-tokyo_night.png" width="75" title="Neo Tokyo (Night)"><br>**Gabbro**<br><img src=".github/images/treeline/gabbro_sketchbook.png" width="75" title="Sketchbook (Day)"> <img src=".github/images/treeline/gabbro_daybreak.png" width="75" title="Daybreak (Day)"> <img src=".github/images/treeline/gabbro_alpenglow.png" width="75" title="Alpenglow (Day)"> <img src=".github/images/treeline/gabbro_blueprint.png" width="75" title="Blueprint (Day)"> <img src=".github/images/treeline/gabbro_forest.png" width="75" title="Forest (Day)"> <img src=".github/images/treeline/gabbro_mono.png" width="75" title="Mono (Day)"> <img src=".github/images/treeline/gabbro_cyberpunk.png" width="75" title="Cyberpunk (Day)"> <img src=".github/images/treeline/gabbro_neo-tokyo.png" width="75" title="Neo Tokyo (Day)"><br><img src=".github/images/treeline/gabbro_sketchbook_night.png" width="75" title="Sketchbook (Night)"> <img src=".github/images/treeline/gabbro_daybreak_night.png" width="75" title="Daybreak (Night)"> <img src=".github/images/treeline/gabbro_alpenglow_night.png" width="75" title="Alpenglow (Night)"> <img src=".github/images/treeline/gabbro_blueprint_night.png" width="75" title="Blueprint (Night)"> <img src=".github/images/treeline/gabbro_forest_night.png" width="75" title="Forest (Night)"> <img src=".github/images/treeline/gabbro_mono_night.png" width="75" title="Mono (Night)"> <img src=".github/images/treeline/gabbro_cyberpunk_night.png" width="75" title="Cyberpunk (Night)"> <img src=".github/images/treeline/gabbro_neo-tokyo_night.png" width="75" title="Neo Tokyo (Night)"> |
 
-Gridlock's previews are layouts rather than themes: it has no fixed screen, so those are
-thirty-two built out of the same catalogue of panels, with the header and border toggles and the
-per-panel colours the settings page offers. Eight of them run as a
-[loop](.github/images/gridlock/layouts.gif) alongside a couple of the starter presets, and
-every panel it can draw is listed in [MODULES](watchfaces/gridlock/MODULES.md).
+Gridlock's previews are layouts rather than themes: it has no fixed screen, so those are thirty-two built out of the same catalogue of panels, with the header and border toggles and the per-panel colours the settings page offers. Eight of them run as a [loop](.github/images/gridlock/layouts.gif) alongside a couple of the starter presets, and every panel it can draw is listed in [MODULES](watchfaces/gridlock/MODULES.md).
 
-You build four of these rather than one, and pick two of them as your day and night screens.
-Gridlock swaps between the pair on its own, at sunset and sunrise or at times you set.
+You build four of these rather than one, and pick two of them as your day and night screens. Gridlock swaps between the pair on its own, at sunset and sunrise or at times you set.
 
 ## Install
 
-Download a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and
-open it with the Pebble app on your phone.
+Download a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone.
 
-Faces version independently, so releases are tagged per face as `<face>-v<version>`. Release notes
-are that version's `CHANGELOG.md` entry. A face built for a single watch names its platform in the
-asset, so `lcars-stardate-emery-1.5.0.pbw` is Emery only.
+Faces version independently, so releases are tagged per face as `<face>-v<version>`. Release notes are that version's `CHANGELOG.md` entry. A face built for a single watch names its platform in the asset, so `lcars-stardate-emery-1.7.0.pbw` is Emery only. A face that runs on more than one is named by version alone, since naming one watch would not be true of it. `ridgeline-1.2.0.pbw` holds a build for the Pebble Time 2 and one for the Round 2, and installs on both.
 
-Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp built from the same
-source. They share a UUID, so only one can be on the watch at a time: the watchface build sits in
-your watchface carousel and is the one on the appstore, and the watchapp build lives in the
-launcher instead. Take whichever you want from the releases page.
+Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp built from the same source. They share a UUID, so only one can be on the watch at a time: the watchface build sits in your watchface carousel and is the one on the appstore, and the watchapp build lives in the launcher instead. Take whichever you want from the releases page.
 
 ## Project Structure
 
@@ -63,23 +48,17 @@ The shared engine lives at the root. Each face owns only what makes it that face
 * **`vendor/`**: third-party source SVGs and the LCARS template (gitignored, see [Third-Party Assets](#third-party-assets)).
 * **`build.sh`**: regenerates a face's manifest, compiles its TypeScript pkjs, and runs `pebble build`.
 
-Anything with a `.g.` in the name is generated and should not be hand-edited: rerun the matching
-`npm run gen:*`. CI checks that the committed output still matches.
+Anything with a `.g.` in the name is generated and should not be hand-edited: rerun the matching `npm run gen:*`. CI checks that the committed output still matches.
 
 ### Adding a Face
 
-Create `watchfaces/<name>/` with the layout above, then build it. The sandbox, manifest, and waf
-entry point are all generated from the face's name and appinfo. Add `<name>` to the CI matrix in
-[.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
+Create `watchfaces/<name>/` with the layout above, then build it. The sandbox, manifest, and waf entry point are all generated from the face's name and appinfo. Add `<name>` to the CI matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
 
-To join a family instead, create it at `watchfaces/<family>/<name>/`. Nothing else changes: the
-name still has to be unique, the sandbox is still `targets/<name>/`, and the family's `core/` is
-compiled in automatically because of where the face sits.
+To join a family instead, create it at `watchfaces/<family>/<name>/`. Nothing else changes: the name still has to be unique, the sandbox is still `targets/<name>/`, and the family's `core/` is compiled in automatically because of where the face sits.
 
 ## Releasing
 
-Pushing a `<face>-v<version>` tag is the whole process. [release.yml](.github/workflows/release.yml)
-builds that face, takes its notes from the matching `CHANGELOG.md` section, and publishes the `.pbw`.
+Pushing a `<face>-v<version>` tag is the whole process. [release.yml](.github/workflows/release.yml) builds that face, takes its notes from the matching `CHANGELOG.md` section, and publishes the `.pbw`.
 
 ```sh
 # date the [1.5.0] heading in watchfaces/lcars-stardate/CHANGELOG.md first, then
@@ -87,9 +66,7 @@ git tag lcars-stardate-v1.5.0
 git push origin lcars-stardate-v1.5.0
 ```
 
-The tag version must match `version` in that face's `config/pebble.appinfo.json`, the changelog entry
-must be dated, and the tag must not already be released. The workflow checks all three before it
-spends time on a build, so a mistake costs seconds.
+The tag version must match `version` in that face's `config/pebble.appinfo.json`, the changelog entry must be dated, and the tag must not already be released. The workflow checks all three before it spends time on a build, so a mistake costs seconds.
 
 ## Development
 
@@ -174,33 +151,22 @@ All four return the same core quote data: last price, price change, percentage c
 
 ## Third-Party Assets
 
-This repository bundles each face's fonts, its generated icon PNGs, and its baked background PNGs.
-The weather and glyph icons' SVG sources and the LCARS template are *not* bundled and must be
-fetched to regenerate them. Everything bundled keeps its own licence, listed per face with its
-source and terms in [NOTICES](NOTICES.md).
+This repository bundles each face's fonts, its generated icon PNGs, and its baked background PNGs. The weather and glyph icons' SVG sources and the LCARS template are *not* bundled and must be fetched to regenerate them. Everything bundled keeps its own licence, listed per face with its source and terms in [NOTICES](NOTICES.md).
 
 ## License
 
-**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
-This license keeps the project aligned with the noncommercial nature of the LCARS-inspired assets
-and *Star Trek* fan-project guidelines.
+**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). This license keeps the project aligned with the noncommercial nature of the LCARS-inspired assets and *Star Trek* fan-project guidelines.
 
-You may use, modify, fork, and share it freely for any **noncommercial** purpose, personal use,
-hobby projects, study, and the like. See [LICENSE](LICENSE) for the full terms.
+You may use, modify, fork, and share it freely for any **noncommercial** purpose, personal use, hobby projects, study, and the like. See [LICENSE](LICENSE) for the full terms.
 
 ## Disclaimer
 
-**LCARS Stardate** is a noncommercial fan project. *Star Trek*, LCARS, and related marks are
-trademarks of CBS / Paramount Global. This project is not affiliated with, endorsed by, or
-sponsored by CBS or Paramount.
+**LCARS Stardate** is a noncommercial fan project. *Star Trek*, LCARS, and related marks are trademarks of CBS / Paramount Global. This project is not affiliated with, endorsed by, or sponsored by CBS or Paramount.
 
-Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an unaffiliated,
-noncommercial homage and is not endorsed by or associated with Microsoft.
+Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an unaffiliated, noncommercial homage and is not endorsed by or associated with Microsoft.
 
 ## AI Training Notice
 
-This repository and its contents are **not permitted to be used for training, fine-tuning, or
-evaluation of artificial intelligence or machine learning models**, including large language
-models. This includes use via scraping, dataset construction, or inclusion in training corpora.
+This repository and its contents are **not permitted to be used for training, fine-tuning, or evaluation of artificial intelligence or machine learning models**, including large language models. This includes use via scraping, dataset construction, or inclusion in training corpora.
 
 No consent is granted for such use.

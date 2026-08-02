@@ -77,6 +77,10 @@ jobs:
       # build.sh emits one <target>.pbw per target, unversioned. a face usually has one target,
       # but gridlock ships two (a watchface and a watchapp), so name each target's pbw with the
       # version (still identifiable months later) and collect them all as release assets
+      #
+      # a pbw built for one watch says which, so it is obvious what it will install on. one built
+      # for several carries every platform's binary inside it, and naming it after any one of them
+      # would be a lie, so those are named by version alone
       - name: Name The Assets
         id: assets
         run: |
@@ -84,7 +88,12 @@ jobs:
           version='${{ steps.face.outputs.version }}'
           assets=""
           for target in $(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/manifest/build-manifests.ts --targets "$face"); do
-            asset="$target-emery-$version.pbw"
+            platforms=$(node -p "JSON.parse(require('fs').readFileSync('targets/$target/package.json')).pebble.targetPlatforms.join(' ')")
+            if [ "$(printf '%s' "$platforms" | wc -w)" -eq 1 ]; then
+              asset="$target-$platforms-$version.pbw"
+            else
+              asset="$target-$version.pbw"
+            fi
             cp "targets/$target/build/$target.pbw" "$asset"
             assets="$assets $asset"
           done
