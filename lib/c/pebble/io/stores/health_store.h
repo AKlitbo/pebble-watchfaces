@@ -23,6 +23,12 @@ typedef struct
     bool     live;         ///< True subscribes the health service and false just keeps the fake data for screenshots
     bool     hr_history;   ///< Keep the rolling minute by minute heart rate window, for a face that graphs it
     bool     step_history; ///< Keep the hour by hour step buckets, for a face that graphs them
+    // the heart rate, steps and distance are read for every face, they are either cached by the
+    // watch or free. these three are not, so each is only read for a face that shows it, and the
+    // getter for one left off keeps returning the -1 that means no reading
+    bool     sleep;        ///< Read the sleep total
+    bool     active;       ///< Read the active minutes total
+    bool     calories;     ///< Read the active calories total
     uint32_t persist_key;  ///< Slot for the saved history so the face owns the key instead of the store
 } HealthConfig;
 

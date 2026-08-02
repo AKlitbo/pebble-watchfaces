@@ -46,6 +46,11 @@ static bool s_live; // true once subscribed to the live health service, so the m
 // current readings are always tracked, they are cheap and every face shows at least one of them
 static bool s_hr_history;
 static bool s_step_history;
+// the watch keeps the step count to hand and the heart rate is a plain peek, but these three cost
+// a flash read apiece every time they are asked for, so only a face that shows one pays for it
+static bool s_sleep;
+static bool s_active;
+static bool s_calories;
 static uint32_t s_persist_key; // the slot the face handed us for the saved history
 
 // --- health service reads (no-op stubs without PBL_HEALTH) ---
@@ -313,6 +318,7 @@ static void refresh_hr(void)
  * These are whole-day sums that can only move once a minute, but a movement event arrives every
  * few seconds while walking. Every metric bar steps costs a blocking read of a flash file, so
  * the reads are held to one round a minute and the rest of the events fall straight through.
+ * The three a face has to ask for are skipped outright when it has not.
  *
  * @param force Read now regardless of the minute gate, for the seed read and for the significant
  * update that calls every number stale.
@@ -331,14 +337,26 @@ static bool refresh_activity(bool force)
 
     // sleep and active time come in seconds. keep the -1 that means no data rather than
     // dividing it down to 0
-    int sleep_sec = read_sum_today(HealthMetricSleepSeconds, -1);
-    s_state.sleep_min = sleep_sec < 0 ? -1 : sleep_sec / 60;
+    if (s_sleep)
+    {
+        int sleep_sec = read_sum_today(HealthMetricSleepSeconds, -1);
+        s_state.sleep_min = sleep_sec < 0 ? -1 : sleep_sec / 60;
+    }
 
-    int active_sec = read_sum_today(HealthMetricActiveSeconds, -1);
-    s_state.active_min = active_sec < 0 ? -1 : active_sec / 60;
+    if (s_active)
+    {
+        int active_sec = read_sum_today(HealthMetricActiveSeconds, -1);
+        s_state.active_min = active_sec < 0 ? -1 : active_sec / 60;
+    }
 
+    if (s_calories)
+    {
+        s_state.calories = read_sum_today(HealthMetricActiveKCalories, -1);
+    }
+
+    // the watch hands the step count back without going near flash, and the distance rides along
+    // with it in the same readout, so both are read for every face
     s_state.steps = read_sum_today(HealthMetricStepCount, 0);
-    s_state.calories = read_sum_today(HealthMetricActiveKCalories, -1);
     s_state.distance_m = read_sum_today(HealthMetricWalkedDistanceMeters, 0);
 
     // the hourly buckets are the dearest thing in here, a blocking flash scan per hour read, so
@@ -399,6 +417,9 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
     s_live = false;
     s_hr_history = cfg.hr_history;
     s_step_history = cfg.step_history;
+    s_sleep = cfg.sleep;
+    s_active = cfg.active;
+    s_calories = cfg.calories;
     s_persist_key = cfg.persist_key;
 
     // -1 means no reading yet so a panel shows a placeholder until data turns up
