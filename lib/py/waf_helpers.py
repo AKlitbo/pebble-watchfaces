@@ -264,6 +264,13 @@ def build_face(ctx, extra_cflags=None):
                 if isinstance(media, list) and any(
                         isinstance(m, dict) and m.get('name') == 'ICON_WEATHER_NOW_NA' for m in media):
                     cflags.append('-DHAS_WEATHER_ICONS=1')
+
+                # a face that bundles both Quiet Time marks can draw the slot either way, the way
+                # bluetooth does. one that only ships the muted one draws it when it applies and
+                # leaves the slot empty otherwise
+                if isinstance(media, list) and any(
+                        isinstance(m, dict) and m.get('name') == 'ICON_QUIET_ON' for m in media):
+                    cflags.append('-DHAS_QUIET_PAIR=1')
         except Exception:
             pass
 
