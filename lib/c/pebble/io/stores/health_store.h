@@ -52,11 +52,12 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed);
 void health_store_subscribe(void (*cb)(void));
 
 /**
- * @brief Sample the live heart rate into the rolling history. Call it once a minute (off the
- * face's minute tick) so the graph builds a continuous line rather than waiting on the sparse
- * heart rate events. A no-op in seed mode.
+ * @brief Sample the live heart rate into the rolling history and refresh the activity numbers.
+ * Call it once a minute (off the face's minute tick) so the graph builds a continuous line
+ * rather than waiting on the sparse heart rate events, and so the step count keeps moving once
+ * the wearer goes still and the movement events dry up. A no-op in seed mode.
  */
-void health_store_poll_hr(void);
+void health_store_poll_minute(void);
 
 /**
  * @brief The last hour of heart rate readings, one per minute (a 60 slot buffer). The store

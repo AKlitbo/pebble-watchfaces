@@ -139,31 +139,36 @@ static uint16_t clamp_u16(int value)
 static void read_step_hourly(void)
 {
 #if defined(PBL_HEALTH)
-    // minute data only changes once a minute and movement events fire far more often than that
-    // so skip the rebuild until the clock minute moves on. the buckets stay good until then
-    static time_t s_built_min = 0;
+    // hours that have already finished can never gain another step, so they are read once and
+    // kept. only the hour in progress is re-read each time. s_cached_day pins those buckets to
+    // the day they were built for and s_settled_hours counts how many of them are final
+    static time_t s_cached_day = 0;
+    static int s_settled_hours = 0;
+
     time_t now = time(NULL);
-    time_t now_min = now / SECONDS_PER_MINUTE;
-    if (now_min == s_built_min)
-    {
-        return;
-    }
-    s_built_min = now_min;
-
-    memset(s_state.step_hourly, 0, sizeof(s_state.step_hourly));
-    s_state.step_hours = 0;
-
     time_t day_start = time_start_of_today();
+    struct tm *lt = localtime(&now);
+    int cur_hour = lt->tm_hour;
+
+    // a new day, or a clock that jumped backwards, leaves the kept buckets describing hours that
+    // are no longer the ones being asked about, so drop the lot and read them again
+    if (day_start != s_cached_day || cur_hour < s_settled_hours)
+    {
+        memset(s_state.step_hourly, 0, sizeof(s_state.step_hourly));
+        s_state.step_hours = 0;
+        s_cached_day = day_start;
+        s_settled_hours = 0;
+    }
+
     if (!metric_available(HealthMetricStepCount, day_start, now))
     {
         return;
     }
 
-    struct tm *lt = localtime(&now);
-    int cur_hour = lt->tm_hour;
-
-    // read a single hour of per-minute records into the shared scratch buffer
-    for (int h = 0; h <= cur_hour && h < HOURS_PER_DAY; h++)
+    // read the hour in progress, plus any whole hours that went by while nothing was looking.
+    // every health_service_get_minute_history is a blocking scan of a flash file that holds up
+    // the watch's background work, so the settled hours are worth far more cached than re-read
+    for (int h = s_settled_hours; h <= cur_hour && h < HOURS_PER_DAY; h++)
     {
         time_t q_start = day_start + (time_t)h * SECONDS_PER_HOUR;
         time_t q_end = q_start + SECONDS_PER_HOUR;
@@ -186,6 +191,8 @@ static void read_step_hourly(void)
         s_state.step_hourly[h] = clamp_u16(sum);
     }
 
+    // the hour in progress still has minutes coming, so only the ones before it have settled
+    s_settled_hours = cur_hour;
     s_state.step_hours = cur_hour + 1;
 #endif
 }
@@ -194,12 +201,27 @@ static void read_step_hourly(void)
 
 // stash the whole state so a relaunch can restore the graph. only a live face writes, so seed
 // mode never touches storage
+//
+// a flash write blocks while it runs and the sensor can land a reading a second during a heart
+// rate burst, so hold the saves to one a minute. the graph only gains a point a minute anyway,
+// so the most this can lose is the point being drawn right now
 static void persist_save(void)
 {
-    if (s_live)
+    static time_t s_saved_min = 0;
+
+    if (!s_live)
     {
-        store_save(s_persist_key, &s_state, sizeof(s_state), STORE_TAG_HEALTH);
+        return;
     }
+
+    time_t now_min = time(NULL) / SECONDS_PER_MINUTE;
+    if (now_min == s_saved_min)
+    {
+        return;
+    }
+    s_saved_min = now_min;
+
+    store_save(s_persist_key, &s_state, sizeof(s_state), STORE_TAG_HEALTH);
 }
 
 /**
@@ -250,16 +272,34 @@ static void refresh_hr(void)
     {
         s_state.hr_history[HR_HISTORY_MINUTES - 1] = (uint8_t)(hr > 255 ? 255 : hr);
         // save on a real reading only, not every minute slide. the restore re-ages the window
-        // so the empty minutes in between do not need writing, which keeps the flash writes rare
+        // so the empty minutes in between do not need writing. a burst can still land a reading
+        // a second, so persist_save holds the actual writing down to one a minute
         persist_save();
     }
 }
 
 /**
  * @brief Refresh the daily activity scalars (steps, distance, calories, sleep, active).
+ *
+ * These are whole-day sums that can only move once a minute, but a movement event arrives every
+ * few seconds while walking. Every metric bar steps costs a blocking read of a flash file, so
+ * the reads are held to one round a minute and the rest of the events fall straight through.
+ *
+ * @param force Read now regardless of the minute gate, for the seed read and for the significant
+ * update that calls every number stale.
+ * @return True when the numbers were actually re-read, so the caller knows there is something
+ * new to repaint.
  */
-static void refresh_activity(void)
+static bool refresh_activity(bool force)
 {
+    static time_t s_read_min = 0;
+    time_t now_min = time(NULL) / SECONDS_PER_MINUTE;
+    if (!force && now_min == s_read_min)
+    {
+        return false;
+    }
+    s_read_min = now_min;
+
     // sleep and active time come in seconds. keep the -1 that means no data rather than
     // dividing it down to 0
     int sleep_sec = read_sum_today(HealthMetricSleepSeconds, -1);
@@ -273,36 +313,43 @@ static void refresh_activity(void)
     s_state.distance_m = read_sum_today(HealthMetricWalkedDistanceMeters, 0);
 
     read_step_hourly();
+    return true;
 }
 
 /**
  * @brief Health event handler: refresh only the metrics the event touched, then notify.
  *
  * A movement event does not change the heart rate history and an hr event does not change
- * the step count, so reading just the affected group keeps these frequent events cheap.
+ * the step count, so each one only reads its own group. Those reads are dear enough that the
+ * group is not the whole saving, though. The minute gate inside refresh_activity is what turns
+ * most of the movement events, which arrive every few seconds, into nothing at all.
  *
  * @param event The health event type.
  * @param context Context (unused).
  */
 static void on_health_event(HealthEventType event, void *context)
 {
+    // a movement event that the minute gate turns away read nothing, so there is no repaint to
+    // ask for either. the other events always bring something new
+    bool changed = true;
+
     switch (event)
     {
         case HealthEventHeartRateUpdate:
             refresh_hr();
             break;
         case HealthEventMovementUpdate:
-            refresh_activity();
+            changed = refresh_activity(false);
             break;
         case HealthEventSignificantUpdate:
             refresh_hr();
-            refresh_activity();
+            refresh_activity(true);
             break;
         default:
             return;
     }
 
-    if (s_cb) s_cb();
+    if (changed && s_cb) s_cb();
 }
 
 // --- public API ---
@@ -389,11 +436,11 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
 
         // seed the first reading before any event lands
         refresh_hr();
-        refresh_activity();
+        refresh_activity(true);
     }
 }
 
-void health_store_poll_hr(void)
+void health_store_poll_minute(void)
 {
     if (!s_live)
     {
@@ -404,6 +451,13 @@ void health_store_poll_hr(void)
     // only raises a heart rate event now and then, which would leave the chart as a few stray
     // dots, but peeking the filtered value each minute fills the window minute by minute
     refresh_hr();
+
+    // the activity numbers ride the minute tick too. movement events are what usually refresh
+    // them, but those stop the moment the wearer goes still, which would leave the step count
+    // and anything watching it sitting on whatever the last event happened to catch. the gate
+    // inside makes this free on any minute an event already covered
+    refresh_activity(false);
+
     if (s_cb) s_cb();
 }
 

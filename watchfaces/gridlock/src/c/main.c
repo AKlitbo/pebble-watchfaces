@@ -186,7 +186,7 @@ static void calendar_vibe(void)
 // from it instead of the whole grid
 // the minute tick lives on the time store, so ride it to sample the heart rate once a minute.
 // that keeps the graph a continuous line instead of the stray dots the sparse hr events leave
-static void on_time_changed(void)    { health_store_poll_hr(); hourly_vibe(); calendar_vibe(); night_layout_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
+static void on_time_changed(void)    { health_store_poll_minute(); hourly_vibe(); calendar_vibe(); night_layout_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
 static void on_weather_changed(void) { night_layout_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
 static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }
 static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR); }
