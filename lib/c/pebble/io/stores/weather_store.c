@@ -10,7 +10,9 @@
 #include <limits.h>
 
 #include "io/appmessage/appmessage.h"
+#include "io/stores/store_cadence.h"
 #include "io/stores/store_persist.h"
+#include "io/stores/store_poll.h"
 
 // a short first fetch after launch (fires from the event loop so appmessage is open by then)
 // then the recurring poll runs at the configured interval
@@ -47,8 +49,9 @@ static struct
 _Static_assert(sizeof(s_state) <= PERSIST_DATA_MAX_LENGTH, "weather state must fit one persist key");
 
 static void (*s_cb)(void);
-static AppTimer *s_timer;
-static int s_poll_ms;
+static AppTimer *s_timer;  // the short boot re-ask only. the recurring poll rides the cadence
+static int s_poll_min;
+static time_t s_next_poll; // wall-clock second the next recurring poll is due
 static int s_boot_retries; // short cold-boot re-asks used so far, until the first reading lands
 static bool s_live;  // true = a live face, so the cache is worth reading and writing
 static uint32_t s_persist_key; // the slot the face handed us for the saved reading
@@ -248,33 +251,30 @@ static void on_location_name(const char *name)
     if (s_cb) s_cb();
 }
 
-// --- poll timer ---
+// --- polling ---
 
 /**
- * @brief Ask the phone for weather, then re-arm at the configured interval.
+ * @brief The short boot re-ask, and only that.
+ *
+ * A cold launch can send its first request before the phone JS is up, and the reconnect refresh
+ * only fires on a real disconnect to connect transition rather than on the initial connect, so
+ * without this the face would sit blank until the next deadline came round. It re-asks on a short
+ * cadence for a bounded number of tries, then stops and leaves the recurring poll to the cadence.
+ *
+ * @param data The timer context (unused).
  */
-static void poll_fire(void *data)
+static void boot_fire(void *data)
 {
+    s_timer = NULL;
     appmessage_request_weather();
-    // re-arm only when there is a real interval, so a 0ms poll_min can never spin the loop.
-    // this keeps poll_fire self-defending regardless of how the timer was first armed
-    if (s_poll_ms <= 0)
+
+    if (s_poll_min <= 0 || s_state.last_sync != 0 || s_boot_retries >= WEATHER_BOOT_RETRIES)
     {
-        s_timer = NULL;  // fired and not re-arming, so drop the now-stale handle
-        return;
+        return;  // got a reading, or ran out of tries. the deadline has it from here
     }
 
-    // until the first reading lands, re-ask on the short boot cadence for a bounded window rather
-    // than waiting out the full interval. a cold launch can send the first request before the phone
-    // JS is up, and the reconnect refresh only fires on a real disconnect->connect transition, not
-    // on the initial connect, so without this the face would stay blank until the next poll
-    int next_ms = s_poll_ms;
-    if (s_state.last_sync == 0 && s_boot_retries < WEATHER_BOOT_RETRIES)
-    {
-        s_boot_retries++;
-        next_ms = WEATHER_BOOT_RETRY_MS;
-    }
-    s_timer = app_timer_register(next_ms, poll_fire, NULL);
+    s_boot_retries++;
+    s_timer = app_timer_register(WEATHER_BOOT_RETRY_MS, boot_fire, NULL);
 }
 
 static void stop_polling(void)
@@ -283,6 +283,22 @@ static void stop_polling(void)
     {
         app_timer_cancel(s_timer);
         s_timer = NULL;
+    }
+}
+
+/**
+ * @brief The store's turn on the face's cadence: poll when the deadline has come round.
+ */
+static void cadence_poll(void)
+{
+    if (!s_live)
+    {
+        return;
+    }
+
+    if (store_poll_due(s_poll_min, &s_next_poll, time(NULL)))
+    {
+        appmessage_request_weather();
     }
 }
 
@@ -298,8 +314,10 @@ void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
     s_live = cfg.live;  // set before any set_current so persist_flush knows whether to write
     s_persist_key = cfg.persist_key;
     reset_state();
-    s_poll_ms = cfg.poll_min * 60 * 1000;
+    s_poll_min = cfg.poll_min;
+    s_next_poll = store_poll_next(s_poll_min > 0 ? s_poll_min : 1, time(NULL));
     s_boot_retries = 0;  // fresh cold-boot re-ask budget
+    store_cadence_register(cadence_poll);
 
     if (seed)
     {
@@ -344,26 +362,26 @@ void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
         // one coalesced persist per inbox instead of one write per channel handler
         appmessage_on_inbox_complete(persist_flush);
 
-        // first fetch shortly after launch then every poll interval. poll_min 0 disables
-        // polling (matching reconfigure), so only arm when there is a real interval,
-        // otherwise poll_fire would re-arm a 0ms timer and spin the event loop
+        // one fetch shortly after launch so the face is not blank while the first deadline is
+        // still coming. poll_min 0 disables polling, matching reconfigure
         stop_polling();
-        if (s_poll_ms > 0)
+        if (s_poll_min > 0)
         {
-            s_timer = app_timer_register(WEATHER_FIRST_POLL_MS, poll_fire, NULL);
+            s_timer = app_timer_register(WEATHER_FIRST_POLL_MS, boot_fire, NULL);
         }
     }
 }
 
 void weather_store_reconfigure(WeatherConfig cfg)
 {
-    s_poll_ms = cfg.poll_min * 60 * 1000;
+    s_poll_min = cfg.poll_min;
 
-    // re-arm at the new interval (no immediate fetch. a real interval change is rare)
+    // take the new interval from the next boundary on (no immediate fetch. a real interval change
+    // is rare, and the reading in hand is still good)
     stop_polling();
-    if (cfg.enabled && cfg.live && s_poll_ms > 0)
+    if (cfg.enabled && cfg.live && s_poll_min > 0)
     {
-        s_timer = app_timer_register(s_poll_ms, poll_fire, NULL);
+        s_next_poll = store_poll_next(s_poll_min, time(NULL));
     }
 }
 

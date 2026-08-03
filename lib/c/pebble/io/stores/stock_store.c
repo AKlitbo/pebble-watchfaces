@@ -8,7 +8,9 @@
 #include <time.h>
 
 #include "io/appmessage/appmessage.h"
+#include "io/stores/store_cadence.h"
 #include "io/stores/store_persist.h"
+#include "io/stores/store_poll.h"
 
 // a short first fetch after launch (fires from the event loop so appmessage is open by then)
 // then the recurring poll runs at the configured interval
@@ -23,8 +25,9 @@ static struct
 _Static_assert(sizeof(s_state) <= PERSIST_DATA_MAX_LENGTH, "stock state must fit one persist key");
 
 static void (*s_cb)(void);
-static AppTimer *s_timer;
-static int s_poll_ms;
+static AppTimer *s_timer;  // the catch-up fetch only. the recurring poll rides the cadence
+static int s_poll_min;
+static time_t s_next_poll; // wall-clock second the next recurring poll is due
 static bool s_live;
 static uint32_t s_persist_key; // the slot the face handed us for the saved strip
 
@@ -84,21 +87,14 @@ static void on_stock_strip(const uint8_t *buf, uint16_t len)
 // --- poll timer ---
 
 /**
- * @brief Ask the phone for fresh quotes, then re-arm at the configured interval.
+ * @brief The one-shot catch-up fetch, used at launch and when the panel turns up empty.
+ *
+ * @param data The timer context (unused).
  */
-static void poll_fire(void *data)
+static void catch_up_fire(void *data)
 {
+    s_timer = NULL;
     appmessage_request_stock();
-    // re-arm only when there is a real interval, so a 0ms poll_min can never spin the loop.
-    // this keeps poll_fire self-defending regardless of how the timer was first armed
-    if (s_poll_ms > 0)
-    {
-        s_timer = app_timer_register(s_poll_ms, poll_fire, NULL);
-    }
-    else
-    {
-        s_timer = NULL;  // fired and not re-arming, so drop the now-stale handle
-    }
 }
 
 static void stop_polling(void)
@@ -107,6 +103,22 @@ static void stop_polling(void)
     {
         app_timer_cancel(s_timer);
         s_timer = NULL;
+    }
+}
+
+/**
+ * @brief The store's turn on the face's cadence: poll when the deadline has come round.
+ */
+static void cadence_poll(void)
+{
+    if (!s_live)
+    {
+        return;
+    }
+
+    if (store_poll_due(s_poll_min, &s_next_poll, time(NULL)))
+    {
+        appmessage_request_stock();
     }
 }
 
@@ -122,7 +134,9 @@ void stock_store_init(StockConfig cfg, const StockSeed *seed)
     s_live = cfg.live; // set before any persist_save so it knows whether to write
     s_persist_key = cfg.persist_key;
     reset_state();
-    s_poll_ms = cfg.poll_min * 60 * 1000;
+    s_poll_min = cfg.poll_min;
+    s_next_poll = store_poll_next(s_poll_min > 0 ? s_poll_min : 1, time(NULL));
+    store_cadence_register(cadence_poll);
 
     if (seed)
     {
@@ -153,30 +167,33 @@ void stock_store_init(StockConfig cfg, const StockSeed *seed)
         // the store owns the stock channel. faces that don't declare the key never see it fire
         appmessage_on_stock_strip(on_stock_strip);
 
-        // first fetch shortly after launch then every poll interval. poll_min 0 disables
-        // polling (matching reconfigure), so only arm when there is a real interval,
-        // otherwise poll_fire would re-arm a 0ms timer and spin the event loop
+        // one fetch shortly after launch so the strip is not left on -- while the first deadline
+        // is still coming. poll_min 0 disables polling, matching reconfigure
         stop_polling();
-        if (s_poll_ms > 0)
+        if (s_poll_min > 0)
         {
-            s_timer = app_timer_register(STOCK_FIRST_POLL_MS, poll_fire, NULL);
+            s_timer = app_timer_register(STOCK_FIRST_POLL_MS, catch_up_fire, NULL);
         }
     }
 }
 
 void stock_store_reconfigure(StockConfig cfg)
 {
-    s_poll_ms = cfg.poll_min * 60 * 1000;
+    s_poll_min = cfg.poll_min;
 
     stop_polling();
-    if (cfg.enabled && cfg.live && s_poll_ms > 0)
+    if (cfg.enabled && cfg.live && s_poll_min > 0)
     {
+        s_next_poll = store_poll_next(s_poll_min, time(NULL));
+
         // an empty store has nothing but -- to draw, so catch up right away: the panel may have
         // just been added to the layout, or this very save may have cancelled the launch poll.
-        // one that already holds quotes keeps its cadence, so a save that only touched colours
-        // never pulls a fetch forward and spends a metered provider's quota
-        int delay_ms = (s_state.strip.count == 0) ? STOCK_FIRST_POLL_MS : s_poll_ms;
-        s_timer = app_timer_register(delay_ms, poll_fire, NULL);
+        // one that already holds quotes waits for the deadline, so a save that only touched
+        // colours never pulls a fetch forward and spends a metered provider's quota
+        if (s_state.strip.count == 0)
+        {
+            s_timer = app_timer_register(STOCK_FIRST_POLL_MS, catch_up_fire, NULL);
+        }
     }
 }
 
