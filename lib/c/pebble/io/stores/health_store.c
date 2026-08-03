@@ -7,6 +7,7 @@
 #include "io/stores/store_cadence.h"
 #include "io/stores/store_persist.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -95,16 +96,19 @@ static int read_sum_today(HealthMetric metric, int fallback)
 }
 
 #if defined(PBL_HEALTH)
-// one shared scratch buffer for both minute-history reads (the HR backfill and the step hourly sum).
-// they run sequentially on the app thread and each fully drains it before the next, so they never
-// need separate storage. that saves a malloc and free on every event
-static HealthMinuteData s_minute_scratch[HR_HISTORY_MINUTES];
+// both minute-history reads (the HR backfill and the step hourly sum) want a batch of records at
+// once. the step sum reads a whole hour in one go, and HR_HISTORY_MINUTES is a separate call about
+// how much heart rate the graph shows, so take whichever is larger rather than trusting them to
+// keep lining up
+#define MINUTE_SCRATCH ((HR_HISTORY_MINUTES > MINUTES_PER_HOUR) ? HR_HISTORY_MINUTES : MINUTES_PER_HOUR)
 
-// the step sum reads a whole hour in one go so the scratch has to hold a full hour of records
-// HR_HISTORY_MINUTES is a separate call about how much heart rate the graph shows so the two
-// only line up by luck. this fails the build if that window ever shrinks
-_Static_assert(ARRAY_LENGTH(s_minute_scratch) >= MINUTES_PER_HOUR,
-               "minute scratch must hold a full hour for the step read");
+// the batch comes off the heap for the length of the read rather than sitting in the app's fixed
+// footprint. only a face that graphs health ever asks for one, and what a pebble app runs out of
+// first is its image, which the heap does not count towards. a read a minute is well worth that
+static HealthMinuteData *scratch_take(void)
+{
+    return malloc(sizeof(HealthMinuteData) * MINUTE_SCRATCH);
+}
 #endif
 
 static void read_hr_history(uint8_t *history_out, int max_records)
@@ -112,17 +116,24 @@ static void read_hr_history(uint8_t *history_out, int max_records)
 #if defined(PBL_HEALTH)
     if (max_records <= 0 || !history_out) return;
 
-    // the store only ever asks for the 60 minute window so cap the query to the scratch buffer
-    if (max_records > (int)ARRAY_LENGTH(s_minute_scratch))
+    // the store only ever asks for the 60 minute window so cap the query to the batch
+    if (max_records > MINUTE_SCRATCH)
     {
-        max_records = (int)ARRAY_LENGTH(s_minute_scratch);
+        max_records = MINUTE_SCRATCH;
     }
 
     memset(history_out, 0, max_records);
+
+    HealthMinuteData *scratch = scratch_take();
+    if (!scratch)
+    {
+        return; // no room for the batch, so leave the window zeroed and let the live readings fill it
+    }
+
     time_t end = time(NULL);
     time_t start = end - (max_records * SECONDS_PER_MINUTE);
 
-    uint32_t records_read = health_service_get_minute_history(s_minute_scratch, max_records, &start, &end);
+    uint32_t records_read = health_service_get_minute_history(scratch, max_records, &start, &end);
 
     // the service is handed the room it has and documents that it returns that many or fewer, but
     // that is its promise rather than something checked here. more than asked for would put offset
@@ -138,8 +149,10 @@ static void read_hr_history(uint8_t *history_out, int max_records)
     int offset = max_records - (int)records_read;
     for (uint32_t i = 0; i < records_read; i++)
     {
-        history_out[offset + i] = s_minute_scratch[i].is_invalid ? 0 : s_minute_scratch[i].heart_rate_bpm;
+        history_out[offset + i] = scratch[i].is_invalid ? 0 : scratch[i].heart_rate_bpm;
     }
+
+    free(scratch);
 #endif
 }
 
@@ -180,6 +193,13 @@ static void read_step_hourly(void)
         return;
     }
 
+    // one batch for the whole run of hours rather than one apiece
+    HealthMinuteData *scratch = scratch_take();
+    if (!scratch)
+    {
+        return; // no room, so leave the buckets as they are and try again next turn
+    }
+
     // read the hour in progress, plus any whole hours that went by while nothing was looking. each
     // health_service_get_minute_history is a blocking flash scan, so settled hours stay cached
     for (int h = s_settled_hours; h <= cur_hour && h < HOURS_PER_DAY; h++)
@@ -192,18 +212,20 @@ static void read_step_hourly(void)
         }
 
         // every record the service hands back sits inside this hour, so just add up their steps
-        uint32_t got = health_service_get_minute_history(s_minute_scratch, MINUTES_PER_HOUR,
+        uint32_t got = health_service_get_minute_history(scratch, MINUTES_PER_HOUR,
                                                          &q_start, &q_end);
         int sum = 0;
         for (uint32_t i = 0; i < got; i++)
         {
-            if (!s_minute_scratch[i].is_invalid)
+            if (!scratch[i].is_invalid)
             {
-                sum += s_minute_scratch[i].steps;
+                sum += scratch[i].steps;
             }
         }
         s_state.step_hourly[h] = clamp_u16(sum);
     }
+
+    free(scratch);
 
     // the hour in progress is never settled, nor is the hour just gone while the clock is on its
     // first minute: the watch writes a minute's record at the top of the minute after it, below
