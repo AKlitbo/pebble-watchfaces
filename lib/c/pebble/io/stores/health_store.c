@@ -7,6 +7,8 @@
 #include "io/stores/store_cadence.h"
 #include "io/stores/store_persist.h"
 
+#include "health/step_hours.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -14,7 +16,9 @@
 // how many minutes of heart rate the graph shows. nothing to do with an hour having 60 minutes
 // even though it lands on the same number
 #define HR_HISTORY_MINUTES 60
-// HOURS_PER_DAY (24) and MINUTES_PER_HOUR (60) come from the Pebble SDK
+// HOURS_PER_DAY (24) and MINUTES_PER_HOUR (60) come from the Pebble SDK. the bucket maths lives in
+// core so it can be tested on the host, so the two have to agree on how long a day is
+_Static_assert(HOURS_PER_DAY == STEP_HOURS_PER_DAY, "core and the SDK must agree on the day");
 
 static struct
 {
@@ -227,15 +231,7 @@ static void read_step_hourly(void)
 
     free(scratch);
 
-    // the hour in progress is never settled, nor is the hour just gone while the clock is on its
-    // first minute: the watch writes a minute's record at the top of the minute after it, below
-    // this in priority, so on the rollover turn that last record is usually not there yet
-    s_settled_hours = (lt->tm_min > 0) ? cur_hour : cur_hour - 1;
-    if (s_settled_hours < 0)
-    {
-        s_settled_hours = 0;
-    }
-
+    s_settled_hours = step_hours_settled(cur_hour, lt->tm_min);
     s_state.step_hours = cur_hour + 1;
 #endif
 }
