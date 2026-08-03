@@ -17,10 +17,9 @@
 /**
  * @brief How many whole hours have settled, meaning they can never gain another step.
  *
- * The hour in progress never counts. Nor does the hour just gone while the clock is still on its
- * first minute: the watch writes a minute's record at the top of the minute after it, and it does
- * that below the watchface in priority, so on the turn an hour rolls over its last record is
- * usually not there to read yet.
+ * The hour in progress never counts, nor does the hour just gone while the clock is on its first
+ * minute: the watch writes a minute's record at the top of the minute after it, below the
+ * watchface in priority, so on the rollover turn that last record is usually not there yet.
  *
  * @param cur_hour The hour now, 0 to 23.
  * @param cur_min The minute within that hour, 0 to 59.
@@ -31,9 +30,8 @@ int step_hours_settled(int cur_hour, int cur_min);
 /**
  * @brief Which hourly bucket a minute record belongs in.
  *
- * A batched read hands back records from several hours at once, and the watch shuffles them
- * towards the front of the array when the window opens on a gap, so where a record sits in that
- * array says nothing about where it sits in the day. Only its own time does.
+ * A batched read spans several hours, and the watch moves the window's start forward to the first
+ * record it holds, so a record's place in the array says nothing about its place in the day.
  *
  * @param seconds_into_day How far past midnight the record sits.
  * @return The bucket index, or -1 when the record falls outside the day.

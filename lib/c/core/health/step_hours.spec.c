@@ -2,9 +2,8 @@
  * @file step_hours.spec.c
  * @brief Host tests for the step chart's hour arithmetic.
  *
- * Both of these encode a timing detail of the watch rather than plain maths, which is why they
- * are worth pinning. An hour settles one minute later than you would guess, and a batched read
- * hands its records back in an order that says nothing about which hour they belong to.
+ * Both encode a timing detail of the watch rather than plain maths: an hour settles a minute
+ * later than you would guess, and a record's place in a batch says nothing about its hour.
  */
 #include "unity.h"
 
@@ -88,8 +87,8 @@ void test_past_the_end_of_the_day_has_no_bucket(void)
 /**
  * @brief A record before the day started has no bucket either.
  *
- * The watch moves the window's start to the first record it actually holds, so a read that opens
- * on a gap can hand back something older than what was asked for.
+ * The watch only ever moves a window's start forward, so this should not come up. It is guarded
+ * anyway because the caller does the subtraction, and a wrong day there would index off the front.
  */
 void test_before_the_day_started_has_no_bucket(void)
 {

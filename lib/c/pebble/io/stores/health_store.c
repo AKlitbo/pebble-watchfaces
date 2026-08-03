@@ -58,6 +58,8 @@ static bool s_calories;
 // because init clears the buckets, and stale beliefs about them would strand the cleared ones
 static time_t s_cached_day;
 static int s_settled_hours;
+// true between init and the first bucket read, which is held back until the face has painted
+static bool s_steps_pending;
 static uint32_t s_persist_key; // the slot the face handed us for the saved history
 
 // --- health service reads (no-op stubs without PBL_HEALTH) ---
@@ -100,18 +102,15 @@ static int read_sum_today(HealthMetric metric, int fallback)
 }
 
 #if defined(PBL_HEALTH)
-// both minute-history reads (the HR backfill and the step hourly sum) want a batch of records at
-// once. the step sum reads a whole hour in one go, and HR_HISTORY_MINUTES is a separate call about
-// how much heart rate the graph shows, so take whichever is larger rather than trusting them to
-// keep lining up
-#define MINUTE_SCRATCH ((HR_HISTORY_MINUTES > MINUTES_PER_HOUR) ? HR_HISTORY_MINUTES : MINUTES_PER_HOUR)
+// how many hours the catch-up asks for at a time. a read costs the same whatever window it asks
+// for, so a wider one is most of a day's catch-up done in four goes instead of twenty-four
+#define STEP_CATCHUP_HOURS 6
 
-// the batch comes off the heap for the length of the read rather than sitting in the app's fixed
-// footprint. only a face that graphs health ever asks for one, and what a pebble app runs out of
-// first is its image, which the heap does not count towards. a read a minute is well worth that
-static HealthMinuteData *scratch_take(void)
+// off the heap for the length of the read rather than sitting in the app's fixed footprint. what
+// a pebble app runs out of first is its image, and the heap does not count towards that
+static HealthMinuteData *scratch_take(int records)
 {
-    return malloc(sizeof(HealthMinuteData) * MINUTE_SCRATCH);
+    return malloc(sizeof(HealthMinuteData) * records);
 }
 #endif
 
@@ -121,17 +120,17 @@ static void read_hr_history(uint8_t *history_out, int max_records)
     if (max_records <= 0 || !history_out) return;
 
     // the store only ever asks for the 60 minute window so cap the query to the batch
-    if (max_records > MINUTE_SCRATCH)
+    if (max_records > HR_HISTORY_MINUTES)
     {
-        max_records = MINUTE_SCRATCH;
+        max_records = HR_HISTORY_MINUTES;
     }
 
     memset(history_out, 0, max_records);
 
-    HealthMinuteData *scratch = scratch_take();
+    HealthMinuteData *scratch = scratch_take(max_records);
     if (!scratch)
     {
-        return; // no room for the batch, so leave the window zeroed and let the live readings fill it
+        return; // no room for the records, so leave the window zeroed and let live readings fill it
     }
 
     time_t end = time(NULL);
@@ -169,11 +168,12 @@ static uint16_t clamp_u16(int value)
 }
 #endif
 
-// fills the per-hour step buckets from midnight up to the current hour. it reads the real
-// minute by minute step counts and adds each minute into its hour. health_service_sum can not
-// do this: it only hands back a daily total sliced by how long the window is, so every whole
-// hour would come out the same. hours yet to come stay 0. step_hours records how many are real
-// so the chart can tell a quiet hour from an hour that has not happened
+// fills the per-hour step buckets from midnight up to the current hour. step_hours records how
+// many are real so the chart can tell a quiet hour from one that has not happened yet
+//
+// an hour is read as it rolls over and once more the minute after, then never again. the hour in
+// progress is today's total less the settled ones, which is free. each real read blocks on a scan
+// of the watch's whole minute log, so they stay off the minute path
 static void read_step_hourly(void)
 {
 #if defined(PBL_HEALTH)
@@ -197,42 +197,84 @@ static void read_step_hourly(void)
         return;
     }
 
-    // one batch for the whole run of hours rather than one apiece
-    HealthMinuteData *scratch = scratch_take();
-    if (!scratch)
+    // any whole hour behind the current one that has not been read yet. normally none, one on the
+    // turn an hour rolls over, and the run since midnight on the first turn after a launch
+    if (s_settled_hours < cur_hour)
     {
-        return; // no room, so leave the buckets as they are and try again next turn
-    }
-
-    // read the hour in progress, plus any whole hours that went by while nothing was looking. each
-    // health_service_get_minute_history is a blocking flash scan, so settled hours stay cached
-    for (int h = s_settled_hours; h <= cur_hour && h < HOURS_PER_DAY; h++)
-    {
-        time_t q_start = day_start + (time_t)h * SECONDS_PER_HOUR;
-        time_t q_end = q_start + SECONDS_PER_HOUR;
-        if (q_end > now)
+        HealthMinuteData *scratch = scratch_take(STEP_CATCHUP_HOURS * MINUTES_PER_HOUR);
+        if (!scratch)
         {
-            q_end = now;
+            return; // no room, so leave the buckets as they are and try again next turn
         }
 
-        // every record the service hands back sits inside this hour, so just add up their steps
-        uint32_t got = health_service_get_minute_history(scratch, MINUTES_PER_HOUR,
-                                                         &q_start, &q_end);
-        int sum = 0;
-        for (uint32_t i = 0; i < got; i++)
+        int sums[HOURS_PER_DAY] = {0};
+
+        for (int h = s_settled_hours; h < cur_hour; h += STEP_CATCHUP_HOURS)
         {
-            if (!scratch[i].is_invalid)
+            int span = cur_hour - h;
+            if (span > STEP_CATCHUP_HOURS)
             {
-                sum += scratch[i].steps;
+                span = STEP_CATCHUP_HOURS;
+            }
+
+            time_t want_end = day_start + (time_t)(h + span) * SECONDS_PER_HOUR;
+            time_t q_start = day_start + (time_t)h * SECONDS_PER_HOUR;
+            time_t q_end = want_end;
+
+            uint32_t asked = (uint32_t)(span * MINUTES_PER_HOUR);
+            uint32_t got = health_service_get_minute_history(scratch, asked, &q_start, &q_end);
+
+            // same guard as the backfill: trust the promise no further than the buffer goes
+            if (got > asked)
+            {
+                got = asked;
+            }
+
+            // q_start comes back moved on to the first record the watch held, so a record's place
+            // in the array says nothing about its hour. only its own time does
+            for (uint32_t i = 0; i < got; i++)
+            {
+                time_t record_at = q_start + (time_t)i * SECONDS_PER_MINUTE;
+
+                // only the count reaches the watch, never the window's end, so a read that opened
+                // on a gap runs past what was asked for and the next batch would count it twice
+                if (record_at >= want_end)
+                {
+                    break; // the records run in order, so nothing after this is wanted either
+                }
+
+                if (scratch[i].is_invalid)
+                {
+                    continue;
+                }
+
+                int bucket = step_hours_bucket((int)(record_at - day_start));
+                if (bucket >= 0)
+                {
+                    sums[bucket] += scratch[i].steps;
+                }
             }
         }
-        s_state.step_hourly[h] = clamp_u16(sum);
-    }
 
-    free(scratch);
+        for (int h = s_settled_hours; h < cur_hour && h < HOURS_PER_DAY; h++)
+        {
+            s_state.step_hourly[h] = clamp_u16(sums[h]);
+        }
+
+        free(scratch);
+    }
 
     s_settled_hours = step_hours_settled(cur_hour, lt->tm_min);
     s_state.step_hours = cur_hour + 1;
+
+    // what is left of today once the settled hours are taken off. the two counts come from
+    // different places in the watch, so a step or two of disagreement lands on this bar
+    int behind = 0;
+    for (int h = 0; h < cur_hour && h < HOURS_PER_DAY; h++)
+    {
+        behind += s_state.step_hourly[h];
+    }
+    s_state.step_hourly[cur_hour] = clamp_u16(s_state.steps - behind);
 #endif
 }
 
@@ -372,13 +414,31 @@ static bool refresh_activity(bool force)
     s_state.steps = read_sum_today(HealthMetricStepCount, 0);
     s_state.distance_m = read_sum_today(HealthMetricWalkedDistanceMeters, 0);
 
-    // the hourly buckets are the dearest thing here, so only a face that graphs them pays
-    if (s_step_history)
+    // the hourly buckets are the dearest thing here, so only a face that graphs them pays. the
+    // first read of all is owed to the timer below, which runs once the face is on screen
+    if (s_step_history && !s_steps_pending)
     {
         read_step_hourly();
     }
 
     return true;
+}
+
+/**
+ * @brief The first read of the hourly buckets, once the face is up.
+ *
+ * Launching is the one time the buckets have a whole day to catch up on, which is several blocking
+ * scans even batched. Doing that inside init leaves the old screen frozen until it finishes.
+ *
+ * @param data The timer context (unused).
+ */
+static void steps_first_read(void *data)
+{
+    // cleared first so nothing below can leave the reader switched off for good
+    s_steps_pending = false;
+
+    read_step_hourly();
+    if (s_cb) s_cb();
 }
 
 /**
@@ -471,6 +531,8 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
     // hour before s_settled_hours reading zero for the rest of the day
     s_cached_day = 0;
     s_settled_hours = 0;
+    // a store coming up seeded never arms the timer, so it must not inherit a gate from a live run
+    s_steps_pending = false;
 
     if (seed)
     {
@@ -511,6 +573,11 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
     if (cfg.live)
     {
         s_live = true;
+
+        // hold the first bucket read until the face is on screen. subscribing below queues a
+        // significant update that lands before the timer, so the gate goes up ahead of both
+        s_steps_pending = s_step_history;
+
 #if defined(PBL_HEALTH)
         health_service_events_subscribe(on_health_event, NULL);
 #endif
@@ -533,9 +600,17 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
             }
         }
 
-        // seed the first reading before any event lands
+        // seed the first reading before any event lands. these are cheap, a peek and a handful of
+        // keyed reads, and the panels would show placeholders on every launch without them
         refresh_hr();
         refresh_activity(true);
+
+        // the timer fires from the event loop, which the first paint runs ahead of. with no timer
+        // to be had, drop the gate and let the next refresh do it, which is also after the paint
+        if (s_steps_pending && !app_timer_register(0, steps_first_read, NULL))
+        {
+            s_steps_pending = false;
+        }
     }
 }
 
