@@ -19,12 +19,9 @@
  * @brief Ask for @p cb to run each time the face's cadence comes round. A store calls this from
  * its own init, so no face has to wire it up by hand.
  *
- * The cadence is whichever ticker the face runs: the minute tick, or the .beats timer on a face
- * that runs .beats in its place. A face with neither never fires this, so what goes here is work
- * that wants doing regularly rather than work something depends on being done.
- *
- * Registering the same function twice does nothing, so a store that is initialised more than once
- * (the screenshot walk does that) still only sits on the list once.
+ * The cadence is whichever ticker the face runs: the minute tick, or the .beats timer in its
+ * place. A face with neither never fires this, so put periodic work here, not work something
+ * depends on. Registering the same function twice does nothing.
  *
  * @param cb The work to run. NULL is ignored.
  */

@@ -1,7 +1,7 @@
 /**
  * @file weather_store.c
  * @brief The active weather store: holds the readings, owns the appmessage weather channels,
- * and polls the phone on its own timer.
+ * and asks the phone for more whenever its turn on the face's cadence finds a poll due.
  */
 #include "io/stores/weather_store.h"
 
@@ -311,13 +311,14 @@ void weather_store_subscribe(void (*cb)(void))
 
 void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
 {
-    s_live = cfg.live;  // set before any set_current so persist_flush knows whether to write
+    s_live = false; // only a store that is enabled AND live goes live, see the guard below
     s_persist_key = cfg.persist_key;
     reset_state();
     s_poll_min = cfg.poll_min;
     s_next_poll = store_poll_next(s_poll_min > 0 ? s_poll_min : 1, time(NULL));
-    s_boot_retries = 0;  // fresh cold-boot re-ask budget
+    // s_live is the gate the cadence turn reads, so registering here is harmless either way
     store_cadence_register(cadence_poll);
+    s_boot_retries = 0;  // fresh cold-boot re-ask budget
 
     if (seed)
     {
@@ -350,6 +351,8 @@ void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
 
     if (cfg.live)
     {
+        s_live = true;
+
         // the store owns every weather channel. faces that don't declare the extra/forecast/
         // location keys simply never see those fire
         appmessage_on_weather(on_weather);
@@ -375,11 +378,13 @@ void weather_store_init(WeatherConfig cfg, const WeatherSeed *seed)
 void weather_store_reconfigure(WeatherConfig cfg)
 {
     s_poll_min = cfg.poll_min;
+    // s_live gates the cadence turn, so switching the store off here has to clear it
+    s_live = cfg.enabled && cfg.live;
 
     // take the new interval from the next boundary on (no immediate fetch. a real interval change
     // is rare, and the reading in hand is still good)
     stop_polling();
-    if (cfg.enabled && cfg.live && s_poll_min > 0)
+    if (s_live && s_poll_min > 0)
     {
         s_next_poll = store_poll_next(s_poll_min, time(NULL));
     }

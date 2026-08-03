@@ -29,10 +29,8 @@ static struct
     int      step_hours;                 // how many of those hours are real (0 to 24)
 } s_state;
 
-// the heart rate graph is the only part of the state worth keeping across a relaunch. every other
-// number is read back off the health service before the first paint, so saving those would be
-// write only. the graph is the exception because it cannot be rebuilt the same way: the watch
-// logs a per-minute heart rate too rarely, which is why the store peeks the live value instead
+// the only part worth keeping across a relaunch. every other number is read back off the health
+// service before the first paint, but the watch logs heart rate too rarely to rebuild the graph
 typedef struct
 {
     uint8_t tag; // STORE_TAG_HEALTH, so a restore can tell this blob from another shape
@@ -43,15 +41,18 @@ _Static_assert(sizeof(HealthSaved) <= PERSIST_DATA_MAX_LENGTH, "health blob must
 
 static void (*s_cb)(void);
 static bool s_live; // true once subscribed to the live health service, so the minute poll is a no-op in seed mode
-// the two history series cost real work to keep, so only a face that graphs one asks for it. the
-// current readings are always tracked, they are cheap and every face shows at least one of them
+// the two history series cost real work, so only a face that graphs one asks for it. the current
+// readings are cheap and every face shows one, so those are always tracked
 static bool s_hr_history;
 static bool s_step_history;
-// the watch keeps the step count to hand and the heart rate is a plain peek, but these three cost
-// a flash read apiece every time they are asked for, so only a face that shows one pays for it
+// these three cost a flash read every time they are asked for, so only a face that shows one pays
 static bool s_sleep;
 static bool s_active;
 static bool s_calories;
+// finished hours can never gain another step, so they are read once and kept. these live out here
+// because init clears the buckets, and stale beliefs about them would strand the cleared ones
+static time_t s_cached_day;
+static int s_settled_hours;
 static uint32_t s_persist_key; // the slot the face handed us for the saved history
 
 // --- health service reads (no-op stubs without PBL_HEALTH) ---
@@ -159,12 +160,6 @@ static uint16_t clamp_u16(int value)
 static void read_step_hourly(void)
 {
 #if defined(PBL_HEALTH)
-    // hours that have already finished can never gain another step, so they are read once and
-    // kept. only the hour in progress is re-read each time. s_cached_day pins those buckets to
-    // the day they were built for and s_settled_hours counts how many of them are final
-    static time_t s_cached_day = 0;
-    static int s_settled_hours = 0;
-
     time_t now = time(NULL);
     time_t day_start = time_start_of_today();
     struct tm *lt = localtime(&now);
@@ -185,9 +180,8 @@ static void read_step_hourly(void)
         return;
     }
 
-    // read the hour in progress, plus any whole hours that went by while nothing was looking.
-    // every health_service_get_minute_history is a blocking scan of a flash file that holds up
-    // the watch's background work, so the settled hours are worth far more cached than re-read
+    // read the hour in progress, plus any whole hours that went by while nothing was looking. each
+    // health_service_get_minute_history is a blocking flash scan, so settled hours stay cached
     for (int h = s_settled_hours; h <= cur_hour && h < HOURS_PER_DAY; h++)
     {
         time_t q_start = day_start + (time_t)h * SECONDS_PER_HOUR;
@@ -211,20 +205,24 @@ static void read_step_hourly(void)
         s_state.step_hourly[h] = clamp_u16(sum);
     }
 
-    // the hour in progress still has minutes coming, so only the ones before it have settled
-    s_settled_hours = cur_hour;
+    // the hour in progress is never settled, nor is the hour just gone while the clock is on its
+    // first minute: the watch writes a minute's record at the top of the minute after it, below
+    // this in priority, so on the rollover turn that last record is usually not there yet
+    s_settled_hours = (lt->tm_min > 0) ? cur_hour : cur_hour - 1;
+    if (s_settled_hours < 0)
+    {
+        s_settled_hours = 0;
+    }
+
     s_state.step_hours = cur_hour + 1;
 #endif
 }
 
 // --- state + poller ---
 
-// stash the whole state so a relaunch can restore the graph. only a live face writes, so seed
-// mode never touches storage
-//
-// a flash write blocks while it runs and the sensor can land a reading a second during a heart
-// rate burst, so hold the saves to one a minute. the graph only gains a point a minute anyway,
-// so the most this can lose is the point being drawn right now
+// stash the graph so a relaunch can restore it. only a live face writes, so seed mode never
+// touches storage. a burst can land a reading a second and a flash write blocks, so the saves
+// are held to one a minute, which is all the graph gains anyway
 static void persist_save(void)
 {
     static time_t s_saved_min = 0;
@@ -241,8 +239,7 @@ static void persist_save(void)
     }
     s_saved_min = now_min;
 
-    // zeroed first so the padding between the fields goes to flash as something settled rather
-    // than whatever was on the stack
+    // zeroed so the padding between fields goes to flash as something settled
     HealthSaved saved;
     memset(&saved, 0, sizeof(saved));
     memcpy(saved.hr_history, s_state.hr_history, sizeof(saved.hr_history));
@@ -282,8 +279,8 @@ static void hr_history_advance(time_t now_min)
 }
 
 /**
- * @brief Refresh the heart rate and append the live reading to the rolling window. A heart
- * rate is never really 0, so 0 is kept as "no reading yet".
+ * @brief Refresh the heart rate, and append the live reading to the rolling window when the face
+ * asked for one. A heart rate is never really 0, so 0 is kept as "no reading yet".
  *
  * The chart reads from this window rather than the minute history: the watch only logs a
  * per-minute heart_rate_bpm now and then in the background, so the minute history is mostly
@@ -294,9 +291,7 @@ static void refresh_hr(void)
     int hr = read_hr();
     s_state.hr = hr > 0 ? hr : -1;
 
-    // the reading above is what a face showing a plain heart rate number wants, and that is all
-    // it wants. building the window behind it and writing that to flash is only worth it for a
-    // face that draws the graph
+    // a face showing a plain heart rate number has no use for the window behind it
     if (!s_hr_history)
     {
         return;
@@ -316,10 +311,9 @@ static void refresh_hr(void)
 /**
  * @brief Refresh the daily activity scalars (steps, distance, calories, sleep, active).
  *
- * These are whole-day sums that can only move once a minute, but a movement event arrives every
- * few seconds while walking. Every metric bar steps costs a blocking read of a flash file, so
- * the reads are held to one round a minute and the rest of the events fall straight through.
- * The three a face has to ask for are skipped outright when it has not.
+ * These are whole-day sums that move once a minute at most, but movement events arrive every few
+ * seconds while walking, and every metric bar steps costs a blocking flash read. So the reads are
+ * held to one round a minute, and the three a face has to ask for are skipped unless it has.
  *
  * @param force Read now regardless of the minute gate, for the seed read and for the significant
  * update that calls every number stale.
@@ -355,13 +349,12 @@ static bool refresh_activity(bool force)
         s_state.calories = read_sum_today(HealthMetricActiveKCalories, -1);
     }
 
-    // the watch hands the step count back without going near flash, and the distance rides along
-    // with it in the same readout, so both are read for every face
+    // the watch keeps the step count to hand so that one is cheap. the distance is not, but it
+    // stays ungated because the steps readout can be switched to show it instead
     s_state.steps = read_sum_today(HealthMetricStepCount, 0);
     s_state.distance_m = read_sum_today(HealthMetricWalkedDistanceMeters, 0);
 
-    // the hourly buckets are the dearest thing in here, a blocking flash scan per hour read, so
-    // they are only built for a face that graphs them
+    // the hourly buckets are the dearest thing here, so only a face that graphs them pays
     if (s_step_history)
     {
         read_step_hourly();
@@ -373,10 +366,9 @@ static bool refresh_activity(bool force)
 /**
  * @brief Health event handler: refresh only the metrics the event touched, then notify.
  *
- * A movement event does not change the heart rate history and an hr event does not change
- * the step count, so each one only reads its own group. Those reads are dear enough that the
- * group is not the whole saving, though. The minute gate inside refresh_activity is what turns
- * most of the movement events, which arrive every few seconds, into nothing at all.
+ * A movement event does not change the heart rate history and an hr event does not change the
+ * step count, so each reads only its own group. The minute gate inside refresh_activity does the
+ * rest, turning most movement events into nothing at all.
  *
  * @param event The health event type.
  * @param context Context (unused).
@@ -409,11 +401,9 @@ static void on_health_event(HealthEventType event, void *context)
 /**
  * @brief The store's turn on the face's cadence, registered at init so no face wires it by hand.
  *
- * The health events on their own are not enough to keep the numbers honest. The watch raises a
- * heart rate event only now and then, which would leave the graph a few stray dots rather than a
- * line, and movement events stop the moment the wearer goes still, which would strand the step
- * count on whatever the last one happened to catch. Riding the cadence covers both, and the gates
- * inside the two refreshes make it free on a turn an event already dealt with.
+ * The events alone are not enough. Heart rate events are sparse, so the graph would be dots not a
+ * line, and movement events stop the moment the wearer goes still, stranding the step count. The
+ * gates inside the two refreshes make this free on a turn an event already covered.
  */
 static void cadence_poll(void)
 {
@@ -445,9 +435,7 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
     s_calories = cfg.calories;
     s_persist_key = cfg.persist_key;
 
-    // the events alone leave gaps, so take a turn on the face's cadence as well. registering here
-    // rather than leaving it to the face means every face gets it, and the call is idempotent so
-    // the screenshot walk re-initialising the store does not stack them up
+    // registering here rather than leaving it to the face means every face gets it
     store_cadence_register(cadence_poll);
 
     // -1 means no reading yet so a panel shows a placeholder until data turns up
@@ -461,6 +449,10 @@ void health_store_init(HealthConfig cfg, const HealthSeed *seed)
     memset(s_state.hr_history, 0, sizeof(s_state.hr_history));
     s_state.step_hours = 0;
     memset(s_state.step_hourly, 0, sizeof(s_state.step_hourly));
+    // clearing the buckets without clearing what the reader believes about them would leave every
+    // hour before s_settled_hours reading zero for the rest of the day
+    s_cached_day = 0;
+    s_settled_hours = 0;
 
     if (seed)
     {

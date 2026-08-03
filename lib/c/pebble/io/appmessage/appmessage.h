@@ -80,19 +80,20 @@ void appmessage_open(void);
 
 /**
  * @brief Asks the phone for a fresh weather reading. The weather store calls this on its
- * own poll timer.
+ * turn on the shared cadence.
  */
 void appmessage_request_weather(void);
 
 /**
- * @brief Asks the phone for fresh quotes. The stock store calls this on its own poll timer.
+ * @brief Asks the phone for fresh quotes. The stock store calls this on its turn on the
+ * shared cadence.
  * A no-op on faces that do not declare the stock keys.
  */
 void appmessage_request_stock(void);
 
 /**
- * @brief Asks the phone for a fresh agenda. The calendar store calls this on its own poll
- * timer. A no-op on faces that do not declare the calendar keys.
+ * @brief Asks the phone for a fresh agenda. The calendar store calls this on its turn on the
+ * shared cadence. A no-op on faces that do not declare the calendar keys.
  */
 void appmessage_request_calendar(void);
 

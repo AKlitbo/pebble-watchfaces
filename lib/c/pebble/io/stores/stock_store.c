@@ -1,7 +1,7 @@
 /**
  * @file stock_store.c
  * @brief The active stock store: holds the quotes, owns the appmessage stock channel, and
- * polls the phone on its own timer.
+ * asks the phone for more whenever its turn on the face's cadence finds a poll due.
  */
 #include "io/stores/stock_store.h"
 
@@ -84,7 +84,7 @@ static void on_stock_strip(const uint8_t *buf, uint16_t len)
     if (s_cb) s_cb();
 }
 
-// --- poll timer ---
+// --- polling ---
 
 /**
  * @brief The one-shot catch-up fetch, used at launch and when the panel turns up empty.
@@ -131,11 +131,12 @@ void stock_store_subscribe(void (*cb)(void))
 
 void stock_store_init(StockConfig cfg, const StockSeed *seed)
 {
-    s_live = cfg.live; // set before any persist_save so it knows whether to write
+    s_live = false; // only a store that is enabled AND live goes live, see the guard below
     s_persist_key = cfg.persist_key;
     reset_state();
     s_poll_min = cfg.poll_min;
     s_next_poll = store_poll_next(s_poll_min > 0 ? s_poll_min : 1, time(NULL));
+    // s_live is the gate the cadence turn reads, so registering here is harmless either way
     store_cadence_register(cadence_poll);
 
     if (seed)
@@ -164,6 +165,8 @@ void stock_store_init(StockConfig cfg, const StockSeed *seed)
 
     if (cfg.live)
     {
+        s_live = true;
+
         // the store owns the stock channel. faces that don't declare the key never see it fire
         appmessage_on_stock_strip(on_stock_strip);
 
@@ -180,16 +183,18 @@ void stock_store_init(StockConfig cfg, const StockSeed *seed)
 void stock_store_reconfigure(StockConfig cfg)
 {
     s_poll_min = cfg.poll_min;
+    // s_live gates the cadence turn, so switching the store off here has to clear it
+    s_live = cfg.enabled && cfg.live;
 
     stop_polling();
-    if (cfg.enabled && cfg.live && s_poll_min > 0)
+    if (s_live && s_poll_min > 0)
     {
         s_next_poll = store_poll_next(s_poll_min, time(NULL));
 
-        // an empty store has nothing but -- to draw, so catch up right away: the panel may have
-        // just been added to the layout, or this very save may have cancelled the launch poll.
-        // one that already holds quotes waits for the deadline, so a save that only touched
-        // colours never pulls a fetch forward and spends a metered provider's quota
+        // an empty store has nothing but -- to draw, so catch up right away. one that already
+        // holds quotes waits for its deadline, so a save that only touched colours does not
+        // fetch on the spot and spend a metered provider's quota. that deadline is a wall
+        // clock boundary, so a save can bring it nearer but never past the interval's rate
         if (s_state.strip.count == 0)
         {
             s_timer = app_timer_register(STOCK_FIRST_POLL_MS, catch_up_fire, NULL);

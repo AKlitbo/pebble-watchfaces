@@ -108,10 +108,10 @@ static void on_settings_changed(bool time_or_date_changed)
     engine_rebuild();
     engine_mark_dirty();
 
-    // the stock poll interval may have changed so re-arm the timer to the new value. dev/seed
+    // the stock poll interval may have changed so move its next poll onto the new one. dev/seed
     // paths never reach here since they get no phone settings pushes
     stock_store_reconfigure((StockConfig){.enabled = true, .live = true, .poll_min = gridlock_stock_poll_min()});
-    // the calendar poll interval may have changed too, so re-arm it the same way
+    // the calendar poll interval may have changed too, so move that one the same way
     calendar_store_reconfigure((CalendarConfig){.enabled = true, .live = true, .poll_min = gridlock_calendar_poll_min()});
 }
 
@@ -184,8 +184,6 @@ static void calendar_vibe(void)
 
 // each store notifies through its own hub tag, so the engine only repaints the cells that read
 // from it instead of the whole grid
-// the minute tick lives on the time store, so ride it to sample the heart rate once a minute.
-// that keeps the graph a continuous line instead of the stray dots the sparse hr events leave
 static void on_time_changed(void)    { hourly_vibe(); calendar_vibe(); night_layout_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
 static void on_weather_changed(void) { night_layout_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
 static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }

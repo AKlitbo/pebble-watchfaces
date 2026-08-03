@@ -900,7 +900,7 @@ function startPebbleApp(options: StartOptions): void {
     }
 
     if (payload[messageKeys.STOCK_REQUEST]) {
-      // the watch's poll timer drives this on every interval, so it goes through the provider
+      // the watch drives this on every interval it asks for, so it goes through the provider
       // quota gate like any other routine fetch. only a settings change forces past it
       const held = lastStockBytes;
       lastStockBytes = null;

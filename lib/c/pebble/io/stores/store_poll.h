@@ -16,11 +16,8 @@
 /**
  * @brief The next wall-clock second a poll of this interval falls due.
  *
- * The boundaries are counted from the epoch rather than from launch, so two watches started
- * minutes apart poll at the same moments and a relaunch does not shift the phase. Every interval
- * the settings offer divides an hour, so in practice these land on the hour, the half hour and so
- * on, which also means a bug is reproducible instead of depending on when the face happened to
- * start.
+ * Counted from the epoch rather than from launch, so two watches started minutes apart poll at
+ * the same moments and a relaunch does not shift the phase.
  *
  * @param poll_min Minutes between polls. Must be above 0.
  * @param now The current wall-clock time.
@@ -35,9 +32,8 @@ static inline time_t store_poll_next(int poll_min, time_t now)
 /**
  * @brief Whether @p next has come round, moving it on to the following deadline when it has.
  *
- * A clock that jumps forward just fires once and carries on. One that jumps back would leave the
- * deadline stranded more than a whole interval ahead, which would hold the poll silent until wall
- * clock time caught up, so that case is pulled back in instead.
+ * A clock that jumps forward just fires once and carries on. One that jumps back would strand the
+ * deadline more than an interval ahead, so that case is pulled back in.
  *
  * @param poll_min Minutes between polls. 0 or less means polling is off and this is never due.
  * @param next The store's deadline, read and updated in place.

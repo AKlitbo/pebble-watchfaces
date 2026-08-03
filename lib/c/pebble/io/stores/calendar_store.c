@@ -1,7 +1,7 @@
 /**
  * @file calendar_store.c
  * @brief The active calendar store: holds the agenda, owns the appmessage calendar channel, and
- * polls the phone on its own timer.
+ * asks the phone for more whenever its turn on the face's cadence finds a poll due.
  */
 #include "io/stores/calendar_store.h"
 
@@ -107,7 +107,7 @@ static void on_calendar_strip(const uint8_t *buf, uint16_t len)
     if (s_cb) s_cb();
 }
 
-// --- poll timer ---
+// --- polling ---
 
 /**
  * @brief The one-shot catch-up fetch, used at launch and after a settings save.
@@ -154,11 +154,12 @@ void calendar_store_subscribe(void (*cb)(void))
 
 void calendar_store_init(CalendarConfig cfg, const CalendarSeed *seed)
 {
-    s_live = cfg.live; // set before any persist_save so it knows whether to write
+    s_live = false; // only a store that is enabled AND live goes live, see the guard below
     s_persist_key = cfg.persist_key;
     reset_state();
     s_poll_min = cfg.poll_min;
     s_next_poll = store_poll_next(s_poll_min > 0 ? s_poll_min : 1, time(NULL));
+    // s_live is the gate the cadence turn reads, so registering here is harmless either way
     store_cadence_register(cadence_poll);
 
     if (seed)
@@ -189,6 +190,8 @@ void calendar_store_init(CalendarConfig cfg, const CalendarSeed *seed)
 
     if (cfg.live)
     {
+        s_live = true;
+
         // the store owns the calendar channel. faces that don't declare the key never see it fire
         appmessage_on_calendar_strip(on_calendar_strip);
 
@@ -205,15 +208,16 @@ void calendar_store_init(CalendarConfig cfg, const CalendarSeed *seed)
 void calendar_store_reconfigure(CalendarConfig cfg)
 {
     s_poll_min = cfg.poll_min;
+    // s_live gates the cadence turn, so switching the store off here has to clear it
+    s_live = cfg.enabled && cfg.live;
 
     stop_polling();
-    if (cfg.enabled && cfg.live && s_poll_min > 0)
+    if (s_live && s_poll_min > 0)
     {
         s_next_poll = store_poll_next(s_poll_min, time(NULL));
 
-        // pull once shortly after the change, same as init, so a new interval (or any settings
-        // save) refreshes the agenda right away instead of waiting for the deadline. an agenda
-        // goes stale on the phone's say-so rather than the watch's, so it is worth the fetch
+        // an agenda goes stale on the phone's say-so rather than the watch's, so pull once after
+        // any settings save rather than waiting for the deadline
         s_timer = app_timer_register(CALENDAR_FIRST_POLL_MS, catch_up_fire, NULL);
     }
 }
