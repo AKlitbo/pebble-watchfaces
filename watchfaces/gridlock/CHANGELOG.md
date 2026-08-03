@@ -5,6 +5,23 @@ All notable changes to the Gridlock watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+> [!IMPORTANT]
+> This release changes how heart rate history is stored. The saved graph is cleared once when you update, then begins filling again immediately. It will be back to a full hour within an hour.
+
+### Changed
+
+- Reduced what the watchface writes to storage for the heart rate graph. Everything else it was saving is already available from the watch's own health data at startup, so keeping a second copy served no purpose.
+
+### Fixed
+
+- Fixed the watchface making the watch feel slow and unresponsive. The health panels were rebuilding the entire day's step history from storage every minute, delaying the watch's background work.
+- Fixed activity readings being re-read every few seconds while walking instead of once per minute. Each read was also written back to storage, creating unnecessary work while the watch was in active use.
+- Fixed the heart rate graph being written to storage on every sensor reading. It is now written once per minute, matching how often the graph gains a new point.
+- Fixed the watchface taking a long time to appear, both on first load and when returning from an app or the menu. It was rebuilding the entire day's step history before drawing anything, leaving the previous screen frozen until it finished.
+- Fixed the Steps Graph re-reading the current hour from storage every minute. It now works the current hour out from the daily step total, so storage is only read when each hour ends.
+
 ## [1.0.0] - 2026-07-31
 
 ### Added
