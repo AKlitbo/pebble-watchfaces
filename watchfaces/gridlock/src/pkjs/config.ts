@@ -361,6 +361,12 @@ const config = [
         ],
       },
       {
+        type: 'themeBuilder',
+        messageKey: 'APPEARANCE_CUSTOM_COLORS',
+        moduleOptions: MODULE_OPTIONS,
+        moduleThumbnails: moduleThumbnails,
+      },
+      {
         type: 'select',
         messageKey: 'APPEARANCE_HEADER_FONT',
         label: 'Header Font',
@@ -378,10 +384,15 @@ const config = [
         ],
       },
       {
-        type: 'themeBuilder',
-        messageKey: 'APPEARANCE_CUSTOM_COLORS',
-        moduleOptions: MODULE_OPTIONS,
-        moduleThumbnails: moduleThumbnails,
+        type: 'select',
+        messageKey: 'APPEARANCE_PANEL_STYLE',
+        label: 'Panel Style',
+        description: 'How every panel is framed . Classic is the original square panel and Rounded softens the four corners.',
+        defaultValue: 0,
+        options: [
+          { label: 'Classic (Default)', value: 0 },
+          { label: 'Rounded', value: 1 },
+        ],
       },
     ],
   },

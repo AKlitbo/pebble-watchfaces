@@ -1,6 +1,6 @@
 {
   "displayName": "Gridlock",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "uuid": "85ee3144-1c42-486a-b2a4-a74a1efaeb69",
   "sdkVersion": "3",
   "enableMultiJS": true,
@@ -56,6 +56,7 @@
     "CLOCK_DATE_FORMAT",
     "APPEARANCE_THEME",
     "APPEARANCE_HEADER_FONT",
+    "APPEARANCE_PANEL_STYLE",
     "APPEARANCE_ANALOG_STYLE",
     "APPEARANCE_CUSTOM_COLORS",
     "HEALTH_STEPS_MODE",

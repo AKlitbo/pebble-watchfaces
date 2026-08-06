@@ -164,6 +164,8 @@ uint8_t gridlock_wind_unit(void);
 /// Number of Analog Face styles (0 classic round, then the rectangular and round dials)
 #define GRIDLOCK_ANALOG_STYLE_COUNT 9
 uint8_t gridlock_analog_style(void); ///< Analog Face Style pick (0 classic round, 1 to 6 other dials)
+/// Panel Style pick (0 Classic, 1 Rounded). Indexes the panel_styles table the grid engine frames with
+uint8_t gridlock_panel_style(void);
 uint8_t gridlock_hourly_vibe(void); ///< VibeChoice buzzed at the top of each hour (VIBE_NONE is off)
 uint8_t gridlock_week_start(void); ///< First day of the week for the calendar panels (0 Sunday, 1 Monday)
 int gridlock_stock_poll_min(void); ///< Minutes between stock quote requests
@@ -293,10 +295,9 @@ void gridlock_set_time_zone_1(const char *value);
  * @brief Sets the custom colours string in memory only (it is not saved). The dev harness
  * uses this to flip per-module colours and header/border on/off without the config page.
  *
- * @param value An APPEARANCE_CUSTOM_COLORS wire string. Either the "~3" sparse form ("~3", the
- *              5-char colour records, "|", then the 3-char flag records) or the "~" positional
- *              form (a 6-char record per module id), or "0" for none. An untagged string carries
- *              no records and leaves every module plain.
+ * @param value An APPEARANCE_CUSTOM_COLORS wire string: the "~3" sparse form ("~3", the 5-char
+ *              colour records, "|", then the 3-char flag records), or "0" for none. Anything
+ *              else carries no records and leaves every module plain.
  */
 void gridlock_set_custom_colors(const char *value);
 

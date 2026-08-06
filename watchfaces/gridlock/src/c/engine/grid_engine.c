@@ -15,6 +15,7 @@
 #include "ui/fonts.h"
 #include "draw/metrics.h"
 #include "draw/header_fonts.h"
+#include "draw/panel_styles.h"
 #include "theme/theme.h"
 #include "system/settings/settings.h"
 #include "settings_schema.h"
@@ -54,6 +55,10 @@ static Palette s_base_pal;
 // alongside the theme. 0/0 for the default Share Tech Mono
 static int8_t s_header_dx;
 static int8_t s_header_dy;
+
+// the corner radius from the user's Panel Style pick, resolved once per build like the theme
+// above so the per-cell path reads a number instead of the setting. 0 is the square Classic look
+static uint8_t s_radius;
 
 // which side the solid label block sits on. the dither fills the other side
 // a knob for later. not hooked up to settings yet
@@ -214,7 +219,14 @@ static void draw_panel(GridCtx *gctx, const ModuleDef *def, bool headerless, boo
     if (!borderless)
     {
         graphics_context_set_stroke_color(gctx->ctx, gctx->color_accent);
-        graphics_draw_rect(gctx->ctx, gctx->bounds);
+        if (s_radius > 0)
+        {
+            graphics_draw_round_rect(gctx->ctx, gctx->bounds, s_radius);
+        }
+        else
+        {
+            graphics_draw_rect(gctx->ctx, gctx->bounds);
+        }
     }
 
     // headerless drops the 14px header strip and hands the module the whole tile. the body
@@ -262,9 +274,15 @@ static void draw_panel(GridCtx *gctx, const ModuleDef *def, bool headerless, boo
     // 1. checker dither fills the side opposite the label
     draw_checker(gctx->ctx, GRect(dither_x, top + 1, dither_w, strip_h - 1), gctx->color_accent);
 
-    // 2. solid block behind the label
+    // 2. solid block behind the label. on a rounded panel its top outer corner follows the border,
+    // since the block runs right into the corner the curve just cut away
+    GCornerMask block_corner = GCornerNone;
+    if (s_radius > 0)
+    {
+        block_corner = s_header_label_right ? GCornerTopRight : GCornerTopLeft;
+    }
     graphics_context_set_fill_color(gctx->ctx, gctx->color_accent);
-    graphics_fill_rect(gctx->ctx, GRect(block_x, top, label_w, strip_h), 0, GCornerNone);
+    graphics_fill_rect(gctx->ctx, GRect(block_x, top, label_w, strip_h), s_radius, block_corner);
 
     // 3. bottom border
     graphics_context_set_stroke_color(gctx->ctx, gctx->color_accent);
@@ -390,6 +408,9 @@ uint8_t gridlock_build(EngineSlot *out, uint8_t max, GRect bounds)
     const HeaderFontSpec *header = header_font_spec(settings_u8(SETTING_HEADER_FONT));
     s_header_dx = header->dx;
     s_header_dy = header->dy;
+
+    // and the same for the Panel Style pick, so draw_panel reads a plain radius per cell
+    s_radius = panel_style_radius(gridlock_panel_style());
 
     uint8_t count = layouts_build(s_resolved, GRIDLOCK_MAX_CELLS);
     if (count > max)

@@ -20,6 +20,7 @@
 #include "engine/layouts.h"
 #include "engine/catalog.h"
 #include "draw/header_fonts.h" // HEADER_FONT_COUNT for the header font enum bound
+#include "draw/panel_styles.h" // PANEL_STYLE_COUNT for the panel style enum bound
 
 #include <pebble.h>
 #include <stddef.h>
@@ -35,12 +36,12 @@
 // retype, or resize a field already in a struct. the static asserts below freeze each size so a
 // stray change breaks the build instead of watches in the field. the persist keys themselves
 // live in persist_keys.h so every key across the face sits in one place
-#define GRIDLOCK_CORE_VERSION 2
-#define GRIDLOCK_CORE_SIZE    131
+#define GRIDLOCK_CORE_VERSION 3
+#define GRIDLOCK_CORE_SIZE    132
 // frozen size of the very first (v1) core blob: version + theme + layout[128], before
-// header_font was appended. min_versioned_size must stay pinned to the v1 size so an older
-// short blob still short-reads instead of being rejected and reset. bump this only if v1 is
-// ever retired, never when appending a new trailing field
+// header_font and panel_style were appended. min_versioned_size must stay pinned to the v1 size
+// so an older short blob still short-reads instead of being rejected and reset. bump this only if
+// v1 is ever retired, never when appending a new trailing field
 #define GRIDLOCK_CORE_V1_SIZE 130
 
 // the per-module custom colours keep their own key so the table never crowds the core blob.
@@ -127,13 +128,14 @@
 
 // --- the per-domain settings structs, each with the version byte first ---
 
-/** @brief Core face settings: theme, the block layout string, and the header font choice. */
+/** @brief Core face settings: theme, the block layout string, and the header font and panel style. */
 typedef struct GridlockCore
 {
     uint8_t version;
     uint8_t theme;
     char    layout[128]; // "module,row,col,w,h;..." with one entry per placed block
     uint8_t header_font; // Header Font pick (index into the header_fonts table)
+    uint8_t panel_style; // Panel Style pick (index into the panel_styles table)
 } GridlockCore;
 _Static_assert(sizeof(GridlockCore) == GRIDLOCK_CORE_SIZE, "core blob size is frozen; fields append only");
 
@@ -276,6 +278,7 @@ static const SettingField s_core_fields[] = {
     { .id = SETTING_HEADER_FONT, .message_key = &MESSAGE_KEY_APPEARANCE_HEADER_FONT,
       .type = SETTING_ENUM_U8, .offset = offsetof(GridlockCore, header_font),
       .enum_count = HEADER_FONT_COUNT, .default_num = 0 },
+    FACE_ENUM(GridlockCore, panel_style, APPEARANCE_PANEL_STYLE, PANEL_STYLE_COUNT, 0),
 };
 
 // --- night (key 12) ---
@@ -795,28 +798,26 @@ void gridlock_set_night_mode(uint8_t mode)
 
 // --- custom colour string parsing ---
 //
-// one fixed 6-char record per module, laid out positionally and indexed by module id, so
-// module m's record starts at offset MARKER + m * 6. a record is four colour chars then two
-// flag chars: [accent][value][icon][subtitle][flagsLo][flagsHi]. a colour char is one base64
-// symbol holding the palette index 0..63, or '.' (or any non-base64 char) to leave that
-// channel mono.
+// the wire string is "~3" then a colour section then a flag section, sparse: only a customised
+// module gets a record, so the string stays small. a colour record is 5 chars, the module id
+// then [accent][value][icon][subtitle]. a flag record is 3 chars, the module id then two packed
+// flag chars. every id and colour char is one base64 symbol holding 0..63, and '.' (or any
+// non-base64 char) leaves that channel mono.
 //
 // the two flag chars carry an 8-bit value split across two base64 symbols (6 bits each, 8
 // used) so the header/border toggles can be kept PER SIZE rather than per module. the byte is
 // Σ (headerless[s] ? 1<<s : 0) | (borderless[s] ? 1<<(4+s) : 0) for size index s (matches
 // ModuleSize: 1x2=0, 2x2=1, 1x4=2, 2x4=3). flagsLo = alphabet[byte & 63], flagsHi =
-// alphabet[(byte >> 6) & 63]. this makes the flag section opaque codes (not the old readable
-// H/B/X letters) but keeps the packed table well under the persist ceiling.
+// alphabet[(byte >> 6) & 63]. that makes the flag section opaque codes rather than readable
+// letters, but keeps the packed table well under the persist ceiling.
 //
-// a v2 string is tagged with a leading '~' marker. an untagged string carries no records at all
-// and leaves every module unset, so a blob in any older shape reads as plain. the "0" default is
-// the empty state and a record that runs past the end of the string is unset. the colours only
-// apply under THEME_CUSTOM but the header and border flags read in every theme.
+// only the "~3" shape carries records here. the phone decodes the older layouts and re-sends
+// them as "~3" (see parseAppearance in src/pkjs/clay/builder/ts/theme/codec.ts), so anything
+// else reaching the watch reads as plain, as do the "0" default and the empty string. a record
+// that runs past the end of its section is unset. the colours only apply under THEME_CUSTOM but
+// the header and border flags read in every theme.
 
-// a v2 record is four colour chars then two flag chars
-#define CUSTOM_RECORD_LEN 6
-
-// leads a tagged string so we can tell it from an empty or unrecognized one. keep in step with
+// leads the string so we can tell it from an empty or unrecognized one. keep in step with
 // src/pkjs/clay/builder/ts/theme/codec.ts
 #define CUSTOM_FORMAT_MARKER '~'
 
@@ -885,7 +886,31 @@ static void unpack_flags(uint8_t id, int lo, int hi)
 }
 
 /**
- * @brief Parses the custom colour string into the per-module cache, unless it is already up to date.
+ * @brief The offset of the first ch within cap bytes, or cap when there is none.
+ *
+ * Both custom blobs sit outside the settings table, so nothing NUL-checks them on load. A
+ * damaged one can arrive with no terminator at all, and a plain strlen or strchr would run off
+ * the end into whatever bss follows. Scanning by hand rather than through memchr also keeps
+ * that function out of the binary, which is worth more than it costs at this size.
+ *
+ * @param blob The buffer.
+ * @param cap Its size.
+ * @param ch The byte to find. NUL gives the readable length.
+ * @return The offset of the first ch, or cap when it holds none.
+ */
+static size_t bounded_find(const char *blob, size_t cap, char ch)
+{
+    size_t off = 0;
+    while (off < cap && blob[off] != ch)
+    {
+        off++;
+    }
+
+    return off;
+}
+
+/**
+ * @brief Parses the custom colour blobs into the per-module cache, unless it is already up to date.
  */
 static void ensure_custom_parsed(void)
 {
@@ -895,105 +920,64 @@ static void ensure_custom_parsed(void)
     }
     s_custom_parsed = true;
 
-    // recombine the two persisted sections into the single "~3 colours | flags" string the parser
-    // understands. a lone v2/legacy blob in the colours key (empty flags key) recombines to itself
-    // the precision bounds each read to its own buffer. these two blobs sit outside the settings
-    // table so nothing NUL-checks them on load, and a plain %s would run off the end of a damaged
-    // one and read whatever bss follows
-    char combined[GRIDLOCK_CUSTOM_COLORS_LEN + GRIDLOCK_CUSTOM_FLAGS_LEN + 2];
-    if (s_custom_flags.flags[0] != '\0')
-    {
-        snprintf(combined, sizeof(combined), "%.*s|%.*s",
-                 (int)sizeof(s_custom_theme.colors), s_custom_theme.colors,
-                 (int)sizeof(s_custom_flags.flags), s_custom_flags.flags);
-    }
-    else
-    {
-        snprintf(combined, sizeof(combined), "%.*s",
-                 (int)sizeof(s_custom_theme.colors), s_custom_theme.colors);
-    }
-
     memset(s_custom, 0, sizeof(s_custom));
     memset(s_flags, 0, sizeof(s_flags));
 
-    const char *src = combined;
+    // the two blobs are the colour section and the flag section of one "~3 colours | flags"
+    // string, each under its own persist key. the parser reads a section at a time, so they are
+    // read where they sit
+    const char *colors = s_custom_theme.colors;
+    size_t colors_len = bounded_find(colors, sizeof(s_custom_theme.colors), '\0');
 
-    // the empty string and the "0" default carry no records, so leave everything unset
-    if (src[0] == '\0' || (src[0] == '0' && src[1] == '\0'))
+    // only a tagged "~3" string carries records. the "0" default, the empty string and any blob
+    // the phone has not re-sent in that shape leave every module plain
+    if (colors_len < 2 || colors[0] != CUSTOM_FORMAT_MARKER || colors[1] != '3')
     {
         return;
     }
 
-    // ~3 sparse format: "~3" + 5-char colour records (id + four channels) then "|" then 3-char
-    // flag records (id + two packed flag chars). colours are keyed by the group's primary id
-    // (a grouped member inherits via resolve_theme_module), flags by each module's own id. only
-    // customised modules appear, so the string stays small
-    if (src[0] == CUSTOM_FORMAT_MARKER && src[1] == '3')
+    const char *body = colors + 2;
+    size_t body_len = colors_len - 2;
+
+    // the flag section normally rides its own key. a bar inside the colour blob ends the colour
+    // section early and carries the flags after it instead, so a blob written as one joined
+    // string still reads
+    const char *flags = s_custom_flags.flags;
+    size_t flag_len = bounded_find(flags, sizeof(s_custom_flags.flags), '\0');
+
+    size_t bar = bounded_find(body, body_len, '|');
+    if (bar < body_len)
     {
-        const char *body = src + 2;
-        const char *bar = strchr(body, '|');
-        size_t color_len = bar ? (size_t)(bar - body) : strlen(body);
-
-        for (size_t off = 0; off + 5 <= color_len; off += 5)
-        {
-            int id = color_index(body[off]);
-            if (id <= 0 || id >= MOD_TYPE_COUNT)
-            {
-                continue;
-            }
-            GridlockCustomColor color = {0};
-            color.accent_set   = read_channel(body[off + 1], &color.accent);
-            color.value_set    = read_channel(body[off + 2], &color.value);
-            color.icon_set     = read_channel(body[off + 3], &color.icon);
-            color.subtitle_set = read_channel(body[off + 4], &color.subtitle);
-            s_custom[id] = color;
-        }
-
-        if (bar)
-        {
-            const char *flags = bar + 1;
-            size_t flag_len = strlen(flags);
-            for (size_t off = 0; off + 3 <= flag_len; off += 3)
-            {
-                int id = color_index(flags[off]);
-                if (id <= 0 || id >= MOD_TYPE_COUNT)
-                {
-                    continue;
-                }
-                unpack_flags((uint8_t)id, color_index(flags[off + 1]), color_index(flags[off + 2]));
-            }
-        }
-        return;
+        flags = body + bar + 1;
+        flag_len = body_len - bar - 1;
+        body_len = bar;
     }
 
-    // a v2 string is tagged with the marker and packs the flags per size. anything untagged is
-    // unrecognized (an old blob or stray data), so carries no records and leaves everything unset
-    if (src[0] != CUSTOM_FORMAT_MARKER)
+    // colours are keyed by the group's primary id, so a grouped member inherits through
+    // resolve_theme_module. flags are keyed by each module's own id
+    for (size_t off = 0; off + 5 <= body_len; off += 5)
     {
-        return;
-    }
-    const char *data = src + 1; // step past the marker
-    size_t len = strlen(data);
-
-    // each module owns a fixed CUSTOM_RECORD_LEN record at offset module * CUSTOM_RECORD_LEN.
-    // module 0 is MOD_EMPTY so its slot is skipped. a record that runs past the end of the string
-    // is missing (the "0" default or a short blob), and so is every record after it
-    for (uint8_t module = 1; module < MOD_TYPE_COUNT; module++)
-    {
-        size_t base = (size_t)module * CUSTOM_RECORD_LEN;
-        if (base + CUSTOM_RECORD_LEN > len)
+        int id = color_index(body[off]);
+        if (id <= 0 || id >= MOD_TYPE_COUNT)
         {
-            break;
+            continue;
         }
-
         GridlockCustomColor color = {0};
-        color.accent_set   = read_channel(data[base + 0], &color.accent);
-        color.value_set    = read_channel(data[base + 1], &color.value);
-        color.icon_set     = read_channel(data[base + 2], &color.icon);
-        color.subtitle_set = read_channel(data[base + 3], &color.subtitle);
-        s_custom[module] = color;
+        color.accent_set   = read_channel(body[off + 1], &color.accent);
+        color.value_set    = read_channel(body[off + 2], &color.value);
+        color.icon_set     = read_channel(body[off + 3], &color.icon);
+        color.subtitle_set = read_channel(body[off + 4], &color.subtitle);
+        s_custom[id] = color;
+    }
 
-        unpack_flags(module, color_index(data[base + 4]), color_index(data[base + 5]));
+    for (size_t off = 0; off + 3 <= flag_len; off += 3)
+    {
+        int id = color_index(flags[off]);
+        if (id <= 0 || id >= MOD_TYPE_COUNT)
+        {
+            continue;
+        }
+        unpack_flags((uint8_t)id, color_index(flags[off + 1]), color_index(flags[off + 2]));
     }
 }
 
@@ -1090,6 +1074,11 @@ uint8_t gridlock_wind_unit(void)
 uint8_t gridlock_analog_style(void)
 {
     return s_analog.style;
+}
+
+uint8_t gridlock_panel_style(void)
+{
+    return s_core.panel_style;
 }
 
 uint8_t gridlock_hourly_vibe(void)
@@ -1235,8 +1224,8 @@ void gridlock_set_time_zone_1(const char *value)
 void gridlock_set_custom_colors(const char *value)
 {
     // the combined "~3 colours | flags" string can exceed one 256 byte persist key, so split it
-    // into the two blobs at the '|'. no '|' (a v2/legacy blob, or colour-only) keeps it all in the
-    // colours key with empty flags. ensure_custom_parsed recombines + re-parses on the next access
+    // into the two blobs at the '|'. a colour-only string (no '|') keeps it all in the colours key
+    // with empty flags. ensure_custom_parsed re-parses both on the next access
     if (!value)
     {
         value = "";
