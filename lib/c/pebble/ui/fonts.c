@@ -5,6 +5,9 @@
 #include "ui/fonts.h"
 
 static GFont s_fonts[FONT_SLOTS_MAX]; // loaded font handles
+// whether the app loaded the handle in that slot and so has to free it. a system font is parked
+// with fonts_register_system and stays false, because unloading one the firmware owns faults
+static bool s_owned[FONT_SLOTS_MAX];
 
 void fonts_register(FontId id, GFont handle)
 {
@@ -15,6 +18,19 @@ void fonts_register(FontId id, GFont handle)
     }
 
     s_fonts[id] = handle;
+    s_owned[id] = true;
+}
+
+void fonts_register_system(FontId id, GFont handle)
+{
+    if (id >= FONT_SLOTS_MAX)
+    {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "fonts_register_system: id %d out of range", id);
+        return;
+    }
+
+    s_fonts[id] = handle;
+    s_owned[id] = false;
 }
 
 GFont fonts_get(FontId id)
@@ -53,10 +69,24 @@ void fonts_unload_all(void)
 {
     for (int i = 0; i < FONT_SLOTS_MAX; i++)
     {
-        if (s_fonts[i])
+        if (s_fonts[i] && s_owned[i])
         {
-            fonts_unload_custom_font(s_fonts[i]);
-            s_fonts[i] = NULL;
+            GFont handle = s_fonts[i];
+            fonts_unload_custom_font(handle);
+
+            // one handle can sit in several slots, so clear every copy of it before moving on
+            // or the next slot holding it would unload it a second time
+            for (int j = i; j < FONT_SLOTS_MAX; j++)
+            {
+                if (s_fonts[j] == handle)
+                {
+                    s_fonts[j] = NULL;
+                    s_owned[j] = false;
+                }
+            }
         }
+
+        s_fonts[i] = NULL;
+        s_owned[i] = false;
     }
 }

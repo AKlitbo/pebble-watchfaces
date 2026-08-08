@@ -34,6 +34,9 @@ void vibe_pulse(VibePulse pulse);
  * that alternate buzz then pause then buzz and so on, starting on a buzz. Lets a caller play a
  * little tune that the three canned pulses cannot.
  *
+ * The array is not copied. The vibe controller keeps reading it while the pattern plays, so it
+ * has to outlive the call: pass a static or otherwise long-lived array, never a stack one.
+ *
  * @param durations The on and off times in milliseconds. The first entry is a buzz.
  * @param num_segments How many entries the durations array has.
  */
