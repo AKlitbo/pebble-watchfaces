@@ -16,6 +16,11 @@ function etMs(day: number, hourEt: number, minuteEt = 0): number {
   return Date.UTC(2026, 6, day, hourEt + 4, minuteEt);
 }
 
+// the same for a winter date, when ET is EST (UTC-5) instead. in 2026 January 5 is a Monday
+function estMs(day: number, hourEt: number, minuteEt = 0): number {
+  return Date.UTC(2026, 0, day, hourEt + 5, minuteEt);
+}
+
 const FIFTEEN_MIN = 15 * 60 * 1000;
 const THREE_HOURS = 3 * 60 * 60 * 1000;
 const NINETY_MIN = 90 * 60 * 1000;
@@ -81,6 +86,50 @@ describe('marketPhase', () => {
 
     expect(result).toBe('closed');
     vi.unstubAllGlobals();
+  });
+});
+
+describe('marketPhase across daylight saving', () => {
+  /**
+   * The session is Eastern wall-clock, so the UTC offset it sits at is -4 in summer and -5 in
+   * winter. Every other case here is a July one, and a fixed summer offset would pass all of them
+   * while running the whole winter session an hour out: Alpha Vantage would burn quota chasing a
+   * close that has not rung, and Twelve Data would spend the last open hour on its closed floor.
+   */
+  test('reads the winter open bell as open, an hour off the summer offset', () => {
+    const result = schedule.marketPhase(estMs(5, 9, 30));
+
+    expect(result).toBe('open');
+  });
+
+  /** A minute before the winter bell must still be closed, which a summer offset would call open. */
+  test('reads a minute before the winter open bell as closed', () => {
+    const result = schedule.marketPhase(estMs(5, 9, 29));
+
+    expect(result).toBe('closed');
+  });
+
+  /** The last minute of the winter session is still open, not already post-close. */
+  test('reads the last minute of the winter session as open', () => {
+    const result = schedule.marketPhase(estMs(5, 15, 59));
+
+    expect(result).toBe('open');
+  });
+
+  /** The winter close bell flips the session the same way the summer one does. */
+  test('reads the winter close bell as postclose', () => {
+    const result = schedule.marketPhase(estMs(5, 16, 0));
+
+    expect(result).toBe('postclose');
+  });
+
+  /** The clearest statement of the contract: one UTC clock time, two seasons, two phases. */
+  test('puts the same UTC time on opposite sides of the bell in summer and winter', () => {
+    const summer = schedule.marketPhase(Date.UTC(2026, 6, 1, 13, 45));
+    const winter = schedule.marketPhase(Date.UTC(2026, 0, 5, 13, 45));
+
+    expect(summer).toBe('open');
+    expect(winter).toBe('closed');
   });
 });
 

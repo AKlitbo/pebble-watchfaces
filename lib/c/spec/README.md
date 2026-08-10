@@ -1,6 +1,6 @@
 # C Unit Tests
 
-Host-side tests for the maths in `lib/c/core`: dates, moon phase, beats, number and text formatting, unit conversion. They build with a plain host `gcc`, no Pebble SDK, and run off the watch.
+Host-side tests for the maths in `lib/c/core` (dates, moon phase, beats, number and text formatting, unit conversion) and for the handful of `lib/c/pebble` units that are pure logic. They build with a plain host `gcc`, no Pebble SDK, and run off the watch.
 
 ## Running
 
@@ -17,9 +17,13 @@ Specs sit next to their source (like `*.spec.ts`) and never reach the watch: `li
 
 ## What is not here
 
-Only `lib/c/core` is covered, and that is on purpose. It is plain arithmetic that needs nothing but a compiler, so a test is cheap and a wrong answer is invisible in review and obvious on the wrist. A one degree error in the moon maths or an off-by-one in the ISO week reads as a bug on someone's watch weeks later.
+The line is not `core` versus `pebble`, it is whether a unit decides something on its own. `lib/c/core` is all decision: plain arithmetic that needs nothing but a compiler, so a test is cheap and a wrong answer is invisible in review and obvious on the wrist. A one degree error in the moon maths or an off-by-one in the ISO week reads as a bug on someone's watch weeks later.
 
-`lib/c/pebble` is a different animal. It talks to the SDK, so testing it off the watch means standing in for the SDK: persist, timers, the clock, dictionaries, the AppMessage transport. That fake has to mirror the real thing byte for byte to be worth anything, and when it drifts the tests still pass while the watch is wrong. The trade is a lot of scaffolding to test code that mostly forwards to Pebble, and Pebble is not ours to test. It is left to the device.
+Most of `lib/c/pebble` is the opposite. It talks to the SDK, so testing it off the watch means standing in for the SDK: persist, timers, the clock, dictionaries, the AppMessage transport. That fake has to mirror the real thing byte for byte to be worth anything, and when it drifts the tests still pass while the watch is wrong. The trade is a lot of scaffolding to test code that mostly forwards to Pebble, and Pebble is not ours to test. It is left to the device.
+
+A few units under `lib/c/pebble` sit on the near side of that line anyway. `store_poll.h` decides when a poll falls due and takes the clock as an argument, and `store_cadence.c` keeps a list. Both include `<pebble.h>` for a constant or the log macro and nothing more, so `host/pebble.h` supplies that much and the specs sit beside the source like any other. The stub deliberately stands in for nothing with behaviour, which is what keeps it from drifting: if a unit needs a real SDK call faked to be testable, that is the signal it belongs on the device instead.
+
+`make` compiles each spec against the whole of `lib/c/core` plus its own sibling `.c` when it has one, so a spec for a header-only unit needs no source and a spec outside `core` needs no Makefile entry either.
 
 ## Unity (Third-Party)
 

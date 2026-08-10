@@ -57,11 +57,14 @@ The faces in this family all set their type in the same face, and each bundles i
   Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's
   [OFL.txt](watchfaces/sketchbook/ridgeline/resources/fonts/OFL.txt)
 
-### Gridlock
+### Mosaic
 
-The clock and values are set in Teko and Share Tech Mono. The rest are the header-font options the
-settings page offers, so a build carries all of them whichever one is picked. They share one
-[OFL.txt](watchfaces/gridlock/resources/fonts/OFL.txt), which carries a copyright notice for each.
+Gridlock and Sidereel bundle the same set. The clock and values are set in Teko and Share Tech Mono,
+and the rest are the header-font options the settings page offers, so a build carries all of them
+whichever one is picked. Each face bundles its own copy under one `OFL.txt`
+([Gridlock](watchfaces/mosaic/gridlock/resources/fonts/OFL.txt),
+[Sidereel](watchfaces/mosaic/sidereel/resources/fonts/OFL.txt)), which carries a copyright notice
+for each.
 
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
 - **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012,
@@ -78,10 +81,10 @@ settings page offers, so a build carries all of them whichever one is picked. Th
 - **[Quantico](https://fonts.google.com/specimen/Quantico)**: Copyright (c) 2011 Matthew Desmond,
   with Reserved Font Name "Quantico"
 
-One of Gridlock's header fonts is not under the OFL:
+One of the header fonts is not under the OFL:
 
 - **[LECO 2014](https://www.1001fonts.com/leco-2014-font.html)**: released into the public domain by
-  its author. It ships as `LECO2014-Regular.ttf` beside the others, and the note at the foot of that
+  its author. It ships as `LECO2014-Regular.ttf` beside the others, and the note at the foot of each
   face's `OFL.txt` says so, since the OFL text there does not cover it.
 
 ### IDE VSCode
@@ -104,11 +107,12 @@ Radar Array and the Sketchbook faces draw no weather icons, so they bundle only 
 glyphs.
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font
-  License 1.1 for the font, MIT for the code. Rendered PNGs bundled by LCARS Stardate and IDE / VS Code
-- **[UXWing](https://uxwing.com)** (heart, step, thermometer and muted-speaker glyphs): the
+  License 1.1 for the font, MIT for the code. Rendered PNGs bundled by LCARS Stardate, IDE / VS Code,
+  Gridlock and Sidereel
+- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the
   [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not
   allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled
-  by LCARS Stardate and the Sketchbook faces
+  by LCARS Stardate, the Sketchbook faces, Gridlock and Sidereel
 - **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs):
   [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources bundled
   under `vendor/svgrepo/`, rendered PNGs bundled by every face

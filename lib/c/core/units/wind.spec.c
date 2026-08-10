@@ -55,10 +55,15 @@ void test_wind_truncates_toward_zero(void)
 /** @brief Each unit must carry its own short label or the number sits next to the wrong tag. */
 void test_wind_unit_labels(void)
 {
-    TEST_ASSERT_EQUAL_STRING("KM/H", wind_unit_label(WIND_UNIT_KMH));
-    TEST_ASSERT_EQUAL_STRING("MPH", wind_unit_label(WIND_UNIT_MPH));
-    TEST_ASSERT_EQUAL_STRING("KTS", wind_unit_label(WIND_UNIT_KTS));
-    TEST_ASSERT_EQUAL_STRING("M/S", wind_unit_label(WIND_UNIT_MS));
+    const char *kmh = wind_unit_label(WIND_UNIT_KMH);
+    const char *mph = wind_unit_label(WIND_UNIT_MPH);
+    const char *kts = wind_unit_label(WIND_UNIT_KTS);
+    const char *ms = wind_unit_label(WIND_UNIT_MS);
+
+    TEST_ASSERT_EQUAL_STRING("KM/H", kmh);
+    TEST_ASSERT_EQUAL_STRING("MPH", mph);
+    TEST_ASSERT_EQUAL_STRING("KTS", kts);
+    TEST_ASSERT_EQUAL_STRING("M/S", ms);
 }
 
 int main(void)

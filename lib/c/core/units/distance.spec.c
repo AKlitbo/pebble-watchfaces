@@ -13,11 +13,20 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-/** @brief The unit label must track the setting or the number reads in the wrong system. */
-void test_distance_unit_labels_each_system(void)
+/** @brief The imperial label must say miles or the number reads in the wrong system. */
+void test_distance_unit_labels_imperial(void)
 {
-    TEST_ASSERT_EQUAL_STRING("MI", distance_unit(true));
-    TEST_ASSERT_EQUAL_STRING("KM", distance_unit(false));
+    const char *result = distance_unit(true);
+
+    TEST_ASSERT_EQUAL_STRING("MI", result);
+}
+
+/** @brief The metric label must say kilometres, the same slip the other way round. */
+void test_distance_unit_labels_metric(void)
+{
+    const char *result = distance_unit(false);
+
+    TEST_ASSERT_EQUAL_STRING("KM", result);
 }
 
 /** @brief A mile is 1609.344 m, so an exact thousand miles worth of metres must read back as 1000.0. */
@@ -74,7 +83,8 @@ int main(void)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_distance_unit_labels_each_system);
+    RUN_TEST(test_distance_unit_labels_imperial);
+    RUN_TEST(test_distance_unit_labels_metric);
     RUN_TEST(test_distance_format_value_thousand_miles_exact);
     RUN_TEST(test_distance_format_value_rounds_up_with_carry);
     RUN_TEST(test_distance_format_value_clamps_negative);

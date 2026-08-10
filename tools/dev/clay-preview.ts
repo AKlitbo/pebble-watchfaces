@@ -158,9 +158,13 @@ function build(): void {
   // required per build so each pass picks up the freshly compiled emit/ tree. at module scope they
   // would stay bound to the first load and dropping the require cache would not budge them
   const configPath = path.join(paths.emit, 'watchfaces', ...rel.split('/'), 'src', 'pkjs', 'config.js');
-  const config = (requireHost(configPath) as { default?: unknown }).default;
+  const configModule = requireHost(configPath) as { default?: unknown; customClay?: unknown };
 
-  const clay = new Clay(config, null, { autoHandleEvents: false });
+  // a face that runs code inside its own config page exports it beside the rows, so the preview
+  // gets the same page the watch would rather than one with its buttons dead
+  const customClay = (configModule.customClay || null) as (() => void) | null;
+
+  const clay = new Clay(configModule.default, customClay, { autoHandleEvents: false });
   for (const component of components(paths.emit)) {
     clay.registerComponent(component);
   }

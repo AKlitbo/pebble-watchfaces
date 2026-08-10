@@ -25,17 +25,25 @@ void test_north_is_zero(void)
 /** @brief And the quarters land where the compass says. */
 void test_quarters_are_a_right_angle_apart(void)
 {
-    TEST_ASSERT_EQUAL_INT(90, wind_bearing("E"));
-    TEST_ASSERT_EQUAL_INT(180, wind_bearing("S"));
-    TEST_ASSERT_EQUAL_INT(270, wind_bearing("W"));
+    int east = wind_bearing("E");
+    int south = wind_bearing("S");
+    int west = wind_bearing("W");
+
+    TEST_ASSERT_EQUAL_INT(90, east);
+    TEST_ASSERT_EQUAL_INT(180, south);
+    TEST_ASSERT_EQUAL_INT(270, west);
 }
 
 /** @brief The three-letter points sit halfway between their neighbours. */
 void test_three_letter_points_split_the_gap(void)
 {
-    TEST_ASSERT_EQUAL_INT(22, wind_bearing("NNE"));
-    TEST_ASSERT_EQUAL_INT(67, wind_bearing("ENE"));
-    TEST_ASSERT_EQUAL_INT(337, wind_bearing("NNW"));
+    int nne = wind_bearing("NNE");
+    int ene = wind_bearing("ENE");
+    int nnw = wind_bearing("NNW");
+
+    TEST_ASSERT_EQUAL_INT(22, nne);
+    TEST_ASSERT_EQUAL_INT(67, ene);
+    TEST_ASSERT_EQUAL_INT(337, nnw);
 }
 
 /** @brief The phone's casing is not guaranteed, so matching must not depend on it. */
@@ -43,7 +51,7 @@ void test_matching_ignores_case(void)
 {
     int result = wind_bearing("wsw");
 
-    TEST_ASSERT_EQUAL_INT(wind_bearing("WSW"), result);
+    TEST_ASSERT_EQUAL_INT(247, result);
 }
 
 /**
@@ -61,10 +69,15 @@ void test_a_short_point_is_not_a_prefix_match(void)
 /** @brief Anything not on the compass is no reading, not north. */
 void test_an_unknown_direction_is_no_data(void)
 {
-    TEST_ASSERT_EQUAL_INT(-1, wind_bearing("NNNW"));
-    TEST_ASSERT_EQUAL_INT(-1, wind_bearing("up"));
-    TEST_ASSERT_EQUAL_INT(-1, wind_bearing(""));
-    TEST_ASSERT_EQUAL_INT(-1, wind_bearing(NULL));
+    int too_long = wind_bearing("NNNW");
+    int not_a_point = wind_bearing("up");
+    int empty = wind_bearing("");
+    int missing = wind_bearing(NULL);
+
+    TEST_ASSERT_EQUAL_INT(-1, too_long);
+    TEST_ASSERT_EQUAL_INT(-1, not_a_point);
+    TEST_ASSERT_EQUAL_INT(-1, empty);
+    TEST_ASSERT_EQUAL_INT(-1, missing);
 }
 
 /** @brief Every one of the sixteen points resolves, and no two share a bearing. */
@@ -107,8 +120,11 @@ void test_an_easterly_leans_left(void)
 /** @brief A wind along the line of sight has no sideways part to show. */
 void test_a_northerly_leans_neither_way(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, wind_lean(wind_bearing("N")));
-    TEST_ASSERT_EQUAL_INT(0, wind_lean(wind_bearing("S")));
+    int northerly = wind_lean(wind_bearing("N"));
+    int southerly = wind_lean(wind_bearing("S"));
+
+    TEST_ASSERT_EQUAL_INT(0, northerly);
+    TEST_ASSERT_EQUAL_INT(0, southerly);
 }
 
 /** @brief A corner of the compass carries some of it, but less than a wind straight across. */

@@ -24,6 +24,28 @@ function row(token: string, resource: string, nightResource?: string): Condition
   return { token: token, resource: resource, nightResource: nightResource, labelShort: token, labelLong: token };
 }
 
+// the forecast wire code is the token's position in conditions.ts, so this order is the contract
+// the generated C switch is built against. spelled out literally rather than read back off
+// conditions.ts, because a test that derives the expected code from the same array it is checking
+// moves with any reorder and can never fail on the drift it is here to catch
+const WIRE_CODES: Array<[string, number]> = [
+  ['CLEAR', 0],
+  ['PCLDY', 1],
+  ['CLDY', 2],
+  ['FOGGY', 3],
+  ['DRZL', 4],
+  ['FZDZ', 5],
+  ['RAIN', 6],
+  ['FZRN', 7],
+  ['SNOW', 8],
+  ['SHWR', 9],
+  ['SNSH', 10],
+  ['STRM', 11],
+];
+
+/** The code an unrecognized token falls back to, pinned as the wire value the watch decodes. */
+const UNKNOWN_WIRE_CODE = 255;
+
 describe('buildIconsTable', () => {
   /** A missing null guard would dereference a null condition string on the watch and crash. */
   test('returns the fallback resource when the condition pointer is null', () => {
@@ -120,23 +142,35 @@ describe('buildIconsTable', () => {
 
 describe('codeFor', () => {
   /** The forecast wire code is the array index, so a drift here draws the wrong icon on every column. */
-  test('returns the array index of a known token', () => {
-    const index = vocabulary.codeFor('CLDY');
+  test.each(WIRE_CODES)('maps %s to wire code %i', (token, expected) => {
+    const result = vocabulary.codeFor(token);
 
-    expect(index).toBe(vocabulary.conditions.findIndex((entry) => entry.token === 'CLDY'));
+    expect(result).toBe(expected);
+  });
+
+  /**
+   * A watch built against an older vocabulary decodes by position, so inserting or dropping a token
+   * renumbers every code after it and draws the wrong sky. Adding one at the end is safe, and the
+   * pinned list above is what has to be reviewed to say so.
+   */
+  test('ships exactly the tokens the pinned wire codes cover, in that order', () => {
+    const result = vocabulary.conditions.map((entry) => entry.token);
+
+    expect(result).toEqual(WIRE_CODES.map(([token]) => token));
   });
 
   /** The forecast shows day glyphs, so a night token must map to the same code as its day form. */
   test('strips the night marker before looking up the code', () => {
     const result = vocabulary.codeFor('RAIN_NIGHT');
 
-    expect(result).toBe(vocabulary.codeFor('RAIN'));
+    expect(result).toBe(6);
   });
 
   /** An unknown or empty token must land on UNKNOWN_CODE so the watch draws WI_NA, not a random icon. */
-  test('returns UNKNOWN_CODE for an unrecognised or empty token', () => {
-    expect(vocabulary.codeFor('ZZZ')).toBe(vocabulary.UNKNOWN_CODE);
-    expect(vocabulary.codeFor('')).toBe(vocabulary.UNKNOWN_CODE);
+  test.each([['ZZZ'], ['']])('returns UNKNOWN_CODE for an unrecognised or empty token (%s)', (token) => {
+    const result = vocabulary.codeFor(token);
+
+    expect(result).toBe(UNKNOWN_WIRE_CODE);
   });
 });
 
@@ -180,14 +214,16 @@ describe('buildIconCodesTable', () => {
     expect(source).toContain('    default: return RESOURCE_ID_ICON_WI_NA;');
   });
 
-  /** The generated case index must equal codeFor for the same row or the C and JS sides disagree. */
-  test('numbers cases so they line up with codeFor over the real vocabulary', () => {
+  /** A case numbered off the pinned wire code is how the C and JS sides disagree about a column. */
+  test('numbers cases so they line up with the pinned wire codes', () => {
     const source = buildIconCodesTable(vocabulary);
 
-    vocabulary.conditions.forEach((entry, index) => {
-      expect(vocabulary.codeFor(entry.token)).toBe(index);
+    WIRE_CODES.forEach(([token, code]) => {
+      const entry = vocabulary.conditions[code];
+
+      expect(entry.token).toBe(token);
       // every real condition ships a night glyph so the case is the night ternary
-      expect(source).toContain(`    case ${index}: return night ? RESOURCE_ID_ICON_${entry.nightResource} : RESOURCE_ID_ICON_${entry.resource};`);
+      expect(source).toContain(`    case ${code}: return night ? RESOURCE_ID_ICON_${entry.nightResource} : RESOURCE_ID_ICON_${entry.resource};`);
     });
   });
 });

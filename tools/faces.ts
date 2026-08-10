@@ -62,3 +62,20 @@ export function faceRelative(face: string): string {
 export function faceDir(face: string): string {
   return path.join(WATCHFACES, faceRelative(face));
 }
+
+/**
+ * A face's family core directory, or null for a face that belongs to no family.
+ *
+ * Nothing declares it: a face nested beside a core/ is in that family, the same positional rule
+ * the C build follows. The core mirrors a face's own src/, so core/pkjs sits where the face has
+ * src/pkjs, which is what lets a lookup fall back from one to the other by swapping the root.
+ */
+export function familyCoreDir(face: string): string | null {
+  const rel = faceRelative(face);
+  if (!rel.includes('/')) {
+    return null;
+  }
+
+  const core = path.join(WATCHFACES, path.dirname(rel), 'core');
+  return fs.existsSync(core) ? core : null;
+}

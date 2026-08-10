@@ -22,9 +22,13 @@
     "gen:icons": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/icons/generate-icons.ts",
     "gen:frame": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/frame/generate-frame.ts",
     "gen:gridlock": "npm run gen:gridlock:clay && npm run gen:gridlock:vibrant && npm run gen:gridlock:thumbnails",
-    "gen:gridlock:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/clay-components/generate-components.ts",
-    "gen:gridlock:vibrant": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/vibrant/generate-vibrant.ts",
-    "gen:gridlock:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/gridlock/src/tools/thumbnails/generate-thumbnails.ts",
+    "gen:sidereel": "npm run gen:sidereel:clay && npm run gen:sidereel:vibrant && npm run gen:sidereel:thumbnails",
+    "gen:sidereel:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/mosaic/core/tools/clay-components/generate-components.ts sidereel",
+    "gen:sidereel:vibrant": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/mosaic/core/tools/vibrant/generate-vibrant.ts sidereel",
+    "gen:sidereel:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/mosaic/core/tools/thumbnails/generate-thumbnails.ts sidereel",
+    "gen:gridlock:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/mosaic/core/tools/clay-components/generate-components.ts gridlock",
+    "gen:gridlock:vibrant": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/mosaic/core/tools/vibrant/generate-vibrant.ts gridlock",
+    "gen:gridlock:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON watchfaces/mosaic/core/tools/thumbnails/generate-thumbnails.ts gridlock",
     "dev:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/dev/clay-preview.ts"
   },
   "devDependencies": {

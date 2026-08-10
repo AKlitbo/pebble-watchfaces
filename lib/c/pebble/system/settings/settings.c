@@ -106,6 +106,53 @@ static void set_cstring(char *dst, const char *src, uint16_t size)
 }
 
 /**
+ * @brief One 0..255 colour byte down to the two bits a GColor channel holds.
+ *
+ * The phone picks from the watch's own palette, so the byte is already one of 0, 85, 170
+ * or 255. Rounding rather than dividing keeps anything slightly off landing on the nearest.
+ *
+ * @param byte The channel byte.
+ * @return 0 to 3.
+ */
+static uint8_t color_channel(uint32_t byte)
+{
+    uint32_t level = (byte + 42) / 85;
+
+    return (uint8_t)(level > 3 ? 3 : level);
+}
+
+/**
+ * @brief A 0xRRGGBB number as one opaque GColor byte.
+ *
+ * @param hex The colour the phone sent.
+ * @return The argb byte.
+ */
+static uint8_t color_from_hex(uint32_t hex)
+{
+    uint8_t red = color_channel((hex >> 16) & 0xFF);
+    uint8_t green = color_channel((hex >> 8) & 0xFF);
+    uint8_t blue = color_channel(hex & 0xFF);
+
+    // an opaque GColor is 0b11rrggbb
+    return (uint8_t)(0xC0 | (red << 4) | (green << 2) | blue);
+}
+
+/**
+ * @brief A GColor byte back to the 0xRRGGBB number the config page reads.
+ *
+ * @param argb The stored byte.
+ * @return The colour as 0xRRGGBB.
+ */
+static uint32_t color_to_hex(uint8_t argb)
+{
+    uint32_t red = ((argb >> 4) & 3) * 85;
+    uint32_t green = ((argb >> 2) & 3) * 85;
+    uint32_t blue = (argb & 3) * 85;
+
+    return (red << 16) | (green << 8) | blue;
+}
+
+/**
  * @brief Seed every field of one schema with its fresh-install default.
  *
  * The whole blob is zeroed first, so a schema that declares no fields (one the face fills in
@@ -136,6 +183,10 @@ static void apply_defaults(const SettingsSchema *schema)
 
             case SETTING_CSTRING:
                 set_cstring((char *)ptr, field->default_str, field->size);
+                break;
+
+            case SETTING_COLOR:
+                *(uint8_t *)ptr = color_from_hex(field->default_num);
                 break;
         }
     }
@@ -202,6 +253,16 @@ static bool sanitize(const SettingsSchema *schema)
 
             case SETTING_CSTRING:
                 changed |= sanitize_cstring(schema, field);
+                break;
+
+            case SETTING_COLOR:
+                // every colour the watch can paint is opaque, so a byte without both alpha
+                // bits set came from a damaged blob rather than a picker
+                if ((*byte & 0xC0) != 0xC0)
+                {
+                    *byte = color_from_hex(field->default_num);
+                    changed = true;
+                }
                 break;
         }
     }
@@ -359,6 +420,11 @@ void settings_serialize(DictionaryIterator *iter)
                 case SETTING_CSTRING:
                     result = dict_write_cstring(iter, *field->message_key, (char *)byte);
                     break;
+
+                case SETTING_COLOR:
+                    // back as the 0xRRGGBB number the config page's picker reads
+                    result = dict_write_uint32(iter, *field->message_key, color_to_hex(*byte));
+                    break;
             }
 
             // the outbox is full: the rest of the seed would be dropped silently so stop
@@ -435,6 +501,20 @@ SettingsInbound settings_apply_inbox(DictionaryIterator *iter)
                     }
 
                     set_cstring((char *)ptr, value, field->size);
+                    break;
+                }
+
+                case SETTING_COLOR:
+                {
+                    // -1 is outside the 0xRRGGBB range the picker sends, so it doubles as the
+                    // "wrong wire type" signal and the field keeps whatever it already held
+                    int32_t hex = tuple_int_or(tuple, -1);
+                    if (hex < 0)
+                    {
+                        continue;
+                    }
+
+                    *(uint8_t *)ptr = color_from_hex((uint32_t)hex);
                     break;
                 }
             }

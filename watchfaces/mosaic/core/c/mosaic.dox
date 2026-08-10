@@ -1,0 +1,86 @@
+/**
+ * @defgroup family-mosaic The Mosaic Family
+ * @brief The panel engine Gridlock and Sidereel share: the panel bodies themselves, the chrome
+ * they are framed in, and the draw helpers that keep them all painting the same shapes.
+ *
+ * A tier between lib and a face. lib is skin-agnostic and reaches into no face; this is the
+ * opposite by design, and it is why this code is not in lib: it knows a reading is drawn as a
+ * panel in a cell, and it is compiled only into the faces that sit beside it.
+ *
+ * What it may reach back into is fixed and short:
+ *
+ * - `engine/grid_engine.h`, the face's `GridCtx`, which is what a panel body is handed
+ * - `draw/fonts.h`, the face's font slot names, so a body can ask for a size by name
+ * - `theme/theme.h`, the face's `Palette`, whose panel channels this tier draws with
+ * - `settings_schema.h`, the goals, units and week start a body reads, under the names it calls
+ * - `dev/dev.h`, the face's dev switches
+ * - anything from lib, the same as any face
+ *
+ * Nothing else. A face's own layout, its persisted settings, its palette tables and the cells it
+ * resolves stay with the face, because those are what make it that face rather than another one.
+ * That contract is why the same panel body compiles into a grid of cells on one face and a pair
+ * of fixed boxes on the other.
+ *
+ * @{
+ * @}
+ */
+
+/**
+ * @defgroup mosaic_engine Engine
+ * @ingroup family-mosaic
+ *
+ * The panel engine both faces sit on: the context a body draws into and the catalog that maps an
+ * id to the body which draws it.
+ */
+
+/**
+ * @defgroup mosaic_draw Draw Helpers
+ * @ingroup family-mosaic
+ *
+ * Shared drawing helpers the panels lean on: the stat panel drawer, icons, metrics, panel styles,
+ * and the header fonts. Keeps every panel painting the same shapes the same way.
+ */
+
+/**
+ * @defgroup mosaic_modules Panel Modules
+ * @ingroup family-mosaic
+ *
+ * The panels themselves, split by what they show. Each module is just data plus a little draw
+ * function, and the face's chrome wraps it in a frame.
+ */
+
+/**
+ * @defgroup mosaic_mod_time Time
+ * @ingroup mosaic_modules
+ *
+ * Clock, date, other time zones, the moon, and swatch .beats.
+ */
+
+/**
+ * @defgroup mosaic_mod_weather Weather
+ * @ingroup mosaic_modules
+ *
+ * The current weather plus the many readouts around it: temperature, wind, humidity, the sun
+ * times, the forecast strips, and friends.
+ */
+
+/**
+ * @defgroup mosaic_mod_health Health
+ * @ingroup mosaic_modules
+ *
+ * Steps, heart rate, calories, sleep, distance, and the little activity graphs.
+ */
+
+/**
+ * @defgroup mosaic_mod_system System
+ * @ingroup mosaic_modules
+ *
+ * The watch's own bits: battery, the phone connection, and the quiet time marker.
+ */
+
+/**
+ * @defgroup mosaic_mod_composite Composite
+ * @ingroup mosaic_modules
+ *
+ * Panels that fold a few readings into one tile, like the combined date and time.
+ */

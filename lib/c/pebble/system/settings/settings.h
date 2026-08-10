@@ -45,7 +45,8 @@ typedef enum
 {
     SETTING_BOOL,     /**< Sent as a byte 0 or 1. default_num holds the default */
     SETTING_ENUM_U8,  /**< Sent as text holding the number (Clay sends selects as strings) */
-    SETTING_CSTRING   /**< Sent as text copied into a fixed buffer */
+    SETTING_CSTRING,  /**< Sent as text copied into a fixed buffer */
+    SETTING_COLOR     /**< Sent as a 0xRRGGBB number, stored as one opaque GColor byte */
 } SettingType;
 
 /**
@@ -59,7 +60,7 @@ typedef struct
     uint16_t    offset;           /**< Where this field sits in the owning face's struct */
     uint16_t    size;             /**< Buffer size (SETTING_CSTRING only) */
     uint8_t     enum_count;       /**< Highest allowed value (SETTING_ENUM_U8 only) */
-    uint32_t    default_num;      /**< Default on a fresh install for BOOL and ENUM_U8 */
+    uint32_t    default_num;      /**< Default on a fresh install for BOOL and ENUM_U8, and the 0xRRGGBB colour for COLOR */
     const char *default_str;      /**< Default on a fresh install for CSTRING */
     bool        affects_layout;   /**< A change re-renders the clock (date and time formats) */
     bool        affects_weather;  /**< A change asks for fresh weather (temperature unit) */

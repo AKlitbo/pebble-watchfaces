@@ -108,14 +108,16 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
           'type': 'heading',
           'defaultValue': 'Appearance',
         },
-        {
+        // a face that colours itself from individual pickers rather than a preset list omits
+        // theme entirely, and the section is then just its own appearanceItems
+        ...(options.theme ? [{
           'type': 'select',
           'messageKey': 'APPEARANCE_THEME',
           'label': theme.label || 'Frame Theme',
           'description': theme.description || 'Colour scheme for the watch frame.',
           'defaultValue': 0,
           'options': theme.options,
-        },
+        }] : []),
         // a face's own appearance controls sit with the theme picker rather than in a section
         // of their own, because a section per setting reads as a longer page than it is
         ...(options.appearanceItems || []),

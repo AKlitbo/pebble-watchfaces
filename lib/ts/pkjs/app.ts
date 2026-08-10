@@ -17,6 +17,7 @@ import stock from '../stock/stock';
 import locationComponent from '../clay/location-component';
 import ical from '../calendar/ical';
 import wire from './wire';
+import { createSendQueue } from './send-queue';
 import schedule from '../stock/schedule';
 import stockCache from '../stock/cache';
 import type { WeatherResult } from '../weather/util';
@@ -46,6 +47,8 @@ interface StartOptions {
   formatCoords: (messageKeys: Record<string, number>, result: WeatherResult) => AppMessageDict;
   components?: unknown[];
   seedKeys?: string[];
+  seedColorKeys?: string[];
+  seedBoolKeys?: string[];
   customClay?: unknown;
 }
 
@@ -255,7 +258,7 @@ const SEED_FIELDS: Array<{ key: string; accept?: (value: any) => boolean; coerce
  * with the real values instead of defaults. The watch persist is the source of
  * truth, since the phone's clay-settings can be empty or stale after an update.
  */
-function seedConfigFromWatch(messageKeys: any, payload: any, seedKeys?: string[]): void {
+function seedConfigFromWatch(messageKeys: any, payload: any, seedKeys?: string[], seedColorKeys?: string[], seedBoolKeys?: string[]): void {
   const config = getConfig();
 
   SEED_FIELDS.forEach((field) => {
@@ -278,6 +281,22 @@ function seedConfigFromWatch(messageKeys: any, payload: any, seedKeys?: string[]
     const messageKey = messageKeys[key];
     if (messageKey in payload && isEnum(payload[messageKey])) {
       config[key] = String(payload[messageKey]);
+    }
+  });
+
+  // the other two wire shapes a face key can take. a colour has to stay a number because Clay's
+  // picker reads a string as hex, and a toggle rides as 0/1 but sets from a real boolean
+  (seedColorKeys || []).forEach((key) => {
+    const messageKey = messageKeys[key];
+    if (messageKey in payload && typeof payload[messageKey] === 'number') {
+      config[key] = payload[messageKey];
+    }
+  });
+
+  (seedBoolKeys || []).forEach((key) => {
+    const messageKey = messageKeys[key];
+    if (messageKey in payload) {
+      config[key] = asBool(payload[messageKey]);
     }
   });
 
@@ -475,67 +494,8 @@ function startPebbleApp(options: StartOptions): void {
   let lastStockBytes: number[] | null = null;
   let lastWeatherKey: string | null = null;
 
-  // PebbleKit JS only allows one AppMessage in flight, so concurrent sends collide and the loser is
-  // silently dropped. at cold boot the settings round-trip, weather, stocks, and calendar all fire
-  // at once, so a fetched reading would drop with no retry and leave the face blank until a lone
-  // later send (like a settings change) got through. serialize every send through one queue: one at
-  // a time, each retried a few times on a nack before it is given up
-  const SEND_RETRIES = 3;
-  const SEND_RETRY_MS = 250;
-  const SEND_WATCHDOG_MS = 8000;
-  const sendQueue: Array<{ dict: any; onOk?: () => void; onFail?: () => void; tries: number }> = [];
-  let sending = false;
-
-  function pumpSend(): void {
-    if (sending || sendQueue.length === 0) {
-      return;
-    }
-    sending = true;
-    const item = sendQueue[0];
-
-    // resolve each send exactly once. a lost ack/nack (neither callback ever fires) would otherwise
-    // leave sending true forever and wedge the whole queue, so a watchdog counts as a failure
-    let settled = false;
-    const settle = (ok: boolean): void => {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      clearTimeout(watchdog);
-      sending = false;
-
-      if (ok) {
-        sendQueue.shift();
-        if (item.onOk) {
-          item.onOk();
-        }
-        pumpSend();
-        return;
-      }
-
-      // a nack usually just means the outbox was momentarily busy, so back off and retry the same
-      // head a few times before dropping it and moving on so one stuck send can't wedge the queue
-      item.tries++;
-      if (item.tries >= SEND_RETRIES) {
-        sendQueue.shift();
-        if (item.onFail) {
-          item.onFail();
-        }
-        pumpSend();
-      } else {
-        setTimeout(pumpSend, SEND_RETRY_MS);
-      }
-    };
-
-    const watchdog = setTimeout(() => settle(false), SEND_WATCHDOG_MS);
-    Pebble.sendAppMessage(item.dict, () => settle(true), () => settle(false));
-  }
-
-  /** Queues an AppMessage so sends never overlap and drop. */
-  function queueSend(dict: any, onOk?: () => void, onFail?: () => void): void {
-    sendQueue.push({ dict: dict, onOk: onOk, onFail: onFail, tries: 0 });
-    pumpSend();
-  }
+  // one AppMessage may be in flight at a time, so every send is serialized through this queue
+  const queueSend = createSendQueue((dict, onOk, onFail) => Pebble.sendAppMessage(dict, onOk, onFail));
 
   /** Sends a weather result to the watch. */
   function sendWeather(result: any) {
@@ -917,6 +877,12 @@ function startPebbleApp(options: StartOptions): void {
       getCalendar();
     }
 
+    // both restore paths seed the same way, so the face's key lists are named once here rather
+    // than repeated at each call
+    const seedFromWatch = (from: any) => {
+      seedConfigFromWatch(messageKeys, from, options.seedKeys, options.seedColorKeys, options.seedBoolKeys);
+    };
+
     // the watch's reply to our SETTINGS_REQUEST carries its current settings
     if (messageKeys.CLOCK_DATE_FORMAT in payload || messageKeys.APPEARANCE_THEME in payload) {
       // faces that declare SETTINGS_FRESH get the two-way restore: the watch flags when it booted
@@ -932,11 +898,11 @@ function startPebbleApp(options: StartOptions): void {
           queueSend(clay.getSettings(JSON.stringify(config)));
         } else if (!phoneHasConfig) {
           // nothing saved on the phone yet so recover it from the watch instead
-          seedConfigFromWatch(messageKeys, payload, options.seedKeys);
+          seedFromWatch(payload);
         }
         // both sides have settings: the phone is the source of truth and already correct
       } else {
-        seedConfigFromWatch(messageKeys, payload, options.seedKeys);
+        seedFromWatch(payload);
       }
     }
   });

@@ -12,7 +12,8 @@
 CC      ?= cc
 # -Wno-unused-parameter keeps the SDK callback signatures (void *data and friends) quiet
 CFLAGS  ?= -std=c11 -Wall -Wextra -Wno-unused-parameter -O2
-INCLUDES = -I../core -Iunity
+# host/ holds the stub pebble.h that lets the pure lib/c/pebble sources compile off the watch
+INCLUDES = -I../core -I../pebble -Ihost -Iunity
 
 BUILD = build
 UNITY = unity/unity.c
@@ -26,15 +27,19 @@ SPECS = $(shell find .. -name '*.spec.c')
 .PHONY: test clean
 .DEFAULT_GOAL := test
 
-# compile each spec fresh, then run it right away
+# compile each spec fresh, then run it right away. every spec gets the whole of core, plus its own
+# sibling source when it has one outside core (a header-only unit has none, and needs none)
 test:
 	@mkdir -p $(BUILD)
 	@fail=0; \
 	for spec in $(SPECS); do \
 	  name=$$(basename $$spec .spec.c); \
 	  bin=$(BUILD)/$$name; \
+	  sibling=$${spec%.spec.c}.c; \
+	  case " $(CORE_SRC) " in *" $$sibling "*) sibling="";; esac; \
+	  [ -n "$$sibling" ] && [ -f "$$sibling" ] || sibling=""; \
 	  echo "== $$spec =="; \
-	  $(CC) $(CFLAGS) $(INCLUDES) $$spec $(CORE_SRC) $(UNITY) -o $$bin || { fail=1; continue; }; \
+	  $(CC) $(CFLAGS) $(INCLUDES) $$spec $$sibling $(CORE_SRC) $(UNITY) -o $$bin || { fail=1; continue; }; \
 	  $$bin || fail=1; \
 	done; \
 	exit $$fail

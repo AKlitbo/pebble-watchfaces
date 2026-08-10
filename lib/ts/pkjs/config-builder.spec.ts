@@ -136,3 +136,15 @@ describe('buildConfig per-section values', () => {
     expect(gpsToggle.defaultValue).toBe(true);
   });
 });
+
+describe('buildConfig time format choices', () => {
+  /** A reordered or dropped choice silently stores a different format than the label promises,
+   *  so picking 24-hour could hand the watch .beats. */
+  test('publishes the stock time format choices in their wire order', () => {
+    const config = buildConfig({ theme: minimalTheme });
+
+    const timeSelect = findItemByKey(config, 'CLOCK_TIME_FORMAT');
+
+    expect(timeSelect.options.map((option) => option.value)).toEqual([0, 1, 4, 2, 3]);
+  });
+});

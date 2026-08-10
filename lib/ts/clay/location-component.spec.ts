@@ -114,6 +114,24 @@ function type(query: HTMLInputElement, text: string): void {
   query.dispatchEvent(new Event('input'));
 }
 
+describe('Clay serialisation safety', () => {
+  /**
+   * Clay serialises a registered component by writing each key followed by the function's own
+   * toString, so a shorthand method comes out as `initialize:initialize() {` and stops the whole
+   * settings page parsing. Every component on the page shares that fate, so the symptom is a
+   * config screen that never opens at all.
+   */
+  test.each([
+    ['initialize', component.initialize],
+    ['manipulator.set', component.manipulator.set],
+    ['manipulator.get', component.manipulator.get],
+  ])('declares %s as an anonymous function expression', (_name, fn) => {
+    const result = String(fn);
+
+    expect(result).toMatch(/^function\s*\(/);
+  });
+});
+
 describe('manipulator', () => {
   /** A saved selection must repopulate the box and round-trip its JSON, else the watch loses the chosen place. */
   test('restores the saved label and persists the value verbatim', () => {

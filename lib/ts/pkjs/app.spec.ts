@@ -229,6 +229,36 @@ describe('seedConfigFromWatch', () => {
     expect(result).toBe(expected);
   });
 
+  /** Clay's colour picker reads a string as hex, so a colour has to stay the number the watch sent. */
+  test('seeds a colour key as a number via seedColorKeys', () => {
+    app.seedConfigFromWatch(messageKeys, { APPEARANCE_REEL_COLOR: 0xFF0000 }, [], ['APPEARANCE_REEL_COLOR']);
+
+    const result = stored('APPEARANCE_REEL_COLOR');
+
+    expect(result).toBe(0xFF0000);
+  });
+
+  /** A colour that arrived as anything but a number is malformed and must be skipped. */
+  test('skips a colour key that is not a number', () => {
+    app.seedConfigFromWatch(messageKeys, { APPEARANCE_REEL_COLOR: 'ff0000' }, [], ['APPEARANCE_REEL_COLOR']);
+
+    const result = 'APPEARANCE_REEL_COLOR' in JSON.parse(localStorage.getItem('clay-settings'));
+
+    expect(result).toBe(false);
+  });
+
+  /** A toggle rides as 0/1 but Clay sets it from a real boolean, so the seed has to convert. */
+  test.each([
+    [1, true],
+    [0, false],
+  ])('seeds a bool key %s as %s via seedBoolKeys', (value, expected) => {
+    app.seedConfigFromWatch(messageKeys, { APPEARANCE_FACE_COLORS: value }, [], [], ['APPEARANCE_FACE_COLORS']);
+
+    const result = stored('APPEARANCE_FACE_COLORS');
+
+    expect(result).toBe(expected);
+  });
+
   /** A dropped field (or wrong coercion) in the seed table silently stops seeding that setting, so its config page opens on the default. */
   test('seeds every supported field from a full payload', () => {
     app.seedConfigFromWatch(messageKeys, {
