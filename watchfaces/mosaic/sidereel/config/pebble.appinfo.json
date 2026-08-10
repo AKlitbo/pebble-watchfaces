@@ -1,7 +1,7 @@
 {
   "name": "sidereel",
   "displayName": "Sidereel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "watchface": true,
   "uuid": "c8d3a53e-3ca1-4fb5-8a0a-af7c5fba781c",
   "sdkVersion": "3",
