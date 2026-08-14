@@ -25,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Panel bars are now drawn by the watchface and take their colour from the theme, reducing the artwork by about a third.
-- Redrew the battery and active minutes icons. The battery bolt was a doubled glyph that turned to mush at panel size, and active minutes now has a runner rather than a plain clock.
 - Sleep, active minutes, and calories are read from the watch again now that they can be displayed.
 - Upgrading preserves the existing layout, with panels starting on weather, heart rate, and steps.
 
