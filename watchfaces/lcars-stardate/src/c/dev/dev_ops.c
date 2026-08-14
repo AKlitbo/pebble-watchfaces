@@ -20,6 +20,34 @@
 static uint8_t s_index;
 static void (*s_apply_theme)(void);
 
+// every frame reads a different clock, because a sheet of shots all sitting on the same minute
+// looks like one screenshot pasted over and over. 53 minutes a step is coprime with the hour, so
+// the walk crosses a whole day without landing on a time twice or falling into an obvious
+// pattern, and the clock stays a function of the walk index. That last part matters: the walk
+// returns to its starting frame pixel for pixel, which is how tap-walk.sh knows it has wrapped
+#define CLOCK_BASE_MIN (7 * 60 + 38)
+#define CLOCK_STEP_MIN 53
+
+/**
+ * @brief Pin the clock to this frame's time.
+ *
+ * The time store is only ever seeded here with live off and takes no subscription on that path,
+ * so re-initialising it per tap re-seeds rather than stacking handlers.
+ *
+ * @param index The walk position.
+ */
+static void apply_clock(uint8_t index)
+{
+    int minutes = (CLOCK_BASE_MIN + index * CLOCK_STEP_MIN) % (24 * 60);
+
+    time_t now = time(NULL);
+    struct tm pinned = *localtime(&now);
+    pinned.tm_hour = minutes / 60;
+    pinned.tm_min = minutes % 60;
+    pinned.tm_sec = 0;
+    time_store_init((TimeConfig){.enabled = true, .live = false, .minute_tick = false, .beats = false}, &pinned);
+}
+
 uint8_t dev_ops_walk_pick(int slot)
 {
     // the tall weather block is the left column's own thing and sits outside the
@@ -38,19 +66,14 @@ uint8_t dev_ops_walk_pick(int slot)
 static void tap_handler(AccelAxisType axis, int32_t direction)
 {
     s_index = (uint8_t)((s_index + 1) % OPS_COUNT);
+    apply_clock(s_index);
     engine_rebuild();
 }
 
-void dev_ops_seed_stores(int hour, int min)
+void dev_ops_seed_stores(void)
 {
-    // pinned clock never ticking. mid-afternoon so the sun countdown is running to a sunset
-    // rather than sitting on a rounding edge
-    time_t now = time(NULL);
-    struct tm pinned = *localtime(&now);
-    pinned.tm_hour = hour;
-    pinned.tm_min = min;
-    pinned.tm_sec = 0;
-    time_store_init((TimeConfig){.enabled = true, .live = false, .minute_tick = false, .beats = false}, &pinned);
+    // pinned clock never ticking, moved on by the walk rather than by a tick
+    apply_clock(0);
 
     // unlike the shared fixture this fills every reading in, because a slot being photographed
     // showing "--" is a picture of nothing

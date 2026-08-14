@@ -32,15 +32,10 @@
 #endif
 
 // ===== the fixed clock every shot shows =====
-// the ops walk wants an afternoon, so its sun countdown runs to a sunset rather than sitting on
-// the edge of a rounding step
-#if DEV_TAP_WALK_OPS
-  #define DEV_TIME_HOUR 14
-  #define DEV_TIME_MIN  23
-#else
-  #define DEV_TIME_HOUR 8   // 08:00 is a wide clock string
-  #define DEV_TIME_MIN  0
-#endif
+// the ops walk is the exception: it carries a clock per frame in dev_ops.c, so a sheet of its
+// readouts is not the same minute over and over
+#define DEV_TIME_HOUR 8   // 08:00 is a wide clock string
+#define DEV_TIME_MIN  0
 
 // which walk a tap advances (from the toggles above)
 #if DEV_TAP_WALK_THEMES
@@ -61,7 +56,7 @@ static inline bool dev_seed_stores(void)
 {
 #if DEV_MODE
 #if DEV_TAP_WALK_OPS
-    dev_ops_seed_stores(DEV_TIME_HOUR, DEV_TIME_MIN);
+    dev_ops_seed_stores();
 #elif DEV_TAP_WALK_WX
     dev_wx_seed_stores(DEV_TIME_HOUR, DEV_TIME_MIN);
 #else

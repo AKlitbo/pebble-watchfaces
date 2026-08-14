@@ -5,6 +5,34 @@ All notable changes to the LCARS Stardate watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-08-12
+
+### Added
+
+- Added drag-and-drop panel configuration, with a preview of the watchface and available readouts.
+- Added a Default button that restores the arrangement the watchface ships with, and a Clear button that empties all four panels.
+- Added LCARS-styled settings matching the watchface.
+- Added support for splitting the left column into two panels.
+- Added moon readouts for illumination, phase, and days until the next full or new moon.
+- Added sun readouts for sunrise, sunset, daylight duration, and countdowns to the next sunrise or sunset.
+- Added weather readouts for humidity, wind, UV index, and daily high and low.
+- Added readouts for battery level, calories, sleep, and active minutes.
+- Added calendar readouts for Julian date, day of year, and week number.
+- Added an Epoch Clock readout showing the raw Unix time.
+- Added a Swatch Beats readout, so you can see internet time without setting the main clock to it.
+- Added an Alternate Time Zone readout. Search for a city under Location Settings and the panel shows that city's time under its name.
+
+### Changed
+
+- Panel bars are now drawn by the watchface and take their colour from the theme, reducing the artwork by about a third.
+- Redrew the battery and active minutes icons. The battery bolt was a doubled glyph that turned to mush at panel size, and active minutes now has a runner rather than a plain clock.
+- Sleep, active minutes, and calories are read from the watch again now that they can be displayed.
+- Upgrading preserves the existing layout, with panels starting on weather, heart rate, and steps.
+
+### Fixed
+
+- Fixed the partly cloudy icon sitting against the panel bar above it.
+
 ## [1.8.0] - 2026-08-03
 
 ### Changed

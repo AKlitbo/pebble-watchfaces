@@ -23,10 +23,10 @@
 /**
  * @brief Seed every store with a fixture that gives all of the catalog a real reading.
  *
- * @param hour The pinned clock hour (0-23).
- * @param min The pinned clock minute.
+ * The clock is the walk's own, one time per frame, so this takes no hour and minute the way the
+ * shared fixture does.
  */
-void dev_ops_seed_stores(int hour, int min);
+void dev_ops_seed_stores(void);
 
 /**
  * @brief Paint the first pair and subscribe the tap that advances them.
