@@ -8,14 +8,16 @@
  * @ingroup watchface-lcars
  */
 #include "settings_schema.h"
+#include "ops/ops.h"
 #include "system/settings/settings_catalog.h"
 #include "system/settings/setting_values.h"
 #include "persist_keys.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define LCARS_SETTINGS_VERSION 4
+#define LCARS_SETTINGS_VERSION 6
 // smallest versioned blob accepted. fields are append-only so this never changes
 #define LCARS_SETTINGS_V1_SIZE 21
 
@@ -44,13 +46,28 @@ typedef struct LcarsSettings
     uint8_t vibe_disconnect;
     bool    quiet_time_icon;
     uint8_t hourly_vibe;
+    uint8_t slot_lt;
+    uint8_t slot_lb;
+    uint8_t slot_rt;
+    uint8_t slot_rb;
+    char    time_zone_offset_1[32]; // "offset,City, Region, CC" as Clay's location search sends it
 } LcarsSettings;
 
-_Static_assert(sizeof(LcarsSettings) == 26, "lcars blob size is frozen at 26 bytes (v4)");
+_Static_assert(sizeof(LcarsSettings) == 62, "lcars blob size is frozen at 62 bytes (v6)");
 _Static_assert(offsetof(LcarsSettings, bluetooth_icon) == LCARS_SETTINGS_V1_SIZE,
                "lcars v1 floor is frozen; the v2 fields must stay appended after it");
 
 static LcarsSettings s_settings;
+
+// the four ops slots are this face's own and are numbered past the shared ones
+// the library still defaults and cleans and saves them. it will not index them for
+// a typed read though so the accessors below reach into the struct
+// the cast is there because the field table's id is a SettingId and mixing enums
+// is an error
+#define SETTING_SLOT_LT ((SettingId)(SETTING_COUNT))
+#define SETTING_SLOT_LB ((SettingId)(SETTING_COUNT + 1))
+#define SETTING_SLOT_RT ((SettingId)(SETTING_COUNT + 2))
+#define SETTING_SLOT_RB ((SettingId)(SETTING_COUNT + 3))
 
 // lcars subscribes to every known setting in its frozen struct order. "%Y.%m%d" is
 // its numeric stardate-style date default
@@ -65,6 +82,30 @@ static const SettingField s_fields[] = {
     KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(LcarsSettings, vibe_disconnect), VIBE_COUNT),
     KNOWN_QUIET_TIME_ICON(offsetof(LcarsSettings, quiet_time_icon)),
     KNOWN_HOURLY_VIBE(offsetof(LcarsSettings, hourly_vibe), VIBE_COUNT),
+
+    // --- this face's own ---
+    // an untouched face shows the weather block filling the left column with the
+    // heart rate over the step count on the right. picking these defaults means
+    // someone upgrading keeps the watch they are already looking at
+    { .id = SETTING_SLOT_LT, .message_key = &MESSAGE_KEY_APPEARANCE_SLOT_LEFT_TOP,
+      .type = SETTING_ENUM_U8, .offset = offsetof(LcarsSettings, slot_lt),
+      .enum_count = OPS_COUNT, .default_num = OPS_SENSORS },
+    { .id = SETTING_SLOT_LB, .message_key = &MESSAGE_KEY_APPEARANCE_SLOT_LEFT_BOTTOM,
+      .type = SETTING_ENUM_U8, .offset = offsetof(LcarsSettings, slot_lb),
+      .enum_count = OPS_COUNT, .default_num = OPS_EMPTY },
+    { .id = SETTING_SLOT_RT, .message_key = &MESSAGE_KEY_APPEARANCE_SLOT_RIGHT_TOP,
+      .type = SETTING_ENUM_U8, .offset = offsetof(LcarsSettings, slot_rt),
+      .enum_count = OPS_COUNT, .default_num = OPS_HEART },
+    { .id = SETTING_SLOT_RB, .message_key = &MESSAGE_KEY_APPEARANCE_SLOT_RIGHT_BOTTOM,
+      .type = SETTING_ENUM_U8, .offset = offsetof(LcarsSettings, slot_rb),
+      .enum_count = OPS_COUNT, .default_num = OPS_STEPS },
+
+    // the ZONE 1 readout's zone. the id is SETTING_COUNT because nothing reads this through the
+    // library's typed accessors, only the two helpers at the bottom of this file
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_CLOCK_TIMEZONE_1, .type = SETTING_CSTRING,
+      .offset = offsetof(LcarsSettings, time_zone_offset_1),
+      .size = sizeof(s_settings.time_zone_offset_1),
+      .default_str = "60,London, England, GB" },
 };
 
 /**
@@ -122,6 +163,37 @@ static const SettingsSchema s_schema = {
 const SettingsSchema *lcars_settings_schema(void)
 {
     return &s_schema;
+}
+
+uint8_t lcars_slot_lt(void)
+{
+    return s_settings.slot_lt;
+}
+
+uint8_t lcars_slot_lb(void)
+{
+    return s_settings.slot_lb;
+}
+
+uint8_t lcars_slot_rt(void)
+{
+    return s_settings.slot_rt;
+}
+
+uint8_t lcars_slot_rb(void)
+{
+    return s_settings.slot_rb;
+}
+
+int16_t lcars_zone_1_offset_minutes(void)
+{
+    return (int16_t)atoi(s_settings.time_zone_offset_1);
+}
+
+const char *lcars_zone_1_name(void)
+{
+    const char *comma = strchr(s_settings.time_zone_offset_1, ',');
+    return comma ? comma + 1 : "";
 }
 
 /** @} */

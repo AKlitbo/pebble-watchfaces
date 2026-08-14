@@ -9,7 +9,7 @@
  * Fields per row:
  *   icon        emoji fallback, shown when a module has no real panel thumbnail.
  *   blockColor  the block tint the layout builder paints behind the icon.
- *   slug        the resources/thumbnails/<slug>-<size>.png filename stem. generate-thumbnails.ts
+ *   slug        the resources/thumbnails/<slug>-<size>.png filename stem. embed-thumbnails.ts
  *               reads it from here so the thumbnail list has one home, not a second copy.
  *
  * The VIBRANT colour is not here: it lives in vibrant.g.js keyed by module id and

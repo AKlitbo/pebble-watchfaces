@@ -7,7 +7,7 @@
  * initialize, which runs in the config webview, so it sticks to browser APIs.
  */
 
-import { createOverlayHost } from '../shared/overlay';
+import { createOverlayHost } from '../../../../../../../../lib/ts/clay/builder/ts/shared/overlay';
 import { argbToCss } from './palette';
 import { allSizesHidden } from './model';
 import { paintSwatch, buildExampleBox } from './preview';

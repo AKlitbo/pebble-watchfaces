@@ -23,7 +23,7 @@ void tearDown(void) {}
 #define CLIP_SPAN 240
 #define CLIP_END_EPOCH (CLIP_SPAN * 60)
 
-/** @brief A whole day runs midnight to midnight. */
+/** @brief A whole day runs midnight to midnight, the axis every placement below is measured along. */
 void test_full_day_covers_the_day(void)
 {
     TimeBand result = timeband_full_day();
@@ -32,7 +32,7 @@ void test_full_day_covers_the_day(void)
     TEST_ASSERT_EQUAL_INT(TIMEBAND_DAY_MINUTES, result.span_min);
 }
 
-/** @brief Noon sits halfway along a whole-day axis. */
+/** @brief Noon sits halfway along a whole-day axis, since a scale that is off puts every marker on the wrong hour. */
 void test_pos_places_noon_halfway(void)
 {
     int result = timeband_pos(timeband_full_day(), 240, 720);
@@ -111,7 +111,7 @@ void test_rolling_pins_a_lead_past_the_span(void)
     TEST_ASSERT_EQUAL_INT(480, result.start_min);
 }
 
-/** @brief A window built from an hour opens on that hour. */
+/** @brief A window built from an hour opens on that hour, or the whole strip is drawn shifted from the times labelling it. */
 void test_from_hour_opens_on_the_hour(void)
 {
     TimeBand result = timeband_from_hour(22, EVENING_SPAN);
@@ -143,7 +143,7 @@ void test_pos_offset_past_the_window_is_none(void)
     TEST_ASSERT_EQUAL_INT(-1, result);
 }
 
-/** @brief An event that finished before the window opened is not on it. */
+/** @brief An event that finished before the window opened is not on it, or this morning's meeting is still drawn on tonight's strip. */
 void test_clip_before_the_window_is_none(void)
 {
     TimeBand band = {.start_min = 0, .span_min = CLIP_SPAN};
@@ -154,7 +154,7 @@ void test_clip_before_the_window_is_none(void)
     TEST_ASSERT_FALSE(result);
 }
 
-/** @brief Nor is one that starts after it closes. */
+/** @brief Nor is one that starts after it closes, the other end of the same over-eager match. */
 void test_clip_after_the_window_is_none(void)
 {
     TimeBand band = {.start_min = 0, .span_min = CLIP_SPAN};
@@ -274,7 +274,7 @@ void test_clip_a_backwards_span_still_draws(void)
     TEST_ASSERT_EQUAL_INT(121, span.to);
 }
 
-/** @brief Daylight wholly inside a whole-day window is one piece. */
+/** @brief Daylight wholly inside a whole-day window is one piece, not two abutting halves with a seam down the middle. */
 void test_clip_daily_inside_is_one_piece(void)
 {
     TimeBandSpan pieces[2] = {0};

@@ -23,7 +23,7 @@ void tearDown(void) {}
 #define NIGHT_START 1260
 #define NIGHT_END 420
 
-/** @brief A window inside one day contains the middle of itself. */
+/** @brief A window inside one day holds the middle of itself, the case the wrapping ones are measured against. */
 void test_plain_window_contains_its_middle(void)
 {
     bool result = clock_window_contains(DAY_START, DAY_END, 600);
@@ -31,14 +31,14 @@ void test_plain_window_contains_its_middle(void)
     TEST_ASSERT_TRUE(result);
 }
 
-/** @brief And nothing outside it. */
+/** @brief And nothing outside it, or the night look bleeds into the middle of the afternoon. */
 void test_plain_window_excludes_outside(void)
 {
     TEST_ASSERT_FALSE(clock_window_contains(DAY_START, DAY_END, 400));
     TEST_ASSERT_FALSE(clock_window_contains(DAY_START, DAY_END, 1200));
 }
 
-/** @brief The start belongs to the window. */
+/** @brief The start belongs to the window, so a night set to begin at 21:00 is dark at 21:00 and not a minute later. */
 void test_start_is_inside(void)
 {
     bool result = clock_window_contains(DAY_START, DAY_END, DAY_START);
@@ -58,7 +58,7 @@ void test_end_is_outside(void)
     TEST_ASSERT_FALSE(result);
 }
 
-/** @brief A window that runs past midnight holds the evening side of it. */
+/** @brief A window that runs past midnight holds the evening side, the half a plain range check throws away. */
 void test_wrapping_window_holds_the_evening(void)
 {
     bool result = clock_window_contains(NIGHT_START, NIGHT_END, 1300);
@@ -66,7 +66,7 @@ void test_wrapping_window_holds_the_evening(void)
     TEST_ASSERT_TRUE(result);
 }
 
-/** @brief And the small hours on the other side of midnight. */
+/** @brief And the small hours on the other side, which is where a watch checked at 01:00 actually sits. */
 void test_wrapping_window_holds_the_small_hours(void)
 {
     bool result = clock_window_contains(NIGHT_START, NIGHT_END, 60);
@@ -74,7 +74,7 @@ void test_wrapping_window_holds_the_small_hours(void)
     TEST_ASSERT_TRUE(result);
 }
 
-/** @brief But not the middle of the day in between. */
+/** @brief But not the day in between, or a wrapping window matches everything and the face never leaves its night look. */
 void test_wrapping_window_excludes_the_afternoon(void)
 {
     bool result = clock_window_contains(NIGHT_START, NIGHT_END, 720);
@@ -104,7 +104,7 @@ void test_a_missing_reading_closes_the_window(void)
     TEST_ASSERT_FALSE(clock_window_contains(DAY_START, DAY_END, -1));
 }
 
-/** @brief So does a reading past the end of the day. */
+/** @brief So does a reading past the end of the day, since 1440 is tomorrow's midnight and answering on it dates the whole window wrong. */
 void test_an_out_of_range_reading_closes_the_window(void)
 {
     TEST_ASSERT_FALSE(clock_window_contains(DAY_START, 1440, 600));
@@ -129,7 +129,7 @@ void test_no_night_look_is_never_night(void)
                                             NIGHT_START, NIGHT_END, false));
 }
 
-/** @brief Following the sun uses sunset round to sunrise. */
+/** @brief Solar runs sunset round to sunrise, so a face set to follow the sun switches on real dark rather than a fixed guess. */
 void test_solar_runs_from_sunset_to_sunrise(void)
 {
     // sunrise 06:00, sunset 20:00. 21:00 is after dark, 12:00 is not
@@ -163,7 +163,7 @@ void test_solar_falls_back_when_only_one_sun_reading_is_missing(void)
                                            NIGHT_START, NIGHT_END, true));
 }
 
-/** @brief The fixed mode ignores the sun even when it is there to be read. */
+/** @brief Fixed ignores the sun even when it is there to be read, or choosing your own times silently gets you solar. */
 void test_fixed_ignores_the_sun(void)
 {
     // sun says night at 21:00, the fixed pair says day

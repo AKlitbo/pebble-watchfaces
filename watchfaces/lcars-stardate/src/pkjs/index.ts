@@ -7,7 +7,9 @@
  */
 import app from '../../../../lib/ts/pkjs/app';
 import type { WeatherResult } from '../../../../lib/ts/weather/util';
+import hiddenStoreComponent from '../../../../lib/ts/clay/hidden-store-component';
 import clayConfig from './config';
+import slotComponent from './clay/slot-component.g';
 
 /**
  * Formats a decimal coordinate in LCARS dash style.
@@ -24,6 +26,8 @@ function fmtCoord(v: number | undefined): string {
 
 app.startPebbleApp({
   clayConfig,
+  // the slot builder plus the hidden stores holding the three panels it does not own
+  components: [slotComponent, hiddenStoreComponent],
   // dash style into two keys. fmtCoord yields '' for a missing coordinate
   formatCoords: (messageKeys: Record<string, number>, result: WeatherResult) => ({
     [messageKeys.LOCATION_LATITUDE]: fmtCoord(result.lat),

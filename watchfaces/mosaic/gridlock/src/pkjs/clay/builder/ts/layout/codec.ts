@@ -8,16 +8,11 @@
  */
 
 import { GRID_ROWS } from './geometry';
+import { EMPTY_LAYOUT } from '../../../../../../../core/pkjs/clay/builder/ts/layout/wire';
 import type { Block } from '../../../../../../../core/pkjs/clay/builder/ts/types';
 
-/**
- * What an empty grid sends instead of an empty string.
- *
- * The watch discards an empty cstring rather than storing it (see
- * settings_apply_inbox), so "" cannot say "I cleared this" — the old layout
- * would just stay. A single character that parses to no blocks can.
- */
-export const EMPTY_LAYOUT = '0';
+// re-exported so everything that speaks this face's wire format still reaches it through the codec
+export { EMPTY_LAYOUT };
 
 /**
  * Dumps the placed blocks to the wire string, sorted by row then column so

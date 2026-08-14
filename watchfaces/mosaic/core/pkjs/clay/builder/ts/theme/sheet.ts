@@ -7,8 +7,8 @@
  * initialize, which runs in the config webview, so it sticks to browser APIs.
  */
 
-import { createOverlayHost } from '../shared/overlay';
-import { buildIoPanel } from '../shared/io-panel';
+import { createOverlayHost } from '../../../../../../../../lib/ts/clay/builder/ts/shared/overlay';
+import { buildIoPanel } from '../../../../../../../../lib/ts/clay/builder/ts/shared/io-panel';
 import { flagOn, setFlag } from './codec';
 import type { FlagMap, ThemeModule } from '../types';
 

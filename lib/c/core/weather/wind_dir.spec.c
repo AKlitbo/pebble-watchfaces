@@ -22,7 +22,7 @@ void test_north_is_zero(void)
     TEST_ASSERT_EQUAL_INT(0, result);
 }
 
-/** @brief And the quarters land where the compass says. */
+/** @brief And the quarters land where the compass says, or the arrow points at a wind blowing the opposite way. */
 void test_quarters_are_a_right_angle_apart(void)
 {
     int east = wind_bearing("E");

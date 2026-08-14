@@ -1,4 +1,4 @@
-// generated from core/pkjs/clay/builder/theme.manifest.ts by the family core's tools/clay-components/generate-components.ts
+// generated from watchfaces/mosaic/core/pkjs/clay/builder/theme.manifest.ts by tools/clay-components/generate-components.ts
 // do not edit by hand: run `npm run gen:clay` after changing the sources
 /**
  * Clay custom component for per-module appearance: colours plus header and
@@ -74,7 +74,7 @@ module.exports = {
       };
       var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/thumbs.ts
+      // lib/ts/clay/builder/ts/shared/thumbs.ts
       var thumbs_exports = {};
       __export(thumbs_exports, {
         thumbByLabel: () => thumbByLabel
@@ -84,11 +84,11 @@ module.exports = {
         return byModule && byModule[size] || null;
       }
       var init_thumbs = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/thumbs.ts"() {
+        "lib/ts/clay/builder/ts/shared/thumbs.ts"() {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/overlay.ts
+      // lib/ts/clay/builder/ts/shared/overlay.ts
       var overlay_exports = {};
       __export(overlay_exports, {
         createOverlayHost: () => createOverlayHost
@@ -122,11 +122,11 @@ module.exports = {
         return { open, close };
       }
       var init_overlay = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/overlay.ts"() {
+        "lib/ts/clay/builder/ts/shared/overlay.ts"() {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/io-panel.ts
+      // lib/ts/clay/builder/ts/shared/io-panel.ts
       var io_panel_exports = {};
       __export(io_panel_exports, {
         buildIoPanel: () => buildIoPanel
@@ -166,7 +166,7 @@ module.exports = {
         panel.appendChild(buttons);
       }
       var init_io_panel = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/io-panel.ts"() {
+        "lib/ts/clay/builder/ts/shared/io-panel.ts"() {
         }
       });
 

@@ -31,7 +31,7 @@ interface ConfigBuilderOptions {
    * passes e.g. ['NOT_PLATFORM_GABBRO'] and Clay drops the control on that platform for it,
    * rather than every face losing it. */
   steps?: { label?: string; description?: string; capabilities?: string[] };
-  location?: { gpsDefault?: boolean };
+  location?: { gpsDefault?: boolean; timeZone?: boolean };
   weather?: unknown;
   temperature?: unknown;
   battery?: { label?: string; description?: string };
@@ -264,36 +264,52 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
   });
 
   if (options.location) {
+    const locationItems: ClayConfigItem[] = [
+      {
+        'type': 'heading',
+        'defaultValue': 'Location Settings',
+      },
+      {
+        'type': 'toggle',
+        'messageKey': 'LOCATION_USE_GPS',
+        'label': 'Enable Phone GPS',
+        'description': 'Automatically fetch weather for your current location.',
+        'defaultValue': options.location.gpsDefault !== undefined ? options.location.gpsDefault : false,
+      },
+      {
+        'type': 'toggle',
+        'messageKey': 'LOCATION_GPS_FALLBACK',
+        'label': 'Fallback to Manual Location',
+        'description': 'If GPS is disabled or unavailable, use the city typed below.',
+        'defaultValue': true,
+      },
+      {
+        'type': 'locationsearch',
+        'messageKey': 'LOCATION_NAME',
+        'label': 'Manual Location',
+        'attributes': {
+          'placeholder': 'Search a city, e.g. Phoenix',
+        },
+      },
+    ];
+
+    // the search writes "<minutes from UTC>,<place>", which is both halves of what a second
+    // clock needs. only faces with a readout for it ask for the control
+    if (options.location.timeZone) {
+      locationItems.push({
+        'type': 'locationsearch',
+        'messageKey': 'CLOCK_TIMEZONE_1',
+        'label': 'Alternate Time Zone',
+        'description': 'Sets the time shown by the alternate time zone readout.',
+        'attributes': {
+          'placeholder': 'Search a city, e.g. Phoenix',
+        },
+      });
+    }
+
     config.push({
       'type': 'section',
-      'items': [
-        {
-          'type': 'heading',
-          'defaultValue': 'Location Settings',
-        },
-        {
-          'type': 'toggle',
-          'messageKey': 'LOCATION_USE_GPS',
-          'label': 'Enable Phone GPS',
-          'description': 'Automatically fetch weather for your current location.',
-          'defaultValue': options.location.gpsDefault !== undefined ? options.location.gpsDefault : false,
-        },
-        {
-          'type': 'toggle',
-          'messageKey': 'LOCATION_GPS_FALLBACK',
-          'label': 'Fallback to Manual Location',
-          'description': 'If GPS is disabled or unavailable, use the city typed below.',
-          'defaultValue': true,
-        },
-        {
-          'type': 'locationsearch',
-          'messageKey': 'LOCATION_NAME',
-          'label': 'Manual Location',
-          'attributes': {
-            'placeholder': 'Search a city, e.g. Phoenix',
-          },
-        },
-      ],
+      'items': locationItems,
     });
   }
 

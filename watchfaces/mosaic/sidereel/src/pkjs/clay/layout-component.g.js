@@ -1,4 +1,4 @@
-// generated from sidereel/src/pkjs/clay/builder/layout.manifest.ts by the family core's tools/clay-components/generate-components.ts
+// generated from watchfaces/mosaic/core/pkjs/clay/builder/layout.manifest.ts by tools/clay-components/generate-components.ts
 // do not edit by hand: run `npm run gen:clay` after changing the sources
 /**
  * Clay custom component for the drag and drop layout builder.
@@ -62,7 +62,7 @@ module.exports = {
       };
       var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/thumbs.ts
+      // lib/ts/clay/builder/ts/shared/thumbs.ts
       var thumbs_exports = {};
       __export(thumbs_exports, {
         thumbByLabel: () => thumbByLabel
@@ -72,11 +72,11 @@ module.exports = {
         return byModule && byModule[size] || null;
       }
       var init_thumbs = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/thumbs.ts"() {
+        "lib/ts/clay/builder/ts/shared/thumbs.ts"() {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/overlay.ts
+      // lib/ts/clay/builder/ts/shared/overlay.ts
       var overlay_exports = {};
       __export(overlay_exports, {
         createOverlayHost: () => createOverlayHost
@@ -110,11 +110,11 @@ module.exports = {
         return { open, close };
       }
       var init_overlay = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/overlay.ts"() {
+        "lib/ts/clay/builder/ts/shared/overlay.ts"() {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/io-panel.ts
+      // lib/ts/clay/builder/ts/shared/io-panel.ts
       var io_panel_exports = {};
       __export(io_panel_exports, {
         buildIoPanel: () => buildIoPanel
@@ -154,7 +154,19 @@ module.exports = {
         panel.appendChild(buttons);
       }
       var init_io_panel = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/shared/io-panel.ts"() {
+        "lib/ts/clay/builder/ts/shared/io-panel.ts"() {
+        }
+      });
+
+      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/wire.ts
+      var wire_exports = {};
+      __export(wire_exports, {
+        EMPTY_LAYOUT: () => EMPTY_LAYOUT
+      });
+      var EMPTY_LAYOUT;
+      var init_wire = __esm({
+        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/wire.ts"() {
+          EMPTY_LAYOUT = "0";
         }
       });
 
@@ -315,11 +327,10 @@ module.exports = {
         }
         return blocks;
       }
-      var EMPTY_LAYOUT;
       var init_codec = __esm({
         "watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/codec.ts"() {
           init_geometry();
-          EMPTY_LAYOUT = "0";
+          init_wire();
         }
       });
 
@@ -350,7 +361,7 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/visuals.ts
+      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/visuals.ts
       var visuals_exports = {};
       __export(visuals_exports, {
         buildModuleList: () => buildModuleList,
@@ -424,197 +435,226 @@ module.exports = {
         }
       }
       var init_visuals = __esm({
-        "watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/visuals.ts"() {
+        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/visuals.ts"() {
           init_thumbs();
         }
       });
 
-      // watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/drag.ts
+      // lib/ts/clay/builder/ts/drag.ts
+      function createDrag(spec, doc = document) {
+        const threshold = spec.threshold === void 0 ? DEFAULT_THRESHOLD : spec.threshold;
+        let armed = null;
+        let active = null;
+        function place(ghost, x, y) {
+          if (spec.anchor === "pointer") {
+            ghost.style.left = x + "px";
+            ghost.style.top = y + "px";
+            return;
+          }
+          const box = ghost.getBoundingClientRect();
+          ghost.style.left = x - box.width / 2 + "px";
+          ghost.style.top = y - box.height / 2 + "px";
+        }
+        function begin(payload, x, y) {
+          const ghost = spec.ghost(payload);
+          doc.body.appendChild(ghost);
+          active = { payload, ghost };
+          place(ghost, x, y);
+          track(x, y);
+        }
+        function track(x, y) {
+          if (!active) {
+            return;
+          }
+          place(active.ghost, x, y);
+          const target = spec.hitTest(x, y);
+          const allowed = target !== null && spec.allows(active.payload, target);
+          spec.highlight(active.payload, target, allowed);
+        }
+        function end() {
+          if (active) {
+            active.ghost.remove();
+            active = null;
+          }
+          armed = null;
+          spec.highlight(null, null, false);
+        }
+        doc.addEventListener("pointermove", (event) => {
+          if (armed) {
+            const moved = Math.abs(event.clientX - armed.x) > threshold || Math.abs(event.clientY - armed.y) > threshold;
+            if (moved) {
+              const payload = armed.payload;
+              armed = null;
+              if (spec.lift) {
+                spec.lift(payload);
+              }
+              begin(payload, event.clientX, event.clientY);
+            }
+          }
+          if (active) {
+            track(event.clientX, event.clientY);
+            event.preventDefault();
+          }
+        });
+        doc.addEventListener("pointerup", (event) => {
+          if (!active) {
+            armed = null;
+            return;
+          }
+          const payload = active.payload;
+          const target = spec.hitTest(event.clientX, event.clientY);
+          end();
+          if (target !== null && spec.allows(payload, target)) {
+            spec.drop(payload, target);
+            return;
+          }
+          spec.dropOutside(payload);
+        });
+        doc.addEventListener("pointercancel", () => {
+          const payload = active && active.payload;
+          end();
+          if (payload !== null && payload !== void 0) {
+            spec.dropOutside(payload);
+          }
+        });
+        return {
+          start(payload, event) {
+            begin(payload, event.clientX, event.clientY);
+            event.preventDefault();
+          },
+          arm(payload, event) {
+            armed = { payload, x: event.clientX, y: event.clientY };
+            event.preventDefault();
+          }
+        };
+      }
+      var DEFAULT_THRESHOLD;
+      var init_drag = __esm({
+        "lib/ts/clay/builder/ts/drag.ts"() {
+          DEFAULT_THRESHOLD = 10;
+        }
+      });
+
+      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/drag.ts
       var drag_exports = {};
       __export(drag_exports, {
         createDragEngine: () => createDragEngine
       });
       function createDragEngine(env) {
-        let initialPointer = null;
-        let potentialDragBlockIdx = null;
-        let draggedModule = null;
-        let draggedBlockIdx = null;
-        let ghostEl = null;
-        function startDragFromPalette(m, sizeGroupKey, e) {
-          e.preventDefault();
-          const w = parseInt(sizeGroupKey[2], 10);
-          const h = parseInt(sizeGroupKey[0], 10);
-          draggedModule = {
-            value: m.value,
-            icon: m.icon,
-            color: m.color,
-            label: m.label,
-            w,
-            h
-          };
-          draggedBlockIdx = null;
-          potentialDragBlockIdx = null;
-          createGhost(e);
-        }
-        function armBlockDrag(idx, e) {
-          e.preventDefault();
-          initialPointer = { x: e.clientX, y: e.clientY };
-          potentialDragBlockIdx = idx;
-        }
-        function createGhost(e) {
-          const dragged = draggedModule;
-          ghostEl = document.createElement("div");
-          ghostEl.className = "lb-ghost lb-block";
-          if (dragged.h >= 2) {
-            ghostEl.classList.add("big");
-          }
-          fillBlockVisual(
-            ghostEl,
-            env.thumbFor(dragged.value, sizeKey(dragged.w, dragged.h) || ""),
-            dragged,
-            dragged.w
-          );
-          const w = dragged.w;
-          const h = dragged.h;
-          ghostEl.style.width = w * 52 + (w - 1) * 3 + "px";
-          ghostEl.style.height = h * 45 + (h - 1) * 3 + "px";
-          document.body.appendChild(ghostEl);
-          moveGhost(e);
-          updateSelectionHighlight(e);
-        }
-        function moveGhost(e) {
-          if (!ghostEl) {
-            return;
-          }
-          ghostEl.style.left = e.clientX + "px";
-          ghostEl.style.top = e.clientY + "px";
-        }
-        function removeGhost() {
-          if (ghostEl) {
-            document.body.removeChild(ghostEl);
-            ghostEl = null;
-          }
-        }
-        function getDropTarget(e) {
+        const rules = env.geometry;
+        function cellAt(x, y) {
           const rect = env.gridEl.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          if (x < -10 || x > rect.width + 10 || y < -10 || y > rect.height + 10) {
+          const localX = x - rect.left;
+          const localY = y - rect.top;
+          if (localX < -10 || localX > rect.width + 10 || localY < -10 || localY > rect.height + 10) {
             return null;
           }
-          const c = Math.max(0, Math.min(GRID_COLS - 1, Math.floor((x - 5) / 55)));
-          const r = Math.max(0, Math.min(GRID_ROWS - 1, Math.floor((y - 5) / 48)));
+          const c = Math.max(0, Math.min(rules.cols - 1, Math.floor((localX - 5) / 55)));
+          const r = Math.max(0, Math.min(rules.rows - 1, Math.floor((localY - 5) / 48)));
           return { r, c };
         }
         function clearHighlight() {
-          const els = env.gridEl.querySelectorAll(".lb-cell");
-          for (let i = 0; i < els.length; i++) {
-            els[i].classList.remove("selecting");
+          const cells = env.gridEl.querySelectorAll(".lb-cell");
+          for (let i = 0; i < cells.length; i++) {
+            cells[i].classList.remove("selecting");
           }
         }
-        function updateSelectionHighlight(e) {
-          clearHighlight();
-          if (!draggedModule) {
-            return;
-          }
-          const target = getDropTarget(e);
-          if (!target) {
-            return;
-          }
-          const w = draggedModule.w;
-          const h = draggedModule.h;
-          const snap = snapDrop(target, w, h);
-          if (canPlace(env.getBlocks(), snap.row, snap.col, w, h)) {
-            const els = env.gridEl.querySelectorAll(".lb-cell");
-            for (let i = 0; i < els.length; i++) {
-              const cr = parseInt(els[i].dataset.row, 10);
-              const cc = parseInt(els[i].dataset.col, 10);
-              if (cr >= snap.row && cr < snap.row + h && cc >= snap.col && cc < snap.col + w) {
-                els[i].classList.add("selecting");
-              }
+        const drag = createDrag({
+          anchor: "pointer",
+          ghost(dragged) {
+            const ghost = document.createElement("div");
+            ghost.className = "lb-ghost lb-block";
+            if (dragged.h >= 2) {
+              ghost.classList.add("big");
             }
-          }
-        }
-        document.addEventListener("pointermove", function(e) {
-          if (potentialDragBlockIdx !== null && initialPointer) {
-            const dx = e.clientX - initialPointer.x;
-            const dy = e.clientY - initialPointer.y;
-            if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-              const blocks = env.getBlocks();
-              const block = blocks[potentialDragBlockIdx];
-              const mod = env.modInfo(block.module);
-              draggedModule = {
-                value: block.module,
-                icon: mod.icon,
-                color: mod.color,
-                label: mod.label,
-                w: block.w,
-                h: block.h
-              };
-              draggedBlockIdx = potentialDragBlockIdx;
-              potentialDragBlockIdx = null;
-              blocks.splice(draggedBlockIdx, 1);
-              env.render();
-              createGhost(e);
-            }
-          }
-          if (draggedModule) {
-            moveGhost(e);
-            updateSelectionHighlight(e);
-          }
-        });
-        document.addEventListener("pointerup", function(e) {
-          if (potentialDragBlockIdx !== null) {
-            potentialDragBlockIdx = null;
-          }
-          if (draggedModule) {
-            const target = getDropTarget(e);
-            let placed = false;
-            if (target) {
-              const w = draggedModule.w;
-              const h = draggedModule.h;
-              const snap = snapDrop(target, w, h);
-              if (canPlace(env.getBlocks(), snap.row, snap.col, w, h)) {
-                env.getBlocks().push({
-                  module: draggedModule.value,
-                  row: snap.row,
-                  col: snap.col,
-                  w,
-                  h
-                });
-                placed = true;
-                env.render();
-              }
-            }
-            if (!placed && draggedBlockIdx !== null) {
-              env.render();
-            }
-            removeGhost();
-            draggedModule = null;
-            draggedBlockIdx = null;
+            fillBlockVisual(
+              ghost,
+              env.thumbFor(dragged.value, rules.sizeKey(dragged.w, dragged.h) || ""),
+              dragged,
+              dragged.w
+            );
+            ghost.style.width = dragged.w * 52 + (dragged.w - 1) * 3 + "px";
+            ghost.style.height = dragged.h * 45 + (dragged.h - 1) * 3 + "px";
+            return ghost;
+          },
+          hitTest: cellAt,
+          allows(dragged, cell) {
+            const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+            return rules.canPlace(env.getBlocks(), snap.row, snap.col, dragged.w, dragged.h);
+          },
+          highlight(dragged, cell, allowed) {
             clearHighlight();
+            if (!dragged || cell === null || !allowed) {
+              return;
+            }
+            const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+            const cells = env.gridEl.querySelectorAll(".lb-cell");
+            for (let i = 0; i < cells.length; i++) {
+              const cr = parseInt(cells[i].dataset.row, 10);
+              const cc = parseInt(cells[i].dataset.col, 10);
+              if (cr >= snap.row && cr < snap.row + dragged.h && cc >= snap.col && cc < snap.col + dragged.w) {
+                cells[i].classList.add("selecting");
+              }
+            }
+          },
+          drop(dragged, cell) {
+            const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+            env.getBlocks().push({
+              module: dragged.value,
+              row: snap.row,
+              col: snap.col,
+              w: dragged.w,
+              h: dragged.h
+            });
+            env.render();
+          },
+          dropOutside() {
+            env.render();
+          },
+          lift(dragged) {
+            if (dragged.blockIdx !== null) {
+              env.getBlocks().splice(dragged.blockIdx, 1);
+              env.render();
+            }
           }
-        });
-        document.addEventListener("pointercancel", function() {
-          potentialDragBlockIdx = null;
-          removeGhost();
-          draggedModule = null;
-          draggedBlockIdx = null;
-          clearHighlight();
         });
         return {
-          startDragFromPalette,
-          armBlockDrag
+          startDragFromPalette(m, sizeGroupKey, e) {
+            drag.start({
+              value: m.value,
+              icon: m.icon,
+              color: m.color,
+              label: m.label,
+              w: parseInt(sizeGroupKey[2], 10),
+              h: parseInt(sizeGroupKey[0], 10),
+              blockIdx: null
+            }, e);
+          },
+          // armed rather than started: a press on a placed block only becomes a drag once the pointer
+          // has moved far enough that it is clearly not a tap
+          armBlockDrag(idx, e) {
+            const block = env.getBlocks()[idx];
+            const mod = env.modInfo(block.module);
+            drag.arm({
+              value: block.module,
+              icon: mod.icon,
+              color: mod.color,
+              label: mod.label,
+              w: block.w,
+              h: block.h,
+              blockIdx: idx
+            }, e);
+          }
         };
       }
-      var init_drag = __esm({
-        "watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/drag.ts"() {
-          init_geometry();
+      var init_drag2 = __esm({
+        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/drag.ts"() {
           init_visuals();
+          init_drag();
         }
       });
 
-      // watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/modes.ts
+      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/modes.ts
       var modes_exports = {};
       __export(modes_exports, {
         LAYOUT_COUNT: () => LAYOUT_COUNT,
@@ -776,8 +816,8 @@ module.exports = {
       }
       var LAYOUT_COUNT, NIGHT_NONE;
       var init_modes = __esm({
-        "watchfaces/mosaic/sidereel/src/pkjs/clay/builder/ts/layout/modes.ts"() {
-          init_codec();
+        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/modes.ts"() {
+          init_wire();
           LAYOUT_COUNT = 4;
           NIGHT_NONE = -1;
         }
@@ -874,6 +914,14 @@ module.exports = {
         }
         const engine = createDragEngine({
           gridEl,
+          // the grid rules are this face's, so the shared engine is told them rather than importing them
+          geometry: {
+            rows: GRID_ROWS,
+            cols: GRID_COLS,
+            sizeKey,
+            canPlace,
+            snapDrop
+          },
           getBlocks: function() {
             return blocks;
           },
@@ -1046,24 +1094,25 @@ module.exports = {
           init_codec();
           init_presets();
           init_visuals();
-          init_drag();
+          init_drag2();
           init_overlay();
           init_io_panel();
           init_modes();
         }
       });
 
-      // watchfaces/mosaic/sidereel/src/pkjs/clay/builder/component-entry.js
+      // watchfaces/mosaic/core/pkjs/clay/builder/component-entry.js
       var require_component_entry = __commonJS({
-        "watchfaces/mosaic/sidereel/src/pkjs/clay/builder/component-entry.js"(exports, module) {
+        "watchfaces/mosaic/core/pkjs/clay/builder/component-entry.js"(exports, module) {
           init_thumbs();
           init_overlay();
           init_io_panel();
+          init_wire();
           init_geometry();
           init_codec();
           init_presets();
           init_visuals();
-          init_drag();
+          init_drag2();
           init_modes();
           init_init();
           module.exports = (init_init(), __toCommonJS(init_exports));

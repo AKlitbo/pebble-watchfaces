@@ -317,9 +317,12 @@ describe('owm provider', () => {
     test('attaches the Open-Meteo forecast strip when the face wants it', () => {
       const result = run({ ...BASE, wantForecast: true }, routing({ [WX]: { body: WX_OK }, [OM]: { body: OM_FORECAST } }, []));
 
-      expect(result.forecastHourly).toBeTruthy();
-      expect(result.forecastHourly.cols.length).toBeGreaterThan(0);
-      expect(result.forecastDaily).toBeTruthy();
+      // the fixture's five hourly readings stride by two from 12:00, so three columns survive
+      expect(result.forecastHourly.baseHour).toBe(12);
+      expect(result.forecastHourly.stepHours).toBe(2);
+      expect(result.forecastHourly.cols.map((col) => col.temp)).toEqual([18, 20, 22]);
+      expect(result.forecastDaily.baseWeekday).toBe(5); // 2026-07-10 is a Friday
+      expect(result.forecastDaily.cols.map((col) => col.tempMax)).toEqual([22, 23]);
     });
 
     /** With a forecast face the single Open-Meteo call must carry the hourly block and extra days. */

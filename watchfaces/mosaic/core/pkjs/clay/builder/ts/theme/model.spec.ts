@@ -9,7 +9,7 @@
 import { describe, test, expect } from 'vitest';
 import { buildThemeModules, sizeRowsFor, buildOptionByLabel, allSizesHidden } from './model';
 import { setFlag } from './codec';
-import { moduleOptionsFixture } from '../testing/harness';
+import { moduleOptionsFixture } from '../testing/fixtures';
 
 const modules = buildThemeModules(moduleOptionsFixture);
 

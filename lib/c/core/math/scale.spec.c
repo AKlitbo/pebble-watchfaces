@@ -21,7 +21,7 @@ void test_clamp_leaves_an_inside_value(void)
     TEST_ASSERT_EQUAL_INT(50, result);
 }
 
-/** @brief Below the low end pins to the low end. */
+/** @brief A reading under the range pins to the low end, or a negative width draws the bar backwards out of its box. */
 void test_clamp_pins_below(void)
 {
     int result = clamp_int(-10, 0, 100);
@@ -29,7 +29,7 @@ void test_clamp_pins_below(void)
     TEST_ASSERT_EQUAL_INT(0, result);
 }
 
-/** @brief Above the high end pins to the high end. */
+/** @brief A reading over the range pins to the high end, or the bar overruns the box it was given. */
 void test_clamp_pins_above(void)
 {
     int result = clamp_int(150, 0, 100);
@@ -45,7 +45,7 @@ void test_segment_width_accounts_for_the_gaps(void)
     TEST_ASSERT_EQUAL_INT(18, result);
 }
 
-/** @brief No gaps is just the plain division. */
+/** @brief With no gaps the width is the plain division, or a gapless gauge still loses pixels to gaps that are not there. */
 void test_segment_width_with_no_gaps(void)
 {
     int result = segment_width(100, 0, 4);
@@ -61,7 +61,7 @@ void test_segment_width_guards_a_zero_count(void)
     TEST_ASSERT_EQUAL_INT(0, result);
 }
 
-/** @brief Half of a length is half its pixels. */
+/** @brief The midpoint maps to half the pixels, the everyday case the guards below are corners of. */
 void test_fraction_px_halfway(void)
 {
     int result = fraction_px(60, 30, 60);
@@ -85,7 +85,7 @@ void test_segments_filled_rounds_the_first_cell_up(void)
     TEST_ASSERT_EQUAL_INT(1, result);
 }
 
-/** @brief A full level lights every cell. */
+/** @brief A full level lights every cell, or a fully charged battery keeps a dark gap and reads as still charging. */
 void test_segments_filled_fills_at_one_hundred(void)
 {
     int result = segments_filled(100, 10);
@@ -101,7 +101,7 @@ void test_segments_filled_caps_over_full(void)
     TEST_ASSERT_EQUAL_INT(10, result);
 }
 
-/** @brief The bottom of the window lands on the bottom row of the area. */
+/** @brief The window's low end lands on the bottom row, since a y that grows the other way draws every trace upside down. */
 void test_plot_y_puts_the_low_end_at_the_bottom(void)
 {
     int result = plot_y(0, 50, 40, 120, 40);
@@ -109,7 +109,7 @@ void test_plot_y_puts_the_low_end_at_the_bottom(void)
     TEST_ASSERT_EQUAL_INT(49, result);
 }
 
-/** @brief The top of the window lands on the top row of the area. */
+/** @brief And its high end on the top row, the other half of the same inversion. */
 void test_plot_y_puts_the_high_end_at_the_top(void)
 {
     int result = plot_y(0, 50, 40, 120, 120);

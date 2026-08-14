@@ -7,7 +7,7 @@
  * initialize, which runs in the config webview, so it sticks to browser APIs.
  */
 
-import { thumbByLabel } from '../shared/thumbs';
+import { thumbByLabel } from '../../../../../../../../lib/ts/clay/builder/ts/shared/thumbs';
 import { flagOn, setFlag } from './codec';
 import { paintSwatch } from './preview';
 import type { Channel, ChannelKey, ColorMap, FlagMap, SizeRow, ThemeModule, Thumbs } from '../types';

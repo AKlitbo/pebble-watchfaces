@@ -4,5 +4,6 @@
   "supportsTheme": false,
   "bareBackgroundBase": "classic",
   "clearTextSelectors": [".time", ".banner", ".data"],
-  "hideSelectors": [".lcars-text-bar h3"]
+  "hideSelectors": [".lcars-text-bar h3"],
+  "unpaintSelectors": [".lcars-text-bar"]
 }

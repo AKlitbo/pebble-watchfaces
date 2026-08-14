@@ -26,7 +26,7 @@ void test_starts_at_low_water(void)
     TEST_ASSERT_EQUAL_INT(0, result);
 }
 
-/** @brief A full period on and the water is back where it started. */
+/** @brief A full period on the water is back where it started, or the cycle never closes and the level walks away over a week. */
 void test_returns_to_low_water_after_one_period(void)
 {
     int result = tide_level(TIDE_PERIOD_MIN);
@@ -96,7 +96,7 @@ void test_moves_slower_at_the_turn_than_at_mid_tide(void)
     TEST_ASSERT_TRUE(at_turn < at_middle);
 }
 
-/** @brief It floods over the first half of the period. */
+/** @brief It floods over the first half, and the direction is what the arrow on the face draws. */
 void test_rising_through_the_first_half(void)
 {
     bool result = tide_rising(TIDE_PERIOD_MIN / 4);
@@ -104,7 +104,7 @@ void test_rising_through_the_first_half(void)
     TEST_ASSERT_TRUE(result);
 }
 
-/** @brief And ebbs back over the second. */
+/** @brief And ebbs back over the second, since an arrow stuck one way round is worse than none at all. */
 void test_falling_through_the_second_half(void)
 {
     bool result = tide_rising((TIDE_PERIOD_MIN * 3) / 4);

@@ -1,0 +1,155 @@
+/*
+  LCARS dressing for the whole settings page, not just this component.
+
+  Clay builds its own markup and ships its own stylesheet, so this overrides it from the outside
+  by the classes Clay actually emits (.section, .component-*, .label, .value). Two things about
+  that stylesheet drive the shape of this one:
+
+    - it loads after this, so matching its specificity is not enough. Selectors here lead with
+      `body` and name both classes on an element to land above it.
+    - it already uses ::after on a heading for a divider rule, and sets its own font-family on
+      most text, so those have to be taken rather than inherited.
+
+  Those class names are the contract. If a Clay upgrade renames them the page falls back to Clay's
+  own look, which is plain but perfectly usable, so this can never leave the settings unreachable.
+
+  It rides on the slot builder's style block because that is the one stylesheet this face already
+  injects. A page without the builder on it keeps Clay's default look.
+*/
+
+body {
+  background: #000;
+  color: #fff;
+}
+
+/* the coloured rail down the left of a real LCARS panel, in a form a settings list can wear */
+body .section {
+  position: relative;
+  background: #0a0a0a;
+  border: none;
+  border-left: 10px solid #aa55ff;
+  border-radius: 0 10px 10px 0;
+  margin: 0 6px 14px;
+  padding: 10px 12px 12px;
+}
+
+/* each section takes the next colour round the classic palette, the way a real panel's blocks do */
+body .section:nth-of-type(2) { border-left-color: #ffaa55; }
+body .section:nth-of-type(3) { border-left-color: #55aaff; }
+body .section:nth-of-type(4) { border-left-color: #ff5500; }
+body .section:nth-of-type(5) { border-left-color: #aaaaff; }
+body .section:nth-of-type(6) { border-left-color: #aa5555; }
+
+/* a heading reads as the holder box on a bar: black label, amber lettering, a pill running off.
+   the second selector is here to outrank Clay's own `.section > .component-heading:first-child`,
+   which is the one rule on this page that carries more weight than a plain two-class match */
+body .component.component-heading,
+body .section > .component.component-heading {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0 0 10px;
+  overflow: visible;
+}
+
+/* Clay uses this for a 1px divider rule, and hides it on the first heading in a section. Taken
+   over for the bar the label sits on, so it has to be turned back on for that first-child case
+   at the same weight Clay switched it off with */
+body .component.component-heading::after,
+body .section > .component.component-heading::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7px;
+  bottom: auto;
+  height: 11px;
+  background: #aaaaff;
+  border-radius: 6px;
+  z-index: 0;
+}
+
+/* the heading at the top of the page sits directly in the form with no section around it, so
+   the padding taken off above leaves it flush against the top edge. it carries its own room */
+body .inputs > .component.component-heading {
+  margin-top: 14px;
+}
+
+body .inputs > .component.component-text {
+  margin-bottom: 16px;
+}
+
+body .component.component-heading h4 {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0 8px 0 0;
+  background: #0a0a0a;
+  color: #ffaa00;
+  font-family: 'LcarsAntonio', 'Arial Narrow', sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  line-height: 25px;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+body .component.component-text p {
+  color: #c8c8d8;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+body .component .label {
+  color: #ffaa55;
+  font-family: 'LcarsAntonio', 'Arial Narrow', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+body .component .description {
+  color: #8a8a9a;
+  font-size: 12px;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+/* controls: dark wells with amber text */
+body .component select,
+body .component input[type="text"],
+body .component input[type="number"] {
+  background: #16161c;
+  color: #ffcc88;
+  border: 1px solid #3a3a44;
+  border-radius: 4px;
+  font-family: 'LcarsAntonio', 'Arial Narrow', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+/* the save button as a full LCARS pill */
+body .component-submit button,
+body button[type="submit"] {
+  background: #ff5500;
+  color: #000;
+  border: none;
+  border-radius: 18px;
+  padding: 11px 24px;
+  font-family: 'LcarsAntonio', 'Arial Narrow', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+/* the builder's own chrome picks up the same lettering */
+body .sb-btn {
+  font-family: 'LcarsAntonio', 'Arial Narrow', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}

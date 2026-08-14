@@ -1,8 +1,10 @@
 /**
  * @file dev.h
- * @brief Per-face dev-walk switches. Keep DEV_MODE 0 for any build you ship. Flip it (plus the
- * walk toggle) to boot the face into a fixed fixture and tap-walk themes for screenshots.
- * The logic lives in lib `dev/dev_walk`. This only holds the switches.
+ * @brief Per-face dev-walk switches. Keep DEV_MODE 0 for any build you ship. Flip it (plus one
+ * walk toggle) to boot the face into a fixed fixture and tap-walk it for screenshots.
+ *
+ * Two walks: the shared theme walk in lib `dev/dev_walk`, and this face's ops-slot walk in
+ * `dev/dev_ops`. Pick one. This file only holds the switches.
  *
  * @ingroup watchface-lcars
  */
@@ -12,20 +14,35 @@
 // ===== master switch (0 for any shipped build) =====
 #define DEV_MODE 0
 
-// the tap-walk screenshot harness lives in the shared lib's dev/dev_walk. nothing outside
-// DEV_MODE touches it, so a shipping build (0) needs neither the include nor the walk macro
+// ===== walk toggles (pick one) =====
+#define DEV_TAP_WALK_THEMES 0  // tap steps through every theme on fixed data + a fixed clock
+#define DEV_TAP_WALK_OPS    0  // tap steps both ops slots through the readout catalog
+#define DEV_TAP_WALK_WX     0  // tap steps the condition through every weather glyph
+
+// the harnesses are only reachable through DEV_MODE so a shipping build (0) needs
+// neither include nor any walk macro
 #if DEV_MODE
+#if DEV_TAP_WALK_OPS
+#include "dev/dev_ops.h"
+#elif DEV_TAP_WALK_WX
+#include "dev/dev_wx.h"
+#else
 #include "dev/dev_walk.h"
 #endif
+#endif
 
-// ===== walk toggle =====
-#define DEV_TAP_WALK_THEMES 0  // tap steps through every theme on fixed data + a fixed clock
+// ===== the fixed clock every shot shows =====
+// the ops walk wants an afternoon, so its sun countdown runs to a sunset rather than sitting on
+// the edge of a rounding step
+#if DEV_TAP_WALK_OPS
+  #define DEV_TIME_HOUR 14
+  #define DEV_TIME_MIN  23
+#else
+  #define DEV_TIME_HOUR 8   // 08:00 is a wide clock string
+  #define DEV_TIME_MIN  0
+#endif
 
-// ===== theme walk: the fixed clock every shot shows =====
-#define DEV_TIME_HOUR 8   // 08:00 is a wide clock string
-#define DEV_TIME_MIN  0
-
-// which walk a tap advances (from the toggle above)
+// which walk a tap advances (from the toggles above)
 #if DEV_TAP_WALK_THEMES
   #define DEV_WALK_MODE DEV_WALK_THEMES
 #else
@@ -33,7 +50,7 @@
 #endif
 
 // the hooks are static inline so a release build (DEV_MODE 0) inlines them to nothing and
-// leaves no dev symbol at all. main.c stays #if-free while shipping zero dev code
+// leaves no dev symbol at all. main.c and layout.c stay #if-free while shipping zero dev code
 
 /**
  * @brief Seed the stores from the dev fixture (live=false) when DEV_MODE is on.
@@ -43,7 +60,13 @@
 static inline bool dev_seed_stores(void)
 {
 #if DEV_MODE
+#if DEV_TAP_WALK_OPS
+    dev_ops_seed_stores(DEV_TIME_HOUR, DEV_TIME_MIN);
+#elif DEV_TAP_WALK_WX
+    dev_wx_seed_stores(DEV_TIME_HOUR, DEV_TIME_MIN);
+#else
     dev_walk_seed_stores(DEV_TIME_HOUR, DEV_TIME_MIN);
+#endif
     return true;
 #else
     return false;
@@ -59,7 +82,13 @@ static inline bool dev_seed_stores(void)
 static inline void dev_start(void (*apply_theme)(void))
 {
 #if DEV_MODE
+#if DEV_TAP_WALK_OPS
+    dev_ops_init(apply_theme);
+#elif DEV_TAP_WALK_WX
+    dev_wx_init(apply_theme);
+#else
     dev_walk_init(DEV_WALK_MODE, apply_theme);
+#endif
 #else
     (void)apply_theme;
 #endif
@@ -69,6 +98,31 @@ static inline void dev_start(void (*apply_theme)(void))
 static inline void dev_stop(void)
 {
 #if DEV_MODE
+#if DEV_TAP_WALK_OPS
+    dev_ops_deinit();
+#elif DEV_TAP_WALK_WX
+    dev_wx_deinit();
+#else
     dev_walk_deinit();
+#endif
+#endif
+}
+
+/**
+ * @brief What a slot should show: the walk's pick while the ops walk is running, otherwise
+ * whatever the user saved.
+ *
+ * @param slot 0 for the upper slot, 1 for the lower.
+ * @param stored The saved pick.
+ * @return An OpsId.
+ */
+static inline uint8_t dev_ops_pick(int slot, uint8_t stored)
+{
+#if DEV_MODE && DEV_TAP_WALK_OPS
+    (void)stored;
+    return dev_ops_walk_pick(slot);
+#else
+    (void)slot;
+    return stored;
 #endif
 }

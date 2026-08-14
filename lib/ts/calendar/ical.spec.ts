@@ -491,30 +491,38 @@ describe('parseIcal awkward recurrences', () => {
    * 1st of its month, where the window never sees it.
    */
   test('keeps a plain yearly rule on the day it started', () => {
-    const result = rule('20200713T090000Z', 'FREQ=YEARLY');
+    const ics = rule('20200713T090000Z', 'FREQ=YEARLY');
 
-    expect(days(ical.parseIcal(result, at(2026, 7, 10)))).toEqual(['2026-07-13']);
+    const result = ical.parseIcal(ics, at(2026, 7, 10));
+
+    expect(days(result)).toEqual(['2026-07-13']);
   });
 
   /** A rule on the 31st has to step over the months that are too short and carry on. */
   test('skips a short month and still lands on the next long one', () => {
-    const result = rule('20260131T090000Z', 'FREQ=MONTHLY');
+    const ics = rule('20260131T090000Z', 'FREQ=MONTHLY');
 
-    expect(days(ical.parseIcal(result, at(2026, 3, 28)))).toEqual(['2026-03-31']);
+    const result = ical.parseIcal(ics, at(2026, 3, 28));
+
+    expect(days(result)).toEqual(['2026-03-31']);
   });
 
   /** The second Tuesday of July 2026 is the 14th, a weekday the rule picks rather than a date. */
   test('lands a monthly rule on the nth weekday of the month', () => {
-    const result = rule('20240109T090000Z', 'FREQ=MONTHLY;BYDAY=2TU');
+    const ics = rule('20240109T090000Z', 'FREQ=MONTHLY;BYDAY=2TU');
 
-    expect(days(ical.parseIcal(result, at(2026, 7, 12)))).toEqual(['2026-07-14']);
+    const result = ical.parseIcal(ics, at(2026, 7, 12));
+
+    expect(days(result)).toEqual(['2026-07-14']);
   });
 
   /** A negative ordinal counts back, so it follows a month's own length. */
   test('counts a negative ordinal back from the month end', () => {
-    const result = rule('20260131T090000Z', 'FREQ=MONTHLY;BYMONTHDAY=-1');
+    const ics = rule('20260131T090000Z', 'FREQ=MONTHLY;BYMONTHDAY=-1');
 
-    expect(days(ical.parseIcal(result, at(2026, 2, 25)))).toEqual(['2026-02-28']);
+    const result = ical.parseIcal(ics, at(2026, 2, 25));
+
+    expect(days(result)).toEqual(['2026-02-28']);
   });
 
   /**
@@ -523,10 +531,12 @@ describe('parseIcal awkward recurrences', () => {
    * runs every week hides it because its weeks touch.
    */
   test('lands a fortnightly rule on the right side of the skipped week', () => {
-    const result = rule('20260713T090000Z', 'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,SU');
+    const ics = rule('20260713T090000Z', 'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,SU');
+
+    const result = ical.parseIcal(ics, at(2026, 7, 14));
 
     // the rule runs the week of Monday the 13th, so its Sunday is the 19th, not the 12th or 26th
-    expect(days(ical.parseIcal(result, at(2026, 7, 14)))).toEqual(['2026-07-19']);
+    expect(days(result)).toEqual(['2026-07-19']);
   });
 
   /**
@@ -535,11 +545,13 @@ describe('parseIcal awkward recurrences', () => {
    * calendar rather than a late one.
    */
   test('walks a long COUNT rule all the way to a window years later', () => {
-    const result = rule('20150101T090000Z', 'FREQ=DAILY;COUNT=9999');
+    const ics = rule('20150101T090000Z', 'FREQ=DAILY;COUNT=9999');
+
+    const result = ical.parseIcal(ics, at(2026, 7, 11));
 
     // the window opens at noon and the rule fires at 09:00 for an hour, so that day's own
     // occurrence has already finished and the six behind it are what is left
-    expect(days(ical.parseIcal(result, at(2026, 7, 11)))).toEqual([
+    expect(days(result)).toEqual([
       '2026-07-12', '2026-07-13', '2026-07-14', '2026-07-15', '2026-07-16', '2026-07-17',
     ]);
   });
@@ -557,16 +569,20 @@ describe('parseIcal awkward recurrences', () => {
    * upstream release corrects it, this test goes red and says so.
    */
   test('slides a leap day to the 1st of march, which the rules say it should not', () => {
-    const result = rule('20240229T090000Z', 'FREQ=YEARLY');
+    const ics = rule('20240229T090000Z', 'FREQ=YEARLY');
 
-    expect(days(ical.parseIcal(result, at(2027, 2, 25)))).toEqual(['2027-03-01']);
+    const result = ical.parseIcal(ics, at(2027, 2, 25));
+
+    expect(days(result)).toEqual(['2027-03-01']);
   });
 
   /** And on a real leap year it lands where it belongs. */
   test('lands a leap day on the leap year itself', () => {
-    const result = rule('20240229T090000Z', 'FREQ=YEARLY');
+    const ics = rule('20240229T090000Z', 'FREQ=YEARLY');
 
-    expect(days(ical.parseIcal(result, at(2028, 2, 25)))).toEqual(['2028-02-29']);
+    const result = ical.parseIcal(ics, at(2028, 2, 25));
+
+    expect(days(result)).toEqual(['2028-02-29']);
   });
 });
 

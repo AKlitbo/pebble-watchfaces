@@ -16,7 +16,8 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
 import component from '../layout-component.g.js';
-import { mount, moduleOptionsFixture } from '../../../../../core/pkjs/clay/builder/ts/testing/harness';
+import { mount } from '../../../../../../../lib/ts/clay/builder/ts/testing/harness';
+import { moduleOptionsFixture } from '../../../../../core/pkjs/clay/builder/ts/testing/fixtures';
 
 /** Mounts the layout builder with the shared module fixture and no thumbnails. */
 function mountLayout() {

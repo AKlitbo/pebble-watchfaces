@@ -23,8 +23,9 @@ enum
     FONT_ANTONIO_32,  // date banner fallback for wide formats
     FONT_ANTONIO_28,  // date banner fallback for the widest formats
     FONT_ANTONIO_20,  // weather temp
-    FONT_ANTONIO_16,  // heartrate / steps / condition
-    FONT_ANTONIO_12,  // lat / lon
+    FONT_ANTONIO_16,  // ops values / condition
+    FONT_ANTONIO_14,  // ops value fallback for the longer readings
+    FONT_ANTONIO_12,  // lat / lon, and the ops fallback for the longest readings
     FONT_ANTONIO_10,  // AM/PM superscript
     FONT_COUNT
 };

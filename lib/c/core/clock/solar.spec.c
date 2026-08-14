@@ -18,7 +18,7 @@ void tearDown(void) {}
 #define RISE 360
 #define SET 1080
 
-/** @brief Noon is exactly halfway through a six-to-six day. */
+/** @brief Noon is exactly halfway through a six-to-six day, the case the edges below are corners of. */
 void test_day_midday_is_halfway(void)
 {
     int result = solar_day_progress(RISE, SET, 720);
@@ -50,7 +50,7 @@ void test_day_no_data_is_none(void)
     TEST_ASSERT_EQUAL_INT(-1, result);
 }
 
-/** @brief In daylight there is no night to show. */
+/** @brief In daylight there is no night to show, or the face draws a night arc straight through the afternoon. */
 void test_night_during_the_day_is_none(void)
 {
     int result = solar_night_progress(RISE, SET, 720);
@@ -85,7 +85,7 @@ void test_next_is_sunrise_while_dark(void)
     TEST_ASSERT_TRUE(is_sunrise);
 }
 
-/** @brief While the sun is up, the next event is the sunset. */
+/** @brief While the sun is up the next event is the sunset, since naming the wrong one puts a sunrise glyph on an afternoon countdown. */
 void test_next_is_sunset_while_up(void)
 {
     bool is_sunrise = true;

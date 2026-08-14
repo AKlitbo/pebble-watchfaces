@@ -36,6 +36,13 @@ static GFont s_font_label;  // Antonio 10 bar labels
  */
 static void lcars_label(GContext *ctx, GRect area, const char *text, GFont font, GColor text_color, int pad)
 {
+    // an ops slot set to show nothing hands over an empty word. painting it would leave a bare
+    // black box on the bar, which reads as a label that failed to load rather than an empty slot
+    if (!text || !text[0])
+    {
+        return;
+    }
+
     GSize sz = graphics_text_layout_get_content_size(text, font, area, GTextOverflowModeFill, GTextAlignmentLeft);
 
     int box_w = sz.w + pad * 2;
@@ -47,10 +54,42 @@ static void lcars_label(GContext *ctx, GRect area, const char *text, GFont font,
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(area.origin.x, area.origin.y, box_w, area.size.h), 0, GCornerNone);
 
+    // flush with the holder box. the drawn bar has a hard top edge so the label
+    // needs no lift to sit on it
     graphics_context_set_text_color(ctx, text_color);
     graphics_draw_text(ctx, text, font,
-        GRect(area.origin.x + pad, area.origin.y - 1, box_w - pad, area.size.h + 4),
+        GRect(area.origin.x + pad, area.origin.y, box_w - pad, area.size.h + 4),
         GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+}
+
+/**
+ * @brief Draw one LCARS header bar: a rounded cap at each end with a square body between.
+ *
+ * The two notches that separate the caps from the body are not drawn. They are the black field
+ * showing through the gap, which is what gives the bar its segmented LCARS look.
+ *
+ * @param ctx The graphics context.
+ * @param area The whole bar including both caps.
+ * @param cap The end-cap colour.
+ * @param body The middle colour.
+ */
+static void lcars_bar(GContext *ctx, GRect area, GColor cap, GColor body)
+{
+    // half the cap's width rounds it into a proper half-pill. the SDK clamps a
+    // radius bigger than the box so this is the largest one that still reads as a
+    // curve rather than a corner
+    graphics_context_set_fill_color(ctx, cap);
+    graphics_fill_rect(ctx, GRect(area.origin.x, area.origin.y, BAR_CAP_W, area.size.h),
+                       BAR_CAP_W / 2, GCornersLeft);
+    graphics_fill_rect(ctx, GRect(area.origin.x + area.size.w - BAR_CAP_W, area.origin.y,
+                                  BAR_CAP_W, area.size.h),
+                       BAR_CAP_W / 2, GCornersRight);
+
+    int inset = BAR_CAP_W + BAR_NOTCH;
+    graphics_context_set_fill_color(ctx, body);
+    graphics_fill_rect(ctx, GRect(area.origin.x + inset, area.origin.y,
+                                  area.size.w - inset * 2, area.size.h),
+                       0, GCornerNone);
 }
 
 /**
@@ -140,6 +179,31 @@ static void draw_icon(GContext *ctx, GBitmap *bmp, GRect r)
     graphics_draw_bitmap_in_rect(ctx, bmp, r);
 }
 
+/**
+ * @brief Blit a glyph centred in a box, at its own size.
+ *
+ * The ops glyphs come from the catalog and are not all cut to the same shape: a thermometer is
+ * taller than it is wide. graphics_draw_bitmap_in_rect repeats a bitmap that is smaller than the
+ * box it is given, so the destination has to be the picture's own size or the glyph tiles.
+ *
+ * @param ctx The graphics context.
+ * @param res The resource id.
+ * @param box The area to centre it in.
+ */
+static void draw_icon_centered(GContext *ctx, uint32_t res, GRect box)
+{
+    GBitmap *bmp = icon_get(res);
+    if (!bmp)
+    {
+        return;
+    }
+
+    GSize sz = icon_size(res);
+    draw_icon(ctx, bmp, GRect(box.origin.x + (box.size.w - sz.w) / 2,
+                              box.origin.y + (box.size.h - sz.h) / 2,
+                              sz.w, sz.h));
+}
+
 void widgets_load(void)
 {
     s_font_label = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_10));
@@ -150,20 +214,67 @@ void widgets_unload(void)
     fonts_unload_custom_font(s_font_label);
 }
 
-void widgets_draw_labels(GContext *ctx)
-{
-    const LcarsLabel labels[] = {
-        {LBL_STARDATE, "STARDATE"},
-        {LBL_WEATHER, "SENSORS"},
-        {LBL_HR, "VITALS"},
-        {LBL_STEPS, "TRAVERSAL"},
-    };
+// where each slot's chrome sits. slot order runs left top then left bottom then
+// right top then right bottom
+static const GRect s_slot_bar[4] = {
+    OPS_BAR(OPS_COL_L, OPS_ROW_T), OPS_BAR(OPS_COL_L, OPS_ROW_B),
+    OPS_BAR(OPS_COL_R, OPS_ROW_T), OPS_BAR(OPS_COL_R, OPS_ROW_B),
+};
 
+static const GRect s_slot_label[4] = {
+    OPS_LABEL(OPS_COL_L, OPS_ROW_T), OPS_LABEL(OPS_COL_L, OPS_ROW_B),
+    OPS_LABEL(OPS_COL_R, OPS_ROW_T), OPS_LABEL(OPS_COL_R, OPS_ROW_B),
+};
+
+static const GRect s_slot_glyph[4] = {
+    OPS_GLYPH(OPS_COL_L, OPS_ROW_T), OPS_GLYPH(OPS_COL_L, OPS_ROW_B),
+    OPS_GLYPH(OPS_COL_R, OPS_ROW_T), OPS_GLYPH(OPS_COL_R, OPS_ROW_B),
+};
+
+/**
+ * @brief Whether a slot draws its own chrome at all.
+ *
+ * The lower left slot does not while the column is one tall weather block: its bar, word and
+ * glyph all belong to the block above it.
+ *
+ * @param chrome What the four slots resolved to.
+ * @param slot The slot index.
+ * @return True when the slot owns its row.
+ */
+static bool slot_draws(const OpsChrome *chrome, int slot)
+{
+    return !(chrome->left_composite && slot == 1);
+}
+
+void widgets_draw_bars(GContext *ctx, const OpsChrome *chrome)
+{
+    uint8_t theme = settings_u8(SETTING_THEME);
+    GColor cap = bar_cap_for_theme(theme);
+    GColor body = bar_body_for_theme(theme);
+
+    lcars_bar(ctx, BAR_STARDATE, cap, body);
+
+    for (int slot = 0; slot < 4; slot++)
+    {
+        if (slot_draws(chrome, slot))
+        {
+            lcars_bar(ctx, s_slot_bar[slot], cap, body);
+        }
+    }
+}
+
+void widgets_draw_labels(GContext *ctx, const OpsChrome *chrome)
+{
     GColor lbl_color = label_color_for_theme(settings_u8(SETTING_THEME));
 
-    for (unsigned i = 0; i < ARRAY_LENGTH(labels); i++)
+    lcars_label(ctx, LBL_STARDATE, "STARDATE", s_font_label, lbl_color, 3);
+
+    for (int slot = 0; slot < 4; slot++)
     {
-        lcars_label(ctx, labels[i].area, labels[i].text, s_font_label, lbl_color, 3);
+        if (slot_draws(chrome, slot))
+        {
+            lcars_label(ctx, s_slot_label[slot], chrome->label[slot], s_font_label, lbl_color, 3);
+        }
     }
 }
 
@@ -175,14 +286,36 @@ void widgets_draw_battery(GContext *ctx, int level)
     lcars_battery_gauge(ctx, GRect(6, 4, 32, 12), level, accent, fill);
 }
 
-void widgets_draw_glyphs(GContext *ctx, const char *condition, bool bt_show, bool bt_connected,
-                         bool qt_show, bool qt_active)
+void widgets_draw_glyphs(GContext *ctx, const OpsChrome *chrome, const char *condition,
+                         bool bt_show, bool bt_connected, bool qt_show, bool qt_active)
 {
     // the cache loads each glyph once and hands back the same picture on later paints
-    draw_icon(ctx, icon_get(wx_resource_for(condition)), WX_ICON);
-    draw_icon(ctx, icon_get(RESOURCE_ID_ICON_THERMOMETER), THERMO_ICON);
-    draw_icon(ctx, icon_get(RESOURCE_ID_ICON_HEART), HR_ICON);
-    draw_icon(ctx, icon_get(RESOURCE_ID_ICON_FEET), FEET_ICON);
+    if (chrome->left_composite)
+    {
+        // partly-cloudy's sun reaches the very top of its box. every other glyph
+        // sits a couple of pixels in so that one alone would touch the bar overhead
+        // any glyph sitting too high gets pushed down to the shared minimum
+        // the check goes off its measured margin rather than its name
+        uint32_t wx = wx_resource_for(condition);
+        GRect wx_at = WX_ICON;
+        int wx_top = icon_margins(wx).n;
+        if (wx_top < WX_MIN_TOP)
+        {
+            wx_at.origin.y += WX_MIN_TOP - wx_top;
+        }
+
+        draw_icon(ctx, icon_get(wx), wx_at);
+        draw_icon(ctx, icon_get(RESOURCE_ID_ICON_THERMOMETER), THERMO_ICON);
+    }
+
+    for (int slot = 0; slot < 4; slot++)
+    {
+        // a slot showing nothing hands over 0 and the cache has no picture for that
+        if (slot_draws(chrome, slot) && chrome->icon[slot])
+        {
+            draw_icon_centered(ctx, chrome->icon[slot], s_slot_glyph[slot]);
+        }
+    }
 
     if (bt_show)
     {

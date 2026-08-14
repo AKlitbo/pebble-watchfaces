@@ -1,12 +1,12 @@
-// typechecks the Clay builder sources, both a face's own under src/pkjs/clay/builder/ and the
-// family core's shared ones under core/pkjs/clay/builder/
-// run by npm run typecheck. gen:gridlock:clay is what actually bundles those pieces
+// typechecks the Clay builder sources: a face's own under src/pkjs/clay/builder/, a family core's
+// under core/pkjs/clay/builder/, and the shared ones under lib/ts/clay/builder/
+// run by npm run typecheck. gen:<face>:clay is what actually bundles those pieces
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM"],
     "noEmit": true
   },
-  "include": ["../watchfaces/**/pkjs/clay/builder/**/*.ts"],
+  "include": ["../watchfaces/**/pkjs/clay/builder/**/*.ts", "../lib/ts/clay/builder/**/*.ts"],
   "exclude": ["../node_modules", "../**/*.spec.ts", "../**/*.manifest.ts"]
 }

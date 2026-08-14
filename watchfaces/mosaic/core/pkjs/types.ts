@@ -48,10 +48,8 @@ export interface ClayItem {
   sunlight?: boolean;
 }
 
-/** Per-module presentation metadata for the Clay builders, keyed by module label. */
-export interface ModuleMeta {
-  icon: string;
-  blockColor: string;
-  /** resources/thumbnails/<slug>-<size>.png filename stem, read by generate-thumbnails.ts. */
-  slug: string;
-}
+/**
+ * Per-module presentation metadata, keyed by module label. Carries no grid vocabulary, so it is
+ * lib's and re-exported here for the two module-meta.ts files that read it by this path.
+ */
+export type { ModuleMeta } from '../../../../lib/ts/clay/types';

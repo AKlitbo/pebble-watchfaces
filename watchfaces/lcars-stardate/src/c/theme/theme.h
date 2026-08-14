@@ -40,6 +40,25 @@ GColor label_color_for_theme(uint8_t theme);
 GColor panel_accent_for_theme(uint8_t theme);
 
 /**
+ * @brief The rounded end-cap colour of the LCARS header bars.
+ *
+ * The bars are drawn rather than baked, so their two colours come from here instead of from the
+ * frame artwork.
+ *
+ * @param theme The theme setting value.
+ * @return The cap colour.
+ */
+GColor bar_cap_for_theme(uint8_t theme);
+
+/**
+ * @brief The long middle colour of the LCARS header bars.
+ *
+ * @param theme The theme setting value.
+ * @return The bar body colour.
+ */
+GColor bar_body_for_theme(uint8_t theme);
+
+/**
  * @brief The lit-segment colour for the battery gauge at a given charge level.
  *
  * Color themes warn with red (critical) and amber (low). Mono themes stay grayscale,

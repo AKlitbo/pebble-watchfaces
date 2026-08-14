@@ -372,9 +372,12 @@ describe('weatherapi provider', () => {
 
       const result = run(opts, routing({ [WX]: { body: OK_BODY }, [OM]: { body: OM_FORECAST } }, []));
 
-      expect(result.forecastHourly).toBeTruthy();
-      expect(result.forecastHourly.cols.length).toBeGreaterThan(0);
-      expect(result.forecastDaily).toBeTruthy();
+      // the fixture's five hourly readings stride by two from 12:00, so three columns survive
+      expect(result.forecastHourly.baseHour).toBe(12);
+      expect(result.forecastHourly.stepHours).toBe(2);
+      expect(result.forecastHourly.cols.map((col) => col.temp)).toEqual([18, 20, 22]);
+      expect(result.forecastDaily.baseWeekday).toBe(5); // 2026-07-10 is a Friday
+      expect(result.forecastDaily.cols.map((col) => col.tempMax)).toEqual([22, 23]);
     });
 
     /** Open-Meteo needs coordinates, so a place-name-only forecast face must not fire a coordless strip request. */

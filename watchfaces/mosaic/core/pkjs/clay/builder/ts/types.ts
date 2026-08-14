@@ -5,19 +5,10 @@
 
 export type { Block, SizeKey } from '../../../types';
 
-/** Label to { size key to data url } screenshot map both builders read. */
-export type Thumbs = Record<string, Record<string, string>>;
-
-/**
- * The component instance initialize runs as, with enough of Clay's shape for what the
- * builders touch. Not the component itself: that is ClayComponentDefinition, the object
- * the generated .g.js exports.
- */
-export interface ClayComponentInstance {
-  $element: HTMLElement[];
-  config?: { moduleOptions?: RawModule[]; moduleThumbnails?: Thumbs };
-  trigger(event: string): void;
-}
+// the builder shapes that carry no grid vocabulary belong to lib. re-exported so the mosaic
+// pieces keep naming one types module rather than two
+export type { Thumbs, ClayComponentInstance } from '../../../../../../../lib/ts/clay/builder/ts/types';
+import type { RawOption } from '../../../../../../../lib/ts/clay/builder/ts/types';
 
 /** One themeRows entry: a size mapped to the module whose screenshot it shows. */
 export interface ThemeRow {
@@ -27,11 +18,7 @@ export interface ThemeRow {
 }
 
 /** A module option as Clay hands it in, matching config.ts MODULE_OPTIONS. */
-export interface RawModule {
-  value: number;
-  label: string;
-  icon?: string;
-  color?: string;
+export interface RawModule extends RawOption {
   sizes?: string[];
   themeRows?: ThemeRow[];
   themeLabel?: string;

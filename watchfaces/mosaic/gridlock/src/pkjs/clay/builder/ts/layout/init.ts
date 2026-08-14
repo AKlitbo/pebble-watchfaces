@@ -8,15 +8,15 @@
  * siblings through the imports below and sticks to browser APIs.
  */
 
-import { GRID_ROWS, GRID_COLS, sizeKey, occupancyGrid } from './geometry';
+import { GRID_ROWS, GRID_COLS, sizeKey, canPlace, snapDrop, occupancyGrid } from './geometry';
 import { serializeLayout, parseLayoutString, EMPTY_LAYOUT } from './codec';
 import { LAYOUT_PRESETS } from './presets';
-import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from './visuals';
-import { createDragEngine } from './drag';
-import { createOverlayHost } from '../../../../../../../core/pkjs/clay/builder/ts/shared/overlay';
-import { buildIoPanel } from '../../../../../../../core/pkjs/clay/builder/ts/shared/io-panel';
-import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, NIGHT_NONE } from './modes';
-import type { ModesBar } from './modes';
+import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from '../../../../../../../core/pkjs/clay/builder/ts/layout/visuals';
+import { createDragEngine } from '../../../../../../../core/pkjs/clay/builder/ts/layout/drag';
+import { createOverlayHost } from '../../../../../../../../../lib/ts/clay/builder/ts/shared/overlay';
+import { buildIoPanel } from '../../../../../../../../../lib/ts/clay/builder/ts/shared/io-panel';
+import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, NIGHT_NONE } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
+import type { ModesBar } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../../../../../../../core/pkjs/clay/builder/ts/types';
 
 /** The set/get handles init hangs on the root element for the manipulator. */
@@ -158,6 +158,14 @@ export function init(this: ClayComponentInstance): void {
 
   const engine = createDragEngine({
     gridEl: gridEl,
+    // the grid rules are this face's, so the shared engine is told them rather than importing them
+    geometry: {
+      rows: GRID_ROWS,
+      cols: GRID_COLS,
+      sizeKey: sizeKey,
+      canPlace: canPlace,
+      snapDrop: snapDrop,
+    },
     getBlocks: function () {
       return blocks;
     },

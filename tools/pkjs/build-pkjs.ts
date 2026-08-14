@@ -93,7 +93,14 @@ export function writeTsconfig(sourceFace: string, p: FacePaths): void {
     extends: path.relative(p.sandbox, PKJS_BASE_TSCONFIG).split(path.sep).join('/'),
     compilerOptions: { rootDir: '../..', outDir: 'emit' },
     include: [`../../watchfaces/${rel}/src/pkjs/**/*.ts`, '../../lib/ts/**/*.ts'],
-    exclude: [`../../watchfaces/${rel}/src/pkjs/clay/builder/**`, '../../**/*.spec.ts'],
+    // builder pieces are bundled into the committed *.g.js so compiling them here
+    // would ship them a second time as loose modules against the 65535 byte cap
+    // lib's are excluded for every face even the ones carrying no Clay builder
+    exclude: [
+      `../../watchfaces/${rel}/src/pkjs/clay/builder/**`,
+      '../../lib/ts/clay/builder/**',
+      '../../**/*.spec.ts',
+    ],
   };
   fs.mkdirSync(p.sandbox, { recursive: true });
   fs.writeFileSync(p.tsconfig, JSON.stringify(tsconfig, null, 2) + '\n');

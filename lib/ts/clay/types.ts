@@ -27,7 +27,26 @@ export interface ClayConfigItem {
    * invert, so ['NOT_PLATFORM_GABBRO'] drops the item on a round watch and keeps it everywhere
    * else. An item with none declared is always shown. */
   capabilities?: string[];
-  // custom components (layoutBuilder / themeBuilder) carry these
+  // custom components (layoutBuilder / themeBuilder / slotBuilder) carry these
   moduleOptions?: unknown;
   moduleThumbnails?: unknown;
+  /** hiddenStore only: the extra class that tells one store on a page from another. */
+  storeClass?: string;
+}
+
+/**
+ * Per-option presentation metadata, keyed by label in a face's clay/module-meta.ts.
+ *
+ * embed-thumbnails.ts reads the slug from here, so the thumbnail list has one home rather than a
+ * second copy alongside the option list.
+ *
+ * Here rather than with the builder types because a module-meta.ts is runtime code that config.ts
+ * ships. A type import reaching into clay/builder/ would pull that folder into the compiled
+ * bundle, which is the one thing those pieces must never do.
+ */
+export interface ModuleMeta {
+  icon: string;
+  blockColor: string;
+  /** resources/thumbnails/<slug>-<size>.png filename stem. */
+  slug: string;
 }

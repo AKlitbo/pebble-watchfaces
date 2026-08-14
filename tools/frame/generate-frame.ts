@@ -43,6 +43,10 @@ const ROOT = path.resolve(import.meta.dirname, '..', '..');
  * per look). clearTextSelectors have their text emptied and hideSelectors are hidden, so the
  * bake is pure chrome. The "bareBackgroundBase" frame bakes to background.png; every other
  * base lands at background-<base>.png.
+ *
+ * hideSelectors drop out of the flow, so use them for something nothing else is positioned
+ * against. unpaintSelectors keep their box and lose only their pixels, which is what a piece of
+ * chrome the watch draws for itself needs: the bake has to leave the space exactly where it was.
  */
 export interface FaceConfig {
   defaultFrame: string;
@@ -51,6 +55,7 @@ export interface FaceConfig {
   bareBackgroundBase: string | null;
   clearTextSelectors: string[];
   hideSelectors: string[];
+  unpaintSelectors?: string[];
 }
 
 /** The paths generate-frame reads and writes for one face, all under watchfaces/<face>/. */
@@ -202,6 +207,7 @@ async function main(): Promise<void> {
 
   const clearSel = faceCfg.clearTextSelectors.join(', ');
   const hideSel = faceCfg.hideSelectors.join(', ');
+  const unpaintSel = (faceCfg.unpaintSelectors || []).join(', ');
 
   for (const themeName of themes) {
     await page.goto(fileUrl, { waitUntil: 'networkidle' });
@@ -218,7 +224,7 @@ async function main(): Promise<void> {
     }
 
     await page.evaluate(
-      ({ clear, hide }: { clear: string; hide: string }) => {
+      ({ clear, hide, unpaint }: { clear: string; hide: string; unpaint: string }) => {
         if (clear) {
           document.querySelectorAll(clear).forEach((el) => {
             el.textContent = '';
@@ -229,8 +235,16 @@ async function main(): Promise<void> {
             (el as HTMLElement).style.display = 'none';
           });
         }
+        // visibility rather than display so the box still takes up its space
+        // it also takes the element's ::before and ::after along with it
+        // which is where LCARS hides its end notches
+        if (unpaint) {
+          document.querySelectorAll(unpaint).forEach((el) => {
+            (el as HTMLElement).style.visibility = 'hidden';
+          });
+        }
       },
-      { clear: clearSel, hide: hideSel }
+      { clear: clearSel, hide: hideSel, unpaint: unpaintSel }
     );
 
     // networkidle does not guarantee custom webfonts are painted, so await the font api

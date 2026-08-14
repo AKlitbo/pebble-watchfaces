@@ -27,16 +27,22 @@
 static Window *s_window;
 
 /**
- * @brief The time-store rules from the current settings (cadence follows the time format).
+ * @brief The time-store rules from the current settings (cadence follows what is on screen).
+ *
+ * Two things can want the .beats ticker and they are independent: the clock itself, and any ops
+ * slot picked as BEATS. A beat is 86.4 seconds, so a slot left on the minute tick sits on a stale
+ * number and reports every rollover up to a minute late. The store runs both cadences at once, so
+ * an ops slot can have its ticker while the clock keeps its minute tick.
  */
 static TimeConfig time_cfg(void)
 {
-    bool beats = settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS;
+    bool clock_beats = settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS;
+
     return (TimeConfig){
         .enabled = true,
         .live = true,
-        .minute_tick = !beats,  // the shell faces run one cadence: .beats replaces the clock
-        .beats = beats,
+        .minute_tick = !clock_beats,  // .beats replaces the clock, and only the clock
+        .beats = clock_beats || stardate_ops_shows_beats(),
     };
 }
 
@@ -59,19 +65,27 @@ static void on_settings_changed(bool time_or_date_changed)
 /**
  * @brief Buzz once at the top of the hour with the pattern the user picked.
  *
- * The minute tick drives this so it lands exactly when tm_min hits 0, and vibe_choice stays
- * silent during quiet time (and for VIBE_NONE).
+ * The tick drives this so it lands when tm_min hits 0, and vibe_choice stays silent during quiet
+ * time (and for VIBE_NONE). The hour is latched because the minute tick and the .beats ticker can
+ * both run, and two fires inside the same minute would buzz the wrist twice for one hour.
  */
 static void hourly_vibe(void)
 {
-    if (time_store_tm()->tm_min == 0)
+    static int s_vibed_hour = -1;
+
+    const struct tm *now = time_store_tm();
+
+    if (now->tm_min != 0 || now->tm_hour == s_vibed_hour)
     {
-        vibe_choice(settings_u8(SETTING_HOURLY_VIBE));
+        return;
     }
+
+    s_vibed_hour = now->tm_hour;
+    vibe_choice(settings_u8(SETTING_HOURLY_VIBE));
 }
 
 /**
- * @brief Minute-tick callback: repaint the slots and fire the hourly vibe.
+ * @brief Tick callback: repaint the slots and fire the hourly vibe.
  */
 static void on_time_tick(void)
 {
@@ -116,7 +130,12 @@ static void init(void)
     if (!dev_seed_stores())
     {
         system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
-        health_store_init((HealthConfig){.enabled = true, .live = true, .persist_key = HEALTH_STORE_KEY}, NULL);
+        // an ops slot can show sleep, active minutes or calories, and those three each cost a
+        // read the watch does not cache. the two history buffers stay off: they cost a storage
+        // write a minute and no slot draws a curve
+        health_store_init((HealthConfig){.enabled = true, .live = true, .sleep = true,
+                                         .active = true, .calories = true,
+                                         .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
         weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = WEATHER_POLL_MIN,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);

@@ -70,10 +70,18 @@ describe('packForecastHourly', () => {
     expect(bytes.slice(3)).toEqual([0, 0x00, 0x80]);
   });
 
-  /** An empty or missing strip must yield null so nothing is sent and the row keeps its placeholder. */
-  test('returns null for a missing or empty strip', () => {
-    expect(wire.packForecastHourly(null)).toBeNull();
-    expect(wire.packForecastHourly({ baseHour: 0, stepHours: 2, cols: [] })).toBeNull();
+  /** A missing strip must yield null so nothing is sent and the row keeps its placeholder. */
+  test('returns null for a missing strip', () => {
+    const result = wire.packForecastHourly(null);
+
+    expect(result).toBeNull();
+  });
+
+  /** An empty strip must yield null too, or a zero-column payload ships and blanks the row. */
+  test('returns null for an empty strip', () => {
+    const result = wire.packForecastHourly({ baseHour: 0, stepHours: 2, cols: [] });
+
+    expect(result).toBeNull();
   });
 
   /** More columns than the watch holds must slice to the cap, or the count byte overstates the strip. */
@@ -103,10 +111,18 @@ describe('packForecastDaily', () => {
     expect(bytes.slice(2)).toEqual([0, 0x19, 0x00, 0x0f, 0x00]);
   });
 
-  /** An empty or missing strip must yield null so nothing is sent. */
-  test('returns null for a missing or empty strip', () => {
-    expect(wire.packForecastDaily(null)).toBeNull();
-    expect(wire.packForecastDaily({ baseWeekday: 0, cols: [] })).toBeNull();
+  /** A missing strip must yield null so nothing is sent. */
+  test('returns null for a missing strip', () => {
+    const result = wire.packForecastDaily(null);
+
+    expect(result).toBeNull();
+  });
+
+  /** An empty strip must yield null too, or a zero-day payload ships and blanks the row. */
+  test('returns null for an empty strip', () => {
+    const result = wire.packForecastDaily({ baseWeekday: 0, cols: [] });
+
+    expect(result).toBeNull();
   });
 
   /** More columns than the watch holds must slice to the cap, or the count byte overstates the strip. */
@@ -161,10 +177,18 @@ describe('packStockStrip', () => {
     expect(bytes[8]).toBe('RATE LIMIT'.length);
   });
 
-  /** An empty or missing list must yield null so nothing is sent and the panel keeps its placeholder. */
-  test('returns null for a missing or empty list', () => {
-    expect(wire.packStockStrip(null)).toBeNull();
-    expect(wire.packStockStrip([])).toBeNull();
+  /** A missing list must yield null so nothing is sent and the panel keeps its placeholder. */
+  test('returns null for a missing list', () => {
+    const result = wire.packStockStrip(null);
+
+    expect(result).toBeNull();
+  });
+
+  /** An empty list must yield null too, or an empty watchlist ships a payload that blanks the panel. */
+  test('returns null for an empty list', () => {
+    const result = wire.packStockStrip([]);
+
+    expect(result).toBeNull();
   });
 
   /**
@@ -280,10 +304,18 @@ describe('packCalendarStrip', () => {
     expect(bytes[0]).toBe(6);
   });
 
-  /** An empty or missing list must yield null so nothing is sent and the panel keeps its placeholder. */
-  test('returns null for a missing or empty list', () => {
-    expect(wire.packCalendarStrip(null)).toBeNull();
-    expect(wire.packCalendarStrip([])).toBeNull();
+  /** A missing list must yield null so nothing is sent and the panel keeps its placeholder. */
+  test('returns null for a missing list', () => {
+    const result = wire.packCalendarStrip(null);
+
+    expect(result).toBeNull();
+  });
+
+  /** An empty list must yield null too, or a clear day ships a payload that blanks the agenda. */
+  test('returns null for an empty list', () => {
+    const result = wire.packCalendarStrip([]);
+
+    expect(result).toBeNull();
   });
 });
 

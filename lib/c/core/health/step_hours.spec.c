@@ -44,7 +44,7 @@ void test_last_hour_settles_like_the_rest(void)
     TEST_ASSERT_EQUAL_INT(23, result);
 }
 
-/** @brief Midnight itself is the first bucket. */
+/** @brief Midnight itself is the first bucket, or an off-by-one shifts the whole day's bars an hour along. */
 void test_day_start_is_bucket_zero(void)
 {
     int result = step_hours_bucket(0);
@@ -68,7 +68,7 @@ void test_hour_boundary_belongs_to_the_new_hour(void)
     TEST_ASSERT_EQUAL_INT(4, result);
 }
 
-/** @brief The last second of the day is still the last bucket. */
+/** @brief The last second of the day is still the last bucket, since spilling one past the end drops the evening's steps off the chart. */
 void test_last_second_of_the_day_is_the_last_bucket(void)
 {
     int result = step_hours_bucket(24 * 3600 - 1);

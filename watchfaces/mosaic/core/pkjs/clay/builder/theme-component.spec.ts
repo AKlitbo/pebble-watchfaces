@@ -17,7 +17,8 @@ import { describe, test, expect, beforeEach } from 'vitest';
 // the pieces are shared but the assembled component is generated into each face. every face in
 // the family builds the same theme component from these sources, so gridlock's copy stands in
 import component from '../../../../gridlock/src/pkjs/clay/theme-component.g.js';
-import { mount, moduleOptionsFixture } from './ts/testing/harness';
+import { mount } from '../../../../../../lib/ts/clay/builder/ts/testing/harness';
+import { moduleOptionsFixture } from './ts/testing/fixtures';
 
 /** Mounts the theme builder with the shared module fixture and no thumbnails. */
 function mountTheme() {
