@@ -47,6 +47,10 @@ const ROOT = path.resolve(import.meta.dirname, '..', '..');
  * hideSelectors drop out of the flow, so use them for something nothing else is positioned
  * against. unpaintSelectors keep their box and lose only their pixels, which is what a piece of
  * chrome the watch draws for itself needs: the bake has to leave the space exactly where it was.
+ *
+ * maxColors caps how many colours the bake may keep. 16 is the number that matters: the SDK packs
+ * a 16-colour bitmap at four bits per pixel and anything above it at eight, which doubles the heap
+ * the watch needs to hold the frame. See capColors.
  */
 export interface FaceConfig {
   defaultFrame: string;
@@ -56,6 +60,7 @@ export interface FaceConfig {
   clearTextSelectors: string[];
   hideSelectors: string[];
   unpaintSelectors?: string[];
+  maxColors?: number;
 }
 
 /** The paths generate-frame reads and writes for one face, all under watchfaces/<face>/. */
@@ -95,6 +100,108 @@ export function faceScreenSize(appinfoPath: string): Dims {
   }
 
   return PLATFORM_DIMS.emery;
+}
+
+// the watch never sees the anti-aliased bake. the SDK snaps every channel to one of four levels
+// on its way to the Pebble-64 palette, so what decides the packed bit depth is how many of those
+// 64 a frame lands on, not how many colours the PNG holds
+function snapChannel(value: number): number {
+  return Math.round(value / 85) * 85;
+}
+
+// one Pebble-64 colour as a single number, so the buckets can key a Map
+// the >>> 0 matters: a red channel of 255 shifts into the sign bit and would otherwise come back
+// negative, which no longer matches the same colour read out of a Uint32Array
+function bucketKey(red: number, green: number, blue: number, alpha: number): number {
+  return ((snapChannel(red) << 24) | (snapChannel(green) << 16) | (snapChannel(blue) << 8) |
+    (alpha >= 128 ? 255 : 0)) >>> 0;
+}
+
+function bucketChannels(key: number): number[] {
+  return [(key >>> 24) & 255, (key >>> 16) & 255, (key >>> 8) & 255, key & 255];
+}
+
+/**
+ * @brief Fold a bake down to at most `limit` Pebble-64 colours.
+ *
+ * A 16-colour bitmap packs at four bits per pixel and a 17-colour one at eight, so one stray
+ * colour doubles the heap the watch needs to hold the frame. A full-screen frame is big enough
+ * that the difference is the difference between the image loading and not loading at all.
+ *
+ * The strays are anti-aliasing crumbs off the curved chrome, a handful of pixels each, so the
+ * fix is to drop the least-used bucket into its nearest neighbour until the count comes down.
+ * Only the pixels sitting in a dropped bucket are repainted. Every other pixel keeps the value
+ * the resize gave it, which is what leaves the anti-aliasing alone.
+ *
+ * @param rgba The resized bake, four bytes per pixel.
+ * @param limit The most colours to keep.
+ * @return The same buffer with the stray pixels repainted.
+ */
+export function capColors(rgba: Uint8Array, limit: number): Uint8Array {
+  const counts = new Map<number, number>();
+  const keys = new Uint32Array(rgba.length / 4);
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = bucketKey(rgba[i * 4], rgba[i * 4 + 1], rgba[i * 4 + 2], rgba[i * 4 + 3]);
+    keys[i] = key;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+
+  const remap = new Map<number, number>();
+  while (counts.size > limit) {
+    // ties break on the key so a re-bake of the same art always folds the same way
+    let rarest = 0;
+    let rarestCount = Infinity;
+    for (const [key, count] of counts) {
+      if (count < rarestCount || (count === rarestCount && key < rarest)) {
+        rarest = key;
+        rarestCount = count;
+      }
+    }
+
+    const [red, green, blue, alpha] = bucketChannels(rarest);
+    let nearest = 0;
+    let nearestDistance = Infinity;
+    for (const key of counts.keys()) {
+      if (key === rarest) {
+        continue;
+      }
+      const [r2, g2, b2, a2] = bucketChannels(key);
+      const distance = (r2 - red) ** 2 + (g2 - green) ** 2 + (b2 - blue) ** 2 + (a2 - alpha) ** 2;
+      if (distance < nearestDistance) {
+        nearest = key;
+        nearestDistance = distance;
+      }
+    }
+
+    remap.set(rarest, nearest);
+    counts.set(nearest, counts.get(nearest)! + rarestCount);
+    counts.delete(rarest);
+  }
+
+  if (remap.size === 0) {
+    return rgba;
+  }
+
+  for (let i = 0; i < keys.length; i++) {
+    let target = remap.get(keys[i]);
+    if (target === undefined) {
+      continue;
+    }
+
+    // a bucket can be folded into one that later folds again, so follow the chain to the end
+    while (remap.has(target)) {
+      target = remap.get(target)!;
+    }
+
+    const [red, green, blue, alpha] = bucketChannels(target);
+    rgba[i * 4] = red;
+    rgba[i * 4 + 1] = green;
+    rgba[i * 4 + 2] = blue;
+    rgba[i * 4 + 3] = alpha;
+  }
+
+  return rgba;
 }
 
 /** Every theme_<name>.css under frame/css by name. */
@@ -255,11 +362,20 @@ async function main(): Promise<void> {
     const out = outFor(opts, themeName, themes.length, faceCfg, dirs.imagesDir);
     fs.mkdirSync(path.dirname(out), { recursive: true });
 
-    await sharp(screenshot)
+    const resized = sharp(screenshot)
       // lanczos3 prevents moire when downscaling the sharp chrome geometry
-      .resize(screenW, screenH, { kernel: 'lanczos3' })
-      .png()
-      .toFile(out);
+      .resize(screenW, screenH, { kernel: 'lanczos3' });
+
+    if (faceCfg.maxColors) {
+      const raw = await resized.ensureAlpha().raw().toBuffer();
+      await sharp(capColors(raw, faceCfg.maxColors), {
+        raw: { width: screenW, height: screenH, channels: 4 },
+      })
+        .png()
+        .toFile(out);
+    } else {
+      await resized.png().toFile(out);
+    }
 
     console.log(
       `Rendered ${path.relative(ROOT, html)}${themeName ? ` [${themeName}]` : ''} -> ` +
