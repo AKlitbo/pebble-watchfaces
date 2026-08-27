@@ -5,6 +5,16 @@ All notable changes to the LCARS Stardate watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-08-26
+
+### Added
+
+- Added two date formats ending in a Swatch Beats reading, so the date line can show internet time while the clock stays on normal time. The date banner shrinks as needed to fit the longer format.
+
+### Fixed
+
+- Fixed the Classic and Nemesis Blue frames not loading, leaving the watchface on a bare black background. Their artwork exceeded the sixteen-colour limit, causing the frames to use twice the expected memory.
+
 ## [1.9.0] - 2026-08-12
 
 ### Added
