@@ -49,7 +49,8 @@ static const Zone s_zones[ZONE_COUNT] = {
     [ZONE_MERIDIEM] = {.rect = SLOT_MERIDIEM, .font_id = FONT_ANTONIO_10, .align = GTextAlignmentRight,  .color = GColorWhite},
     [ZONE_DATE]     = {.rect = SLOT_BANNER,   .font_id = FONT_ANTONIO_36, .align = GTextAlignmentCenter, .color = GColorWhite,
                        .font_id_fallback = FONT_ANTONIO_32, .rect_fallback = SLOT_BANNER_SM,
-                       .font_id_fallback2 = FONT_ANTONIO_28, .rect_fallback2 = SLOT_BANNER_XS},
+                       .font_id_fallback2 = FONT_ANTONIO_28, .rect_fallback2 = SLOT_BANNER_XS,
+                       .font_id_fallback3 = FONT_ANTONIO_24, .rect_fallback3 = SLOT_BANNER_XXS},
     [ZONE_WEATHER]  = {.rect = SLOT_WEATHER,  .font_id = FONT_ANTONIO_20, .align = GTextAlignmentLeft,   .color = GColorWhite},
     [ZONE_COND]     = {.rect = SLOT_COND,     .font_id = FONT_ANTONIO_16, .align = GTextAlignmentLeft,   .color = GColorWhite},
     [ZONE_LT]       = OPS_ZONE(OPS_COL_L, OPS_ROW_T, OPS_R_L),
@@ -156,6 +157,7 @@ static void load_fonts(void)
     fonts_register(FONT_ANTONIO_36, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_36)));
     fonts_register(FONT_ANTONIO_32, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_32)));
     fonts_register(FONT_ANTONIO_28, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_28)));
+    fonts_register(FONT_ANTONIO_24, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_24)));
     fonts_register(FONT_ANTONIO_20, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_20)));
     fonts_register(FONT_ANTONIO_16, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_16)));
     fonts_register(FONT_ANTONIO_14, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ANTONIO_14)));

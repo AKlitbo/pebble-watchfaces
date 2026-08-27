@@ -162,6 +162,12 @@
       },
       {
         "type": "font",
+        "name": "FONT_ANTONIO_24",
+        "file": "fonts/Antonio.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
         "name": "FONT_ANTONIO_20",
         "file": "fonts/Antonio.ttf"
       },

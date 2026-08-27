@@ -114,6 +114,8 @@ export default buildConfig({
       ],
     },
   ],
+  // the date line runs through readout_date, so it can end in a .beats reading
+  date: { beats: true },
   location: { gpsDefault: false, timeZone: true },
   weather: {},
   temperature: {},

@@ -26,7 +26,9 @@ interface ConfigBuilderOptions {
   bluetooth?: { description?: string };
   quietTime?: { description?: string };
   hourlyVibe?: { label?: string; description?: string };
-  date?: { label?: string; description?: string; default?: string; options?: Array<{ label: string; value: string | number }> };
+  /** beats adds the .beat date formats to the end of the list. Only a face whose date line runs
+   * through readout_date asks for them, since that is what fills the token in. */
+  date?: { label?: string; description?: string; default?: string; beats?: boolean; options?: Array<{ label: string; value: string | number }> };
   /** capabilities is Clay's own item filter. A face that shows no step count on some watch
    * passes e.g. ['NOT_PLATFORM_GABBRO'] and Clay drops the control on that platform for it,
    * rather than every face losing it. */
@@ -59,6 +61,15 @@ const defaultDateOptions = [
   { 'label': '2026-169 (yyyy-dayofyear)', 'value': '%Y-%j' },
 ];
 
+/** The .beat date-format choices, tacked onto the list above by a face that opts in.
+ * {B} is not a strftime token. It is the marker readout_date swaps for a .beats reading,
+ * so a date line can end in one while the clock stays on normal time. Only a face whose
+ * date line runs through readout_date can offer these, since nothing else fills them in. */
+const beatsDateOptions = [
+  { 'label': '0618.672 (mmdd.beat)', 'value': '%m%d.{B}' },
+  { 'label': '2026.0618.672 (yyyy.mmdd.beat)', 'value': '%Y.%m%d.{B}' },
+];
+
 /** The buzz patterns the connect and disconnect selects both offer. */
 const vibeOptions = [
   { 'label': 'None', 'value': 0 },
@@ -78,7 +89,7 @@ const vibeOptions = [
  *   appearanceItems [ClayConfigItem]            extra controls inside the Appearance section
  *   clockItems      [ClayConfigItem]            extra controls inside the Clock section
  *   bluetooth { description? }                   always shown
- *   date     { label?, description?, default?, options? }
+ *   date     { label?, description?, default?, beats?, options? }
  *   steps    { label?, description? }
  *
  * Optional sections (present = included, omitted = excluded):
@@ -170,6 +181,10 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
     ],
   });
 
+  const dateDescription = date.beats
+    ? 'How the date line is written. The .beat formats add Swatch Internet Time, so you can read both at once.'
+    : 'How the date line is written.';
+
   const clockItems: ClayConfigItem[] = [
     {
       'type': 'heading',
@@ -179,9 +194,9 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
       'type': 'select',
       'messageKey': 'CLOCK_DATE_FORMAT',
       'label': date.label || 'Date Format',
-      'description': date.description || 'How the date line is written.',
+      'description': date.description || dateDescription,
       'defaultValue': date.default || '%Y.%m%d',
-      'options': date.options || defaultDateOptions,
+      'options': [...(date.options || defaultDateOptions), ...(date.beats ? beatsDateOptions : [])],
     },
     {
       'type': 'select',
@@ -381,5 +396,6 @@ function buildConfig(options: ConfigBuilderOptions): ClayConfigItem[] {
 // attach the date options to the function too so it matches the module.exports shape
 // so a consumer can read them off the default export as well as the named one
 buildConfig.defaultDateOptions = defaultDateOptions;
+buildConfig.beatsDateOptions = beatsDateOptions;
 
 export default buildConfig;

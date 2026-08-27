@@ -118,6 +118,36 @@ describe('buildConfig per-section values', () => {
     expect(dateSelect.defaultValue).toBe('%a %d %b');
   });
 
+  /** Only readout_date fills the token in, so a face that never asked would show a raw brace. */
+  test('leaves the .beats date formats out unless the face opts in', () => {
+    const config = buildConfig({ theme: minimalTheme });
+
+    const dateSelect = findItemByKey(config, 'CLOCK_DATE_FORMAT');
+    const result = dateSelect.options.filter((option) => String(option.value).includes('{B}'));
+
+    expect(result).toEqual([]);
+  });
+
+  /** The {B} token is what the C side swaps for a reading, so a typo here shows a raw brace. */
+  test('appends the .beats date formats when the face opts in', () => {
+    const config = buildConfig({ theme: minimalTheme, date: { beats: true } });
+
+    const dateSelect = findItemByKey(config, 'CLOCK_DATE_FORMAT');
+    const result = dateSelect.options.slice(-2);
+
+    expect(result.map((option) => option.value)).toEqual(['%m%d.{B}', '%Y.%m%d.{B}']);
+  });
+
+  /** date_format is a 16 byte field on the watch, so a longer value arrives truncated. */
+  test('keeps every stock date format inside the watch buffer', () => {
+    const config = buildConfig({ theme: minimalTheme, date: { beats: true } });
+
+    const dateSelect = findItemByKey(config, 'CLOCK_DATE_FORMAT');
+    const result = dateSelect.options.filter((option) => String(option.value).length > 15);
+
+    expect(result).toEqual([]);
+  });
+
   /** A face that wants GPS on by default would silently ship with it off if the default leaked. */
   test('defaults GPS off when the location section omits gpsDefault', () => {
     const config = buildConfig({ theme: minimalTheme, location: {} });

@@ -1,10 +1,12 @@
 /**
  * @file beats.h
- * @brief Pure swatch .beats math, operates on ms since Biel Mean Time (UTC+1) midnight
+ * @brief Pure swatch .beats math, operates on ms since Biel Mean Time (UTC+1) midnight.
+ * Also holds the token a date format uses to ask for a .beats reading.
  *
  * @ingroup lib_core
  */
 #pragma once
+#include <stdbool.h>
 #include <stdint.h>
 
 // shared time constants for the .beats clock and the BMT conversion
@@ -15,6 +17,19 @@
 #define SECS_PER_HOUR    3600      ///< Seconds in one hour
 #define SECS_PER_MIN     60        ///< Seconds in one minute
 #define BMT_UTC_OFFSET_S 3600      ///< Biel Mean Time is UTC plus 1 hour, in seconds
+
+/**
+ * @brief The marker a date format carries where a .beats reading should go.
+ *
+ * Braces rather than a percent, because the date format is handed to strftime first and every
+ * percent belongs to it (%B is already the month name). strftime copies anything else through
+ * untouched, so the token survives the pass and can be filled in afterwards.
+ *
+ * Three characters wide on purpose. A reading is always three digits, so swapping one for the
+ * other is a same-length overwrite that cannot grow the string past the buffer it arrived in.
+ */
+#define BEATS_TOKEN     "{B}"
+#define BEATS_TOKEN_LEN 3          ///< Length of BEATS_TOKEN, which matches a three digit reading
 
 /**
  * @addtogroup lib_core
@@ -58,5 +73,29 @@ uint32_t ms_until_next_beat(int32_t ms_into_bmt_day);
  * @return Milliseconds into the current BMT day (0 to 86,399,999).
  */
 int32_t beats_ms_from_hms(int hour, int minute, int second, uint16_t ms);
+
+/**
+ * @brief Whether a date format asks for a .beats reading.
+ *
+ * The face asks this to decide whether to run the .beats ticker. A beat is 86.4 seconds and the
+ * date line otherwise redraws on the minute, so without the ticker the reading sits stale and
+ * reports every rollover up to a minute late.
+ *
+ * @param format The date format string, or NULL.
+ * @return true if the format carries BEATS_TOKEN.
+ */
+bool beats_has_token(const char *format);
+
+/**
+ * @brief Overwrite every BEATS_TOKEN in a string with a three digit .beats reading.
+ *
+ * Works in place because the token and the reading are the same width, so the string neither
+ * grows nor needs its tail shifted. A reading outside 0 to 999 is clamped rather than written,
+ * which is what keeps that width promise true.
+ *
+ * @param text The string to fill in, NUL terminated. Left alone if NULL or tokenless.
+ * @param beats The reading to write, 0 to 999.
+ */
+void beats_expand_token(char *text, int beats);
 
 /** @} */

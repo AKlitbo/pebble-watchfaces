@@ -57,6 +57,8 @@ export default buildConfig({
   bluetooth: {
     description: 'Show a bluetooth glyph in the sky - lit when the phone is connected, slashed when it drops.',
   },
+  // the date line runs through readout_date, so it can end in a .beats reading
+  date: { beats: true },
   location: { gpsDefault: true },
   weather: {},
   temperature: {},

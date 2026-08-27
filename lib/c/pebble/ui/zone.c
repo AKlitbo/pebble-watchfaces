@@ -34,11 +34,13 @@ void zone_set_text_fit(TextLayer *layer, const Zone *zone, const char *text)
     // whose text fits. a face omits a tier by leaving its rect zero-sized (C
     // zero-fills structs). tier 0 always exists. if nothing fits the smallest
     // defined tier wins and the text layer trails an ellipsis as a last resort
-    const FontId fonts[3] = {zone->font_id, zone->font_id_fallback, zone->font_id_fallback2};
-    const GRect rects[3] = {zone->rect, zone->rect_fallback, zone->rect_fallback2};
+    const FontId fonts[4] = {zone->font_id, zone->font_id_fallback, zone->font_id_fallback2,
+                             zone->font_id_fallback3};
+    const GRect rects[4] = {zone->rect, zone->rect_fallback, zone->rect_fallback2,
+                            zone->rect_fallback3};
 
     int chosen = 0;
-    for (int tier = 0; tier < 3; tier++)
+    for (int tier = 0; tier < 4; tier++)
     {
         // a zero-sized rect means this tier (and any after it) isn't defined
         if (tier > 0 && (rects[tier].size.w == 0 || rects[tier].size.h == 0))

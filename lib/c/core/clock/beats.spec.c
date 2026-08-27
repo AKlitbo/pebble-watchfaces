@@ -10,6 +10,8 @@
 
 #include "clock/beats.h"
 
+#include <stddef.h>
+
 void setUp(void) {}
 void tearDown(void) {}
 
@@ -138,6 +140,116 @@ void test_ms_from_hms_feeds_the_beats_maths(void)
     TEST_ASSERT_EQUAL_INT(999, result);
 }
 
+/** @brief Without this the face never arms the .beats ticker and the date line sits stale. */
+void test_has_token_spots_a_beats_date_format(void)
+{
+    bool result = beats_has_token("%m%d." BEATS_TOKEN);
+
+    TEST_ASSERT_TRUE(result);
+}
+
+/** @brief An ordinary date format must not arm the ticker, or every face pays for a timer. */
+void test_has_token_ignores_a_plain_date_format(void)
+{
+    bool result = beats_has_token("%Y.%m%d");
+
+    TEST_ASSERT_FALSE(result);
+}
+
+/** @brief Settings can hand back NULL before the store is seeded, and that must not crash. */
+void test_has_token_handles_null(void)
+{
+    bool result = beats_has_token(NULL);
+
+    TEST_ASSERT_FALSE(result);
+}
+
+/** @brief The whole point: the token leaves and a reading takes its place. */
+void test_expand_writes_the_reading_over_the_token(void)
+{
+    char text[16] = "0618." BEATS_TOKEN;
+
+    beats_expand_token(text, 672);
+
+    TEST_ASSERT_EQUAL_STRING("0618.672", text);
+}
+
+/** @brief A low reading keeps its padding, else the date line changes width as the day turns. */
+void test_expand_pads_a_low_reading_to_three_digits(void)
+{
+    char text[16] = "0618." BEATS_TOKEN;
+
+    beats_expand_token(text, 7);
+
+    TEST_ASSERT_EQUAL_STRING("0618.007", text);
+}
+
+/** @brief Midnight BMT reads @000 rather than an empty gap where the token was. */
+void test_expand_writes_zero_as_three_zeroes(void)
+{
+    char text[16] = BEATS_TOKEN;
+
+    beats_expand_token(text, 0);
+
+    TEST_ASSERT_EQUAL_STRING("000", text);
+}
+
+/** @brief Text either side of the token has to survive, since the date is built around it. */
+void test_expand_leaves_the_rest_of_the_string_alone(void)
+{
+    char text[24] = "SOL " BEATS_TOKEN " MARK";
+
+    beats_expand_token(text, 500);
+
+    TEST_ASSERT_EQUAL_STRING("SOL 500 MARK", text);
+}
+
+/** @brief A tokenless string must come back untouched, not truncated or part-written. */
+void test_expand_leaves_a_tokenless_string_untouched(void)
+{
+    char text[16] = "2026.0618";
+
+    beats_expand_token(text, 672);
+
+    TEST_ASSERT_EQUAL_STRING("2026.0618", text);
+}
+
+/** @brief Every token gets filled, or a format using two would show a stray brace on screen. */
+void test_expand_fills_every_token(void)
+{
+    char text[16] = BEATS_TOKEN "-" BEATS_TOKEN;
+
+    beats_expand_token(text, 123);
+
+    TEST_ASSERT_EQUAL_STRING("123-123", text);
+}
+
+/**
+ * @brief An out of range reading is clamped, which is what keeps the swap a same-width one.
+ *
+ * beats_from_ms can only hand back 0 to 999, so this is guarding the promise rather than a
+ * reading anyone expects. A four digit number written into a three character token would run
+ * over whatever follows it in the buffer.
+ */
+void test_expand_clamps_a_reading_past_the_top_of_the_day(void)
+{
+    char text[16] = "X" BEATS_TOKEN "Y";
+
+    beats_expand_token(text, 1500);
+
+    TEST_ASSERT_EQUAL_STRING("X999Y", text);
+}
+
+/** @brief A negative reading clamps too, rather than writing a minus sign into the date. */
+void test_expand_clamps_a_negative_reading(void)
+{
+    char text[16] = "X" BEATS_TOKEN "Y";
+
+    beats_expand_token(text, -5);
+
+    TEST_ASSERT_EQUAL_STRING("X000Y", text);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -156,6 +268,18 @@ int main(void)
     RUN_TEST(test_ms_from_hms_at_the_top_of_the_day_still_fits);
     RUN_TEST(test_ms_from_hms_keeps_the_milliseconds);
     RUN_TEST(test_ms_from_hms_feeds_the_beats_maths);
+
+    RUN_TEST(test_has_token_spots_a_beats_date_format);
+    RUN_TEST(test_has_token_ignores_a_plain_date_format);
+    RUN_TEST(test_has_token_handles_null);
+    RUN_TEST(test_expand_writes_the_reading_over_the_token);
+    RUN_TEST(test_expand_pads_a_low_reading_to_three_digits);
+    RUN_TEST(test_expand_writes_zero_as_three_zeroes);
+    RUN_TEST(test_expand_leaves_the_rest_of_the_string_alone);
+    RUN_TEST(test_expand_leaves_a_tokenless_string_untouched);
+    RUN_TEST(test_expand_fills_every_token);
+    RUN_TEST(test_expand_clamps_a_reading_past_the_top_of_the_day);
+    RUN_TEST(test_expand_clamps_a_negative_reading);
 
     return UNITY_END();
 }

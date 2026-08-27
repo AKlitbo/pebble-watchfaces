@@ -54,7 +54,8 @@ enum
 #define SLOT_TIME GRect(53, 92, 142, 74)       // centered time box (Antonio 62)
 #define SLOT_BANNER GRect(53, 17, 142, 44)     // date below STARDATE bar (Antonio 36)
 #define SLOT_BANNER_SM GRect(53, 20, 142, 43)  // wide date fallback vertically centered (Antonio 32)
-#define SLOT_BANNER_XS GRect(53, 22, 142, 42)  // widest date fallback vertically centered (Antonio 28)
+#define SLOT_BANNER_XS GRect(53, 22, 142, 42)  // wider date fallback vertically centered (Antonio 28)
+#define SLOT_BANNER_XXS GRect(53, 24, 142, 40) // widest date fallback, fits the .beats formats (Antonio 24)
 #define SLOT_MERIDIEM GRect(150, 95, 45, 14)   // AM/PM top-right of clock and right-aligned (Antonio 10)
 #define SLOT_WEATHER GRect(72, 202, 49, 24)    // temp left-aligned next to thermometer
 #define SLOT_COND GRect(77, 180, 42, 18)       // condition abbrev next to weather icon

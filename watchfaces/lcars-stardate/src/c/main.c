@@ -7,6 +7,7 @@
 
 #include "io/appmessage/appmessage.h"
 #include "ui/engine/engine.h"
+#include "ui/readouts.h"
 #include "io/stores/health_store.h"
 #include "io/stores/location_store.h"
 #include "io/stores/system_store.h"
@@ -29,10 +30,11 @@ static Window *s_window;
 /**
  * @brief The time-store rules from the current settings (cadence follows what is on screen).
  *
- * Two things can want the .beats ticker and they are independent: the clock itself, and any ops
- * slot picked as BEATS. A beat is 86.4 seconds, so a slot left on the minute tick sits on a stale
- * number and reports every rollover up to a minute late. The store runs both cadences at once, so
- * an ops slot can have its ticker while the clock keeps its minute tick.
+ * Three things can want the .beats ticker and they are independent: the clock itself, any ops
+ * slot picked as BEATS, and a date format ending in a reading. A beat is 86.4 seconds, so
+ * anything left on the minute tick sits on a stale number and reports every rollover up to a
+ * minute late. The store runs both cadences at once, so the .beats ticker can drive an ops slot
+ * or the date line while the clock keeps its minute tick.
  */
 static TimeConfig time_cfg(void)
 {
@@ -42,7 +44,7 @@ static TimeConfig time_cfg(void)
         .enabled = true,
         .live = true,
         .minute_tick = !clock_beats,  // .beats replaces the clock, and only the clock
-        .beats = clock_beats || stardate_ops_shows_beats(),
+        .beats = clock_beats || stardate_ops_shows_beats() || readout_date_shows_beats(),
     };
 }
 

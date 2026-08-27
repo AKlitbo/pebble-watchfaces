@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "clock/beats.h"
 #include "io/stores/time_store.h"
 #include "io/stores/health_store.h"
 #include "io/stores/weather_store.h"
@@ -64,8 +65,16 @@ void readout_meridiem(char *out, size_t n)
 
 void readout_date(char *out, size_t n)
 {
+    // strftime first, which copies the .beats token through untouched because it owns no braces.
+    // filling the reading in afterwards keeps the token out of a format string strftime parses
     strftime(out, n, settings_str(SETTING_DATE_FORMAT), time_store_tm());
+    beats_expand_token(out, units_swatch_beats());
     text_to_upper(out);
+}
+
+bool readout_date_shows_beats(void)
+{
+    return beats_has_token(settings_str(SETTING_DATE_FORMAT));
 }
 
 void readout_hr(char *out, size_t n)

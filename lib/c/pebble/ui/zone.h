@@ -31,6 +31,8 @@ typedef struct
     GRect          rect_fallback;     ///< Area for the first smaller font
     FontId         font_id_fallback2; ///< Second smaller font for the widest strings
     GRect          rect_fallback2;    ///< Area for the second smaller font. Leave it zero-sized to skip this step
+    FontId         font_id_fallback3; ///< Third smaller font for the widest strings of all
+    GRect          rect_fallback3;    ///< Area for the third smaller font. Leave it zero-sized to skip this step
 } Zone;
 
 /**

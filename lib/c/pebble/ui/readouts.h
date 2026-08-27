@@ -37,10 +37,23 @@ void readout_meridiem(char *out, size_t n);
 /**
  * @brief Format the date in the chosen format, upper-cased.
  *
+ * A format carrying the .beats token gets a reading written into it, so the date line can end
+ * in one (`0618.672`) alongside a normal clock.
+ *
  * @param out Output buffer.
  * @param n Buffer size.
  */
 void readout_date(char *out, size_t n);
+
+/**
+ * @brief Whether the chosen date format ends in a .beats reading.
+ *
+ * A face asks this when it builds its TimeConfig. A beat is 86.4 seconds, so a date line
+ * carrying one needs the .beats ticker or it sits on a stale reading until the next minute.
+ *
+ * @return true if the date format carries the .beats token.
+ */
+bool readout_date_shows_beats(void);
 
 /**
  * @brief Format the heart rate, or "--" when there is no reading.
