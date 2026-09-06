@@ -54,6 +54,7 @@ extern const IconSpec ICON_FEET;
 extern const IconSpec ICON_DISTANCE;
 extern const IconSpec ICON_FIRE;
 extern const IconSpec ICON_SNOOZE;
+extern const IconSpec ICON_ALARM;
 extern const IconSpec ICON_TIME_LATE;
 extern const IconSpec ICON_THERMOMETER;
 extern const IconSpec ICON_CLOCK;

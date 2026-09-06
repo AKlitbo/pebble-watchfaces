@@ -19,6 +19,7 @@ const IconSpec ICON_FEET            = { RESOURCE_ID_ICON_HEALTH_STEPS, 0, -1 };
 const IconSpec ICON_DISTANCE        = { RESOURCE_ID_ICON_HEALTH_DISTANCE, 0, 0 };
 const IconSpec ICON_FIRE            = { RESOURCE_ID_ICON_HEALTH_CALORIES, 0, -1 };
 const IconSpec ICON_SNOOZE          = { RESOURCE_ID_ICON_SYSTEM_SNOOZE, -1, 0 };
+const IconSpec ICON_ALARM           = { RESOURCE_ID_ICON_SYSTEM_ALARM, 0, 0 };
 const IconSpec ICON_TIME_LATE       = { RESOURCE_ID_ICON_TIME_LATE, -1, 0 };
 const IconSpec ICON_THERMOMETER     = { RESOURCE_ID_ICON_WEATHER_THERMOMETER, 1, 0 };
 const IconSpec ICON_CLOCK           = { RESOURCE_ID_ICON_TIME_CLOCK, -1, -1 };

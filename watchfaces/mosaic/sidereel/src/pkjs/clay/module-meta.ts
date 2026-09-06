@@ -55,6 +55,7 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Next Moon':     { icon: '🌕', blockColor: '#5c6bc0', slug: 'next-moon' },
   'Julian Date':   { icon: '🔭', blockColor: '#3d5afe', slug: 'julian' },
   'Weeks Left':    { icon: '🔢', blockColor: '#0288d1', slug: 'weeksleft' },
+  'Next Alarm':    { icon: '🔔', blockColor: '#ef5350', slug: 'alarm' },
 };
 
 export default moduleMeta;

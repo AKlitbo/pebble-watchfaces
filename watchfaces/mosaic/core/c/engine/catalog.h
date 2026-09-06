@@ -75,6 +75,7 @@ typedef enum
     MOD_TIME_HOUR_BIG,
     MOD_TIME_MIN_BIG,
     MOD_TIME_BIGCLOCK,
+    MOD_SYSTEM_ALARM,
     MOD_TYPE_COUNT
 } ModuleType;
 

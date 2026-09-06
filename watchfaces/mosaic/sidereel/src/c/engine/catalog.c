@@ -24,6 +24,7 @@
 #include "mosaic/modules/health/health_sleep.h"
 #include "mosaic/modules/health/health_steps.h"
 #include "mosaic/modules/health/health_steps_graph.h"
+#include "mosaic/modules/system/system_alarm.h"
 #include "mosaic/modules/system/system_battery.h"
 #include "mosaic/modules/time/time_beats.h"
 #include "mosaic/modules/time/time_date.h"
@@ -70,6 +71,7 @@ const ModuleDef *module_def(ModuleType type)
     switch (type)
     {
         case MOD_SYSTEM_BATTERY: return &mod_system_battery_def;
+        case MOD_SYSTEM_ALARM: return &mod_system_alarm_def;
 
         case MOD_HEALTH_HEARTRATE: return &mod_health_heartrate_def;
         case MOD_HEALTH_STEPS: return &mod_health_steps_def;

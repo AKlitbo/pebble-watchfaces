@@ -59,4 +59,5 @@ static const ModuleColors MODULE_VIBRANT[MOD_TYPE_COUNT] = {
     [MOD_TIME_HOUR_BIG] = { .accent = GColorVividCerulean, .value = GColorVividCerulean, .icon = GColorVividCerulean },
     [MOD_TIME_MIN_BIG] = { .accent = GColorVividCerulean, .value = GColorVividCerulean, .icon = GColorVividCerulean },
     [MOD_TIME_BIGCLOCK] = { .accent = GColorVividCerulean, .value = GColorVividCerulean, .icon = GColorVividCerulean },
+    [MOD_SYSTEM_ALARM] = { .accent = GColorSunsetOrange, .value = GColorSunsetOrange, .icon = GColorSunsetOrange },
 };

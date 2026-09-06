@@ -210,6 +210,7 @@ const MODULE_BASE = [
   { label: 'Big Hour', value: 53, sizes: ['2x2'], themeHidden: true },
   { label: 'Big Minutes', value: 54, sizes: ['2x2'], themeHidden: true },
   { label: 'Big Time', value: 55, sizes: ['2x4'], themeHidden: true },
+  { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
   // "Weather Now" (module 27) is built in C but intentionally left out of the builder until it
   // is ready to ship so it is not selectable in the layout builder yet
 ];

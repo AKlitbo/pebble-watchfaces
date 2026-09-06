@@ -1,7 +1,7 @@
 /**
  * @file system_store.c
  * @brief The active system store: holds the battery + bluetooth state and subscribes to the
- * battery and connection services itself.
+ * battery and connection services itself. The alarm is read through on demand.
  */
 #include "io/stores/system_store.h"
 
@@ -13,6 +13,8 @@ static struct
 } s_state;
 
 static bool s_bt_initialized;   // the first bluetooth reading only seeds. later changes can buzz
+static bool s_live;             // false pins the seeded values so screenshots stay put
+static time_t s_seed_alarm;     // the pinned alarm used while not live
 static void (*s_cb)(void);
 static BtVibePolicy s_vibe;
 static void (*s_reconnect)(void); // fired on a real disconnected -> connected transition
@@ -83,6 +85,8 @@ void system_store_init(SystemConfig cfg, const SystemSeed *seed)
     s_state.bluetooth_connected = false;
     s_bt_initialized = false;
     s_vibe = cfg.vibe;
+    s_live = cfg.live;
+    s_seed_alarm = 0;
 
     if (seed)
     {
@@ -90,6 +94,7 @@ void system_store_init(SystemConfig cfg, const SystemSeed *seed)
         s_state.battery_level = seed->battery;
         s_state.charging = seed->charging;
         s_state.bluetooth_connected = seed->bluetooth;
+        s_seed_alarm = seed->next_alarm;
     }
 
     if (!cfg.enabled)
@@ -120,3 +125,18 @@ void system_store_deinit(void)
 int  system_store_battery(void)   { return s_state.battery_level; }
 bool system_store_charging(void)  { return s_state.charging; }
 bool system_store_bluetooth(void) { return s_state.bluetooth_connected; }
+
+bool system_store_next_alarm(time_t *out)
+{
+    *out = 0;
+
+    if (!s_live)
+    {
+        *out = s_seed_alarm;
+        return s_seed_alarm != 0;
+    }
+
+    // a platform without the alarm service defines this away to 0, which never touches out and
+    // so leaves the reading at no alarm
+    return alarm_service_peek_next(out);
+}

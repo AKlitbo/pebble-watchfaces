@@ -5,6 +5,12 @@ All notable changes to the Gridlock watchface are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-06
+
+### Added
+
+- Added a Next Alarm panel in 1x2 and 2x2 sizes. It shows when your next alarm goes off, with a countdown in the 2x2 version. The panel reads the alarm directly from the watch, so nothing needs setting up.
+
 ## [1.2.0] - 2026-08-05
 
 ### Added

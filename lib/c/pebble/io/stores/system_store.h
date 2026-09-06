@@ -1,8 +1,11 @@
 /**
  * @file system_store.h
- * @brief Active system store: the watch's own battery and bluetooth state. It subscribes to the
- * battery and connection services itself and buzzes on a bluetooth change through a policy
- * the face installs (so the store never has to know about settings or buzzing).
+ * @brief Active system store: the watch's own battery, bluetooth and next-alarm state. It
+ * subscribes to the battery and connection services itself and buzzes on a bluetooth change
+ * through a policy the face installs (so the store never has to know about settings or buzzing).
+ *
+ * The alarm has no service to subscribe to, so it is read straight through on each call rather
+ * than mirrored here.
  *
  * @ingroup lib_stores
  */
@@ -37,9 +40,10 @@ typedef struct
  */
 typedef struct
 {
-    int  battery;   ///< Battery level from 0 to 100
-    bool charging;  ///< True when plugged in
-    bool bluetooth; ///< True when the phone link is up
+    int  battery;      ///< Battery level from 0 to 100
+    bool charging;     ///< True when plugged in
+    bool bluetooth;    ///< True when the phone link is up
+    time_t next_alarm; ///< When the next alarm fires, or 0 for none
 } SystemSeed;
 
 /**
@@ -67,5 +71,16 @@ bool system_store_charging(void);
 
 /** @brief True when the phone link is up. */
 bool system_store_bluetooth(void);
+
+/**
+ * @brief When the wearer's next enabled alarm fires.
+ *
+ * Read through to the alarm service on every call, since there is nothing to subscribe to. A
+ * platform without the alarm API always reads as no alarm.
+ *
+ * @param out Set to the alarm's UTC time, or 0 when there is none. Never NULL.
+ * @return True when an enabled alarm is scheduled.
+ */
+bool system_store_next_alarm(time_t *out);
 
 /** @} */

@@ -56,4 +56,5 @@ module.exports = {
   53: "Vivid Cerulean",
   54: "Vivid Cerulean",
   55: "Vivid Cerulean",
+  56: "Sunset Orange",
 };

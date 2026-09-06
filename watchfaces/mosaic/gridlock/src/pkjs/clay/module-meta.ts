@@ -73,6 +73,7 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Big Hour':      { icon: '🕛', blockColor: '#b0bec5', slug: 'big-hour' },
   'Big Minutes':   { icon: '🕧', blockColor: '#b0bec5', slug: 'big-min' },
   'Big Time':      { icon: '🌙', blockColor: '#b0bec5', slug: 'big-time' },
+  'Next Alarm':    { icon: '🔔', blockColor: '#ef5350', slug: 'alarm' },
 };
 
 export default moduleMeta;

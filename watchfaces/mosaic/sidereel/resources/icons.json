@@ -49,6 +49,7 @@
   "date-time":                        { "svg": "ux/calendar-blank-line-icon",                  "size": [16, 16] },
   "system-globe":                     { "svg": "ux/globe-network-icon",          "size": [14, 14] },
   "system-snooze":                    { "svg": "ux/snooze-zzz-icon",             "size": [10, 16] },
+  "system-alarm":                     { "svg": "ux/alarm-icon",                  "size": [16, 17] },
   "connection-bluetooth-on":          { "svg": "sr/bluetooth-on",                "size": [14, 14] },
   "connection-bluetooth-off":         { "svg": "sr/bluetooth-slash",             "size": [14, 14] },
   "connection-bluetooth-on-sm":       { "svg": "sr/bluetooth-on",                "size": [10, 10] },

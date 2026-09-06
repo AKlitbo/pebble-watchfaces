@@ -54,5 +54,6 @@
   "MOD_SYSTEM_STATUS": { "alias": "MOD_SYSTEM_BATTERY" },
   "MOD_TIME_HOUR_BIG": { "alias": "MOD_COMPOSITE_DATETIME" },
   "MOD_TIME_MIN_BIG": { "alias": "MOD_COMPOSITE_DATETIME" },
-  "MOD_TIME_BIGCLOCK": { "alias": "MOD_COMPOSITE_DATETIME" }
+  "MOD_TIME_BIGCLOCK": { "alias": "MOD_COMPOSITE_DATETIME" },
+  "MOD_SYSTEM_ALARM": { "color": "Sunset Orange" }
 }

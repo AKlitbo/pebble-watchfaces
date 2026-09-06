@@ -1,7 +1,7 @@
 {
   "name": "sidereel",
   "displayName": "Sidereel",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "watchface": true,
   "uuid": "c8d3a53e-3ca1-4fb5-8a0a-af7c5fba781c",
   "sdkVersion": "3",
@@ -122,6 +122,7 @@
       { "type": "bitmap", "name": "ICON_DATE_TIME", "file": "icons/date-time.png" },
       { "type": "bitmap", "name": "ICON_SYSTEM_GLOBE", "file": "icons/system-globe.png" },
       { "type": "bitmap", "name": "ICON_SYSTEM_SNOOZE", "file": "icons/system-snooze.png" },
+      { "type": "bitmap", "name": "ICON_SYSTEM_ALARM", "file": "icons/system-alarm.png" },
       { "type": "bitmap", "name": "ICON_CONNECTION_BLUETOOTH_ON", "file": "icons/connection-bluetooth-on.png" },
       { "type": "bitmap", "name": "ICON_CONNECTION_BLUETOOTH_OFF", "file": "icons/connection-bluetooth-off.png" },
       { "type": "bitmap", "name": "ICON_CONNECTION_BLUETOOTH_ON_SM", "file": "icons/connection-bluetooth-on-sm.png" },

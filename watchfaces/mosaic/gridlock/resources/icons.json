@@ -64,6 +64,7 @@
   "weather-thermometer":              { "svg": "ux/thermometer-icon",            "size": [13, 17] },
   "health-calories":                  { "svg": "ux/burn-fire-icon",              "size": [12, 17] },
   "system-snooze":                    { "svg": "ux/snooze-zzz-icon",             "size": [10, 16] },
+  "system-alarm":                     { "svg": "ux/alarm-icon",                  "size": [16, 17] },
   "time-late":                        { "svg": "ux/time-late-icon",              "size": [14, 17] },
   "health-steps":                     { "svg": "ux/steps-icon",                  "size": [14, 14] },
   "health-distance":                  { "svg": "ux/road-route-map-icon",         "size": [14, 14] },

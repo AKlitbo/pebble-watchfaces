@@ -136,6 +136,7 @@ const MODULE_BASE = [
   { label: 'Julian Date', value: 50, sizes: ['1x2'], themeHidden: true },
   // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
   { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
+  { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
 ];
 
 const MODULE_OPTIONS = MODULE_BASE.map(function (option) {

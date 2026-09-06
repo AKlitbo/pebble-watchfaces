@@ -8,6 +8,7 @@
 #include "mosaic/engine/catalog.h"
 #include "mosaic/draw/common.h"
 #include "mosaic/draw/icons.h"
+#include "mosaic/modules/system/system_alarm.h"
 #include "mosaic/modules/system/system_battery.h"
 #include "modules/system/system_connection.h"
 #include "mosaic/modules/health/health_hr_graph.h"
@@ -84,6 +85,7 @@ const ModuleDef *module_def(ModuleType type)
     switch (type)
     {
         case MOD_SYSTEM_BATTERY: return &mod_system_battery_def;
+        case MOD_SYSTEM_ALARM: return &mod_system_alarm_def;
         case MOD_WEATHER_TEMPERATURE: return &mod_weather_temperature_def;
         case MOD_HEALTH_HEARTRATE: return &mod_health_heartrate_def;
         case MOD_HEALTH_STEPS: return &mod_health_steps_def;
