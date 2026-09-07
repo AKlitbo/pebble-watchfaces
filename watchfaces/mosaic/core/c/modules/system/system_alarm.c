@@ -60,14 +60,6 @@ static void system_alarm_body(GridCtx *gctx)
         progress = (int)((elapsed * 100) / ALARM_WINDOW_S);
     }
 
-    // with nothing scheduled the bell drops to the caption colour, so the dashes read as an
-    // empty schedule rather than as art that failed to load
-    GColor icon_color = gctx->color_icon;
-    if (!has_alarm)
-    {
-        gctx->color_icon = gctx->color_subtitle;
-    }
-
     if (gctx->size == MSIZE_1x2)
     {
         gh_stat_1x2(gctx, val, meridiem ? (is_am ? "AM" : "PM") : NULL, FONT_TEKO_26, &ICON_ALARM);
@@ -76,8 +68,6 @@ static void system_alarm_body(GridCtx *gctx)
     {
         gh_stat_time_2x2(gctx, val, meridiem, is_am, caption, "", &ICON_ALARM, progress);
     }
-
-    gctx->color_icon = icon_color;
 }
 
 const ModuleDef mod_system_alarm_def = {

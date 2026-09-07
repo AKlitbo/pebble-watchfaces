@@ -57,7 +57,11 @@ panels in or take them out and it is your layout from there.
 
 ### Starter Layouts
 
-!TODO same as gridlock with the preset images
+Five preset buttons on the settings page, so there is something on screen before you have
+placed anything yourself. Shown in Vibrant, and each one is a starting point rather than a
+mode: drag panels in or take them out and it is your layout from there.
+
+<img src="../../.github/images/sidereel/preset_default.png" width="105" title="Default"> <img src="../../.github/images/sidereel/preset_health.png" width="105" title="Health"> <img src="../../.github/images/sidereel/preset_weather.png" width="105" title="Weather"> <img src="../../.github/images/sidereel/preset_solar.png" width="105" title="Solar"> <img src="../../.github/images/sidereel/preset_activity.png" width="105" title="Activity">
 
 ### 1×2
 
