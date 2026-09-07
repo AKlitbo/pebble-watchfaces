@@ -67,6 +67,10 @@ static const OpsReadout s_catalog[OPS_COUNT] = {
                           .text = ops_text_beats},
     [OPS_ZONE_1]       = {.label_for = ops_zone_1_label, .icon = RESOURCE_ID_ICON_GLOBE,
                           .text = ops_text_zone_1},
+
+    // the watch's own alarm, read straight off the alarm service
+    [OPS_NEXT_ALARM]   = {.label = "ALARM",   .icon = RESOURCE_ID_ICON_ALARM,
+                          .text = ops_text_next_alarm},
 };
 
 const OpsReadout *ops_entry(uint8_t id)

@@ -7,6 +7,7 @@
   "thermometer":                     { "svg": "ux/thermometer-icon",           "size": [13, 17] },
   "thermometer-sm":                  { "svg": "ux/thermometer-icon",           "size": [10, 13] },
   "power":                           { "svg": "ux/spark-icon",                 "size": [14, 14] },
+  "alarm":                           { "svg": "ux/alarm-icon",                 "size": [14, 14] },
   "calories":                        { "svg": "ux/burn-fire-icon",             "size": [14, 14] },
   "sleep":                           { "svg": "ux/snooze-zzz-icon",            "size": [14, 14] },
   "active":                          { "svg": "ux/time-late-icon",             "size": [14, 14] },

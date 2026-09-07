@@ -22,6 +22,7 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Heart Rate (VITALS)':            { icon: '❤️', blockColor: '#e74c3c', slug: 'heart' },
   'Steps / Distance (TRAVERSAL)':   { icon: '👟', blockColor: '#2ecc71', slug: 'steps' },
   'Battery (POWER)':                { icon: '🔋', blockColor: '#f0a500', slug: 'battery' },
+  'Next Alarm (ALARM)':             { icon: '🔔', blockColor: '#ef5350', slug: 'alarm' },
   'Calories (METABOLIC)':           { icon: '🔥', blockColor: '#e67e22', slug: 'calories' },
   'Sleep (REGEN)':                  { icon: '😴', blockColor: '#4a5568', slug: 'sleep' },
   'Active Minutes (EXERTION)':      { icon: '🏃', blockColor: '#1abc9c', slug: 'active' },

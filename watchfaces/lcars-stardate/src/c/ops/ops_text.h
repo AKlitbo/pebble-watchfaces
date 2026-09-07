@@ -19,6 +19,7 @@
 
 // --- system ---
 void ops_text_battery(char *out, size_t n);
+void ops_text_next_alarm(char *out, size_t n);
 
 // --- health ---
 void ops_text_calories(char *out, size_t n);

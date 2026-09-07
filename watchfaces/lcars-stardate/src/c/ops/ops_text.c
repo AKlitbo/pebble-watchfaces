@@ -104,6 +104,29 @@ void ops_text_battery(char *out, size_t n)
     snprintf(out, n, "%d%%", system_store_battery());
 }
 
+/**
+ * @brief When the wearer's next alarm goes off.
+ *
+ * A smart alarm reports the end of its wake window, so what shows is the latest it can go off
+ * rather than the start of the window.
+ *
+ * @param out Output buffer.
+ * @param n Buffer size.
+ */
+void ops_text_next_alarm(char *out, size_t n)
+{
+    time_t alarm = 0;
+    if (!system_store_next_alarm(&alarm))
+    {
+        no_data(out, n);
+        return;
+    }
+
+    // 24 hour, matching DAWN and DUSK. an AM or PM would not fit beside the glyph anyway
+    struct tm lt = *localtime(&alarm);
+    snprintf(out, n, "%02d:%02d", lt.tm_hour, lt.tm_min);
+}
+
 // --- health ---
 
 void ops_text_calories(char *out, size_t n)

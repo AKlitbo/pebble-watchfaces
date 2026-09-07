@@ -34,6 +34,7 @@ const OPS_OPTIONS = [
   { label: 'Epoch Clock', value: 24 },
   { label: 'Swatch Beats', value: 25 },
   { label: 'Alternate Time Zone (ZONE 1)', value: 26 },
+  { label: 'Next Alarm (ALARM)', value: 27 },
   { label: 'Temperature (THERMAL)', value: 21 },
   { label: 'Conditions (SKY)', value: 22 },
   { label: 'Empty', value: 20 },

@@ -53,6 +53,7 @@ typedef enum
     OPS_EPOCH,
     OPS_BEATS,
     OPS_ZONE_1,
+    OPS_NEXT_ALARM,
     OPS_COUNT
 } OpsId;
 

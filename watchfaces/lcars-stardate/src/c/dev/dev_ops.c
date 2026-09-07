@@ -96,7 +96,16 @@ void dev_ops_seed_stores(void)
     health_store_init((HealthConfig){.enabled = true, .live = false, .sleep = true,
                                      .active = true, .calories = true}, &health);
 
-    SystemSeed system = {.battery = 64, .charging = false, .bluetooth = true};
+    // an absolute wake time rather than an offset from now, so the shot always reads 06:30
+    // however long after the build it is captured
+    time_t now = time(NULL);
+    struct tm alarm_tm = *localtime(&now);
+    alarm_tm.tm_hour = 6;
+    alarm_tm.tm_min = 30;
+    alarm_tm.tm_sec = 0;
+
+    SystemSeed system = {.battery = 64, .charging = false, .bluetooth = true,
+                         .next_alarm = mktime(&alarm_tm)};
     system_store_init((SystemConfig){.enabled = true, .live = false, .vibe = NULL}, &system);
 
     LocationSeed location = {.lat = "33-44", .lon = "-112-07"};
