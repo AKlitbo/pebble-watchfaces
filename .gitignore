@@ -45,8 +45,6 @@ site/
 .env.local
 
 # Third-party vendored assets (fonts, icons, templates) - not redistributed.
-# Includes the TheLCARS.com template: please go to https://www.thelcars.com/
-# to download and support the creator.
 vendor/
 
 # the local Clay settings preview, rebuilt by tools/dev/clay-preview.ts on demand

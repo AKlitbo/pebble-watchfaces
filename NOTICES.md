@@ -1,6 +1,6 @@
-# Third-party notices
+# Third-Party Notices
 
-The watchfaces in this repository are under the PolyForm Noncommercial License, see [LICENSE](LICENSE).
+The watchfaces in this repository are under the AGPL-3.0-or-later, see [LICENSE](LICENSE).
 They bundle the third-party work below, each of which keeps its own licence. This file is how those
 licences are passed on to anyone a watchface or this repository is given to.
 
@@ -25,7 +25,7 @@ calendar panels, but the shared bundle carries the reader, so it ships in every 
 
 The MPL covers ical.js and nothing else here. Section 1.10 of that licence puts it plainly: a file
 carrying none of its code is not a modification of it, so the rest of this project stays under the
-PolyForm terms. Keeping ical.js in a file of its own rather than mixing it into ours is deliberate,
+AGPL. The MPL 2.0 is compatible with the AGPL through its secondary licence provision. Keeping ical.js in a file of its own rather than mixing it into ours is deliberate,
 and is what section 1.7 asks of a larger work.
 
 ## Fonts
@@ -36,12 +36,6 @@ them into the watch's own font format, so both this repository and the built wat
 All fonts below are under the SIL Open Font License 1.1, published at <https://openfontlicense.org>.
 Each face ships an `OFL.txt` beside its fonts carrying the full licence text and the copyright
 notice each font declares in its own metadata.
-
-### LCARS Stardate
-
-- **[Antonio](https://fonts.google.com/specimen/Antonio)**: Copyright The Antonio Project Authors,
-  with Reserved Font Name "Antonio". Licence text in
-  [OFL.txt](watchfaces/lcars-stardate/resources/fonts/OFL.txt)
 
 ### Radar Array
 
@@ -107,26 +101,19 @@ Radar Array and the Sketchbook faces draw no weather icons, so they bundle only 
 glyphs.
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font
-  License 1.1 for the font, MIT for the code. Rendered PNGs bundled by LCARS Stardate, IDE / VS Code,
-  Gridlock and Sidereel
+  License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and
+  Sidereel
 - **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the
   [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not
   allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled
-  by LCARS Stardate, the Sketchbook faces, Gridlock and Sidereel
+  by the Sketchbook faces, Gridlock and Sidereel
 - **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs):
   [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources bundled
   under `vendor/svgrepo/`, rendered PNGs bundled by every face
 
-## Template
-
-- **LCARS Inspired Website Template by [TheLCARS.com](https://www.thelcars.com)**: the HTML/CSS the
-  LCARS Stardate frame backgrounds are baked from, used with modifications. Fetched separately and
-  not bundled. Please visit the site to download and support the creator.
-
 ## Trademarks
 
-*Star Trek*, LCARS, and related marks are trademarks of CBS / Paramount Global. Visual Studio Code is
-a trademark of Microsoft. These faces are unaffiliated, noncommercial homages and are not endorsed by
-or associated with those rights holders. No trademark licence is granted or implied.
+Visual Studio Code is a trademark of Microsoft. The IDE VSCode face is an unaffiliated homage and is
+not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
 
 Refer to each source above for the full terms.

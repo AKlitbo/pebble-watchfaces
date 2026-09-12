@@ -6,7 +6,7 @@ name: Release
 run-name: ${{ github.event.head_commit.message }}
 
 # faces version independently, so a release is tagged per face: <face>-v<version>, e.g.
-# lcars-stardate-v1.5.0. pushing that tag is the whole release process
+# ridgeline-v1.5.0. pushing that tag is the whole release process
 on:
   push:
     tags: ['*-v*']
@@ -20,7 +20,22 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # split lcars-stardate-v1.5.0 into face and version, then check the tag against the tree it
+      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the release check reads
+      - name: Checkout Engine
+        run: git submodule update --init
+
+      # a release ships on a named engine version, so a lib pointer sitting between engine tags
+      # stops here. day-to-day commits can sit between tags, releases cannot
+      - name: Check Engine Is Tagged
+        run: |
+          if ! engine_tag=$(git -C lib describe --exact-match --tags 2>/dev/null); then
+            echo "lib is at $(git -C lib rev-parse --short HEAD), which is not an engine release tag" >&2
+            exit 1
+          fi
+          echo "building on engine $engine_tag"
+
+      # split ridgeline-v1.5.0 into face and version, then check the tag against the tree it
       # points at. a tag that disagrees with the manifest is a typo, and catching it here costs
       # seconds instead of a published release nobody can unpublish cleanly
       - name: Resolve Face And Version
@@ -65,18 +80,16 @@ jobs:
       - name: Build Release Notes
         run: |
           {
-            printf 'Released %s.\n\n' "$(bash tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}' --date)"
-            bash tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}'
+            printf 'Released %s.\n\n' "$(bash lib/tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}' --date)"
+            bash lib/tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}'
           } > notes.md
 
-      - uses: ./.github/actions/setup-pebble
+      - uses: ./lib/.github/actions/setup-pebble
 
       - name: Build Watchface
-        run: bash build.sh ${{ steps.face.outputs.face }}
+        run: bash lib/build.sh ${{ steps.face.outputs.face }}
 
-      # build.sh emits one <target>.pbw per target, unversioned. a face usually has one target,
-      # but gridlock ships two (a watchface and a watchapp), so name each target's pbw with the
-      # version (still identifiable months later) and collect them all as release assets
+      # build.sh emits one <target>.pbw per target, unversioned, so name each with the version
       #
       # a pbw built for one watch says which, so it is obvious what it will install on. one built
       # for several carries every platform's binary inside it, and naming it after any one of them
@@ -87,7 +100,7 @@ jobs:
           face='${{ steps.face.outputs.face }}'
           version='${{ steps.face.outputs.version }}'
           assets=""
-          for target in $(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/manifest/build-manifests.ts --targets "$face"); do
+          for target in $(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/manifest/build-manifests.ts --targets "$face"); do
             platforms=$(node -p "JSON.parse(require('fs').readFileSync('targets/$target/package.json')).pebble.targetPlatforms.join(' ')")
             if [ "$(printf '%s' "$platforms" | wc -w)" -eq 1 ]; then
               asset="$target-$platforms-$version.pbw"

@@ -4,11 +4,12 @@ A collection of watchfaces for current Pebble hardware, built on one shared engi
 
 ## Watchfaces
 
+LCARS Stardate lives in its own repository, [pebble-watchface-lcars](https://github.com/AKlitbo/pebble-watchface-lcars), along with its releases.
+
 ### Standalone
 
 | Watchface | Preview |
 | :--- | :--- |
-| **LCARS Stardate**<br>[readouts](watchfaces/lcars-stardate/MODULES.md) · [changelog](watchfaces/lcars-stardate/CHANGELOG.md) | <img src=".github/images/lcars-stardate/theme_classic.png" width="75" title="Classic"> <img src=".github/images/lcars-stardate/theme_nemesis-blue.png" width="75" title="Nemesis Blue"> <img src=".github/images/lcars-stardate/theme_mono.png" width="75" title="Classic Mono"> <img src=".github/images/lcars-stardate/theme_voyager.png" width="75" title="Voyager"> <img src=".github/images/lcars-stardate/theme_voyager-mono.png" width="75" title="Voyager Mono"> <img src=".github/images/lcars-stardate/theme_lower-decks.png" width="75" title="Lower Decks"> <img src=".github/images/lcars-stardate/theme_lower-decks-mono.png" width="75" title="Lower Decks Mono"> <img src=".github/images/lcars-stardate/theme_lower-decks-padd.png" width="75" title="Lower Decks PADD"> <img src=".github/images/lcars-stardate/theme_lower-decks-padd-mono.png" width="75" title="Lower Decks PADD Mono"> |
 | **Radar Array**<br>[changelog](watchfaces/radar-array/CHANGELOG.md) | <img src=".github/images/radar-array/theme_default.png" width="75" title="Default"> <img src=".github/images/radar-array/theme_crimson.png" width="75" title="Crimson"> <img src=".github/images/radar-array/theme_neon.png" width="75" title="Neon"> <img src=".github/images/radar-array/theme_phosphor.png" width="75" title="Phosphor"> <img src=".github/images/radar-array/theme_rescue.png" width="75" title="Rescue"> <img src=".github/images/radar-array/theme_stealth.png" width="75" title="Stealth"> <img src=".github/images/radar-array/theme_mono.png" width="75" title="Mono"> |
 | **IDE VSCode**<br>[changelog](watchfaces/ide-vscode/CHANGELOG.md) | <img src=".github/images/ide-vscode/theme_dark.png" width="75" title="Dark"> <img src=".github/images/ide-vscode/theme_light.png" width="75" title="Light"> <img src=".github/images/ide-vscode/theme_terminal.png" width="75" title="Terminal"> <img src=".github/images/ide-vscode/theme_cyberpunk.png" width="75" title="Cyberpunk"> <img src=".github/images/ide-vscode/theme_synthwave.png" width="75" title="Synthwave"> <img src=".github/images/ide-vscode/theme_mono.png" width="75" title="Mono"> |
 
@@ -37,7 +38,7 @@ These run on both the Pebble Time 2 (**Emery**) and the Round 2 (**Gabbro**). On
 
 Download a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone.
 
-Faces version independently, so releases are tagged per face as `<face>-v<version>`. Release notes are that version's `CHANGELOG.md` entry. A face built for a single watch names its platform in the asset, so `lcars-stardate-emery-1.7.0.pbw` is Emery only. A face that runs on more than one is named by version alone, since naming one watch would not be true of it. `ridgeline-1.2.0.pbw` holds a build for the Pebble Time 2 and one for the Round 2, and installs on both.
+Faces version independently, so releases are tagged per face as `<face>-v<version>`. Release notes are that version's `CHANGELOG.md` entry. A face built for a single watch names its platform in the asset, so `radar-array-emery-1.6.0.pbw` is Emery only. A face that runs on more than one is named by version alone, since naming one watch would not be true of it. `ridgeline-1.2.0.pbw` holds a build for the Pebble Time 2 and one for the Round 2, and installs on both.
 
 Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp built from the same source. They share a UUID, so only one can be on the watch at a time: the watchface build sits in your watchface carousel and is the one on the appstore, and the watchapp build lives in the launcher instead. Take whichever you want from the releases page.
 
@@ -49,11 +50,10 @@ A face is any directory carrying a `config/pebble.appinfo.json`, so it is found 
 
 * **`watchfaces/<face>/`**: one face. `config/` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
 * **`watchfaces/<family>/core/`**: the family's shared code, staged into each member's build and reached as `<family>/...`.
-* **`lib/`**: the base every face shares (`c/` device engine, `ts/` PebbleKit JS, `py/` waf helpers, `tools/` generators, `css/` the Pebble-64 gamut, `testing/` test helpers).
-* **`tools/`** and **`config/`**: build tooling, and the shared tsconfig/eslint/vitest setup.
+* **`lib/`**: the shared engine, a git submodule of [the engine repo](https://github.com/AKlitbo/pebble-watchface-engine). It holds the base every face shares (`c/` device engine, `ts/` PebbleKit JS, `py/` waf helpers, `css/` the Pebble-64 gamut, `testing/` test helpers), the build tooling under `tools/`, and the shared tsconfig/eslint/vitest setup under `config/`.
 * **`targets/<target>/`**: the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
-* **`vendor/`**: third-party source SVGs and the LCARS template (gitignored, see [Third-Party Assets](#third-party-assets)).
-* **`build.sh`**: regenerates a face's manifest, compiles its pkjs, and runs `pebble build`.
+* **`vendor/`**: third-party source SVGs (gitignored, see [Third-Party Assets](#third-party-assets)).
+* **`lib/build.sh`**: regenerates a face's manifest, compiles its pkjs, and runs `pebble build`.
 
 Anything with a `.g.` in the name is generated and should not be hand-edited: rerun the matching `npm run gen:*`. CI checks that the committed output still matches.
 
@@ -65,12 +65,12 @@ To join a family instead, create it at `watchfaces/<family>/<name>/`. Nothing el
 
 ## Releasing
 
-Pushing a `<face>-v<version>` tag is the whole process. [release.yml](.github/workflows/release.yml) builds that face, takes its notes from the matching `CHANGELOG.md` section, and publishes the `.pbw`.
+A release starts when a `<face>-v<version>` tag is pushed. [release.yml](.github/workflows/release.yml) then builds that face, takes its notes from the matching `CHANGELOG.md` section, and publishes the `.pbw`.
 
 ```sh
-# date the [1.5.0] heading in watchfaces/lcars-stardate/CHANGELOG.md first, then
-git tag lcars-stardate-v1.5.0
-git push origin lcars-stardate-v1.5.0
+# date the [1.7.0] heading in watchfaces/radar-array/CHANGELOG.md first, then
+git tag radar-array-v1.7.0
+git push origin radar-array-v1.7.0
 ```
 
 The tag version must match `version` in that face's `config/pebble.appinfo.json`, the changelog entry must be dated, and the tag must not already be released. The workflow checks all three before it spends time on a build, so a mistake costs seconds.
@@ -78,22 +78,23 @@ The tag version must match `version` in that face's `config/pebble.appinfo.json`
 ## Development
 
 ```sh
+git submodule update --init               # once: fetches the shared engine into lib/
 npm ci
-git config core.hooksPath .githooks   # once: runs lint + typecheck before each commit
-./build.sh lcars-stardate             # the .pbw, from WSL with the Pebble SDK installed
+git config core.hooksPath lib/.githooks   # once: runs lint + typecheck before each commit
+bash lib/build.sh radar-array             # the .pbw, from WSL with the Pebble SDK installed
 ```
 
 Every face-scoped command takes the face name:
 
 ```sh
-./build.sh <face> [--clean]           # build a .pbw into targets/<face>/build/
+bash lib/build.sh <face> [--clean]    # build a .pbw into targets/<face>/build/
 npm run build:pkjs -- <face>          # compile src/pkjs + lib/ts into targets/<face>/emit/
 npm run build:manifests -- <face>     # regenerate the waf manifest + wscript
 npm run gen:icons -- <face>           # rasterize vendored SVGs to resources/icons/*.png
 npm run gen:frame -- <face> [theme]   # re-bake a background from frame/<name>.html
 ```
 
-Repo-wide checks cover `lib/`, `tools/`, and every face:
+Repo-wide checks cover `lib/` and every face:
 
 ```sh
 npm test          # offline unit suite
@@ -136,10 +137,6 @@ All return the same core quote data: last price, price change, percentage change
 
 ## Credits
 
-* **LCARS Stardate**
-  * **LCARS Design**: LCARS Inspired Website Template by [TheLCARS.com](https://www.thelcars.com), with modifications.
-  * **Typography**: [Antonio](https://fonts.google.com/specimen/Antonio).
-  * **Glyphs**: Heart, step, thermometer, and muted-speaker icons from [UXWing](https://uxwing.com).
 * **Radar Array**
   * **Typography**: [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono).
 * **IDE VSCode**
@@ -158,22 +155,22 @@ All return the same core quote data: last price, price change, percentage change
 
 ## Third-Party Assets
 
-This repository bundles each face's fonts, its generated icon PNGs, and its baked background PNGs. The weather and glyph icons' SVG sources and the LCARS template are *not* bundled and must be fetched to regenerate them. Everything bundled keeps its own licence, listed per face with its source and terms in [NOTICES](NOTICES.md).
+This repository bundles each face's fonts, its generated icon PNGs, and its baked background PNGs. The weather and glyph icons' SVG sources are *not* bundled and must be fetched to regenerate them. Everything bundled keeps its own licence, listed per face with its source and terms in [NOTICES](NOTICES.md).
 
 ## License
 
-**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). This license keeps the project aligned with the noncommercial nature of the LCARS-inspired assets and *Star Trek* fan-project guidelines.
+**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared engine in `lib/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
 
-You may use, modify, fork, and share it freely for any **noncommercial** purpose, personal use, hobby projects, study, and the like. See [LICENSE](LICENSE) for the full terms.
+You may use, modify, fork, and share these faces under the AGPL. If you share a modified face, you share its source under the same license. See [LICENSE](LICENSE) for the full terms.
+
+Earlier history and releases of this repository were published under the PolyForm Noncommercial License 1.0.0, and copies taken from them keep those terms.
 
 ## Disclaimer
 
-**LCARS Stardate** is a noncommercial fan project. *Star Trek*, LCARS, and related marks are trademarks of CBS / Paramount Global. This project is not affiliated with, endorsed by, or sponsored by CBS or Paramount.
-
-Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an unaffiliated, noncommercial homage and is not endorsed by or associated with Microsoft.
+Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an unaffiliated homage and is not endorsed by or associated with Microsoft.
 
 ## AI Training Notice
 
-This repository and its contents are **not permitted to be used for training, fine-tuning, or evaluation of artificial intelligence or machine learning models**, including large language models. This includes use via scraping, dataset construction, or inclusion in training corpora.
+Please do not use this repository or its contents for training, fine-tuning, or evaluating artificial intelligence or machine learning models, including large language models. That includes scraping, dataset construction, and inclusion in training corpora.
 
-No consent is granted for such use.
+This is a request and not a term of the license. The AGPL does not allow further restrictions to be added to it.

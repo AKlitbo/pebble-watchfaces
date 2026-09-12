@@ -17,27 +17,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        face: [lcars-stardate, radar-array, ide-vscode, gridlock, sidereel, ridgeline, shoreline, treeline]
+        face: [radar-array, ide-vscode, gridlock, sidereel, ridgeline, shoreline, treeline]
     steps:
       - uses: actions/checkout@v7
 
-      - uses: ./.github/actions/setup-pebble
+      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the release check reads
+      - name: Checkout Engine
+        run: git submodule update --init
 
-      # build.sh <face> regenerates the manifest, compiles watchfaces/<face>/src/pkjs + lib/ts
-      # into targets/<face>/emit/, then runs `pebble build`. node (setup-node) and pebble (uv,
-      # on GITHUB_PATH) are both available here.
+      - uses: ./lib/.github/actions/setup-pebble
+
       # tee'd because the SDK's memory report is printed during the link and is the only place
       # the heap figure exists. shell: bash for pipefail, or a failed build would pass as long as
       # tee succeeded
       - name: Build Watchface
         shell: bash
-        run: bash build.sh ${{ matrix.face }} | tee build-${{ matrix.face }}.log
+        run: bash lib/build.sh ${{ matrix.face }} | tee build-${{ matrix.face }}.log
 
-      # one row per target, collected by the memory job below. GITHUB_STEP_SUMMARY is per job, so
-      # a table written here would be one of seven scattered across the matrix
       - name: Collect Memory Usage
         if: always()
-        run: bash tools/ci/report-memory.sh build-${{ matrix.face }}.log ${{ matrix.face }} mem-${{ matrix.face }}.tsv
+        run: bash lib/tools/ci/report-memory.sh build-${{ matrix.face }}.log ${{ matrix.face }} mem-${{ matrix.face }}.tsv
 
       - uses: actions/upload-artifact@v7
         if: always()
@@ -46,9 +46,6 @@ jobs:
           path: mem-${{ matrix.face }}.tsv
           if-no-files-found: warn
 
-      # a face usually builds one sandbox (targets/<face>/), but gridlock builds two
-      # (targets/gridlock-face/ and targets/gridlock-app/). the <face>* glob catches both
-      # while still matching the single sandbox for every other face
       - uses: actions/upload-artifact@v7
         with:
           name: pbw-${{ matrix.face }}
@@ -56,14 +53,17 @@ jobs:
             targets/${{ matrix.face }}*/build/*.pbw
           if-no-files-found: error
 
-  # every face's memory in one table, which is the only shape that answers "which one is closest
-  # to the edge". always() so a single face failing to build still reports the rest
   memory:
     runs-on: ubuntu-latest
     needs: pebble
     if: always()
     steps:
       - uses: actions/checkout@v7
+
+      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the release check reads
+      - name: Checkout Engine
+        run: git submodule update --init
 
       - uses: actions/download-artifact@v7
         with:
@@ -72,12 +72,17 @@ jobs:
           merge-multiple: true
 
       - name: Memory Summary
-        run: bash tools/ci/render-memory.sh mem
+        run: bash lib/tools/ci/render-memory.sh mem
 
   vitest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the release check reads
+      - name: Checkout Engine
+        run: git submodule update --init
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -89,6 +94,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the release check reads
+      - name: Checkout Engine
+        run: git submodule update --init
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -100,27 +110,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the release check reads
+      - name: Checkout Engine
+        run: git submodule update --init
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run typecheck
-
-  # host C unit tests over the lib/c/core maths. no SDK or node needed: gcc and make ship on the
-  # runner
-  c-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      # shell: bash for pipefail. the default shell is `bash -e` without it, which would report
-      # tee's exit code and let a failing suite pass
-      - name: Run C Tests
-        shell: bash
-        run: make -C lib/c/spec | tee c-tests.log
-
-      # always() so a failing suite still reports its numbers
-      - name: C Test Summary
-        if: always()
-        run: bash tools/ci/report-c-tests.sh c-tests.log

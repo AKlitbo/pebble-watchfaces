@@ -12,7 +12,7 @@
  * hoist across the assembled initialize, so order never changes behaviour.
  */
 
-import type { Manifest } from '../../../../../../tools/clay-components/generate-components.ts';
+import type { Manifest } from '../../../../../../lib/tools/clay-components/generate-components.ts';
 
 export default {
   name: 'layoutBuilder',

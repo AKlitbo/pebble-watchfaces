@@ -26,7 +26,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { PEBBLE_COLORS_CSV, buildPalette } from '../../pkjs/clay/builder/ts/theme/palette.ts';
-import { faceDir } from '../../../../../tools/faces.ts';
+import { faceDir } from '../../../../../lib/tools/faces.ts';
 
 // this generator lives in the family core, so its own root is the core and the face it writes
 // the JS half into arrives as an argument
