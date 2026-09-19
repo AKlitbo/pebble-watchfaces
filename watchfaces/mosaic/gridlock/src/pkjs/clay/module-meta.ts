@@ -76,4 +76,8 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Next Alarm':    { icon: '🔔', blockColor: '#ef5350', slug: 'alarm' },
 };
 
+// the block sizes this face's layout places, and so the sizes its thumbnails come in.
+// embed-thumbnails.ts refuses a png in any other size
+export const thumbnailSizes = ['1x2', '2x2', '1x4', '2x4'];
+
 export default moduleMeta;

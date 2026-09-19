@@ -2,6 +2,8 @@ import app from '../../../../../lib/ts/pkjs/app';
 import layoutComponent from './clay/layout-component.g';
 import themeComponent from './clay/theme-component.g';
 import hiddenStoreComponent from '../../../../../lib/ts/clay/hidden-store-component';
+import stocks from '../../../../../lib/ts/stock/feature';
+import calendar from '../../../../../lib/ts/calendar/feature';
 import clayConfig from './config';
 
 // the select settings seeded from the watch payload as their "0"/"1" string form so the config
@@ -31,5 +33,6 @@ app.startPebbleApp({
   clayConfig,
   components: [layoutComponent, themeComponent, hiddenStoreComponent],
   seedKeys,
+  features: [stocks, calendar],
   formatCoords: () => ({}),
 });

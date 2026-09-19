@@ -486,9 +486,14 @@ module.exports = {
         doc.addEventListener("pointercancel", () => {
           const payload = active && active.payload;
           end();
-          if (payload !== null && payload !== void 0) {
-            spec.dropOutside(payload);
+          if (payload === null || payload === void 0) {
+            return;
           }
+          if (spec.cancel) {
+            spec.cancel(payload);
+            return;
+          }
+          spec.dropOutside(payload);
         });
         return {
           start(payload, event) {

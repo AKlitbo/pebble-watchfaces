@@ -5,7 +5,7 @@ name: Release
 # on any older commit, which tells you nothing about what shipped
 run-name: ${{ github.event.head_commit.message }}
 
-# faces version independently, so a release is tagged per face: <face>-v<version>, e.g.
+# faces version independently, so a release is tagged per face as <face>-v<version>, such as
 # ridgeline-v1.5.0. pushing that tag is the whole release process
 on:
   push:
@@ -25,97 +25,21 @@ jobs:
       - name: Checkout Engine
         run: git submodule update --init
 
-      # a release ships on a named engine version, so a lib pointer sitting between engine tags
-      # stops here. day-to-day commits can sit between tags, releases cannot
-      - name: Check Engine Is Tagged
-        run: |
-          if ! engine_tag=$(git -C lib describe --exact-match --tags 2>/dev/null); then
-            echo "lib is at $(git -C lib rev-parse --short HEAD), which is not an engine release tag" >&2
-            exit 1
-          fi
-          echo "building on engine $engine_tag"
-
-      # split ridgeline-v1.5.0 into face and version, then check the tag against the tree it
-      # points at. a tag that disagrees with the manifest is a typo, and catching it here costs
-      # seconds instead of a published release nobody can unpublish cleanly
-      - name: Resolve Face And Version
-        id: face
-        run: |
-          tag="$GITHUB_REF_NAME"
-          version="${tag##*-v}"
-          face="${tag%-v$version}"
-          appinfo=$(find watchfaces -mindepth 3 -maxdepth 4 -path "*/$face/config/pebble.appinfo.json" | head -1)
-
-          if [ ! -f "$appinfo" ]; then
-            echo "tag $tag names face '$face', which has no appinfo under watchfaces/" >&2
-            exit 1
-          fi
-
-          manifest_version=$(jq -r .version "$appinfo")
-          if [ "$manifest_version" != "$version" ]; then
-            echo "tag $tag disagrees with $appinfo (version $manifest_version)" >&2
-            exit 1
-          fi
-
-          {
-            echo "face=$face"
-            echo "version=$version"
-            echo "display=$(jq -r .displayName "$appinfo")"
-          } >> "$GITHUB_OUTPUT"
-
-      # a re-pushed or moved tag would otherwise build for minutes and only then hit "release
-      # already exists" on the final step. republishing over a shipped release is not something
-      # to do silently, so this stops early and leaves the existing one alone
-      - name: Check Release Is New
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            echo "$GITHUB_REF_NAME is already released: delete it first to republish" >&2
-            exit 1
-          fi
-
-      # fails when the entry is still Unreleased or empty, so an unwritten changelog stops the
-      # release rather than shipping with blank notes
-      - name: Build Release Notes
-        run: |
-          {
-            printf 'Released %s.\n\n' "$(bash lib/tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}' --date)"
-            bash lib/tools/ci/changelog-section.sh '${{ steps.face.outputs.face }}' '${{ steps.face.outputs.version }}'
-          } > notes.md
+      # every check that can stop a release runs here, before the SDK install and the build, so a
+      # mistyped tag or an undated changelog costs seconds
+      - name: Prepare Release
+        id: release
+        uses: ./lib/.github/actions/prepare-release
 
       - uses: ./lib/.github/actions/setup-pebble
 
       - name: Build Watchface
-        run: bash lib/build.sh ${{ steps.face.outputs.face }}
-
-      # build.sh emits one <target>.pbw per target, unversioned, so name each with the version
-      #
-      # a pbw built for one watch says which, so it is obvious what it will install on. one built
-      # for several carries every platform's binary inside it, and naming it after any one of them
-      # would be a lie, so those are named by version alone
-      - name: Name The Assets
-        id: assets
-        run: |
-          face='${{ steps.face.outputs.face }}'
-          version='${{ steps.face.outputs.version }}'
-          assets=""
-          for target in $(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/manifest/build-manifests.ts --targets "$face"); do
-            platforms=$(node -p "JSON.parse(require('fs').readFileSync('targets/$target/package.json')).pebble.targetPlatforms.join(' ')")
-            if [ "$(printf '%s' "$platforms" | wc -w)" -eq 1 ]; then
-              asset="$target-$platforms-$version.pbw"
-            else
-              asset="$target-$version.pbw"
-            fi
-            cp "targets/$target/build/$target.pbw" "$asset"
-            assets="$assets $asset"
-          done
-          echo "assets=${assets# }" >> "$GITHUB_OUTPUT"
+        run: bash lib/build.sh ${{ steps.release.outputs.face }}
 
       - name: Publish Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "$GITHUB_REF_NAME" ${{ steps.assets.outputs.assets }} \
-            --title "${{ steps.face.outputs.display }} ${{ steps.face.outputs.version }}" \
-            --notes-file notes.md
+        uses: ./lib/.github/actions/publish-release
+        with:
+          face: ${{ steps.release.outputs.face }}
+          version: ${{ steps.release.outputs.version }}
+          title: ${{ steps.release.outputs.title }}
+          notes-file: ${{ steps.release.outputs.notes-file }}

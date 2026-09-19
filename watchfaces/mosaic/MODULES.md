@@ -2,9 +2,7 @@
 
 Every panel the Mosaic faces can put on a grid, shown at each size it supports.
 
-Sizes are `rows × width`: `1×2` and `2×2` are half width, `1×4` and `2×4` span the screen, and many
-panels come in more than one. Both faces read from the same catalogue, so a panel shows the same
-thing whichever one it is on. What differs is how much grid the face has to give it.
+Sizes are `rows × width`: `1×2` and `2×2` are half width, `1×4` and `2×4` span the screen, and many panels come in more than one. Both faces read from the same catalogue, so a panel shows the same thing whichever one it is on. What differs is how much grid the face has to give it.
 
 For what a finished screen looks like, see the previews in the [README](../../README.md).
 
@@ -12,9 +10,7 @@ For what a finished screen looks like, see the previews in the [README](../../RE
 
 ### Starter Layouts
 
-Six preset buttons on the settings page, so there is something on screen before you have placed
-anything yourself. Shown in Vibrant, and each one is a starting point rather than a mode: drop
-panels in or take them out and it is your layout from there.
+Six preset buttons on the settings page, so there is something on screen before you have placed anything yourself. Shown in Vibrant, and each one is a starting point rather than a mode: drop panels in or take them out and it is your layout from there.
 
 <img src="../../.github/images/gridlock/preset_default.png" width="105" title="Default"> <img src="../../.github/images/gridlock/preset_activity.png" width="105" title="Activity"> <img src="../../.github/images/gridlock/preset_weather.png" width="105" title="Weather"> <img src="../../.github/images/gridlock/preset_data.png" width="105" title="Data"> <img src="../../.github/images/gridlock/preset_sleep.png" width="105" title="Sleep"> <img src="../../.github/images/gridlock/preset_creator.png" width="105" title="Creator">
 
@@ -57,9 +53,7 @@ panels in or take them out and it is your layout from there.
 
 ### Starter Layouts
 
-Five preset buttons on the settings page, so there is something on screen before you have
-placed anything yourself. Shown in Vibrant, and each one is a starting point rather than a
-mode: drag panels in or take them out and it is your layout from there.
+Five preset buttons on the settings page, so there is something on screen before you have placed anything yourself. Shown in Vibrant, and each one is a starting point rather than a mode: drag panels in or take them out and it is your layout from there.
 
 <img src="../../.github/images/sidereel/preset_default.png" width="105" title="Default"> <img src="../../.github/images/sidereel/preset_health.png" width="105" title="Health"> <img src="../../.github/images/sidereel/preset_weather.png" width="105" title="Weather"> <img src="../../.github/images/sidereel/preset_solar.png" width="105" title="Solar"> <img src="../../.github/images/sidereel/preset_activity.png" width="105" title="Activity">
 

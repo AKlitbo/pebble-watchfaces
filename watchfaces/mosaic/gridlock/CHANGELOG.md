@@ -2,8 +2,26 @@
 
 All notable changes to the Gridlock watchface are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.3.2] - Unreleased
+
+### Changed
+
+- The Alternate Time Zone now follows daylight saving, so a city picked in winter keeps the right time through the summer. A city picked before this version has no saved time zone, so the settings page asks you to pick it again.
+- Weather from OpenWeatherMap arrives sooner, since its extra readings are now fetched at the same time rather than after it. The extra readings still arrive when the OpenWeatherMap key is rejected.
+
+### Fixed
+
+- Fixed weather getting stuck until the Pebble app was restarted after an update failed to reach the watch.
+- Fixed the watch starting a new weather fetch every time it asked again while one was already running.
+- Fixed every settings save fetching fresh weather, even when nothing that affects the weather had changed.
+- Fixed drizzle showing the N/A icon with OpenWeatherMap.
+- Fixed a weather, stocks or calendar panel added while the watchface was running getting no data until it was restarted.
+- Fixed events deleted from a calendar staying on the agenda, including when a calendar was emptied or removed.
+- Fixed moved occurrences of repeating events disappearing from the agenda.
+- Fixed a cleared stock watchlist staying on the watch and coming back the next time the watchface started.
+- Fixed accented letters in calendar titles and stock statuses showing as different letters. The accent is now dropped and the plain letter kept.
 
 ## [1.3.1] - 2026-09-07
 
