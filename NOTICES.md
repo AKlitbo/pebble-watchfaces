@@ -7,14 +7,15 @@ licences are passed on to anyone a watchface or this repository is given to.
 For who made these and what they are used for, see the Credits section of the [README](README.md).
 
 Each face bundles only what it uses, so the notices are grouped by what ships in which `.pbw`. The
-Code and General sections apply to every face.
+Code section ships in Gridlock only, and the General section applies to every face.
 
 ## Code
 
 ### ical.js
 
-The phone-side calendar reader in the shared PebbleKit JS bundle. None of these faces surface
-calendar panels, but the shared bundle carries the reader, so it ships in every built `.pbw`.
+The phone-side calendar reader in the shared PebbleKit JS bundle. The pkjs build copies it in only
+for a face that turns calendars on, and Gridlock is the one face here that does, so it ships in
+Gridlock's `.pbw` and in no other.
 
 - **Source:** <https://github.com/kewisch/ical.js>
 - **Licence:** Mozilla Public License 2.0, published at <https://www.mozilla.org/en-US/MPL/2.0/>.
