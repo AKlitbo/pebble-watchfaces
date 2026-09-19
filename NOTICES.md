@@ -1,120 +1,75 @@
 # Third-Party Notices
 
-The watchfaces in this repository are under the AGPL-3.0-or-later, see [LICENSE](LICENSE).
-They bundle the third-party work below, each of which keeps its own licence. This file is how those
-licences are passed on to anyone a watchface or this repository is given to.
+The watchfaces in this repository are under the AGPL-3.0-or-later, see [LICENSE](LICENSE). They bundle the third-party work below, each of which keeps its own licence. This file is how those licences are passed on to anyone a watchface or this repository is given to.
 
 For who made these and what they are used for, see the Credits section of the [README](README.md).
 
-Each face bundles only what it uses, so the notices are grouped by what ships in which `.pbw`. The
-Code section ships in Gridlock only, and the General section applies to every face.
+Each face bundles only what it uses, so the notices are grouped by what ships in which `.pbw`. The Code section ships in Gridlock only, and the General section applies to every face.
 
 ## Code
 
 ### ical.js
 
-The phone-side calendar reader in the shared PebbleKit JS bundle. The pkjs build copies it in only
-for a face that turns calendars on, and Gridlock is the one face here that does, so it ships in
-Gridlock's `.pbw` and in no other.
+The phone-side calendar reader in the shared PebbleKit JS bundle. The pkjs build copies it in only for a face that turns calendars on, and Gridlock is the one face here that does, so it ships in Gridlock's `.pbw` and in no other.
 
 - **Source:** <https://github.com/kewisch/ical.js>
-- **Licence:** Mozilla Public License 2.0, published at <https://www.mozilla.org/en-US/MPL/2.0/>.
-  The full text also ships in the package at `node_modules/ical.js/LICENSE`
-- **What ships:** the package's own prebuilt `dist/ical.es5.min.cjs`, copied in unchanged by the
-  pkjs build. It is not modified, patched or re-bundled, so the source that produced it is the
-  upstream repository above, and its licence header travels inside the bundle
+- **Licence:** Mozilla Public License 2.0, published at <https://www.mozilla.org/en-US/MPL/2.0/>. The full text also ships in the package at `node_modules/ical.js/LICENSE`
+- **What Ships:** the package's own prebuilt `dist/ical.es5.min.cjs`, copied in unchanged by the pkjs build. It is not modified, patched or re-bundled, so the source that produced it is the upstream repository above, and its licence header travels inside the bundle
 
-The MPL covers ical.js and nothing else here. Section 1.10 of that licence puts it plainly: a file
-carrying none of its code is not a modification of it, so the rest of this project stays under the
-AGPL. The MPL 2.0 is compatible with the AGPL through its secondary licence provision. Keeping ical.js in a file of its own rather than mixing it into ours is deliberate,
-and is what section 1.7 asks of a larger work.
+The MPL covers ical.js and nothing else here. Section 1.10 of that licence puts it plainly: a file carrying none of its code is not a modification of it, so the rest of this project stays under the AGPL. The MPL 2.0 is compatible with the AGPL through its secondary licence provision. Keeping ical.js in a file of its own rather than mixing it into ours is deliberate, and is what section 1.7 asks of a larger work.
 
 ## Fonts
 
-Each face bundles its `.ttf` files under `watchfaces/<face>/resources/fonts/`, and the build converts
-them into the watch's own font format, so both this repository and the built watchface carry them.
+Each face bundles its `.ttf` files under `watchfaces/<face>/resources/fonts/`, and the build converts them into the watch's own font format, so both this repository and the built watchface carry them.
 
-All fonts below are under the SIL Open Font License 1.1, published at <https://openfontlicense.org>.
-Each face ships an `OFL.txt` beside its fonts carrying the full licence text and the copyright
-notice each font declares in its own metadata.
+All fonts below are under the SIL Open Font License 1.1, published at <https://openfontlicense.org>. Each face ships an `OFL.txt` beside its fonts carrying the full licence text and the copyright notice each font declares in its own metadata.
 
 ### Radar Array
 
-- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012,
-  Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. Licence text in
-  [OFL.txt](watchfaces/radar-array/resources/fonts/OFL.txt)
+- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. Licence text in [OFL.txt](watchfaces/radar-array/resources/fonts/OFL.txt)
 
 ### Sketchbook
 
 The faces in this family all set their type in the same face, and each bundles its own copy.
 
-- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012
-  Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's
-  [OFL.txt](watchfaces/sketchbook/ridgeline/resources/fonts/OFL.txt)
+- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012 Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's [OFL.txt](watchfaces/sketchbook/ridgeline/resources/fonts/OFL.txt)
 
 ### Mosaic
 
-Gridlock and Sidereel bundle the same set. The clock and values are set in Teko and Share Tech Mono,
-and the rest are the header-font options the settings page offers, so a build carries all of them
-whichever one is picked. Each face bundles its own copy under one `OFL.txt`
-([Gridlock](watchfaces/mosaic/gridlock/resources/fonts/OFL.txt),
-[Sidereel](watchfaces/mosaic/sidereel/resources/fonts/OFL.txt)), which carries a copyright notice
-for each.
+Gridlock and Sidereel bundle the same set. The clock and values are set in Teko and Share Tech Mono, and the rest are the header-font options the settings page offers, so a build carries all of them whichever one is picked. Each face bundles its own copy under one `OFL.txt` ([Gridlock](watchfaces/mosaic/gridlock/resources/fonts/OFL.txt), [Sidereel](watchfaces/mosaic/sidereel/resources/fonts/OFL.txt)), which carries a copyright notice for each.
 
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
-- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012,
-  Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
+- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
 - **[Aldrich](https://fonts.google.com/specimen/Aldrich)**: Copyright (c) Matthew Desmond, 2011
-- **[Electrolize](https://fonts.google.com/specimen/Electrolize)**: Copyright (c) 2011, Cyreal, with
-  Reserved Font Name "Electrolize"
-- **[Kode Mono](https://fonts.google.com/specimen/Kode+Mono)**: Copyright 2023 The Kode Mono Project
-  Authors
-- **[Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans)**: Copyright 2021 The Pixelify
-  Sans Project Authors
-- **[Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)**: Copyright 2012 The Press
-  Start 2P Project Authors, with Reserved Font Name "Press Start 2P"
-- **[Quantico](https://fonts.google.com/specimen/Quantico)**: Copyright (c) 2011 Matthew Desmond,
-  with Reserved Font Name "Quantico"
+- **[Electrolize](https://fonts.google.com/specimen/Electrolize)**: Copyright (c) 2011, Cyreal, with Reserved Font Name "Electrolize"
+- **[Kode Mono](https://fonts.google.com/specimen/Kode+Mono)**: Copyright 2023 The Kode Mono Project Authors
+- **[Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans)**: Copyright 2021 The Pixelify Sans Project Authors
+- **[Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)**: Copyright 2012 The Press Start 2P Project Authors, with Reserved Font Name "Press Start 2P"
+- **[Quantico](https://fonts.google.com/specimen/Quantico)**: Copyright (c) 2011 Matthew Desmond, with Reserved Font Name "Quantico"
 
 One of the header fonts is not under the OFL:
 
-- **[LECO 2014](https://www.1001fonts.com/leco-2014-font.html)**: released into the public domain by
-  its author. It ships as `LECO2014-Regular.ttf` beside the others, and the note at the foot of each
-  face's `OFL.txt` says so, since the OFL text there does not cover it.
+- **[LECO 2014](https://www.1001fonts.com/leco-2014-font.html)**: released into the public domain by its author. It ships as `LECO2014-Regular.ttf` beside the others, and the note at the foot of each face's `OFL.txt` says so, since the OFL text there does not cover it.
 
 ### IDE VSCode
 
-Both fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a
-copyright notice for each.
+Both fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a copyright notice for each.
 
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
-- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012,
-  Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
+- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
 
 ## Icons
 
-The SVG sources for the weather and glyph icons are not in this repository. They are fetched to
-regenerate the icons, and only the rendered PNGs are bundled. The bluetooth SVGs are the exception,
-bundled under `vendor/svgrepo/`.
+The SVG sources for the weather and glyph icons are not in this repository. They are fetched to regenerate the icons, and only the rendered PNGs are bundled. The bluetooth SVGs are the exception, bundled under `vendor/svgrepo/`.
 
-Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`.
-Radar Array and the Sketchbook faces draw no weather icons, so they bundle only the bluetooth
-glyphs.
+Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`. Radar Array and the Sketchbook faces draw no weather icons, so they bundle only the bluetooth glyphs.
 
-- **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font
-  License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and
-  Sidereel
-- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the
-  [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not
-  allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled
-  by the Sketchbook faces, Gridlock and Sidereel
-- **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs):
-  [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources bundled
-  under `vendor/svgrepo/`, rendered PNGs bundled by every face
+- **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and Sidereel
+- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by the Sketchbook faces, Gridlock and Sidereel
+- **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources bundled under `vendor/svgrepo/`, rendered PNGs bundled by every face
 
 ## Trademarks
 
-Visual Studio Code is a trademark of Microsoft. The IDE VSCode face is an unaffiliated homage and is
-not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
+Visual Studio Code is a trademark of Microsoft. The IDE VSCode face is an unaffiliated homage and is not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
 
 Refer to each source above for the full terms.
