@@ -2,8 +2,19 @@
 
 All notable changes to the Shoreline watchface are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.3.1] - Unreleased
+
+### Changed
+
+- The download is smaller. It no longer carries the phone code for stocks and calendars, which Shoreline never shows.
+
+### Fixed
+
+- Fixed weather getting stuck until the Pebble app was restarted after an update failed to reach the watch.
+- Fixed the watch starting a new weather fetch every time it asked again while one was already running.
+- Fixed every settings save fetching fresh weather, even when nothing that affects the weather had changed.
 
 ## [1.3.0] - 2026-08-26
 
