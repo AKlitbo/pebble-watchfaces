@@ -11,35 +11,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, test, expect } from 'vitest';
 import config from './config';
+import { pageKeys } from '../../../core/pkjs/testing/page-keys';
 
 const appinfo = JSON.parse(
   fs.readFileSync(path.resolve(import.meta.dirname, '../../config/pebble.appinfo.json'), 'utf8')
 ) as { messageKeys: string[] };
-
-/** Every messageKey the page carries, however deeply the item is nested in sections. */
-function pageKeys(items: unknown): string[] {
-  const found: string[] = [];
-
-  function walk(node: unknown): void {
-    if (Array.isArray(node)) {
-      node.forEach(walk);
-      return;
-    }
-    if (!node || typeof node !== 'object') {
-      return;
-    }
-    const item = node as { messageKey?: unknown; items?: unknown };
-    if (typeof item.messageKey === 'string') {
-      found.push(item.messageKey);
-    }
-    if (item.items) {
-      walk(item.items);
-    }
-  }
-
-  walk(items);
-  return found;
-}
 
 /** The values the date format select offers, wherever on the page it sits. */
 function dateFormatValues(items: unknown): string[] {
@@ -83,6 +59,19 @@ describe('config page message keys', () => {
     const result = pageKeys(config).filter((key) => !declared.has(key));
 
     expect(result).toEqual([]);
+  });
+
+  /**
+   * The rows the family builds from one shared source. A count alone would pass just as happily
+   * with a whole section gone, and a missing section is a settings page quietly short of Health,
+   * Location or Weather.
+   */
+  test('the shared family sections are on the page', () => {
+    const onPage = new Set(pageKeys(config));
+
+    for (const key of ['HEALTH_GOAL_STEPS', 'HEALTH_GOAL_VIBE_CUSTOM', 'LOCATION_USE_GPS', 'CLOCK_TIMEZONE_1', 'WEATHER_WIND_UNIT', 'WEATHER_PROVIDER']) {
+      expect(onPage.has(key), `${key} missing from the config page`).toBe(true);
+    }
   });
 
   /** The night layout keys in particular, since they span the page, the appinfo and the C schema. */

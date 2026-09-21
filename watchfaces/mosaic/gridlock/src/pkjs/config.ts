@@ -2,11 +2,12 @@ import configBuilder from '../../../../../lib/ts/pkjs/config-builder';
 import moduleThumbnails from './clay/module-thumbnails.g';
 import moduleMeta from './clay/module-meta';
 import vibrantByType from './clay/vibrant.g';
-import type { ClayItem } from '../../../core/pkjs/types';
+import type { ClayOption } from '../../../core/pkjs/types';
 import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
-
-/** A select/toggle option: its label and the value Clay stores. */
-type ClayOption = { label: string; value: string | number };
+import { select, heading, VIBE_OPTIONS } from '../../../core/pkjs/config-rows';
+import { healthSection } from '../../../core/pkjs/health-section';
+import { locationSection } from '../../../core/pkjs/location-section';
+import { weatherSection } from '../../../core/pkjs/weather-section';
 
 // base list. icon/colour get merged in from module-meta below so the builders read one source
 const MODULE_BASE = [
@@ -229,67 +230,6 @@ const MODULE_OPTIONS = MODULE_BASE.map(function (option) {
   return merged;
 });
 
-/** A Clay select row. The description is optional so a self-evident picker can skip it. */
-function select(
-  messageKey: string,
-  label: string,
-  options: ClayOption[],
-  def: string | number,
-  description?: string
-): ClayItem {
-  const item: ClayItem = {
-    type: 'select',
-    messageKey: messageKey,
-    label: label,
-    defaultValue: def,
-    options: options,
-  };
-  if (description) {
-    item.description = description;
-  }
-  return item;
-}
-
-/** A section heading row. */
-function heading(text: string): ClayItem {
-  return { type: 'heading', defaultValue: text };
-}
-
-/** A Clay on/off toggle row. */
-function toggle(messageKey: string, label: string, description: string, def: boolean): ClayItem {
-  return {
-    type: 'toggle',
-    messageKey: messageKey,
-    label: label,
-    description: description,
-    defaultValue: def,
-  };
-}
-
-const VIBE_OPTIONS: ClayOption[] = [
-  { label: 'None', value: 0 },
-  { label: 'Short', value: 1 },
-  { label: 'Long', value: 2 },
-  { label: 'Double', value: 3 },
-];
-
-// the Goal Met Vibe picks. the value IS what the watch plays, so the tune data lives here in the
-// config, not in the watch binary. a one-letter sentinel is a plain pulse (S/L/D), C means the
-// Custom Vibe Pattern box below, and a comma list of milliseconds is a fanfare rhythm the watch
-// buzzes straight through. None is the empty string
-const GOAL_VIBE_OPTIONS: ClayOption[] = [
-  { label: 'None', value: '' },
-  { label: 'Short', value: 'S' },
-  { label: 'Long', value: 'L' },
-  { label: 'Double', value: 'D' },
-  { label: 'Fanfare 7', value: '50,50,50,50,50,50,250,150,250,150,250,150,100,100,100,100,600' },
-  { label: 'Fanfare 8', value: '50,60,50,60,50,60,300,180,300,180,300,180,110,110,110,110,700' },
-  { label: 'Fanfare 10', value: '60,50,60,50,60,50,350,250,350,250,350,250,120,100,120,100,800' },
-  { label: 'Fanfare 12', value: '70,60,70,60,70,60,400,200,400,200,400,200,150,100,150,100,900' },
-  { label: 'Fanfare 13', value: '40,40,40,40,40,40,200,100,200,100,200,100,80,80,80,80,500' },
-  { label: 'Custom', value: 'C' },
-];
-
 // the buzz pattern for a calendar reminder. no None here since the mode dropdown above decides
 // which reminders fire (values match VIBE_OPTIONS so they land on the same VibeChoice)
 const VIBE_TYPE_OPTIONS: ClayOption[] = [
@@ -306,16 +246,9 @@ const CALENDAR_VIBE_MODE_OPTIONS: ClayOption[] = [
   { label: 'Start Only', value: 3 },
 ];
 
-const GOAL_STEPS = [5000, 7500, 10000, 12500, 15000, 20000, 25000].map((n, i) => ({ label: n.toLocaleString(), value: i }));
-const GOAL_CALORIES = [500, 1000, 1500, 2000, 2500, 3000].map((n, i) => ({ label: n + ' kcal', value: i }));
-const GOAL_SLEEP = [6, 7, 8, 9, 10].map((n, i) => ({ label: n + ' h', value: i }));
-const GOAL_ACTIVE = [15, 30, 45, 60, 90].map((n, i) => ({ label: n + ' min', value: i }));
-const GOAL_HR = [150, 160, 170, 180, 190, 200].map((n, i) => ({ label: n + ' bpm', value: i }));
-const GOAL_DISTANCE = [2, 3, 5, 8, 10, 15, 20].map((n, i) => ({ label: n + ' km', value: i }));
-
 const config = [
   // intro lives in its own section like every other heading so it picks up the same
-  // .section > .component padding. at the top level it missed that and the title bar sat cramped
+  // .section > .component padding. at the top level it misses that and the title bar sits cramped
   {
     type: 'section',
     items: [
@@ -371,7 +304,7 @@ const config = [
         type: 'select',
         messageKey: 'APPEARANCE_PANEL_STYLE',
         label: 'Panel Style',
-        description: 'How every panel is framed . Classic is the original square panel and Rounded softens the four corners.',
+        description: 'How every panel is framed. Classic is the original square panel and Rounded softens the four corners.',
         defaultValue: 0,
         options: [
           { label: 'Classic (Default)', value: 0 },
@@ -387,7 +320,7 @@ const config = [
       heading('Layout'),
       {
         type: 'text',
-        defaultValue: 'Build up to five layouts and give them their jobs. Tap a number to edit that layout, then drag panels in from below to place them, or drag a placed one to move or remove it. Every edit is kept as you go. Day is the layout you normally see. Night takes over on the schedule you set underneath, and Quiet Time takes over whenever the watch is on Quiet Time, whatever the hour.',
+        defaultValue: 'Build up to five layouts. Day is the one you normally see. Night takes over on the schedule below, and Quiet Time takes over whenever the watch is on Quiet Time.',
       },
       // the two invisible stores come first on purpose. Clay builds each item in order and only
       // attaches it after setting its value, so a store declared after the builder does not exist
@@ -467,105 +400,17 @@ const config = [
       ], 0, 'The dial an Analog Clock panel draws. Add an Analog Clock to your layout to see it.'),
     ],
   },
-  // --- Health ---
-  {
-    type: 'section',
-    items: [
-      heading('Health Configuration'),
-      select('HEALTH_GOAL_ACTIVE', 'Activity Goal', GOAL_ACTIVE, 1),
-      select('HEALTH_GOAL_CALORIES', 'Calorie Goal', GOAL_CALORIES, 3),
-      select('HEALTH_GOAL_HR', 'Heart-rate Limit', GOAL_HR, 3),
-      select('HEALTH_GOAL_SLEEP', 'Sleep Goal', GOAL_SLEEP, 2),
-      select('HEALTH_GOAL_STEPS', 'Step Goal', GOAL_STEPS, 2),
-      select('HEALTH_STEPS_MODE', 'Steps Unit', [
-        { label: 'Steps', value: 0 },
-        { label: 'Miles', value: 1 },
-        { label: 'Kilometers', value: 2 },
-      ], 0, "What the Steps panel shows: your step count, or the distance you've walked today, in miles or kilometers."),
-      select('HEALTH_GOAL_DISTANCE', 'Distance Goal', GOAL_DISTANCE, 2),
-      select('HEALTH_DISTANCE_UNIT', 'Distance Unit', [
-        { label: 'Miles', value: 1 },
-        { label: 'Kilometers', value: 0 },
-      ], 0, 'The unit for the standalone Distance panel, kept apart so it can differ from the Steps panel.'),
-      select('HEALTH_GOAL_VIBE', 'Goal Met Vibration', GOAL_VIBE_OPTIONS, '', 'Buzz the first time you reach a daily goal (steps, calories, distance, or active minutes). The fanfares are little celebration rhythms. Pick Custom to use your own pattern below.'),
-      {
-        type: 'input',
-        messageKey: 'HEALTH_GOAL_VIBE_CUSTOM',
-        label: 'Custom Vibe Pattern',
-        description: 'Your own rhythm as comma-separated on and off times in milliseconds, starting with a buzz. Used only when Goal Met Vibration is set to Custom. Example: 100,80,100,80,300',
-        attributes: {
-          placeholder: '100,80,100,80,300',
-          limit: 120,
-        },
-      },
-    ],
-  },
-  // --- Location & Time Zone ---
-  {
-    type: 'section',
-    items: [
-      heading('Location Settings'),
-      toggle('LOCATION_USE_GPS', 'Enable Phone GPS', 'Automatically fetch weather for your current location.', true),
-      toggle('LOCATION_GPS_FALLBACK', 'Fallback to Manual Location', 'If GPS is disabled or unavailable, use the city typed below.', true),
-      {
-        type: 'locationsearch',
-        messageKey: 'LOCATION_NAME',
-        label: 'Manual Location',
-        attributes: {
-          placeholder: 'Search a city, e.g. Phoenix',
-        },
-      },
-      {
-        type: 'locationsearch',
-        messageKey: 'CLOCK_TIMEZONE_1',
-        label: 'Alternate Time Zone',
-        description: "Sets the local time displayed by the 'Alternate Time' module in your layout. Search a city, a zone name such as Europe/London, or type UTC or an offset like UTC+05:30.",
-        attributes: {
-          placeholder: 'e.g. Phoenix, UTC, or Europe/London',
-        },
-      },
-    ],
-  },
-  // --- Weather ---
-  {
-    type: 'section',
-    items: [
-      heading('Weather Preferences'),
-      select('WEATHER_TEMPERATURE_UNIT', 'Temperature Unit', [
-        { label: 'Celsius (°C)', value: 0 },
-        { label: 'Fahrenheit (°F)', value: 1 },
-      ], 0),
-      select('WEATHER_WIND_UNIT', 'Wind Speed Unit', [
-        { label: 'Kilometers/hour (km/h)', value: 0 },
-        { label: 'Miles/hour (mph)', value: 1 },
-        { label: 'Knots (kts)', value: 2 },
-        { label: 'Meters/second (m/s)', value: 3 },
-      ], 0),
-      select('WEATHER_PROVIDER', 'Data Source', [
-        { label: 'Open-Meteo (Free, No Key Required)', value: 'openmeteo' },
-        { label: 'OpenWeatherMap', value: 'owm' },
-        { label: 'WeatherAPI.com', value: 'weatherapi' },
-      ], 'openmeteo', 'Choose where your watch pulls its weather data. Open-Meteo works right out of the box with no setup required.'),
-      {
-        type: 'input',
-        messageKey: 'WEATHER_API_KEY',
-        label: 'API Key',
-        description: 'Only required if you selected OpenWeatherMap or WeatherAPI above.',
-        attributes: {
-          placeholder: 'Paste your private API key here...',
-          limit: 64,
-        },
-      },
-    ],
-  },
+  healthSection(),
+  locationSection(),
+  weatherSection(),
   // --- Calendar ---
   {
     type: 'section',
     items: [
-      heading('Calendar'),
+      heading('Calendar Preferences'),
       {
         type: 'text',
-        defaultValue: 'Add a Calendar panel (Agenda, Countdown, or Free/Busy) to your layout, then paste your private iCal link below.',
+        defaultValue: 'Add a Calendar panel (Next Event, Agenda, or Timeline) to your layout, then paste your private iCal link below.',
       },
       {
         type: 'input',

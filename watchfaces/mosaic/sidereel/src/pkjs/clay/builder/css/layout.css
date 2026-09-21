@@ -492,11 +492,13 @@
   margin-bottom: 10px;
 }
 
+/* the caption sits above its picker, so Quiet Time gets the whole column to itself */
 .lb-assign-row {
   flex: 1;
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -511,7 +513,8 @@
 }
 
 .lb-assign-sel {
-  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
   min-width: 0;
   padding: 6px 4px;
   border: 2px solid #3d434d;

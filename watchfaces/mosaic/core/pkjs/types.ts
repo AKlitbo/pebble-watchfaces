@@ -19,6 +19,9 @@ export interface Block {
 /** The four placeable block sizes, keyed the way the wire string names them. */
 export type SizeKey = '1x2' | '2x2' | '1x4' | '2x4';
 
+/** A select/toggle option: its label and the value Clay stores. */
+export type ClayOption = { label: string; value: string | number };
+
 /** A Clay setting row, the shape the config.ts helpers build. */
 export interface ClayItem {
   type:
@@ -41,7 +44,7 @@ export interface ClayItem {
   label?: string;
   defaultValue?: string | number | boolean;
   description?: string;
-  options?: Array<{ label: string; value: string | number }>;
+  options?: ClayOption[];
   items?: ClayItem[];
   attributes?: Record<string, string | number>;
   /** color only: false shows the true colours instead of their washed-out sunlight pair. */

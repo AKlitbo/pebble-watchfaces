@@ -4,11 +4,13 @@
    rules are safe but bare button/img/textarea are not. the submit is hit by its .button
    class, never a bare button, so the builder's .lb-btn stay put and keep their proportions.
    padding-bottom here (not margin on the button, which collapses through its wrapper) is what
-   reliably keeps a gap under the full-width submit at the end of the page */
+   reliably keeps a gap under the full-width submit at the end of the page. Clay gives the body no
+   top padding at all, so padding-top here is what puts the same gap above the first section */
 body {
   background-color: #101216 !important;
   background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 22px 22px;
+  padding-top: .7rem !important;
   padding-bottom: 40px !important;
 }
 
