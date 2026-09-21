@@ -1,9 +1,10 @@
 /**
- * The layout library: four grids you build, and which two of them the watch uses.
+ * The layout library: the grids you build, and which of them the watch uses when.
  *
  * The grid on screen edits whichever layout the tab strip has selected, and every edit is kept —
- * there is no Save button because there is nothing to lose. Two of the four are then assigned:
- * one is the day layout, one is the night layout, and those are the only two that reach the watch.
+ * there is no Save button because there is nothing to lose. Some of them are then assigned a job:
+ * one is the day layout, one takes over after dark, one takes over while Quiet Time is on. Only
+ * the assigned ones reach the watch.
  *
  * Everything except those two lives in the hidden gl-store input on the page, so Clay saves it to
  * the phone and seeds it back next time. The config webview blocks its own localStorage, which is
@@ -15,11 +16,14 @@
 
 import { EMPTY_LAYOUT } from './wire';
 
-/** How many layouts the library holds. Two get used; the rest are somewhere to keep a design. */
-export const LAYOUT_COUNT = 4;
+/** How many layouts the library holds. Some get used; the rest are somewhere to keep a design. */
+export const LAYOUT_COUNT = 5;
 
-/** Which layout is the night one when none is. */
-export const NIGHT_NONE = -1;
+/** What an assignment reads as when the job has no layout. */
+export const ROLE_NONE = -1;
+
+/** A job a layout can be assigned to. Day always has one, the others can be left unassigned. */
+export type LayoutRole = 'day' | 'night' | 'quiet';
 
 /** The library as it sits in the hidden store. */
 export interface LayoutLibrary {
@@ -27,8 +31,10 @@ export interface LayoutLibrary {
   layouts: string[];
   /** Which layout the watch shows by day. */
   day: number;
-  /** And after dark, or NIGHT_NONE to stay on the day one all night. */
+  /** And after dark, or ROLE_NONE to stay on the day one all night. */
   night: number;
+  /** And while Quiet Time is on, or ROLE_NONE to leave the hour to decide. */
+  quiet: number;
 }
 
 /** How the tab strip reaches the builder around it. */
@@ -101,7 +107,8 @@ export function readLibrary(): LayoutLibrary {
   return {
     layouts: layouts,
     day: clampIndex(raw.day, 0),
-    night: clampIndex(raw.night, NIGHT_NONE),
+    night: clampIndex(raw.night, ROLE_NONE),
+    quiet: clampIndex(raw.quiet, ROLE_NONE),
   };
 }
 
@@ -136,11 +143,15 @@ export function seedLibrary(library: LayoutLibrary, existing: string): LayoutLib
 
   const layouts = library.layouts.slice();
   layouts[0] = existing;
-  return { layouts: layouts, day: 0, night: library.night };
+  return { layouts: layouts, day: 0, night: library.night, quiet: library.quiet };
 }
 
 /**
- * Builds the tab strip and the two assignment rows into a host element.
+ * Builds the tab strip and the assignment rows into a host element.
+ *
+ * The Quiet Time row only appears on a page that has somewhere to put the answer. Every mosaic
+ * face builds its grid through this same file, so without that test a face with no such store
+ * would grow a picker backed by nothing.
  *
  * @param host Where to put it, above the grid.
  * @param library The library to drive, mutated in place as the user edits.
@@ -156,6 +167,9 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   const assignments = document.createElement('div');
   assignments.className = 'lb-assign';
 
+  // only offered where the page has a store to keep the answer in
+  const quietWanted = document.querySelector('.gl-quiet') !== null;
+
   /** Stash whatever is on the grid into the layout it belongs to. */
   function keep(): void {
     library.layouts[selected] = opts.getCurrent();
@@ -163,7 +177,10 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   }
 
   function label(index: number): string {
-    const marks = (library.day === index ? '☀' : '') + (library.night === index ? '☽' : '');
+    // one mark per job the layout has been given, so the strip says at a glance which are spares
+    const marks = (library.day === index ? '☀' : '')
+      + (library.night === index ? '☽' : '')
+      + (library.quiet === index ? '⊘' : '');
     return marks ? index + 1 + ' ' + marks : String(index + 1);
   }
 
@@ -178,10 +195,11 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
       }
     }
 
+    // the rows were built in this order, and the quiet one may not be there at all
+    const order: LayoutRole[] = quietWanted ? ['day', 'night', 'quiet'] : ['day', 'night'];
     const selects = assignments.querySelectorAll<HTMLSelectElement>('select');
-    if (selects.length === 2) {
-      selects[0].value = String(library.day);
-      selects[1].value = String(library.night);
+    for (let i = 0; i < selects.length && i < order.length; i++) {
+      selects[i].value = String(library[order[i]]);
     }
   }
 
@@ -203,8 +221,8 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
     })(i);
   }
 
-  /** One "Day"/"Night" row: a label and a picker over the four layouts. */
-  function assignRow(name: string, night: boolean): void {
+  /** One assignment row: a caption and a picker over every layout in the library. */
+  function assignRow(name: string, role: LayoutRole): void {
     const row = document.createElement('div');
     row.className = 'lb-assign-row';
 
@@ -215,9 +233,10 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
     const select = document.createElement('select');
     select.className = 'lb-assign-sel';
 
-    if (night) {
+    // day always has a layout, so only the jobs that can be skipped offer None
+    if (role !== 'day') {
       const none = document.createElement('option');
-      none.value = String(NIGHT_NONE);
+      none.value = String(ROLE_NONE);
       none.textContent = 'None';
       select.appendChild(none);
     }
@@ -231,12 +250,7 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
 
     select.addEventListener('change', function () {
       keep(); // the picker reads the library, so make sure the grid is in it first
-      const index = clampIndex(select.value, night ? NIGHT_NONE : 0);
-      if (night) {
-        library.night = index;
-      } else {
-        library.day = index;
-      }
+      library[role] = clampIndex(select.value, role === 'day' ? 0 : ROLE_NONE);
       opts.save();
       redraw();
       opts.onAssign();
@@ -247,8 +261,11 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
     assignments.appendChild(row);
   }
 
-  assignRow('Day', false);
-  assignRow('Night', true);
+  assignRow('Day', 'day');
+  assignRow('Night', 'night');
+  if (quietWanted) {
+    assignRow('Quiet Time', 'quiet');
+  }
 
   host.appendChild(tabs);
   host.appendChild(assignments);

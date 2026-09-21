@@ -44,16 +44,16 @@ const GridlockBlock *gridlock_block(uint8_t index);
 bool gridlock_has_module(uint8_t type);
 
 /**
- * @brief Whether a module is placed in *either* layout, day or night.
+ * @brief Whether a module is placed in *any* layout, day, night, or Quiet Time.
  *
- * For the things that should not go quiet just because the other layout is showing. The calendar
+ * For the things that should not stop just because another layout is showing. The calendar
  * reminders are the case that matters: gating them on the layout on screen would silence every
  * overnight reminder for anyone whose night grid has no Calendar panel, which is exactly the hours
  * an early meeting needs one. Drawing still asks gridlock_has_module, which is about what is on
  * screen right now.
  *
  * @param type A ModuleType.
- * @return True when either layout places it.
+ * @return True when any layout places it.
  */
 bool gridlock_has_module_either(uint8_t type);
 
@@ -73,15 +73,33 @@ int gridlock_night_end_min(void);
 /** @brief Whether there is a night layout worth switching to, rather than an empty or junk one. */
 bool gridlock_night_layout_set(void);
 
-/** @brief Whether the night layout is the one currently being drawn. */
-bool gridlock_active_layout_is_night(void);
+/**
+ * @brief Tell whatever draws a system reading that one moved.
+ *
+ * The shared layout switch calls this when Quiet Time flips without changing the layout. It sits
+ * with the face because the two faces name that repaint tag differently.
+ */
+void gridlock_mark_system_dirty(void);
 
 /**
- * @brief Pick which layout the face draws from. In memory only, so neither stored layout moves.
+ * @brief Settle anything holding a layer before the shared layout switch rebuilds the engine.
  *
- * @param night True to draw the night layout.
+ * Nothing on this face runs between paints, so there is nothing to settle.
  */
-void gridlock_set_active_layout(bool night);
+void gridlock_before_rebuild(void);
+
+/** @brief And whether there is a Quiet Time one, on the same test. */
+bool gridlock_quiet_layout_set(void);
+
+/** @brief Which layout is being drawn, as a LayoutRole. */
+uint8_t gridlock_active_layout_role(void);
+
+/**
+ * @brief Pick which layout the face draws from. In memory only, so no stored layout moves.
+ *
+ * @param role A LayoutRole. Anything out of range is ignored and the current one stays.
+ */
+void gridlock_set_active_layout_role(uint8_t role);
 
 /**
  * @brief Sets the night layout in memory only (it is not saved). The dev harness uses this to
@@ -90,6 +108,13 @@ void gridlock_set_active_layout(bool night);
  * @param layout A LAYOUT wire string.
  */
 void gridlock_set_night_layout(const char *layout);
+
+/**
+ * @brief Sets the Quiet Time layout in memory only (it is not saved), for the dev harness.
+ *
+ * @param layout A LAYOUT wire string.
+ */
+void gridlock_set_quiet_layout(const char *layout);
 
 /**
  * @brief Sets the night schedule mode in memory only (it is not saved). The dev harness pins this
@@ -213,18 +238,24 @@ const char *gridlock_temp_unit_label(void);
 /** @} */
 
 /**
- * @brief The timezone offset in minutes for the given time zone index (0-3 for Time Zones 1-4).
+ * @brief How far the alternate time zone runs from UTC.
  *
- * @param index The time zone index (0 to 3).
- * @return The offset in minutes.
+ * The setting arrives from the config page as "offset,name", so this is the number in front of the
+ * first comma. Only index 0 holds a zone, and any other index reads as zero.
+ *
+ * @param index Which alternate zone to read. There is one, so this is 0.
+ * @return Minutes ahead of UTC, negative behind it.
  */
 int16_t gridlock_time_zone_offset_minutes(uint8_t index);
 
 /**
- * @brief The timezone name for the given time zone index.
+ * @brief The alternate time zone's name, for the panel header.
  *
- * @param index The time zone index.
- * @return The name string.
+ * Everything after the first comma of the setting, which the caller cuts down to fit. Only index 0
+ * holds a zone, and any other index reads as "TZ".
+ *
+ * @param index Which alternate zone to read. There is one, so this is 0.
+ * @return The name, never NULL.
  */
 const char* gridlock_time_zone_name(uint8_t index);
 

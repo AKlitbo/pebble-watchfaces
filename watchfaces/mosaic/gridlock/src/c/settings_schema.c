@@ -17,6 +17,9 @@
 #include "system/settings/setting_values.h"
 #include "units/wind.h"
 #include "clock/nightsched.h"
+#include "layout/layout_role.h"
+#include "layout/layout_string.h"
+#include "ui/engine/engine.h"
 #include "engine/layouts.h"
 #include "mosaic/engine/catalog.h"
 #include "mosaic/draw/header_fonts.h" // HEADER_FONT_COUNT for the header font enum bound
@@ -110,6 +113,12 @@
 #define GRIDLOCK_NIGHT_SIZE    132
 #define GRIDLOCK_NIGHT_V1_SIZE 132
 
+// the Quiet Time layout rides its own key for the same reason the night one does: a third
+// 128-byte layout fits in no blob that already holds one
+#define GRIDLOCK_QUIET_VERSION 1
+#define GRIDLOCK_QUIET_SIZE    129
+#define GRIDLOCK_QUIET_V1_SIZE 129
+
 // the wire value for "no night layout". an empty string cannot say this: settings_apply_inbox
 // skips an empty cstring rather than storing it, so a cleared grid would never reach the watch.
 // the same sentinel the custom colours use for their own empty state
@@ -154,6 +163,19 @@ typedef struct GridlockNight
     char    layout[128];
 } GridlockNight;
 _Static_assert(sizeof(GridlockNight) == GRIDLOCK_NIGHT_SIZE, "night blob size is frozen; fields append only");
+
+/**
+ * @brief The layout that takes over while Quiet Time is on.
+ *
+ * There is no mode beside it the way night has one. Leaving the layout unassigned is the off
+ * switch, which is the same test that already decides whether the night layout counts.
+ */
+typedef struct GridlockQuiet
+{
+    uint8_t version;
+    char    layout[128];
+} GridlockQuiet;
+_Static_assert(sizeof(GridlockQuiet) == GRIDLOCK_QUIET_SIZE, "quiet blob size is frozen; fields append only");
 
 /** @brief Weather settings. */
 typedef struct GridlockWeather
@@ -249,6 +271,7 @@ static GridlockAnalog    s_analog;
 static GridlockCalendar  s_calendar;
 static GridlockGoalVibe  s_goal_vibe;
 static GridlockNight     s_night;
+static GridlockQuiet     s_quiet;
 
 // goal option values looked up by the saved menu choice
 static const int16_t s_steps_goals[]   = {5000, 7500, 10000, 12500, 15000, 20000, 25000};
@@ -290,6 +313,13 @@ static const SettingField s_night_fields[] = {
     FACE_ENUM(GridlockNight, end_slot, LAYOUT_NIGHT_END, 48, 14),     // 07:00
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_NIGHT, .type = SETTING_CSTRING,
       .offset = offsetof(GridlockNight, layout), .size = sizeof(s_night.layout),
+      .default_str = GRIDLOCK_NO_LAYOUT },
+};
+
+// --- quiet (key 13) ---
+static const SettingField s_quiet_fields[] = {
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_QUIET, .type = SETTING_CSTRING,
+      .offset = offsetof(GridlockQuiet, layout), .size = sizeof(s_quiet.layout),
       .default_str = GRIDLOCK_NO_LAYOUT },
 };
 
@@ -522,9 +552,23 @@ static const SettingsSchema s_goal_vibe_schema = {
     .companion = &s_custom_theme_schema,
 };
 
+// chained straight after night for the same reason night is chained after core: all three
+// layouts stay at the front of the walk, clear of the tail a squeezed outbox would drop
+static const SettingsSchema s_quiet_schema = {
+    .key = GRIDLOCK_QUIET_KEY,
+    .version = GRIDLOCK_QUIET_VERSION,
+    .min_versioned_size = GRIDLOCK_QUIET_V1_SIZE,
+    .blob = &s_quiet,
+    .blob_size = sizeof(s_quiet),
+    .fields = s_quiet_fields,
+    .field_count = ARRAY_LENGTH(s_quiet_fields),
+    .migrate = NULL,
+    .companion = &s_goal_vibe_schema,
+};
+
 // chained straight after core on purpose: settings_serialize walks the chain in order and stops
-// at the first dict failure, so keeping both layouts at the front keeps the night one out of the
-// tail that a squeezed outbox would drop
+// at the first dict failure, so keeping the layouts at the front keeps them out of the tail that
+// a squeezed outbox would drop
 static const SettingsSchema s_night_schema = {
     .key = GRIDLOCK_NIGHT_KEY,
     .version = GRIDLOCK_NIGHT_VERSION,
@@ -534,7 +578,7 @@ static const SettingsSchema s_night_schema = {
     .fields = s_night_fields,
     .field_count = ARRAY_LENGTH(s_night_fields),
     .migrate = NULL,
-    .companion = &s_goal_vibe_schema,
+    .companion = &s_quiet_schema,
 };
 
 static const SettingsSchema s_core_schema = {
@@ -563,7 +607,7 @@ const SettingsSchema *gridlock_settings_schema(void)
 static GridlockBlock s_blocks[GRIDLOCK_MAX_CELLS];
 static uint8_t s_block_count;
 static char s_parsed_src[sizeof(s_core.layout)]; // last string we parsed so we can skip doing it twice
-static bool s_night_active;                      // which of the two layouts the parser is reading
+static uint8_t s_active_role;                    // a LayoutRole: which layout the parser is reading
 
 /**
  * @brief Reads a run of digits and moves the cursor past them.
@@ -584,46 +628,25 @@ static int parse_int(const char **p)
 }
 
 /**
- * @brief Whether a layout string holds at least one placeable block.
- *
- * One test covers the three ways a layout can be nothing: the "0" sentinel, an empty string, and
- * whatever a corrupt blob left behind.
- *
- * @param layout The wire string.
- * @return True when at least one record names a real module.
- */
-static bool layout_has_any_block(const char *layout)
-{
-    for (const char *p = layout; p && *p; )
-    {
-        int type = parse_int(&p);
-        if (type > 0 && type < MOD_TYPE_COUNT)
-        {
-            return true;
-        }
-
-        while (*p && *p != ';')
-        {
-            p++;
-        }
-        if (*p == ';')
-        {
-            p++;
-        }
-    }
-
-    return false;
-}
-
-/**
  * @brief The layout the block cache should be reading.
  *
- * The night one only wins while it is switched on and actually holds blocks, so a cleared or
- * corrupt night grid quietly falls back to the day layout rather than showing an empty screen.
+ * An alternate layout only wins while it actually holds blocks, so a cleared or corrupt grid
+ * quietly falls back to the day layout rather than showing an empty screen. The role was picked
+ * on the same test, and this catches a blob that went bad after it was.
  */
 static const char *active_layout(void)
 {
-    return (s_night_active && layout_has_any_block(s_night.layout)) ? s_night.layout : s_core.layout;
+    if (s_active_role == LAYOUT_ROLE_QUIET && layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT))
+    {
+        return s_quiet.layout;
+    }
+
+    if (s_active_role == LAYOUT_ROLE_NIGHT && layout_has_any_block(s_night.layout, MOD_TYPE_COUNT))
+    {
+        return s_night.layout;
+    }
+
+    return s_core.layout;
 }
 
 /**
@@ -746,7 +769,8 @@ bool gridlock_has_module_either(uint8_t type)
 {
     return gridlock_has_module(type)
         || layout_string_has_module(s_core.layout, type)
-        || layout_string_has_module(s_night.layout, type);
+        || layout_string_has_module(s_night.layout, type)
+        || layout_string_has_module(s_quiet.layout, type);
 }
 
 uint8_t gridlock_night_mode(void)
@@ -766,17 +790,35 @@ int gridlock_night_end_min(void)
 
 bool gridlock_night_layout_set(void)
 {
-    return layout_has_any_block(s_night.layout);
+    return layout_has_any_block(s_night.layout, MOD_TYPE_COUNT);
 }
 
-bool gridlock_active_layout_is_night(void)
+bool gridlock_quiet_layout_set(void)
 {
-    return s_night_active;
+    return layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT);
 }
 
-void gridlock_set_active_layout(bool night)
+void gridlock_mark_system_dirty(void)
 {
-    s_night_active = night;
+    engine_mark_dirty_tags(FEATURE_SYSTEM);
+}
+
+void gridlock_before_rebuild(void)
+{
+    // nothing on this face outlives a paint, so there is nothing to settle
+}
+
+uint8_t gridlock_active_layout_role(void)
+{
+    return s_active_role;
+}
+
+void gridlock_set_active_layout_role(uint8_t role)
+{
+    if (role < LAYOUT_ROLE_COUNT)
+    {
+        s_active_role = role;
+    }
 }
 
 void gridlock_set_night_layout(const char *layout)
@@ -785,6 +827,15 @@ void gridlock_set_night_layout(const char *layout)
     {
         strncpy(s_night.layout, layout, sizeof(s_night.layout) - 1);
         s_night.layout[sizeof(s_night.layout) - 1] = '\0';
+    }
+}
+
+void gridlock_set_quiet_layout(const char *layout)
+{
+    if (layout)
+    {
+        strncpy(s_quiet.layout, layout, sizeof(s_quiet.layout) - 1);
+        s_quiet.layout[sizeof(s_quiet.layout) - 1] = '\0';
     }
 }
 

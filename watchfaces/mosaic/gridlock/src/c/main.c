@@ -23,7 +23,7 @@
 #include "system/settings/setting_values.h"
 #include "settings_schema.h"
 #include "mosaic/goal_vibe.h"
-#include "night.h"
+#include "mosaic/layout_switch.h"
 #include "persist_keys.h"
 #include "theme/theme.h"
 #include "system/vibe/vibe.h"
@@ -98,8 +98,8 @@ static void load_fonts(void)
  */
 static void on_settings_changed(bool time_or_date_changed)
 {
-    // the night schedule may have changed, so settle the flag before the rebuild below reads it
-    night_layout_settings_changed();
+    // a layout or its trigger may have changed, so settle the role before the rebuild reads it
+    layout_switch_settings_changed();
 
     // the theme may have changed so re-apply the window background, and the header font may have
     // changed so swap it (a no-op when unchanged) before rebuilding the cells
@@ -184,8 +184,8 @@ static void calendar_vibe(void)
 
 // each store notifies through its own hub tag, so the engine only repaints the cells that read
 // from it instead of the whole grid
-static void on_time_changed(void)    { hourly_vibe(); calendar_vibe(); night_layout_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
-static void on_weather_changed(void) { night_layout_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
+static void on_time_changed(void)    { hourly_vibe(); calendar_vibe(); layout_switch_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
+static void on_weather_changed(void) { layout_switch_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
 static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }
 static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR); }
 static void on_health_changed(void)  { goal_vibe_update(); engine_mark_dirty_tags(FEATURE_HEALTH); }
@@ -263,9 +263,9 @@ static void init(void)
 
     load_fonts();
 
-    // settle day or night before the first build, so a watchface launched after dark comes up on
-    // the night layout instead of flashing the day one
-    night_layout_init();
+    // settle which layout wins before the first build, so a watchface launched after dark comes
+    // up on the night layout instead of flashing the day one
+    layout_switch_init();
     engine_init(s_window, gridlock_build);
 
     // a store change repaints only the cells that read from that hub (see the wrappers above)

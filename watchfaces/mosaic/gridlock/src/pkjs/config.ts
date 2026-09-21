@@ -3,6 +3,7 @@ import moduleThumbnails from './clay/module-thumbnails.g';
 import moduleMeta from './clay/module-meta';
 import vibrantByType from './clay/vibrant.g';
 import type { ClayItem } from '../../../core/pkjs/types';
+import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
 
 /** A select/toggle option: its label and the value Clay stores. */
 type ClayOption = { label: string; value: string | number };
@@ -305,24 +306,6 @@ const CALENDAR_VIBE_MODE_OPTIONS: ClayOption[] = [
   { label: 'Start Only', value: 3 },
 ];
 
-// the swap runs both ways, so the labels name both ends of it: naming only sunset reads as a
-// one-way trip into night with no way back. the two clocks below double as the fixed schedule and
-// as the fallback whenever the watch has no sun readings, so nobody has to be asked what happens
-// when the weather has not arrived
-const NIGHT_MODE_OPTIONS: ClayOption[] = [
-  { label: 'Never', value: 0 },
-  { label: 'At Sunset & Sunrise', value: 1 },
-  { label: 'At Custom Times', value: 2 },
-];
-
-// half-hour steps, matching the slot the watch stores. a free-text time would need its own
-// validation and would hit the empty-string problem the layout sentinel exists for
-const HALF_HOURS: ClayOption[] = Array.from({ length: 48 }, (_, slot) => {
-  const hour = Math.floor(slot / 2);
-  const minute = slot % 2 ? '30' : '00';
-  return { label: (hour < 10 ? '0' : '') + hour + ':' + minute, value: slot };
-});
-
 const GOAL_STEPS = [5000, 7500, 10000, 12500, 15000, 20000, 25000].map((n, i) => ({ label: n.toLocaleString(), value: i }));
 const GOAL_CALORIES = [500, 1000, 1500, 2000, 2500, 3000].map((n, i) => ({ label: n + ' kcal', value: i }));
 const GOAL_SLEEP = [6, 7, 8, 9, 10].map((n, i) => ({ label: n + ' h', value: i }));
@@ -404,7 +387,7 @@ const config = [
       heading('Layout'),
       {
         type: 'text',
-        defaultValue: 'Build up to four layouts and pick which two the watch uses. Tap a number to edit that layout, then drag panels in from below to place them, or drag a placed one to move or remove it. Every edit is kept as you go. Day is the layout you normally see; Night takes over on the schedule you set underneath.',
+        defaultValue: 'Build up to five layouts and give them their jobs. Tap a number to edit that layout, then drag panels in from below to place them, or drag a placed one to move or remove it. Every edit is kept as you go. Day is the layout you normally see. Night takes over on the schedule you set underneath, and Quiet Time takes over whenever the watch is on Quiet Time, whatever the hour.',
       },
       // the two invisible stores come first on purpose. Clay builds each item in order and only
       // attaches it after setting its value, so a store declared after the builder does not exist
@@ -427,6 +410,14 @@ const config = [
         storeClass: 'gl-night',
         defaultValue: '0',
       },
+      // the Quiet Time layout, written the same way and read the same way. its presence is also
+      // what tells the builder to offer a Quiet Time row at all
+      {
+        type: 'hiddenStore',
+        messageKey: 'LAYOUT_QUIET',
+        storeClass: 'gl-quiet',
+        defaultValue: '0',
+      },
       {
         type: 'layoutBuilder',
         messageKey: 'LAYOUT',
@@ -434,12 +425,7 @@ const config = [
         moduleOptions: MODULE_OPTIONS,
         moduleThumbnails: moduleThumbnails,
       },
-      select('LAYOUT_NIGHT_MODE', 'Swap Day & Night Layouts', NIGHT_MODE_OPTIONS, 0,
-        'When the watch swaps between your two layouts. At Sunset & Sunrise follows the times your weather provider reports, and falls back to the times below whenever it has none yet.'),
-      select('LAYOUT_NIGHT_START', 'Night Starts', HALF_HOURS, 42,
-        'When the night layout takes over. Used for custom times, and as the fallback whenever the watch has no sunset reading.'),
-      select('LAYOUT_NIGHT_END', 'Night Ends', HALF_HOURS, 14,
-        'And when the day layout comes back.'),
+      ...nightScheduleItems(),
     ],
   },
   // --- Bluetooth ---
@@ -533,9 +519,9 @@ const config = [
         type: 'locationsearch',
         messageKey: 'CLOCK_TIMEZONE_1',
         label: 'Alternate Time Zone',
-        description: "Sets the local time displayed by the 'Alternate Time' module in your layout.",
+        description: "Sets the local time displayed by the 'Alternate Time' module in your layout. Search a city, a zone name such as Europe/London, or type UTC or an offset like UTC+05:30.",
         attributes: {
-          placeholder: 'Search a city, e.g. Phoenix',
+          placeholder: 'e.g. Phoenix, UTC, or Europe/London',
         },
       },
     ],

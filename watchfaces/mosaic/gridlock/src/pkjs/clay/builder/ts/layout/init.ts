@@ -15,7 +15,7 @@ import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from '../../../..
 import { createDragEngine } from '../../../../../../../core/pkjs/clay/builder/ts/layout/drag';
 import { createOverlayHost } from '../../../../../../../../../lib/ts/clay/builder/ts/shared/overlay';
 import { buildIoPanel } from '../../../../../../../../../lib/ts/clay/builder/ts/shared/io-panel';
-import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, NIGHT_NONE } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
+import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, ROLE_NONE } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { ModesBar } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../../../../../../../core/pkjs/clay/builder/ts/types';
 
@@ -83,16 +83,28 @@ export function init(this: ClayComponentInstance): void {
     hidden.value = library.layouts[library.day] || EMPTY_LAYOUT;
     self.trigger('change');
 
-    const nightInput = document.querySelector('.gl-night') as HTMLInputElement | null;
-    if (nightInput) {
-      const value = library.night === NIGHT_NONE
-        ? EMPTY_LAYOUT
-        : library.layouts[library.night] || EMPTY_LAYOUT;
-      // only when it moved, so dragging around the day grid does not spam Clay with saves
-      if (nightInput.value !== value) {
-        nightInput.value = value;
-        nightInput.dispatchEvent(new Event('change'));
-      }
+    pushAssigned('.gl-night', library.night);
+    pushAssigned('.gl-quiet', library.quiet);
+  }
+
+  /**
+   * Writes one assigned layout into the hidden store the watch reads it from.
+   *
+   * An unassigned job sends the empty layout, which is how the watch is told to stop using it. A
+   * page without that store just skips it, which is what a face with no such layout looks like.
+   */
+  function pushAssigned(selector: string, index: number): void {
+    const input = document.querySelector(selector) as HTMLInputElement | null;
+    if (!input) {
+      return;
+    }
+
+    const value = index === ROLE_NONE ? EMPTY_LAYOUT : library.layouts[index] || EMPTY_LAYOUT;
+
+    // only when it moved, so dragging around the day grid does not spam Clay with saves
+    if (input.value !== value) {
+      input.value = value;
+      input.dispatchEvent(new Event('change'));
     }
   }
 
@@ -353,6 +365,7 @@ export function init(this: ClayComponentInstance): void {
         library.layouts = saved.layouts;
         library.day = saved.day;
         library.night = saved.night;
+        library.quiet = saved.quiet;
         blocks = parseLayoutString(library.layouts[library.day]);
         if (modes) {
           modes.refresh();

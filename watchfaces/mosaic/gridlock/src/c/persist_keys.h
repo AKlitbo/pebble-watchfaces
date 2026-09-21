@@ -29,6 +29,8 @@
 // and a second 128-byte layout would push it past the 256 a persist key holds, which
 // persist_write_data reports by writing nothing at all
 #define GRIDLOCK_NIGHT_KEY        12
+// and the Quiet Time layout its own again, for the same reason
+#define GRIDLOCK_QUIET_KEY        13
 
 // --- store snapshots (high band, handed to each store's init) ---
 // 253 is the location store's slot, left reserved: this face doesn't wire location
@@ -38,4 +40,4 @@
 #define WEATHER_STORE_KEY  255
 
 // a stray edit that lets the two bands meet breaks the build instead of a watch in the field
-_Static_assert(GRIDLOCK_NIGHT_KEY < CALENDAR_STORE_KEY, "settings keys must stay below the store keys");
+_Static_assert(GRIDLOCK_QUIET_KEY < CALENDAR_STORE_KEY, "settings keys must stay below the store keys");

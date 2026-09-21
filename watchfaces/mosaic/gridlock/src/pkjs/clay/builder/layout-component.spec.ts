@@ -27,12 +27,12 @@ function mountLayout() {
 }
 
 /**
- * The two hidden stores the config page renders beside the builder.
+ * The hidden stores the config page renders beside the builder.
  *
- * The library keeps the four layouts; the night one carries whichever is assigned. They are
- * separate inputs because a single .gl-store lookup would keep finding the first of the two.
+ * The library keeps every layout, and the night and quiet ones carry whichever is assigned to
+ * them. They are separate inputs because a single .gl-store lookup would keep finding the first.
  */
-function mountStores(): { library: HTMLInputElement; night: HTMLInputElement } {
+function mountStores(): { library: HTMLInputElement; night: HTMLInputElement; quiet: HTMLInputElement } {
   function input(extra: string): HTMLInputElement {
     const element = document.createElement('input');
     element.type = 'hidden';
@@ -40,7 +40,7 @@ function mountStores(): { library: HTMLInputElement; night: HTMLInputElement } {
     document.body.appendChild(element);
     return element;
   }
-  return { library: input('gl-library'), night: input('gl-night') };
+  return { library: input('gl-library'), night: input('gl-night'), quiet: input('gl-quiet') };
 }
 
 /** A pointer style event jsdom can dispatch (MouseEvent carries the client coords). */
@@ -275,6 +275,42 @@ describe('the layout library', () => {
     expect(JSON.parse(stores.library.value).night).toBe(-1);
   });
 
+  /** Assigning a layout to Quiet Time has to reach its own store, or the watch never gets one. */
+  test('assigning Quiet Time publishes that layout to the quiet store', () => {
+    const stores = mountStores();
+    const { ctx, root } = mountLayout();
+    ctx.set('2,0,0,2,1');
+
+    // build something on layout 3, then come back so the day grid is the one on screen
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[2].click();
+    root.querySelector<HTMLElement>('.lb-btn-clear').click();
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[0].click();
+    const quiet = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[2];
+    quiet.value = '2';
+    quiet.dispatchEvent(new Event('change'));
+
+    expect(stores.quiet.value).toBe('0');
+    expect(JSON.parse(stores.library.value).quiet).toBe(2);
+  });
+
+  /** The two alternate jobs must not share a store, or assigning one would overwrite the other. */
+  test('night and Quiet Time publish to their own stores', () => {
+    const stores = mountStores();
+    const { ctx, root } = mountLayout();
+    ctx.set('2,0,0,2,1');
+
+    const selects = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel');
+    selects[1].value = '1';
+    selects[1].dispatchEvent(new Event('change'));
+    selects[2].value = '2';
+    selects[2].dispatchEvent(new Event('change'));
+
+    const saved = JSON.parse(stores.library.value);
+
+    expect(saved.night).toBe(1);
+    expect(saved.quiet).toBe(2);
+  });
+
   /** Without a store the page must still work, since Clay may render it after the builder. */
   test('builds with no stores on the page at all', () => {
     const { ctx } = mountLayout();
@@ -314,5 +350,25 @@ describe('the layout library', () => {
 
     expect(JSON.parse(stores.library.value).layouts[2]).toBe('6,0,0,2,1');
     expect(JSON.parse(stores.library.value).day).toBe(2);
+  });
+
+  /**
+   * The Quiet Time assignment has to come back off that late read with the other two.
+   *
+   * Dropping it leaves the page showing no Quiet layout, and the next edit saves that emptiness
+   * back over the one the user picked, so the watch stops switching without ever saying so.
+   */
+  test('keeps the Quiet Time assignment from a library that arrives late', async () => {
+    const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,0,0,4,1'], day: 0, night: 1, quiet: 2 });
+    const { root } = mountLayout();
+    const stores = mountStores();
+    stores.library.value = saved;
+
+    await new Promise((resolve) => { setTimeout(resolve, 0); }); // let the deferred re-read run
+    root.querySelectorAll<HTMLElement>('.lb-ltab')[1].click();
+
+    const result = JSON.parse(stores.library.value).quiet;
+
+    expect(result).toBe(2);
   });
 });
