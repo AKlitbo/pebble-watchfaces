@@ -18,6 +18,7 @@
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 #include "layout.h"
+#include "mosaic/layout_switch.h"
 #include "persist_keys.h"
 #include "reel/reel.h"
 #include "settings_schema.h"
@@ -60,6 +61,9 @@ static void on_settings_changed(bool time_or_date_changed)
     // the scroll timer marks a layer that engine_rebuild is about to destroy, so settle it first
     reel_cancel();
 
+    // a layout or its trigger may have changed, so settle the role before the rebuild reads it
+    layout_switch_settings_changed();
+
     sidereel_apply_theme();
     sidereel_apply_header_font();
     engine_rebuild();
@@ -88,6 +92,7 @@ static void on_time_tick(void)
 
     engine_mark_dirty_tags(TAG_TIME);
     hourly_vibe();
+    layout_switch_tick();
 }
 
 // the store callbacks are void(*)(void) so they cannot carry their own tag
@@ -100,6 +105,8 @@ static void on_health_changed(void)
 static void on_weather_changed(void)
 {
     engine_mark_dirty_tags(TAG_WEATHER);
+    // a sunset arriving mid-evening can mean the layout should already have swapped
+    layout_switch_tick();
 }
 
 static void on_system_changed(void)
@@ -155,6 +162,10 @@ static void init(void)
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
         location_store_init((LocationConfig){.enabled = true, .live = true}, NULL);
     }
+
+    // settle which layout wins before the first build, so a watchface launched after dark comes
+    // up on the night layout instead of flashing the day one
+    layout_switch_init();
 
     s_window = window_create();
     sidereel_setup(s_window);

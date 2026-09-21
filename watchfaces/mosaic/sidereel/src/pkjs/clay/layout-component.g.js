@@ -663,7 +663,7 @@ module.exports = {
       var modes_exports = {};
       __export(modes_exports, {
         LAYOUT_COUNT: () => LAYOUT_COUNT,
-        NIGHT_NONE: () => NIGHT_NONE,
+        ROLE_NONE: () => ROLE_NONE,
         buildModesBar: () => buildModesBar,
         readLibrary: () => readLibrary,
         seedLibrary: () => seedLibrary,
@@ -701,7 +701,8 @@ module.exports = {
         return {
           layouts,
           day: clampIndex(raw.day, 0),
-          night: clampIndex(raw.night, NIGHT_NONE)
+          night: clampIndex(raw.night, ROLE_NONE),
+          quiet: clampIndex(raw.quiet, ROLE_NONE)
         };
       }
       function writeLibrary(library) {
@@ -722,7 +723,7 @@ module.exports = {
         }
         const layouts = library.layouts.slice();
         layouts[0] = existing;
-        return { layouts, day: 0, night: library.night };
+        return { layouts, day: 0, night: library.night, quiet: library.quiet };
       }
       function buildModesBar(host, library, opts) {
         let selected = library.day;
@@ -730,12 +731,13 @@ module.exports = {
         tabs.className = "lb-ltabs";
         const assignments = document.createElement("div");
         assignments.className = "lb-assign";
+        const quietWanted = document.querySelector(".gl-quiet") !== null;
         function keep() {
           library.layouts[selected] = opts.getCurrent();
           opts.save();
         }
         function label(index) {
-          const marks = (library.day === index ? "\u2600" : "") + (library.night === index ? "\u263D" : "");
+          const marks = (library.day === index ? "\u2600" : "") + (library.night === index ? "\u263D" : "") + (library.quiet === index ? "\u2298" : "");
           return marks ? index + 1 + " " + marks : String(index + 1);
         }
         function redraw() {
@@ -748,10 +750,10 @@ module.exports = {
               buttons[i].classList.remove("active");
             }
           }
+          const order = quietWanted ? ["day", "night", "quiet"] : ["day", "night"];
           const selects = assignments.querySelectorAll("select");
-          if (selects.length === 2) {
-            selects[0].value = String(library.day);
-            selects[1].value = String(library.night);
+          for (let i = 0; i < selects.length && i < order.length; i++) {
+            selects[i].value = String(library[order[i]]);
           }
         }
         for (let i = 0; i < LAYOUT_COUNT; i++) {
@@ -771,7 +773,7 @@ module.exports = {
             tabs.appendChild(tab);
           })(i);
         }
-        function assignRow(name, night) {
+        function assignRow(name, role) {
           const row = document.createElement("div");
           row.className = "lb-assign-row";
           const caption = document.createElement("span");
@@ -779,9 +781,9 @@ module.exports = {
           caption.textContent = name;
           const select = document.createElement("select");
           select.className = "lb-assign-sel";
-          if (night) {
+          if (role !== "day") {
             const none = document.createElement("option");
-            none.value = String(NIGHT_NONE);
+            none.value = String(ROLE_NONE);
             none.textContent = "None";
             select.appendChild(none);
           }
@@ -793,12 +795,7 @@ module.exports = {
           }
           select.addEventListener("change", function() {
             keep();
-            const index = clampIndex(select.value, night ? NIGHT_NONE : 0);
-            if (night) {
-              library.night = index;
-            } else {
-              library.day = index;
-            }
+            library[role] = clampIndex(select.value, role === "day" ? 0 : ROLE_NONE);
             opts.save();
             redraw();
             opts.onAssign();
@@ -807,8 +804,11 @@ module.exports = {
           row.appendChild(select);
           assignments.appendChild(row);
         }
-        assignRow("Day", false);
-        assignRow("Night", true);
+        assignRow("Day", "day");
+        assignRow("Night", "night");
+        if (quietWanted) {
+          assignRow("Quiet Time", "quiet");
+        }
         host.appendChild(tabs);
         host.appendChild(assignments);
         redraw();
@@ -819,12 +819,12 @@ module.exports = {
           refresh: redraw
         };
       }
-      var LAYOUT_COUNT, NIGHT_NONE;
+      var LAYOUT_COUNT, ROLE_NONE;
       var init_modes = __esm({
         "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/modes.ts"() {
           init_wire();
-          LAYOUT_COUNT = 4;
-          NIGHT_NONE = -1;
+          LAYOUT_COUNT = 5;
+          ROLE_NONE = -1;
         }
       });
 
@@ -856,13 +856,18 @@ module.exports = {
           save();
           hidden.value = library.layouts[library.day] || EMPTY_LAYOUT;
           self.trigger("change");
-          const nightInput = document.querySelector(".gl-night");
-          if (nightInput) {
-            const value = library.night === NIGHT_NONE ? EMPTY_LAYOUT : library.layouts[library.night] || EMPTY_LAYOUT;
-            if (nightInput.value !== value) {
-              nightInput.value = value;
-              nightInput.dispatchEvent(new Event("change"));
-            }
+          pushAssigned(".gl-night", library.night);
+          pushAssigned(".gl-quiet", library.quiet);
+        }
+        function pushAssigned(selector, index) {
+          const input = document.querySelector(selector);
+          if (!input) {
+            return;
+          }
+          const value = index === ROLE_NONE ? EMPTY_LAYOUT : library.layouts[index] || EMPTY_LAYOUT;
+          if (input.value !== value) {
+            input.value = value;
+            input.dispatchEvent(new Event("change"));
           }
         }
         let modes = null;
@@ -1083,6 +1088,7 @@ module.exports = {
               library.layouts = saved.layouts;
               library.day = saved.day;
               library.night = saved.night;
+              library.quiet = saved.quiet;
               blocks = parseLayoutString(library.layouts[library.day]);
               if (modes) {
                 modes.refresh();

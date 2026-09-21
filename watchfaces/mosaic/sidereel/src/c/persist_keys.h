@@ -31,6 +31,13 @@
 // blob has no room for beside the layout and the place name
 #define SIDEREEL_GOAL_VIBE_KEY 4
 
+// the night and Quiet Time layouts each ride their own key. both would fit beside each other
+// today, since a sidereel layout is 64 bytes rather than gridlock's 128, but a layout that grew
+// later would push the pair past the 256 a persist key holds and there is no way back from that
+// for a watch in the field
+#define SIDEREEL_NIGHT_KEY 5
+#define SIDEREEL_QUIET_KEY 6
+
 // --- store snapshots (high band, handed to each store's init) ---
 // 251 (calendar) and 254 (stock) are left reserved: this face wires neither. 253 belongs to the
 // location store, which owns its key itself
@@ -38,4 +45,4 @@
 #define WEATHER_STORE_KEY 255
 
 // a stray edit that lets the two bands meet breaks the build instead of a watch in the field
-_Static_assert(SIDEREEL_GOAL_VIBE_KEY < HEALTH_STORE_KEY, "settings keys must stay below the store keys");
+_Static_assert(SIDEREEL_QUIET_KEY < HEALTH_STORE_KEY, "settings keys must stay below the store keys");

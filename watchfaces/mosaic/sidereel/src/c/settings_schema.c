@@ -20,12 +20,24 @@
 #include "mosaic/draw/header_fonts.h"
 #include "mosaic/draw/panel_styles.h"
 #include "units/wind.h"
+#include "clock/nightsched.h"
+#include "layout/layout_role.h"
+#include "layout/layout_string.h"
 
 #include <stddef.h>
 #include <string.h>
 
 #define SIDEREEL_SETTINGS_VERSION 1
 #define SIDEREEL_GOAL_VIBE_VERSION 1
+#define SIDEREEL_NIGHT_VERSION 1
+#define SIDEREEL_QUIET_VERSION 1
+
+#define SIDEREEL_NIGHT_SIZE (4 + SIDEREEL_LAYOUT_LEN)
+#define SIDEREEL_QUIET_SIZE (1 + SIDEREEL_LAYOUT_LEN)
+
+// the wire value for "no layout here". an empty string cannot say this: settings_apply_inbox
+// skips an empty cstring rather than storing it, so a cleared grid would never reach the watch
+#define SIDEREEL_NO_LAYOUT "0"
 
 // the Goal Met Vibe strings, sized as gridlock sizes them: the longest preset dropdown value
 // plus room to spare, and the config's 120 character cap on the custom box
@@ -85,6 +97,42 @@ typedef struct SidereelSettings
 } SidereelSettings;
 
 static SidereelSettings s_settings;
+
+/**
+ * @brief The night layout and when to show it.
+ *
+ * Scalars first and the string last, so a field appended later lands after the layout rather than
+ * shifting it.
+ */
+typedef struct SidereelNight
+{
+    uint8_t version;
+    uint8_t mode;       // a NightSchedMode: off, follow the sun, or the fixed pair
+    uint8_t start_slot; // half-hour slot 0..47, so 21:00 is 42
+    uint8_t end_slot;
+    char    layout[SIDEREEL_LAYOUT_LEN];
+} SidereelNight;
+_Static_assert(sizeof(SidereelNight) == SIDEREEL_NIGHT_SIZE, "night blob size is frozen; fields append only");
+
+static SidereelNight s_night;
+
+/**
+ * @brief The layout that takes over while Quiet Time is on.
+ *
+ * There is no mode beside it the way night has one. Leaving the layout unassigned is the off
+ * switch, which is the same test that already decides whether the night layout counts.
+ */
+typedef struct SidereelQuiet
+{
+    uint8_t version;
+    char    layout[SIDEREEL_LAYOUT_LEN];
+} SidereelQuiet;
+_Static_assert(sizeof(SidereelQuiet) == SIDEREEL_QUIET_SIZE, "quiet blob size is frozen; fields append only");
+
+static SidereelQuiet s_quiet;
+
+// a LayoutRole: which of the three the layout reader is handing out
+static uint8_t s_active_role;
 
 /**
  * @brief The Goal Met Vibe, in its own blob because the two rhythm strings will not fit beside
@@ -182,6 +230,31 @@ static const SettingField s_goal_vibe_fields[] = {
       .offset = offsetof(SidereelGoalVibe, custom), .size = sizeof(s_goal_vibe.custom), .default_str = "" },
 };
 
+// --- night (key 5) ---
+// the times are half-hour slots rather than an "HH:MM" string: one byte instead of six, no parse,
+// and the framework's enum_count clamp sanitises them for free
+static const SettingField s_night_fields[] = {
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_NIGHT_MODE, .type = SETTING_ENUM_U8,
+      .offset = offsetof(SidereelNight, mode), .enum_count = NIGHT_SCHED_COUNT,
+      .affects_layout = true, .default_num = NIGHT_SCHED_OFF },
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_NIGHT_START, .type = SETTING_ENUM_U8,
+      .offset = offsetof(SidereelNight, start_slot), .enum_count = 48,
+      .affects_layout = true, .default_num = 42 }, // 21:00
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_NIGHT_END, .type = SETTING_ENUM_U8,
+      .offset = offsetof(SidereelNight, end_slot), .enum_count = 48,
+      .affects_layout = true, .default_num = 14 },  // 07:00
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_NIGHT, .type = SETTING_CSTRING,
+      .offset = offsetof(SidereelNight, layout), .size = sizeof(s_night.layout),
+      .default_str = SIDEREEL_NO_LAYOUT, .affects_layout = true },
+};
+
+// --- quiet (key 6) ---
+static const SettingField s_quiet_fields[] = {
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT_QUIET, .type = SETTING_CSTRING,
+      .offset = offsetof(SidereelQuiet, layout), .size = sizeof(s_quiet.layout),
+      .default_str = SIDEREEL_NO_LAYOUT, .affects_layout = true },
+};
+
 static const SettingsSchema s_goal_vibe_schema = {
     .key = SIDEREEL_GOAL_VIBE_KEY,
     .version = SIDEREEL_GOAL_VIBE_VERSION,
@@ -192,6 +265,33 @@ static const SettingsSchema s_goal_vibe_schema = {
     .field_count = ARRAY_LENGTH(s_goal_vibe_fields),
     .migrate = NULL,
     .companion = &sidereel_custom_theme_schema,  // the packed appearance string, in its own two slots
+};
+
+// chained straight after the main blob: settings_serialize walks the chain in order and stops at
+// the first dict failure, so keeping the layouts at the front keeps them out of the tail that a
+// squeezed outbox would drop
+static const SettingsSchema s_quiet_schema = {
+    .key = SIDEREEL_QUIET_KEY,
+    .version = SIDEREEL_QUIET_VERSION,
+    .min_versioned_size = SIDEREEL_QUIET_SIZE,
+    .blob = &s_quiet,
+    .blob_size = sizeof(s_quiet),
+    .fields = s_quiet_fields,
+    .field_count = ARRAY_LENGTH(s_quiet_fields),
+    .migrate = NULL,
+    .companion = &s_goal_vibe_schema,
+};
+
+static const SettingsSchema s_night_schema = {
+    .key = SIDEREEL_NIGHT_KEY,
+    .version = SIDEREEL_NIGHT_VERSION,
+    .min_versioned_size = SIDEREEL_NIGHT_SIZE,
+    .blob = &s_night,
+    .blob_size = sizeof(s_night),
+    .fields = s_night_fields,
+    .field_count = ARRAY_LENGTH(s_night_fields),
+    .migrate = NULL,
+    .companion = &s_quiet_schema,
 };
 
 static const SettingsSchema s_schema = {
@@ -205,8 +305,9 @@ static const SettingsSchema s_schema = {
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,  // v1 is the only shape a stored blob can have, so nothing to bring forward
-    // the chain runs on to the goal vibe, which carries the packed appearance string behind it
-    .companion = &s_goal_vibe_schema,
+    // the chain runs on through the two alternate layouts to the goal vibe, which carries the
+    // packed appearance string behind it
+    .companion = &s_night_schema,
 };
 
 const SettingsSchema *sidereel_settings_schema(void)
@@ -216,7 +317,58 @@ const SettingsSchema *sidereel_settings_schema(void)
 
 const char *sidereel_layout(void)
 {
+    // an alternate layout only wins while it actually holds blocks, so a cleared or corrupt grid
+    // quietly falls back to the day one rather than showing an empty screen. layout_string.c
+    // re-reads this and notices the string changed, so nothing else has to be told about a swap
+    if (s_active_role == LAYOUT_ROLE_QUIET && layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT))
+    {
+        return s_quiet.layout;
+    }
+
+    if (s_active_role == LAYOUT_ROLE_NIGHT && layout_has_any_block(s_night.layout, MOD_TYPE_COUNT))
+    {
+        return s_night.layout;
+    }
+
     return s_settings.layout;
+}
+
+uint8_t sidereel_night_mode(void)
+{
+    return s_night.mode;
+}
+
+int sidereel_night_start_min(void)
+{
+    return s_night.start_slot * 30;
+}
+
+int sidereel_night_end_min(void)
+{
+    return s_night.end_slot * 30;
+}
+
+bool sidereel_night_layout_set(void)
+{
+    return layout_has_any_block(s_night.layout, MOD_TYPE_COUNT);
+}
+
+bool sidereel_quiet_layout_set(void)
+{
+    return layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT);
+}
+
+uint8_t sidereel_active_layout_role(void)
+{
+    return s_active_role;
+}
+
+void sidereel_set_active_layout_role(uint8_t role)
+{
+    if (role < LAYOUT_ROLE_COUNT)
+    {
+        s_active_role = role;
+    }
 }
 
 const char *sidereel_timezone_1(void)

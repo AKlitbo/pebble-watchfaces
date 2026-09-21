@@ -34,6 +34,31 @@ const SettingsSchema *sidereel_settings_schema(void);
  */
 const char *sidereel_layout(void);
 
+/** @brief Which layout is being drawn, as a LayoutRole. */
+uint8_t sidereel_active_layout_role(void);
+
+/**
+ * @brief Pick which layout the face draws from. In memory only, so no stored layout moves.
+ *
+ * @param role A LayoutRole. Anything out of range is ignored and the current one stays.
+ */
+void sidereel_set_active_layout_role(uint8_t role);
+
+/** @brief What the night swap is following, as a NightSchedMode. */
+uint8_t sidereel_night_mode(void);
+
+/** @brief The minute of the day the night window opens, from the user's own setting. */
+int sidereel_night_start_min(void);
+
+/** @brief And the minute it closes. */
+int sidereel_night_end_min(void);
+
+/** @brief Whether there is a night layout worth switching to, rather than an empty or junk one. */
+bool sidereel_night_layout_set(void);
+
+/** @brief And whether there is a Quiet Time one, on the same test. */
+bool sidereel_quiet_layout_set(void);
+
 /**
  * @brief The second time zone as its wire string ("<offset minutes>,<place name>").
  *
@@ -128,6 +153,19 @@ bool gridlock_distance_in_miles(void);
 int gridlock_wind_value(int kmh);
 const char *gridlock_wind_unit_label(void);
 const char *gridlock_temp_unit_label(void);
+
+// and what the shared layout switch asks for. most of it forwards to this face's own accessors.
+// the repaint and the settle before a rebuild are the face's own, since the two faces name their
+// tags differently and only this one has a reel to stop
+uint8_t gridlock_night_mode(void);
+int gridlock_night_start_min(void);
+int gridlock_night_end_min(void);
+bool gridlock_night_layout_set(void);
+bool gridlock_quiet_layout_set(void);
+uint8_t gridlock_active_layout_role(void);
+void gridlock_set_active_layout_role(uint8_t role);
+void gridlock_mark_system_dirty(void);
+void gridlock_before_rebuild(void);
 int16_t gridlock_time_zone_offset_minutes(uint8_t index);
 const char *gridlock_time_zone_name(uint8_t index);
 bool gridlock_clock_is_24h(void);

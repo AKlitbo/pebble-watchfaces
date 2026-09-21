@@ -5,6 +5,7 @@ import moduleMeta from './clay/module-meta';
 import vibrantByType from './clay/vibrant.g';
 import layoutPresets from '../data/layout-presets.json';
 import type { ClayItem } from '../../../core/pkjs/types';
+import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
 
 /** A select/toggle option: its label and the value Clay stores. */
 type ClayOption = { label: string; value: string | number };
@@ -329,7 +330,32 @@ const config = [
       heading('Layout'),
       {
         type: 'text',
-        defaultValue: 'Drag panels in from below to place them, or drag a placed one to move or remove it. The reel and the hour pointer own the rest of the screen, so panels sit in the two rows above the pointer and the two below.',
+        defaultValue: 'Build up to five layouts and give them their jobs. Tap a number to edit that layout, then drag panels in from below to place them, or drag a placed one to move or remove it. The reel and the hour pointer own the rest of the screen, so panels sit in the two rows above the pointer and the two below. Day is the layout you normally see. Night takes over on the schedule you set underneath, and Quiet Time takes over whenever the watch is on Quiet Time, whatever the hour.',
+      },
+      // the three stores come first on purpose. Clay builds each item in order and only attaches
+      // it after setting its value, so a store declared after the builder does not exist yet when
+      // the builder initialises and goes looking for it.
+      //
+      // the library holds every layout and which of them has which job. the watch never reads it
+      {
+        type: 'hiddenStore',
+        messageKey: 'LAYOUT_SLOTS',
+        storeClass: 'gl-library',
+        defaultValue: '',
+      },
+      // the night and Quiet Time layouts, which the builder writes from whichever library entry
+      // is assigned. these two the watch does read
+      {
+        type: 'hiddenStore',
+        messageKey: 'LAYOUT_NIGHT',
+        storeClass: 'gl-night',
+        defaultValue: '0',
+      },
+      {
+        type: 'hiddenStore',
+        messageKey: 'LAYOUT_QUIET',
+        storeClass: 'gl-quiet',
+        defaultValue: '0',
       },
       {
         type: 'layoutBuilder',
@@ -338,6 +364,7 @@ const config = [
         moduleOptions: MODULE_OPTIONS,
         moduleThumbnails: moduleThumbnails,
       },
+      ...nightScheduleItems(),
     ],
   },
   // --- Bluetooth ---
@@ -425,9 +452,9 @@ const config = [
         type: 'locationsearch',
         messageKey: 'CLOCK_TIMEZONE_1',
         label: 'Alternate Time Zone',
-        description: "Sets the local time displayed by the 'Time Zone 1' module in your layout.",
+        description: "Sets the local time displayed by the 'Time Zone 1' module in your layout. Search a city, a zone name such as Europe/London, or type UTC or an offset like UTC+05:30.",
         attributes: {
-          placeholder: 'Search a city, e.g. Phoenix',
+          placeholder: 'e.g. Phoenix, UTC, or Europe/London',
         },
       },
     ],
