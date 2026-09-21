@@ -4,6 +4,19 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-20
+
+### Added
+
+- Added a Quiet Time layout that takes over whenever the watch is on Quiet Time, and wins over the night layout. Leave it on None and nothing changes.
+- Added a fifth slot to the layout library, so there is one more grid to keep a design in.
+- Added time zones to the Alternate Time Zone picker, so UTC, a zone name such as Europe/London, or an offset like UTC+05:30 can be picked as well as a city.
+
+### Fixed
+
+- Fixed the night layout never taking effect. The settings page offered a Night picker and a schedule, but the watchface had nowhere to keep either.
+- Fixed the layouts you build being forgotten. Only the one on screen was kept, so the rest were gone the next time you opened the settings.
+
 ## [1.1.2] - 2026-09-18
 
 ### Changed

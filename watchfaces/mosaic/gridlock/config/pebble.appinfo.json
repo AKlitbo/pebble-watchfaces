@@ -1,6 +1,6 @@
 {
   "displayName": "Gridlock",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "uuid": "85ee3144-1c42-486a-b2a4-a74a1efaeb69",
   "sdkVersion": "3",
   "enableMultiJS": true,
@@ -95,7 +95,8 @@
     "LAYOUT_NIGHT",
     "LAYOUT_NIGHT_MODE",
     "LAYOUT_NIGHT_START",
-    "LAYOUT_NIGHT_END"
+    "LAYOUT_NIGHT_END",
+    "LAYOUT_QUIET"
   ],
   "resources": {
     "media": [
@@ -315,49 +316,49 @@
         "type": "font",
         "name": "FONT_LECO_12",
         "file": "fonts/LECO2014-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_PRESS_8",
         "file": "fonts/PressStart2P-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 8
       },
       {
         "type": "font",
         "name": "FONT_PIXELIFY_12",
         "file": "fonts/PixelifySans.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_ALDRICH_11",
         "file": "fonts/Aldrich-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 11
       },
       {
         "type": "font",
         "name": "FONT_KODEMONO_12",
         "file": "fonts/KodeMono-SemiBold.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_ELECTRO_12",
         "file": "fonts/Electrolize-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_QUANTICO_11",
         "file": "fonts/Quantico-Bold.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 11
       },
       {

@@ -1,7 +1,7 @@
 {
   "name": "sidereel",
   "displayName": "Sidereel",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "watchface": true,
   "uuid": "c8d3a53e-3ca1-4fb5-8a0a-af7c5fba781c",
   "sdkVersion": "3",
@@ -22,6 +22,12 @@
     "APPEARANCE_QUIET_TIME_ICON",
     "APPEARANCE_CUSTOM_COLORS",
     "LAYOUT",
+    "LAYOUT_SLOTS",
+    "LAYOUT_NIGHT",
+    "LAYOUT_NIGHT_MODE",
+    "LAYOUT_NIGHT_START",
+    "LAYOUT_NIGHT_END",
+    "LAYOUT_QUIET",
     "CLOCK_DATE_FORMAT",
     "CLOCK_TIME_FORMAT",
     "CLOCK_HOURLY_VIBE",
@@ -278,49 +284,49 @@
         "type": "font",
         "name": "FONT_LECO_12",
         "file": "fonts/LECO2014-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_PRESS_8",
         "file": "fonts/PressStart2P-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 8
       },
       {
         "type": "font",
         "name": "FONT_PIXELIFY_12",
         "file": "fonts/PixelifySans.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_ALDRICH_11",
         "file": "fonts/Aldrich-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 11
       },
       {
         "type": "font",
         "name": "FONT_KODEMONO_12",
         "file": "fonts/KodeMono-SemiBold.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_ELECTRO_12",
         "file": "fonts/Electrolize-Regular.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 12
       },
       {
         "type": "font",
         "name": "FONT_QUANTICO_11",
         "file": "fonts/Quantico-Bold.ttf",
-        "characterRegex": "[A-Z0-9 /.'-]",
+        "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 11
       },
       {
