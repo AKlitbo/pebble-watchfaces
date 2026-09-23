@@ -9,11 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Changed the wording in the Clay layout builder.
+- The prompt to pick a city again now stands out as a boxed note rather than a loose line of text.
 
 ### Fixed
 
 - Fixed the Day, Night and Quiet Time pickers in the Clay layout builder being squeezed thin. Each caption now sits above its picker.
 - Fixed inconsistent wording and spacing through the Clay settings page, including notes that named panels Sidereel does not have.
+- Fixed the Alternate Time Zone opening empty on the settings page while the watch still showed the old zone. The place name now comes back from the watch.
+- Fixed a settings page with no city chosen dropping the Alternate Time Zone to UTC under a bare TZ heading.
+- Fixed a city picked for the Alternate Time Zone saving as UTC when the page was saved straight away or with no connection.
 
 ## [1.2.0] - 2026-09-20
 

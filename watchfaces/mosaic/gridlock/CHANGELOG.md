@@ -9,11 +9,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Changed the wording in the Clay layout builder.
+- The prompt to pick a city again now stands out as a boxed note rather than a loose line of text.
 
 ### Fixed
 
 - Fixed the Day, Night and Quiet Time pickers in the Clay layout builder being squeezed thin. Each caption now sits above its picker.
 - Fixed inconsistent wording and spacing through the Clay settings page, including notes that named panels Gridlock does not have.
+- Fixed the Alternate Time Zone opening empty on the settings page while the watch still showed the old zone. The place name now comes back from the watch.
+- Fixed a settings page with no city chosen dropping the Alternate Time Zone to UTC under a bare TZ heading.
+- Fixed a city picked for the Alternate Time Zone saving as UTC when the page was saved straight away or with no connection.
+- Fixed a moved event replacing the same slot in every other repeating calendar event, and showing once for each of them.
+- Fixed an older calendar load overwriting a newer one, such as the old feed showing after you changed the iCal address.
+- Fixed the Gridlock app opening on placeholder weather until the next half hourly poll. It now asks for a reading as it opens.
 
 ## [1.4.0] - 2026-09-20
 
