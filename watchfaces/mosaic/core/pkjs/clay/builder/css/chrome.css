@@ -140,3 +140,17 @@ input[type='text'], input[type='email'], input[type='url'], input[type='search']
   background: #ff6a1f;
   color: #1a0c03;
 }
+
+/* the locationsearch component carries its own callout for the "pick this city again" prompt, in
+   Clay's stock orange. paint it in the page's own orange and square the badge so it sits in the
+   industrial chrome rather than beside it */
+.loc-search .loc-note {
+  background: rgba(255, 106, 31, 0.1) !important;
+  border-left-color: #ff6a1f !important;
+}
+
+.loc-search .loc-note:before {
+  border-color: #ff6a1f !important;
+  border-radius: 0 !important;
+  color: #ff6a1f !important;
+}
