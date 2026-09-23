@@ -1,6 +1,6 @@
 # Pebble Watchfaces
 
-A collection of watchfaces for current Pebble hardware, built on one shared engine. Each face shows the time, date, weather and battery, wrapped in its own interface, with themes selectable from a Clay settings page. Most also show heart rate and steps where the watch has the sensors for them.
+A collection of watchfaces for current Pebble hardware, built on one shared framework. Each face shows the time, date, weather and battery, wrapped in its own interface, with themes selectable from a Clay settings page. Most also show heart rate and steps where the watch has the sensors for them.
 
 ## Watchfaces
 
@@ -50,13 +50,13 @@ Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp bu
 
 ## Project Structure
 
-The shared engine lives at the root. Each face owns only what makes it that face.
+The shared framework lives at the root. Each face owns only what makes it that face.
 
 A face is any directory carrying a `config/pebble.appinfo.json`, so it is found whether it sits at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
 
 * **`watchfaces/<face>/`**: one face. `config/` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
 * **`watchfaces/<family>/core/`**: the family's shared code, staged into each member's build and reached as `<family>/...`.
-* **`lib/`**: the shared engine, a git submodule of [the engine repo](https://github.com/AKlitbo/pebble-watchface-engine). It holds the base every face shares (`c/` device engine, `ts/` PebbleKit JS, `py/` waf helpers, `css/` the Pebble-64 gamut, `testing/` test helpers), the build tooling under `tools/`, and the shared tsconfig/eslint/vitest setup under `config/`.
+* **`lib/`**: the shared framework, a git submodule of [the framework repo](https://github.com/AKlitbo/pebble-app-framework). It holds the base every face shares (`c/` device code, `ts/` PebbleKit JS, `py/` waf helpers, `css/` the Pebble-64 gamut, `testing/` test helpers), the build tooling under `tools/`, and the shared tsconfig/eslint/vitest setup under `config/`.
 * **`targets/<target>/`**: the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
 * **`vendor/`**: third-party source SVGs (gitignored, see [Third-Party Assets](#third-party-assets)).
 * **`lib/build.sh`**: regenerates a face's manifest, compiles its pkjs, and runs `pebble build`.
@@ -84,7 +84,7 @@ The tag version must match `version` in that face's `config/pebble.appinfo.json`
 ## Development
 
 ```sh
-git submodule update --init               # once: fetches the shared engine into lib/
+git submodule update --init               # once: fetches the shared framework into lib/
 npm ci
 git config core.hooksPath lib/.githooks   # once: runs lint + typecheck before each commit
 bash lib/build.sh radar-array             # the .pbw, from WSL with the Pebble SDK installed
@@ -165,7 +165,7 @@ This repository bundles each face's fonts, its generated icon PNGs, and its bake
 
 ## License
 
-**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared engine in `lib/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
+**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework in `lib/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
 
 You may use, modify, fork, and share these faces under the AGPL. If you share a modified face, you share its source under the same license. See [LICENSE](LICENSE) for the full terms.
 

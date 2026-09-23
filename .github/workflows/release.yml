@@ -20,9 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # the engine is a submodule at lib/. a full submodule clone carries the engine's tags, which
+      # the framework is a submodule at lib/. a full submodule clone carries the framework's tags, which
       # the release check reads
-      - name: Checkout Engine
+      - name: Checkout Framework
         run: git submodule update --init
 
       # every check that can stop a release runs here, before the SDK install and the build, so a
