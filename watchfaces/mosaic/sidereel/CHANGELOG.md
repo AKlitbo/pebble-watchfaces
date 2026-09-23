@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed the Alternate Time Zone opening empty on the settings page while the watch still showed the old zone. The place name now comes back from the watch.
 - Fixed a settings page with no city chosen dropping the Alternate Time Zone to UTC under a bare TZ heading.
 - Fixed a city picked for the Alternate Time Zone saving as UTC when the page was saved straight away or with no connection.
+- Fixed your settings being replaced by the defaults after installing a new version.
 
 ## [1.2.0] - 2026-09-20
 

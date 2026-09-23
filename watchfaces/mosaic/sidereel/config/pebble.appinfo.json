@@ -16,6 +16,7 @@
   ],
   "messageKeys": [
     "SETTINGS_REQUEST",
+    "SETTINGS_FRESH",
     "WEATHER_REQUEST",
     "WEATHER_OK",
     "APPEARANCE_THEME",
