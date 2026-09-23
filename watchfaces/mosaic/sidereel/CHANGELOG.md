@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Changed the wording in the Clay layout builder.
+- A new install now starts with no Alternate Time Zone rather than London, reading UTC until you pick a city.
 - The prompt to pick a city again now stands out as a boxed note rather than a loose line of text.
 
 ### Fixed

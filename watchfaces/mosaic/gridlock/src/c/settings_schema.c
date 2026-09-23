@@ -364,7 +364,7 @@ static const SettingField s_clock_fields[] = {
       .enum_count = TIME_FORMAT_COUNT, .affects_layout = true, .default_num = 0 },
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_CLOCK_TIMEZONE_1, .type = SETTING_CSTRING,
       .offset = offsetof(GridlockClock, time_zone_offset_1), .size = sizeof(s_clock.time_zone_offset_1),
-      .default_str = "60,London, England, GB" },
+      .default_str = "" },
     FACE_ENUM(GridlockClock, hourly_vibe, CLOCK_HOURLY_VIBE, VIBE_COUNT, 0),
     FACE_ENUM(GridlockClock, week_start, CLOCK_WEEK_START, 2, 0),
 };

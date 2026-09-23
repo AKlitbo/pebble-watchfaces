@@ -189,7 +189,7 @@ static const SettingField s_fields[] = {
 
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_CLOCK_TIMEZONE_1, .type = SETTING_CSTRING,
       .offset = offsetof(SidereelSettings, time_zone_1), .size = sizeof(s_settings.time_zone_1),
-      .default_str = "60,London, England, GB" },
+      .default_str = "" },
 
     // the goals every health panel measures against, and the units and week start the shared
     // panel bodies read. defaults match gridlock's so a panel reads the same on either face
