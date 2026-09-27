@@ -10,10 +10,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added support for stock symbols outside the US, indexes, and currency pairs, such as 7203.T, ^GSPC, EURUSD=X, and BTC/USD. The watch shows the first 11 characters.
 
-### Changed
-
-- Changed the Timeline panel to mark an event with no length, such as a reminder, as a thin sliver rather than leaving it out.
-
 ### Fixed
 
 - Fixed the temperature showing the old number with the new unit, such as 23F for 23°C, after switching units while the phone was offline, when a refresh already under way finished just after, on the first save after installing, or after the Pebble app's data was cleared.
@@ -54,7 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed the watchlist and calendar staying blank after the phone app's data was cleared, until the next refresh, or on Alpha Vantage until a weekday evening.
 - Fixed sunrise and sunset, what follows them, and the forecast hours showing hours off when the weather location is in another time zone. Today's high, low, and rain chance could also come from the day before or after.
 - Fixed yesterday's high, low, UV, and rain chance staying on the watch as today's when part of the weather refresh kept failing.
-- Fixed a weather key that ran out of calls showing API ERROR and using up more calls on retries. It now shows RATE LIMIT until the next refresh.
+- Fixed the weather retrying when the key was wrong or out of calls, or no location was set, which used up more of the key's calls.
 - Fixed the weather and the watchlist each being fetched twice on every refresh, which used up a weather key's or a stock provider's calls twice as fast.
 - Fixed the weather readouts sometimes staying on dashes for up to half an hour after the watchface started.
 

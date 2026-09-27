@@ -34,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed the steps showing 0 with Health turned off. They show dashes until there is a reading.
 - Fixed sunrise and sunset, and what follows them, showing hours off when the weather location is in another time zone. Today's high, low, and rain chance could also come from the day before or after.
 - Fixed yesterday's high, low, UV, and rain chance staying on the watch as today's when part of the weather refresh kept failing.
-- Fixed a weather key that ran out of calls showing API ERROR and using up more calls on retries. It now shows RATE LIMIT until the next refresh.
+- Fixed the weather retrying when the key was wrong or out of calls, or no location was set, which used up more of the key's calls.
 - Fixed the weather being fetched twice on every refresh, which used up a weather key's calls twice as fast.
 - Fixed the weather readouts sometimes staying on dashes for up to half an hour after the watchface started.
 
