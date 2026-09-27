@@ -5,9 +5,11 @@
  * radar theme list, GPS on by default, and the RANGE wording this face uses for its
  * stats slot.
  */
-import buildConfig from '../../../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../lib/ts/pkjs/config-builder';
 
 export default buildConfig({
+  // the framework's default intro leaves weather out, and this face has it
+  intro: 'Personalize your layout, dial in your weather preferences, and make this watchface your own.',
   theme: {
     label: 'Frame Theme',
     description: 'Colour scheme for the watch frame.',

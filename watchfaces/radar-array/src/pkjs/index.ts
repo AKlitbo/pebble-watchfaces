@@ -1,12 +1,13 @@
 /**
  * PebbleKit JS entry point.
  *
- * Thin wrapper over the shared bootstrap (see lib/ts/pkjs/app.ts). This face formats
- * coordinates as a single hemisphere-style readout carried in the latitude key. The
- * longitude key is left empty. Everything else is shared.
+ * Thin wrapper over the shared bootstrap (see lib/ts/pkjs/app.ts). This face opts into
+ * weather with coordinates, formatted as a single hemisphere-style readout carried in the
+ * latitude key. The longitude key is left empty. Everything else is shared.
  */
-import app from '../../../../lib/ts/pkjs/app';
-import type { WeatherResult } from '../../../../lib/ts/weather/util';
+import app from '../../lib/ts/pkjs/app';
+import weather from '../../lib/ts/weather/feature';
+import type { WeatherResult } from '../../lib/ts/weather/util';
 import clayConfig from './config';
 
 /**
@@ -35,8 +36,10 @@ app.startPebbleApp({
   clayConfig,
   // the combined readout travels in the latitude key
   // longitude is left empty
-  formatCoords: (messageKeys: Record<string, number>, result: WeatherResult) => ({
-    [messageKeys.LOCATION_LATITUDE]: coordString(result),
-    [messageKeys.LOCATION_LONGITUDE]: '',
-  }),
+  features: [
+    weather.withCoords((messageKeys: Record<string, number>, result: WeatherResult) => ({
+      [messageKeys.LOCATION_LATITUDE]: coordString(result),
+      [messageKeys.LOCATION_LONGITUDE]: '',
+    })),
+  ],
 });

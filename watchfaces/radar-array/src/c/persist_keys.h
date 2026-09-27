@@ -18,10 +18,10 @@
 #define RADAR_SETTINGS_KEY 1
 
 // --- store snapshots (high band, handed to each store's init) ---
-// 251 (calendar) and 254 (stock) are left reserved: this face wires neither. 253 belongs to the
-// location store, which owns its key itself
-#define HEALTH_STORE_KEY  252
-#define WEATHER_STORE_KEY 255
+// 251 (calendar) and 254 (stock) are left reserved: this face wires neither
+#define HEALTH_STORE_KEY   252
+#define LOCATION_STORE_KEY 253
+#define WEATHER_STORE_KEY  255
 
 // a stray edit that lets the two bands meet breaks the build instead of a watch in the field
 _Static_assert(RADAR_SETTINGS_KEY < HEALTH_STORE_KEY, "settings keys must stay below the store keys");

@@ -33,7 +33,6 @@ static TimeConfig time_cfg(void)
 {
     bool beats = settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS;
     return (TimeConfig){
-        .enabled = true,
         .live = true,
         .minute_tick = !beats,  // the shell faces run one cadence: .beats replaces the clock
         .beats = beats,
@@ -117,12 +116,12 @@ static void init(void)
     // every store from a fixed fixture (live=false) for deterministic screenshots
     if (!dev_seed_stores())
     {
-        system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
-        health_store_init((HealthConfig){.enabled = true, .live = true, .persist_key = HEALTH_STORE_KEY}, NULL);
+        system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
+        health_store_init((HealthConfig){.live = true, .distance = true, .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
-        weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = WEATHER_POLL_MIN,
+        weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
-        location_store_init((LocationConfig){.enabled = true, .live = true}, NULL);
+        location_store_init((LocationConfig){.live = true, .persist_key = LOCATION_STORE_KEY}, NULL);
     }
 
     s_window = window_create();
@@ -140,7 +139,7 @@ static void init(void)
 
     // weather_store + location_store own their channels. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);
-    appmessage_open();
+    appmessage_open(2048);
 
     // dev mode only: force the theme then paint the fixture then subscribe the tap walk
     dev_start(radar_apply_theme);

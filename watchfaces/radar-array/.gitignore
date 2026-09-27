@@ -1,0 +1,12 @@
+# the framework, filled by paf sync from the tag in paf.json
+lib/
+lib.paf-*/
+
+# the install, from package-lock.json
+node_modules/
+
+# build output
+targets/
+/emit/
+coverage/
+clay-preview.html

@@ -4,6 +4,25 @@ All notable changes to the Radar Array watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed the temperature showing the old number with the new unit, such as 23F for 23°C, after switching units while the phone was offline, when a refresh already under way finished just after, on the first save after installing, or after the Pebble app's data was cleared.
+- Fixed your settings sometimes not coming back after an update, leaving the defaults until the Pebble app restarted. Going back to an older version could leave the defaults for good.
+- Fixed your settings being replaced by the defaults after installing a new version.
+- Fixed the settings page opening on the default for a choice such as the temperature unit, rather than what the watch was set to.
+- Fixed a city typed on the settings page and saved without tapping one of the suggestions being lost. The settings page now asks you to pick a place from the list.
+- Fixed the weather showing clear skies when Open-Meteo, the default weather provider, had no reading for the current conditions.
+- Fixed the steps showing -1 just after the watchface opened, or 0 with Health turned off, and the Stats Readout set to distance reading 0.0 all day. It shows dashes until there is a reading.
+- Fixed a weather key that ran out of calls showing API ERROR and using up more calls on retries. It now shows RATE LIMIT until the next refresh.
+- Fixed the weather being fetched twice on every refresh, which used up a weather key's calls twice as fast.
+- Fixed the weather readouts sometimes staying on dashes for up to half an hour after the watchface started.
+
+### Notes
+
+- This release clears the saved weather and position once. The weather readouts and the latitude and longitude show dashes until the first refresh after the update, and nothing needs doing to bring them back.
+
 ## [1.6.1] - 2026-09-18
 
 ### Changed

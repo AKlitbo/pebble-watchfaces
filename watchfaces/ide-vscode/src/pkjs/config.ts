@@ -5,9 +5,11 @@
  * editor theme list, a compact date default that fits the terminal panel, and the
  * battery section this face's tab-strip readout needs.
  */
-import buildConfig from '../../../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../lib/ts/pkjs/config-builder';
 
 export default buildConfig({
+  // the framework's default intro leaves weather out, and this face has it
+  intro: 'Personalize your layout, dial in your weather preferences, and make this watchface your own.',
   theme: {
     label: 'Editor Theme',
     description: 'Colour scheme for the editor frame and readouts.',
