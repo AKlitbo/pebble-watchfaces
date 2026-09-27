@@ -20,24 +20,25 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # the framework is a submodule at lib/. a full submodule clone carries the framework's tags, which
-      # the release check reads
-      - name: Checkout Framework
-        run: git submodule update --init
+      # paf fills every unit's lib/ from the framework tag in its paf.json and installs its node_modules
+      # from the committed lock. the face is only known once the tag is read, so every unit is filled
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v1.0.0
 
       # every check that can stop a release runs here, before the SDK install and the build, so a
       # mistyped tag or an undated changelog costs seconds
       - name: Prepare Release
         id: release
-        uses: ./lib/.github/actions/prepare-release
+        uses: AKlitbo/pebble-app-framework/.github/actions/prepare-release@v3.0.0
 
-      - uses: ./lib/.github/actions/setup-pebble
+      - uses: AKlitbo/pebble-app-framework/.github/actions/setup-pebble@v3.0.0
+        with:
+          face: ${{ steps.release.outputs.face }}
 
       - name: Build Watchface
-        run: bash lib/build.sh ${{ steps.release.outputs.face }}
+        run: paf build ${{ steps.release.outputs.face }}
 
       - name: Publish Release
-        uses: ./lib/.github/actions/publish-release
+        uses: AKlitbo/pebble-app-framework/.github/actions/publish-release@v3.0.0
         with:
           face: ${{ steps.release.outputs.face }}
           version: ${{ steps.release.outputs.version }}

@@ -5,16 +5,7 @@ build/
 # Waf-compiled resource artifacts (sources are versioned)
 *.reso
 
-# staged build folders (sources live under watchfaces/<face>/)
-targets/*/package.json
-targets/*/tsconfig.pkjs.json
-targets/*/wscript
-targets/*/.source-face
-targets/*/src/
-targets/*/lib/
-targets/*/family/
-targets/*/resources/
-targets/*/emit/
+# each face or family under watchfaces/ ignores its own lib/, node_modules/, and targets/
 
 # Python
 __pycache__/

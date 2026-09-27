@@ -11,33 +11,45 @@ on:
 
 jobs:
   # build each watchface (regenerates the manifest, compiles the TS pkjs, runs pebble build).
-  # one job per face so a failing face does not block the others' artifacts
+  # one job per face so a failing face does not block the others' artifacts. each face builds in its
+  # own paf unit, the family or face folder under watchfaces/ that holds it
   pebble:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        face: [radar-array, ide-vscode, gridlock, sidereel, ridgeline, shoreline, treeline]
+        include:
+          - { face: radar-array, unit: watchfaces/radar-array }
+          - { face: ide-vscode, unit: watchfaces/ide-vscode }
+          - { face: gridlock, unit: watchfaces/mosaic }
+          - { face: sidereel, unit: watchfaces/mosaic }
+          - { face: ridgeline, unit: watchfaces/sketchbook }
+          - { face: shoreline, unit: watchfaces/sketchbook }
+          - { face: treeline, unit: watchfaces/sketchbook }
     steps:
       - uses: actions/checkout@v7
 
-      # the framework is a submodule at lib/
-      - name: Checkout Framework
-        run: git submodule update --init
+      # paf fills the unit's lib/ from the framework tag in its paf.json and installs its node_modules
+      # from the committed lock
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v1.0.0
+        with:
+          face: ${{ matrix.face }}
 
-      - uses: ./lib/.github/actions/setup-pebble
+      - uses: AKlitbo/pebble-app-framework/.github/actions/setup-pebble@v3.0.0
+        with:
+          face: ${{ matrix.face }}
 
       # tee'd because the SDK's memory report is printed during the link and is the only place
       # the heap figure exists. shell: bash for pipefail, or a failed build would pass as long as
       # tee succeeded
       - name: Build Watchface
         shell: bash
-        run: bash lib/build.sh ${{ matrix.face }} | tee build-${{ matrix.face }}.log
+        run: paf build ${{ matrix.face }} | tee build-${{ matrix.face }}.log
 
       # runs after a failed build too, so a face that broke still shows up as missing its rows
       - name: Report Memory
         if: always()
-        uses: ./lib/.github/actions/report-memory
+        uses: AKlitbo/pebble-app-framework/.github/actions/report-memory@v3.0.0
         with:
           face: ${{ matrix.face }}
           log: build-${{ matrix.face }}.log
@@ -46,7 +58,7 @@ jobs:
         with:
           name: pbw-${{ matrix.face }}
           path: |
-            targets/${{ matrix.face }}*/build/*.pbw
+            ${{ matrix.unit }}/targets/${{ matrix.face }}*/build/*.pbw
           if-no-files-found: error
 
   memory:
@@ -56,54 +68,27 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # the framework is a submodule at lib/
-      - name: Checkout Framework
-        run: git submodule update --init
-
       - name: Render Memory
-        uses: ./lib/.github/actions/render-memory
+        uses: AKlitbo/pebble-app-framework/.github/actions/render-memory@v3.0.0
 
+  # the checks run in every unit, each against its own framework
   vitest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
-      # the framework is a submodule at lib/
-      - name: Checkout Framework
-        run: git submodule update --init
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm test
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v1.0.0
+      - run: paf test
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
-      # the framework is a submodule at lib/
-      - name: Checkout Framework
-        run: git submodule update --init
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v1.0.0
+      - run: paf lint
 
   typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
-      # the framework is a submodule at lib/
-      - name: Checkout Framework
-        run: git submodule update --init
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v1.0.0
+      - run: paf typecheck

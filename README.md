@@ -50,24 +50,24 @@ Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp bu
 
 ## Project Structure
 
-The shared framework lives at the root. Each face owns only what makes it that face.
+Each face and each family under `watchfaces/` is a [paf](https://github.com/AKlitbo/pebble-app-framework-cli) unit with its own copy of the shared [framework](https://github.com/AKlitbo/pebble-app-framework) in `lib/`, on the tag its `paf.json` names. A finished face can stay on the framework it was finished on while another moves ahead.
 
-A face is any directory carrying a `config/pebble.appinfo.json`, so it is found whether it sits at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
+A face is any directory carrying a `config/pebble.appinfo.json`, at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
 
 * **`watchfaces/<face>/`**: one face. `config/` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
 * **`watchfaces/<family>/core/`**: the family's shared code, staged into each member's build and reached as `<family>/...`.
-* **`lib/`**: the shared framework, a git submodule of [the framework repo](https://github.com/AKlitbo/pebble-app-framework). It holds the base every face shares (`c/` device code, `ts/` PebbleKit JS, `py/` waf helpers, `css/` the Pebble-64 gamut, `testing/` test helpers), the build tooling under `tools/`, and the shared tsconfig/eslint/vitest setup under `config/`.
-* **`targets/<target>/`**: the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
-* **`vendor/`**: third-party source SVGs (gitignored, see [Third-Party Assets](#third-party-assets)).
-* **`lib/build.sh`**: regenerates a face's manifest, compiles its pkjs, and runs `pebble build`.
+* **`paf.json`**, **`package.json`**, **`tsconfig.json`**: in each unit, the framework tag it is on, its scripts, and its phone code's type check.
+* **`lib/`**: in each unit, the shared framework, filled by `paf sync` and gitignored. It holds the base every face shares (`c/` device code, `ts/` PebbleKit JS, `py/` waf helpers, `css/` the Pebble-64 gamut), the build tooling under `tools/` with `build.sh`, and the shared tsconfig/eslint/vitest setup under `config/`.
+* **`targets/<target>/`**: in each unit, the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
+* **`vendor/`**: third-party source SVGs every unit's `gen:icons` reads (gitignored, see [Third-Party Assets](#third-party-assets)).
 
 Anything with a `.g.` in the name is generated and should not be hand-edited: rerun the matching `npm run gen:*`. CI checks that the committed output still matches.
 
 ### Adding a Face
 
-Create `watchfaces/<name>/` with the layout above, then build it. The sandbox, manifest, and waf entry point are all generated from the face's name and appinfo. Add `<name>` to the `face` matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
+Create `watchfaces/<name>/` with the layout above, plus a `paf.json`, `package.json`, `tsconfig.json`, and `.gitignore` copied from another standalone face, then run `paf sync` and build it. The sandbox, manifest, and waf entry point are all generated from the face's name and appinfo. Add the face and its unit to the matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
 
-To join a family instead, create it at `watchfaces/<family>/<name>/`. Nothing else changes, and the family's `core/` is compiled in automatically because of where the face sits.
+To join a family instead, create it at `watchfaces/<family>/<name>/`. It builds on the family's framework, and the family's `core/` is compiled in automatically because of where the face sits.
 
 ## Releasing
 
@@ -84,29 +84,27 @@ The tag version must match `version` in that face's `config/pebble.appinfo.json`
 ## Development
 
 ```sh
-git submodule update --init               # once: fetches the shared framework into lib/
-npm ci
-git config core.hooksPath lib/.githooks   # once: runs lint + typecheck before each commit
-bash lib/build.sh radar-array             # the .pbw, from WSL with the Pebble SDK installed
+paf sync                  # fills every unit's lib/ from its paf.json tag and installs its node_modules
+paf build radar-array     # the .pbw, from WSL with the Pebble SDK installed
 ```
 
-Every face-scoped command takes the face name:
+Every face-scoped command takes the face name, and runs in the unit that holds it:
 
 ```sh
-bash lib/build.sh <face> [--clean]    # build a .pbw into targets/<face>/build/
-npm run build:pkjs -- <face>          # compile src/pkjs + lib/ts into targets/<face>/emit/
-npm run build:manifests -- <face>     # regenerate the waf manifest + wscript
-npm run gen:icons -- <face>           # rasterize vendored SVGs to resources/icons/*.png
-npm run gen:frame -- <face> [theme]   # re-bake a background from frame/<name>.html
+paf build <face> [--clean]    # build a .pbw into the unit's targets/<face>/build/
+paf gen <face> <kind|all>     # icons, frame, clay, thumbnails, or every generator the face has inputs for
+paf run <face> <script>       # any other script in the face's unit, such as build:pkjs
 ```
 
-Repo-wide checks cover `lib/` and every face:
+The checks run in every unit, each against its own framework:
 
 ```sh
-npm test          # offline unit suite
-npm run lint
-npm run typecheck
+paf test
+paf lint
+paf typecheck
 ```
+
+`paf pin <unit> <tag>` moves a unit to another framework release, and prints the framework's changelog between the two.
 
 ## Weather Providers
 
@@ -165,7 +163,7 @@ This repository bundles each face's fonts, its generated icon PNGs, and its bake
 
 ## License
 
-**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework in `lib/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
+**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework each unit fills into `lib/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
 
 You may use, modify, fork, and share these faces under the AGPL. If you share a modified face, you share its source under the same license. See [LICENSE](LICENSE) for the full terms.
 
