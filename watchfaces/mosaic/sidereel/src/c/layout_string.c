@@ -9,6 +9,7 @@
  */
 #include "layout_string.h"
 
+#include "layout/layout_string.h"
 #include "mosaic/engine/catalog.h"
 #include "settings_schema.h"
 
@@ -22,25 +23,6 @@
 static SidereelBlock s_blocks[CELL_COUNT];
 static uint8_t s_count;
 static char s_parsed[SIDEREEL_LAYOUT_LEN];  // the string the cache was built from
-
-/**
- * @brief Reads a run of digits and moves the cursor past them.
- *
- * @param cursor The cursor, moved past the digits.
- * @return The value read, 0 when there are no digits.
- */
-static int parse_int(const char **cursor)
-{
-    int value = 0;
-
-    while (**cursor >= '0' && **cursor <= '9')
-    {
-        value = value * 10 + (**cursor - '0');
-        (*cursor)++;
-    }
-
-    return value;
-}
 
 /** @brief Steps the cursor past the rest of the current record. */
 static void skip_record(const char **cursor)
@@ -100,7 +82,8 @@ static void ensure_parsed(void)
 
     for (const char *cursor = layout; cursor && *cursor && s_count < CELL_COUNT; )
     {
-        int module = parse_int(&cursor);
+        // a number too big for any field comes back as -1, which the checks below drop
+        int module = layout_parse_int(&cursor);
 
         // every field is read in order, and the two this grid cannot vary are dropped on the
         // floor: there is one column and one width
@@ -108,25 +91,25 @@ static void ensure_parsed(void)
         {
             cursor++;
         }
-        int row = parse_int(&cursor);
+        int row = layout_parse_int(&cursor);
 
         if (*cursor == ',')
         {
             cursor++;
         }
-        (void)parse_int(&cursor);  // col
+        (void)layout_parse_int(&cursor);  // col
 
         if (*cursor == ',')
         {
             cursor++;
         }
-        (void)parse_int(&cursor);  // w
+        (void)layout_parse_int(&cursor);  // w
 
         if (*cursor == ',')
         {
             cursor++;
         }
-        int height = parse_int(&cursor) >= 2 ? 2 : 1;
+        int height = layout_parse_int(&cursor) >= 2 ? 2 : 1;
 
         skip_record(&cursor);
 

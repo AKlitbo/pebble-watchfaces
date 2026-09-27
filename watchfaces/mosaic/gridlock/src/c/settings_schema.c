@@ -17,6 +17,7 @@
 #include "system/settings/setting_values.h"
 #include "units/wind.h"
 #include "clock/nightsched.h"
+#include "clock/zone_setting.h"
 #include "layout/layout_role.h"
 #include "layout/layout_string.h"
 #include "ui/engine/engine.h"
@@ -610,24 +611,6 @@ static char s_parsed_src[sizeof(s_core.layout)]; // last string we parsed so we 
 static uint8_t s_active_role;                    // a LayoutRole: which layout the parser is reading
 
 /**
- * @brief Reads a run of digits and moves the cursor past them.
- *
- * @param p The cursor (moved past the digits).
- * @return The value read (0 when there are no digits).
- */
-static int parse_int(const char **p)
-{
-    int value = 0;
-    while (**p >= '0' && **p <= '9')
-    {
-        value = value * 10 + (**p - '0');
-        (*p)++;
-    }
-
-    return value;
-}
-
-/**
  * @brief The layout the block cache should be reading.
  *
  * An alternate layout only wins while it actually holds blocks, so a cleared or corrupt grid
@@ -677,7 +660,8 @@ static void ensure_parsed(void)
                 p++;
             }
 
-            vals[i] = parse_int(&p);
+            // a number too big for any field comes back as -1, which every check below drops
+            vals[i] = layout_parse_int(&p);
             if (*p == ',')
             {
                 p++;
@@ -707,7 +691,7 @@ static void ensure_parsed(void)
         blk->col = vals[2] >= 2 ? 2 : 0;
         blk->w   = vals[3] >= 4 ? 4 : 2;
         blk->h   = vals[4] >= 2 ? 2 : 1;
-        blk->row = vals[1] < GRIDLOCK_ROWS ? (uint8_t)vals[1] : 0;
+        blk->row = vals[1] >= 0 && vals[1] < GRIDLOCK_ROWS ? (uint8_t)vals[1] : 0;
 
         // keep the block inside the grid so a bad string can never place it off the bottom
         if (blk->row + blk->h > GRIDLOCK_ROWS)
@@ -747,7 +731,7 @@ static bool layout_string_has_module(const char *layout, uint8_t type)
 {
     for (const char *p = layout; p && *p; )
     {
-        if (parse_int(&p) == type)
+        if (layout_parse_int(&p) == type)
         {
             return true;
         }
@@ -1325,23 +1309,19 @@ void gridlock_set_time_format(uint8_t format)
     s_clock.time_format = format;
 }
 
+bool gridlock_time_zone_is_set(uint8_t index)
+{
+    return index == 0 && zone_setting_is_set(s_clock.time_zone_offset_1);
+}
+
 int16_t gridlock_time_zone_offset_minutes(uint8_t index)
 {
-    if (index == 0)
-    {
-        return atoi(s_clock.time_zone_offset_1);
-    }
-    return 0;
+    return index == 0 ? zone_setting_offset(s_clock.time_zone_offset_1) : 0;
 }
 
 const char* gridlock_time_zone_name(uint8_t index)
 {
-    if (index == 0)
-    {
-        const char *comma = strchr(s_clock.time_zone_offset_1, ',');
-        return comma ? (comma + 1) : "TZ";
-    }
-    return "TZ";
+    return index == 0 ? zone_setting_label(s_clock.time_zone_offset_1) : "";
 }
 
 /** @} */

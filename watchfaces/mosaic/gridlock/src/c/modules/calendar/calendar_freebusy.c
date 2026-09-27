@@ -15,6 +15,7 @@
 #include "mosaic/draw/icons.h"
 #include "io/stores/calendar_store.h"
 #include "settings_schema.h"
+#include "clock/timeband.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -47,36 +48,38 @@ static void draw_timeline(GridCtx *gctx, GRect area, int hours)
 {
     const CalendarStrip *strip = calendar_store_strip();
 
-    // the window starts at the top of the current hour so the cells line up with the clock
+    // the window opens at the top of the current hour so the cells line up with the clock
     time_t now = time(NULL);
-    struct tm lt = *localtime(&now);
-    lt.tm_min = 0;
-    lt.tm_sec = 0;
-    time_t window_start = mktime(&lt);
+    struct tm *lt = localtime(&now);
+    TimeBand band = timeband_from_hour(lt->tm_hour, hours * 60);
+    time_t window_start = timeband_window_epoch(band, now, lt->tm_hour * 60 + lt->tm_min);
+
+    // each timed event clipped onto the window once, in minutes past its start. a pinned moment
+    // with no length still comes back a minute wide so it draws
+    TimeBandSpan spans[CALENDAR_MAX_SLOTS];
+    int span_count = 0;
+    for (uint8_t i = 0; i < strip->count && span_count < CALENDAR_MAX_SLOTS; i++)
+    {
+        const CalendarEvent *event = &strip->event[i];
+        if (!event->all_day && timeband_clip(band, window_start, event->start, event->end, &spans[span_count]))
+        {
+            span_count++;
+        }
+    }
 
     int gap = 1;
     int cell_w = (area.size.w - gap * (hours - 1)) / hours;
 
     for (int hour = 0; hour < hours; hour++)
     {
-        time_t cell_start = window_start + hour * 3600;
-        time_t cell_end = cell_start + 3600;
-
-        // mark the minutes any timed event covers in this hour, so overlapping events count once
-        // and a short meeting fills only its share of the cell
+        // mark the minutes any event covers in this hour, so overlapping events count once and a
+        // short meeting fills only its share of the cell
         bool covered[60] = {0};
-        for (uint8_t i = 0; i < strip->count; i++)
+        for (int i = 0; i < span_count; i++)
         {
-            const CalendarEvent *event = &strip->event[i];
-            if (event->all_day || event->start >= cell_end || event->end <= cell_start)
-            {
-                continue;
-            }
-            // clamp the event to this hour: floor the start minute, ceil the end, so any minute
-            // the event touches at all reads busy
-            int from = (event->start > cell_start) ? (int)((event->start - cell_start) / 60) : 0;
-            int to = (event->end < cell_end) ? (int)((event->end - cell_start + 59) / 60) : 60;
-            for (int minute = from; minute < to; minute++)
+            int from = spans[i].from - hour * 60;
+            int to = spans[i].to - hour * 60;
+            for (int minute = from < 0 ? 0 : from; minute < to && minute < 60; minute++)
             {
                 covered[minute] = true;
             }

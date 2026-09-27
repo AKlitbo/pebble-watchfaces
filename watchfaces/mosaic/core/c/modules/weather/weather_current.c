@@ -4,7 +4,7 @@
 #include "mosaic/draw/metrics.h"
 #include "mosaic/draw/wx_icon.h"
 #include "io/stores/weather_store.h"
-#include "ui/weather/labels.h"
+#include "weather/wx_label.h"
 #include "settings_schema.h"
 #include <stdio.h>
 #include <string.h>
@@ -23,10 +23,13 @@ static void weather_current_inner_2x2(GridCtx *gctx)
         snprintf(temp, sizeof(temp), "%d%s", temp_value, gridlock_temp_unit_label());
     }
 
-    // the 2x2 is roomy, so show the full readable label ("Partly Cloudy"). the
-    // label tables resolve the "_NIGHT" token themselves, so no stripping here.
+    // the 2x2 is roomy, so it shows the sky in words ("Partly Cloudy"), which the phone sends. a
+    // reading from before the phone sent any, such as a screenshot seed, falls back to the token
     const char *raw = weather_store_cond();
-    const char *cond = (!raw[0] || !strcmp(raw, "--")) ? "--" : wx_label_long(raw);
+    char word[16];
+    wx_label_short(word, sizeof(word), raw);
+    const char *label = weather_store_cond_label();
+    const char *cond = (!raw[0] || !strcmp(raw, "--")) ? "--" : (label[0] ? label : word);
 
     IconMargins margin;
     GBitmap *bmp = wx_icon_get(&margin);
@@ -57,10 +60,11 @@ static void weather_current_inner_2x2(GridCtx *gctx)
 
 static void weather_current_inner_1x2(GridCtx *gctx)
 {
-    // the 1x2 is tight, so show the compact label (seeded to the token text, e.g.
-    // "PCLDY"). the label tables resolve the "_NIGHT" token, so no stripping here.
+    // the 1x2 is tight, so it shows the token itself, such as "PCLDY", less its night suffix
     const char *raw = weather_store_cond();
-    const char *cond = (!raw[0] || !strcmp(raw, "--")) ? "--" : wx_label_short(raw);
+    char word[16];
+    wx_label_short(word, sizeof(word), raw);
+    const char *cond = (!raw[0] || !strcmp(raw, "--")) ? "--" : word;
 
     IconMargins margin;
     GBitmap *bmp = wx_icon_get(&margin);

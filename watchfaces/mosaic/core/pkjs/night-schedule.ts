@@ -10,7 +10,7 @@
  * weather has arrived.
  */
 
-import type { ClayItem } from './types';
+import type { ClayConfigItem } from '../../lib/ts/clay/types';
 
 /** How the swap is triggered. The values line up with the watch's own NightSchedMode. */
 const MODE_OPTIONS = [
@@ -32,7 +32,7 @@ const HALF_HOURS = Array.from({ length: 48 }, (_, slot) => {
  *
  * @return The mode picker and the two clocks, in the order they should appear.
  */
-export function nightScheduleItems(): ClayItem[] {
+export function nightScheduleItems(): ClayConfigItem[] {
   return [
     {
       type: 'select',

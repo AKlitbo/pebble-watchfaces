@@ -12,7 +12,6 @@
  */
 #include "engine/grid_engine.h"
 #include "weather_solar.h"
-#include "clock/clockstr.h"
 #include "clock/duration.h"
 #include "clock/solar.h"
 #include "mosaic/draw/grid_helpers.h"
@@ -36,8 +35,8 @@ typedef struct
 static SolarTimes read_solar(void)
 {
     SolarTimes s;
-    s.rise = clockstr_minutes(weather_store_sunrise());
-    s.set = clockstr_minutes(weather_store_sunset());
+    s.rise = weather_store_sunrise();
+    s.set = weather_store_sunset();
 
     const struct tm *t = time_store_tm();
     s.now = t ? t->tm_hour * 60 + t->tm_min : -1;

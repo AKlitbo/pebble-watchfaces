@@ -110,9 +110,9 @@ static void on_settings_changed(bool time_or_date_changed)
 
     // the stock poll interval may have changed so move its next poll onto the new one. dev/seed
     // paths never reach here since they get no phone settings pushes
-    stock_store_reconfigure((StockConfig){.enabled = true, .live = true, .poll_min = gridlock_stock_poll_min()});
+    stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
     // the calendar poll interval may have changed too, so move that one the same way
-    calendar_store_reconfigure((CalendarConfig){.enabled = true, .live = true, .poll_min = gridlock_calendar_poll_min()});
+    calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
 }
 
 // buzz once at the top of the hour with the pattern the user picked. the minute tick drives this
@@ -241,19 +241,19 @@ static void init(void)
     // store from a fixed fixture (live=false) for deterministic screenshots
     if (!dev_seed_stores())
     {
-        system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
+        system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
         // the only face with the two health graphs and with panels for sleep, active time and
         // calories, so the only one that keeps their history or pays to read them
-        health_store_init((HealthConfig){.enabled = true, .live = true, .hr_history = true,
+        health_store_init((HealthConfig){.live = true, .hr_history = true,
                                          .step_history = true, .sleep = true, .active = true,
-                                         .calories = true, .persist_key = HEALTH_STORE_KEY}, NULL);
+                                         .calories = true, .distance = true, .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick
-        time_store_init((TimeConfig){.enabled = true, .live = true, .minute_tick = true, .beats = false}, NULL);
-        weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = WEATHER_POLL_MIN, .persist_key = WEATHER_STORE_KEY}, NULL);
+        time_store_init((TimeConfig){.live = true, .minute_tick = true, .beats = false}, NULL);
+        weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN, .persist_key = WEATHER_STORE_KEY}, NULL);
         // the poll interval comes from the config (Finnhub only, see the Clay note)
-        stock_store_init((StockConfig){.enabled = true, .live = true, .poll_min = gridlock_stock_poll_min(), .persist_key = STOCK_STORE_KEY}, NULL);
+        stock_store_init((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min(), .persist_key = STOCK_STORE_KEY}, NULL);
         // the calendar polls the phone for a fresh agenda on its own interval, same as stocks
-        calendar_store_init((CalendarConfig){.enabled = true, .live = true, .poll_min = gridlock_calendar_poll_min(), .persist_key = CALENDAR_STORE_KEY}, NULL);
+        calendar_store_init((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min(), .persist_key = CALENDAR_STORE_KEY}, NULL);
         // no location_store: Gridlock shows no coordinates
     }
 
@@ -283,7 +283,7 @@ static void init(void)
     // the way in, rebuild on the way out
     appmessage_on_custom_colors(gridlock_set_custom_colors);
     appmessage_set_custom_colors_provider(gridlock_get_custom_colors);
-    appmessage_open();
+    appmessage_open(6144);
 
 #ifdef BUILD_WATCHAPP
     // the app opens cold each launch, so ask for weather now instead of waiting for the 30-min poll

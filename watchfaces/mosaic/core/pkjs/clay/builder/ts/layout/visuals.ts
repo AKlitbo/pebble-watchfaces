@@ -7,7 +7,7 @@
  * initialize, which runs in the config webview, so it sticks to browser APIs.
  */
 
-import { thumbByLabel } from '../../../../../../../../lib/ts/clay/builder/ts/shared/thumbs';
+import { thumbByLabel } from '../../../../../../lib/ts/clay/builder/ts/shared/thumbs';
 import type { ModuleInfo, RawModule, Thumbs } from '../types';
 
 /**

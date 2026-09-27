@@ -8,7 +8,6 @@
 
 #include "settings_schema.h"
 #include "ui/engine/engine.h"
-#include "clock/clockstr.h"
 #include "clock/nightsched.h"
 #include "layout/layout_role.h"
 #include "io/stores/time_store.h"
@@ -40,8 +39,8 @@ static bool night_is_on(void)
     int minutes = now ? now->tm_hour * 60 + now->tm_min : -1;
 
     return night_schedule_active(gridlock_night_mode(), minutes,
-                                 clockstr_minutes(weather_store_sunrise()),
-                                 clockstr_minutes(weather_store_sunset()),
+                                 weather_store_sunrise(),
+                                 weather_store_sunset(),
                                  gridlock_night_start_min(), gridlock_night_end_min(),
                                  gridlock_night_layout_set());
 }

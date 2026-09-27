@@ -16,6 +16,7 @@
 #include "layout.h"
 #include "reel/reel.h"
 #include "ui/engine/engine.h"
+#include "clock/zone_setting.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -72,23 +73,27 @@ void gridlock_before_rebuild(void)
     reel_cancel();
 }
 
-int16_t gridlock_time_zone_offset_minutes(uint8_t index)
+// there is one alternate zone, so the index is ignored by all three
+bool gridlock_time_zone_is_set(uint8_t index)
 {
-    // there is one alternate zone, so the index is ignored. the offset rides at the front of the
-    // wire string and atoi stops at the comma
     (void)index;
 
-    return (int16_t)atoi(sidereel_timezone_1());
+    return zone_setting_is_set(sidereel_timezone_1());
+}
+
+int16_t gridlock_time_zone_offset_minutes(uint8_t index)
+{
+    (void)index;
+
+    return zone_setting_offset(sidereel_timezone_1());
 }
 
 const char *gridlock_time_zone_name(uint8_t index)
 {
     (void)index;
 
-    const char *comma = strchr(sidereel_timezone_1(), ',');
-
     // the caller cuts this at the next comma itself, so hand back the whole tail
-    return comma ? comma + 1 : "";
+    return zone_setting_label(sidereel_timezone_1());
 }
 
 bool gridlock_clock_is_24h(void)

@@ -8,15 +8,15 @@
  * without anyone having to sign up for anything.
  */
 
-import type { ClayItem } from './types';
-import { select, heading } from './config-rows';
+import type { ClayConfigItem } from '../../lib/ts/clay/types';
+import { select, heading } from '../../lib/ts/pkjs/config-rows';
 
 /**
  * The whole section, ready to drop into the page.
  *
  * @return The Weather section with its units, the provider picker and the key box.
  */
-export function weatherSection(): ClayItem {
+export function weatherSection(): ClayConfigItem {
   return {
     type: 'section',
     items: [

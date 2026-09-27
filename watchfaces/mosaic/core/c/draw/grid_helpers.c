@@ -6,7 +6,6 @@
  */
 #include "mosaic/draw/grid_helpers.h"
 
-#include "clock/clockstr.h"
 #include "math/pct.h"
 #include "math/scale.h"
 #include "mosaic/draw/common.h"
@@ -16,16 +15,15 @@
 #include <stdio.h>
 #include <string.h>
 
-void gh_format_hhmm(char *out, size_t n, const char *src)
+void gh_format_hhmm(char *out, size_t n, int minutes)
 {
-    int h, m;
-    if (!clockstr_parse(src, &h, &m))
+    if (minutes < 0)
     {
         snprintf(out, n, "--");
         return;
     }
 
-    gridlock_format_clock(out, n, h, m);
+    gridlock_format_clock(out, n, minutes / 60, minutes % 60);
 }
 
 GRect gh_value_left(GridCtx *gctx, const char *text, FontId font, int box_w, int value_h, int pad)

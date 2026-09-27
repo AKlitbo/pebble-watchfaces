@@ -9,8 +9,8 @@
  * so a picker only has to agree with it on the order.
  */
 
-import type { ClayItem, ClayOption } from './types';
-import { select, heading } from './config-rows';
+import type { ClayConfigItem, ClayOption } from '../../lib/ts/clay/types';
+import { select, heading } from '../../lib/ts/pkjs/config-rows';
 
 // the Goal Met Vibe picks. the value IS what the watch plays, so the tune data lives here in the
 // config, not in the watch binary. a one-letter sentinel is a plain pulse (S/L/D), C means the
@@ -41,7 +41,7 @@ const GOAL_DISTANCE = [2, 3, 5, 8, 10, 15, 20].map((n, i) => ({ label: n + ' km'
  *
  * @return The Health section with its goals, units and the goal-met buzz.
  */
-export function healthSection(): ClayItem {
+export function healthSection(): ClayConfigItem {
   return {
     type: 'section',
     items: [

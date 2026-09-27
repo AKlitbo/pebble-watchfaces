@@ -1,6 +1,6 @@
 /**
- * Shared domain types for the pkjs layer: the layout wire-string block, the Clay
- * setting rows the config builders emit, and the per-module presentation metadata.
+ * Shared domain types for the pkjs layer: the layout wire-string block and the per-module
+ * presentation metadata.
  *
  * These are pure vocabulary: every consumer imports them with `import type`, which erases,
  * so nothing here reaches the watch beyond the empty module tsc emits for the file itself.
@@ -19,40 +19,8 @@ export interface Block {
 /** The four placeable block sizes, keyed the way the wire string names them. */
 export type SizeKey = '1x2' | '2x2' | '1x4' | '2x4';
 
-/** A select/toggle option: its label and the value Clay stores. */
-export type ClayOption = { label: string; value: string | number };
-
-/** A Clay setting row, the shape the config.ts helpers build. */
-export interface ClayItem {
-  type:
-    | 'section'
-    | 'heading'
-    | 'text'
-    | 'select'
-    | 'toggle'
-    | 'input'
-    | 'color'
-    | 'button'
-    | 'submit'
-    | 'locationsearch'
-    | 'layoutBuilder'
-    | 'themeBuilder'
-    | 'hiddenStore';
-  /** Names the row for getItemById, for a row a custom function has to reach. */
-  id?: string;
-  messageKey?: string;
-  label?: string;
-  defaultValue?: string | number | boolean;
-  description?: string;
-  options?: ClayOption[];
-  items?: ClayItem[];
-  attributes?: Record<string, string | number>;
-  /** color only: false shows the true colours instead of their washed-out sunlight pair. */
-  sunlight?: boolean;
-}
-
 /**
  * Per-module presentation metadata, keyed by module label. Carries no grid vocabulary, so it is
  * lib's and re-exported here for the two module-meta.ts files that read it by this path.
  */
-export type { ModuleMeta } from '../../../../lib/ts/clay/types';
+export type { ModuleMeta } from '../../lib/ts/clay/types';

@@ -1,4 +1,4 @@
-// generated from watchfaces/mosaic/core/pkjs/clay/builder/layout.manifest.ts by tools/clay-components/generate-components.ts
+// generated from core/pkjs/clay/builder/layout.manifest.ts by tools/clay-components/generate-components.ts
 // do not edit by hand: run `npm run gen:clay` after changing the sources
 /**
  * Clay custom component for the drag and drop layout builder.
@@ -158,19 +158,19 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/wire.ts
+      // core/pkjs/clay/builder/ts/layout/wire.ts
       var wire_exports = {};
       __export(wire_exports, {
         EMPTY_LAYOUT: () => EMPTY_LAYOUT
       });
       var EMPTY_LAYOUT;
       var init_wire = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/wire.ts"() {
+        "core/pkjs/clay/builder/ts/layout/wire.ts"() {
           EMPTY_LAYOUT = "0";
         }
       });
 
-      // watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/geometry.ts
+      // gridlock/src/pkjs/clay/builder/ts/layout/geometry.ts
       var geometry_exports = {};
       __export(geometry_exports, {
         BLOCK_SIZES: () => BLOCK_SIZES,
@@ -239,7 +239,7 @@ module.exports = {
       }
       var GRID_ROWS, GRID_COLS, BLOCK_SIZES;
       var init_geometry = __esm({
-        "watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/geometry.ts"() {
+        "gridlock/src/pkjs/clay/builder/ts/layout/geometry.ts"() {
           GRID_ROWS = 5;
           GRID_COLS = 4;
           BLOCK_SIZES = [
@@ -251,7 +251,7 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/codec.ts
+      // gridlock/src/pkjs/clay/builder/ts/layout/codec.ts
       var codec_exports = {};
       __export(codec_exports, {
         EMPTY_LAYOUT: () => EMPTY_LAYOUT,
@@ -300,16 +300,16 @@ module.exports = {
         return blocks;
       }
       var init_codec = __esm({
-        "watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/codec.ts"() {
+        "gridlock/src/pkjs/clay/builder/ts/layout/codec.ts"() {
           init_geometry();
           init_wire();
         }
       });
 
-      // watchfaces/mosaic/gridlock/src/data/layout-presets.json
+      // gridlock/src/data/layout-presets.json
       var layout_presets_default;
       var init_layout_presets = __esm({
-        "watchfaces/mosaic/gridlock/src/data/layout-presets.json"() {
+        "gridlock/src/data/layout-presets.json"() {
           layout_presets_default = {
             default: "2,0,0,2,2;12,0,2,2,1;13,1,2,2,1;1,2,0,4,1;3,3,0,2,2;6,3,2,2,2",
             "1": "2,0,0,2,1;18,0,2,2,1;5,1,0,2,2;6,1,2,2,2;9,3,0,2,2;7,3,2,2,2",
@@ -321,20 +321,20 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/presets.ts
+      // gridlock/src/pkjs/clay/builder/ts/layout/presets.ts
       var presets_exports = {};
       __export(presets_exports, {
         LAYOUT_PRESETS: () => LAYOUT_PRESETS
       });
       var LAYOUT_PRESETS;
       var init_presets = __esm({
-        "watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/presets.ts"() {
+        "gridlock/src/pkjs/clay/builder/ts/layout/presets.ts"() {
           init_layout_presets();
           LAYOUT_PRESETS = layout_presets_default;
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/visuals.ts
+      // core/pkjs/clay/builder/ts/layout/visuals.ts
       var visuals_exports = {};
       __export(visuals_exports, {
         buildModuleList: () => buildModuleList,
@@ -408,7 +408,7 @@ module.exports = {
         }
       }
       var init_visuals = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/visuals.ts"() {
+        "core/pkjs/clay/builder/ts/layout/visuals.ts"() {
           init_thumbs();
         }
       });
@@ -418,6 +418,7 @@ module.exports = {
         const threshold = spec.threshold === void 0 ? DEFAULT_THRESHOLD : spec.threshold;
         let armed = null;
         let active = null;
+        let owner;
         function place(ghost, x, y) {
           if (spec.anchor === "pointer") {
             ghost.style.left = x + "px";
@@ -427,6 +428,9 @@ module.exports = {
           const box = ghost.getBoundingClientRect();
           ghost.style.left = x - box.width / 2 + "px";
           ghost.style.top = y - box.height / 2 + "px";
+        }
+        function foreign(event) {
+          return (armed !== null || active !== null) && event.pointerId !== owner;
         }
         function begin(payload, x, y) {
           const ghost = spec.ghost(payload);
@@ -452,7 +456,25 @@ module.exports = {
           armed = null;
           spec.highlight(null, null, false);
         }
+        function abandon() {
+          if (!armed && !active) {
+            return;
+          }
+          const payload = active && active.payload;
+          end();
+          if (payload === null || payload === void 0) {
+            return;
+          }
+          if (spec.cancel) {
+            spec.cancel(payload);
+            return;
+          }
+          spec.dropOutside(payload);
+        }
         doc.addEventListener("pointermove", (event) => {
+          if (foreign(event)) {
+            return;
+          }
           if (armed) {
             const moved = Math.abs(event.clientX - armed.x) > threshold || Math.abs(event.clientY - armed.y) > threshold;
             if (moved) {
@@ -470,6 +492,9 @@ module.exports = {
           }
         });
         doc.addEventListener("pointerup", (event) => {
+          if (foreign(event)) {
+            return;
+          }
           if (!active) {
             armed = null;
             return;
@@ -483,24 +508,22 @@ module.exports = {
           }
           spec.dropOutside(payload);
         });
-        doc.addEventListener("pointercancel", () => {
-          const payload = active && active.payload;
-          end();
-          if (payload === null || payload === void 0) {
+        doc.addEventListener("pointercancel", (event) => {
+          if (foreign(event)) {
             return;
           }
-          if (spec.cancel) {
-            spec.cancel(payload);
-            return;
-          }
-          spec.dropOutside(payload);
+          abandon();
         });
         return {
           start(payload, event) {
+            abandon();
+            owner = event.pointerId;
             begin(payload, event.clientX, event.clientY);
             event.preventDefault();
           },
           arm(payload, event) {
+            abandon();
+            owner = event.pointerId;
             armed = { payload, x: event.clientX, y: event.clientY };
             event.preventDefault();
           }
@@ -513,7 +536,7 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/drag.ts
+      // core/pkjs/clay/builder/ts/layout/drag.ts
       var drag_exports = {};
       __export(drag_exports, {
         createDragEngine: () => createDragEngine
@@ -626,13 +649,13 @@ module.exports = {
         };
       }
       var init_drag2 = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/drag.ts"() {
+        "core/pkjs/clay/builder/ts/layout/drag.ts"() {
           init_visuals();
           init_drag();
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/modes.ts
+      // core/pkjs/clay/builder/ts/layout/modes.ts
       var modes_exports = {};
       __export(modes_exports, {
         LAYOUT_COUNT: () => LAYOUT_COUNT,
@@ -794,14 +817,14 @@ module.exports = {
       }
       var LAYOUT_COUNT, ROLE_NONE;
       var init_modes = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/layout/modes.ts"() {
+        "core/pkjs/clay/builder/ts/layout/modes.ts"() {
           init_wire();
           LAYOUT_COUNT = 5;
           ROLE_NONE = -1;
         }
       });
 
-      // watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/init.ts
+      // gridlock/src/pkjs/clay/builder/ts/layout/init.ts
       var init_exports = {};
       __export(init_exports, {
         init: () => init
@@ -1069,7 +1092,7 @@ module.exports = {
         }
       }
       var init_init = __esm({
-        "watchfaces/mosaic/gridlock/src/pkjs/clay/builder/ts/layout/init.ts"() {
+        "gridlock/src/pkjs/clay/builder/ts/layout/init.ts"() {
           init_geometry();
           init_codec();
           init_presets();
@@ -1081,9 +1104,9 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/component-entry.js
+      // core/pkjs/clay/builder/component-entry.js
       var require_component_entry = __commonJS({
-        "watchfaces/mosaic/core/pkjs/clay/builder/component-entry.js"(exports, module) {
+        "core/pkjs/clay/builder/component-entry.js"(exports, module) {
           init_thumbs();
           init_overlay();
           init_io_panel();

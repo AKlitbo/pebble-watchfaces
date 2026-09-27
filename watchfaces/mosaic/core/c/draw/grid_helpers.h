@@ -104,14 +104,13 @@ void gh_gauge(GridCtx *gctx, GRect area, int segments, int level);
 void gh_icon_bottom_of(GridCtx *gctx, const IconSpec *icon, GRect value_rect, FontId value_font);
 
 /**
- * @brief Formats a 24-hour "HH:MM" string (as the phone sends sunrise/sunset) into the
- * user's clock style, or "--" when the source isn't a real time.
+ * @brief Writes a time of day in the wearer's clock style, or "--" when there is none.
  *
  * @param out Buffer that receives the formatted clock.
  * @param n Size of out.
- * @param src The "HH:MM" source string.
+ * @param minutes Minutes past midnight, or -1 for none.
  */
-void gh_format_hhmm(char *out, size_t n, const char *src);
+void gh_format_hhmm(char *out, size_t n, int minutes);
 
 // --- composite panels ---
 

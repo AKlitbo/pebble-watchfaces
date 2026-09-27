@@ -16,7 +16,7 @@
  */
 
 import { fillBlockVisual } from './visuals';
-import { createDrag } from '../../../../../../../../lib/ts/clay/builder/ts/drag';
+import { createDrag } from '../../../../../../lib/ts/clay/builder/ts/drag';
 import type { Block, ModuleInfo, SizeKey } from '../types';
 
 /** The module riding under the pointer mid drag, palette icon or lifted block. */

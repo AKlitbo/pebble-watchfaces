@@ -11,7 +11,6 @@
  */
 #include "band.h"
 
-#include "clock/clockstr.h"
 #include "clock/timeband.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
@@ -120,8 +119,8 @@ void band_draw(GContext *ctx, GRect bounds, const Chrome *chrome)
 {
     TimeBand band = timeband_full_day();
 
-    int rise = clockstr_minutes(weather_store_sunrise());
-    int set = clockstr_minutes(weather_store_sunset());
+    int rise = weather_store_sunrise();
+    int set = weather_store_sunset();
     bool has_sun = rise >= 0 && set >= 0;
 
     // with no sun reading the honest answer is one flat colour, and dim is what the rest of the

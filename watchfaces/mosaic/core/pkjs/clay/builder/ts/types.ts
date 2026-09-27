@@ -7,8 +7,8 @@ export type { Block, SizeKey } from '../../../types';
 
 // the builder shapes that carry no grid vocabulary belong to lib. re-exported so the mosaic
 // pieces keep naming one types module rather than two
-export type { Thumbs, ClayComponentInstance } from '../../../../../../../lib/ts/clay/builder/ts/types';
-import type { RawOption } from '../../../../../../../lib/ts/clay/builder/ts/types';
+export type { Thumbs, ClayComponentInstance } from '../../../../../lib/ts/clay/builder/ts/types';
+import type { RawOption } from '../../../../../lib/ts/clay/builder/ts/types';
 
 /** One themeRows entry: a size mapped to the module whose screenshot it shows. */
 export interface ThemeRow {

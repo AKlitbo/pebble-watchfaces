@@ -1,12 +1,12 @@
-import configBuilder from '../../../../../lib/ts/pkjs/config-builder';
+import configBuilder from '../../../lib/ts/pkjs/config-builder';
 import resetFaceColors from './clay/reset-face-colors';
 import moduleThumbnails from './clay/module-thumbnails.g';
 import moduleMeta from './clay/module-meta';
 import vibrantByType from './clay/vibrant.g';
 import layoutPresets from '../data/layout-presets.json';
-import type { ClayItem } from '../../../core/pkjs/types';
+import type { ClayConfigItem } from '../../../lib/ts/clay/types';
 import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
-import { select, heading, toggle, VIBE_OPTIONS } from '../../../core/pkjs/config-rows';
+import { select, heading, toggle, VIBE_OPTIONS } from '../../../lib/ts/pkjs/config-rows';
 import { healthSection } from '../../../core/pkjs/health-section';
 import { locationSection } from '../../../core/pkjs/location-section';
 import { weatherSection } from '../../../core/pkjs/weather-section';
@@ -155,7 +155,7 @@ const MODULE_OPTIONS = MODULE_BASE.map(function (option) {
 });
 
 /** A Clay colour swatch row. Sunlight is off so the grid shows the colours as the watch paints them. */
-function color(messageKey: string, label: string, description: string, def: number): ClayItem {
+function color(messageKey: string, label: string, description: string, def: number): ClayConfigItem {
   return {
     type: 'color',
     messageKey: messageKey,

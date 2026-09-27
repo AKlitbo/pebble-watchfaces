@@ -15,7 +15,7 @@
 #include "io/stores/weather_store.h"
 #include "ui/icon_cache.h"
 #include "ui/weather/icons.h"
-#include "ui/weather/labels.h"
+#include "weather/wx_label.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -100,7 +100,17 @@ static int draw_hilo(GridCtx *gctx, int rel_x, int baseline)
 // fits the remaining width
 static void draw_status(GridCtx *gctx, int rel_x, int baseline, int avail, const char *cond)
 {
-    const char *label = wx_label_short(cond);
+    // no reading yet draws a placeholder, like the other weather panels
+    char label[16];
+    if (!cond || !cond[0] || !strcmp(cond, "--"))
+    {
+        strcpy(label, "--");
+    }
+    else
+    {
+        wx_label_short(label, sizeof(label), cond);
+    }
+
     if (text_width(label, STATUS_FONT) <= avail)
     {
         draw_text_at(gctx, rel_x, baseline, label, STATUS_FONT, gctx->color_subtitle);

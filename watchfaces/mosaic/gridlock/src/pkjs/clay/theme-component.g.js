@@ -1,4 +1,4 @@
-// generated from watchfaces/mosaic/core/pkjs/clay/builder/theme.manifest.ts by tools/clay-components/generate-components.ts
+// generated from core/pkjs/clay/builder/theme.manifest.ts by tools/clay-components/generate-components.ts
 // do not edit by hand: run `npm run gen:clay` after changing the sources
 /**
  * Clay custom component for per-module appearance: colours plus header and
@@ -170,7 +170,7 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/palette.ts
+      // core/pkjs/clay/builder/ts/theme/palette.ts
       var palette_exports = {};
       __export(palette_exports, {
         PEBBLE_COLORS_CSV: () => PEBBLE_COLORS_CSV,
@@ -216,12 +216,12 @@ module.exports = {
       }
       var PEBBLE_COLORS_CSV;
       var init_palette = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/palette.ts"() {
+        "core/pkjs/clay/builder/ts/theme/palette.ts"() {
           PEBBLE_COLORS_CSV = "000000 Black,000055 Oxford Blue,0000AA Duke Blue,0000FF Blue,005500 Dark Green,005555 Midnight Green,0055AA Cobalt Blue,0055FF Blue Moon,00AA00 Islamic Green,00AA55 Jaeger Green,00AAAA Tiffany Blue,00AAFF Vivid Cerulean,00FF00 Green,00FF55 Malachite,00FFAA Medium Spring Green,00FFFF Cyan,550000 Bulgarian Rose,550055 Imperial Purple,5500AA Indigo,5500FF Electric Ultramarine,555500 Army Green,555555 Dark Gray,5555AA Liberty,5555FF Very Light Blue,55AA00 Kelly Green,55AA55 May Green,55AAAA Cadet Blue,55AAFF Picton Blue,55FF00 Bright Green,55FF55 Screamin Green,55FFAA Medium Aquamarine,55FFFF Electric Blue,AA0000 Dark Candy Apple Red,AA0055 Jazzberry Jam,AA00AA Purple,AA00FF Vivid Violet,AA5500 Windsor Tan,AA5555 Rose Vale,AA55AA Purpureus,AA55FF Lavender Indigo,AAAA00 Limerick,AAAA55 Brass,AAAAAA Light Gray,AAAAFF Baby Blue Eyes,AAFF00 Spring Bud,AAFF55 Inchworm,AAFFAA Mint Green,AAFFFF Celeste,FF0000 Red,FF0055 Folly,FF00AA Fashion Magenta,FF00FF Magenta,FF5500 Orange,FF5555 Sunset Orange,FF55AA Brilliant Rose,FF55FF Shocking Pink,FFAA00 Chrome Yellow,FFAA55 Rajah,FFAAAA Melon,FFAAFF Rich Brilliant Lavender,FFFF00 Yellow,FFFF55 Icterine,FFFFAA Pastel Yellow,FFFFFF White";
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/codec.ts
+      // core/pkjs/clay/builder/ts/theme/codec.ts
       var codec_exports = {};
       __export(codec_exports, {
         COLOR_ALPHABET: () => COLOR_ALPHABET,
@@ -401,14 +401,14 @@ module.exports = {
       }
       var COLOR_ALPHABET, FORMAT_MARKER, SIZE_ORDER;
       var init_codec = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/codec.ts"() {
+        "core/pkjs/clay/builder/ts/theme/codec.ts"() {
           COLOR_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
           FORMAT_MARKER = "~";
           SIZE_ORDER = ["1x2", "2x2", "1x4", "2x4"];
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/model.ts
+      // core/pkjs/clay/builder/ts/theme/model.ts
       var model_exports = {};
       __export(model_exports, {
         allSizesHidden: () => allSizesHidden,
@@ -486,12 +486,12 @@ module.exports = {
         return true;
       }
       var init_model = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/model.ts"() {
+        "core/pkjs/clay/builder/ts/theme/model.ts"() {
           init_codec();
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/preview.ts
+      // core/pkjs/clay/builder/ts/theme/preview.ts
       var preview_exports = {};
       __export(preview_exports, {
         buildExampleBox: () => buildExampleBox,
@@ -565,12 +565,12 @@ module.exports = {
         return { box, paint: paintChannel };
       }
       var init_preview = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/preview.ts"() {
+        "core/pkjs/clay/builder/ts/theme/preview.ts"() {
           init_palette();
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/picker.ts
+      // core/pkjs/clay/builder/ts/theme/picker.ts
       var picker_exports = {};
       __export(picker_exports, {
         createPicker: () => createPicker
@@ -720,7 +720,7 @@ module.exports = {
         return { open, close: host.close };
       }
       var init_picker = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/picker.ts"() {
+        "core/pkjs/clay/builder/ts/theme/picker.ts"() {
           init_overlay();
           init_palette();
           init_model();
@@ -728,7 +728,7 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/rows.ts
+      // core/pkjs/clay/builder/ts/theme/rows.ts
       var rows_exports = {};
       __export(rows_exports, {
         createRowBuilder: () => createRowBuilder
@@ -833,14 +833,14 @@ module.exports = {
         return { buildRow };
       }
       var init_rows = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/rows.ts"() {
+        "core/pkjs/clay/builder/ts/theme/rows.ts"() {
           init_thumbs();
           init_codec();
           init_preview();
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/sheet.ts
+      // core/pkjs/clay/builder/ts/theme/sheet.ts
       var sheet_exports = {};
       __export(sheet_exports, {
         createSheet: () => createSheet
@@ -984,14 +984,14 @@ module.exports = {
         return { open };
       }
       var init_sheet = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/sheet.ts"() {
+        "core/pkjs/clay/builder/ts/theme/sheet.ts"() {
           init_overlay();
           init_io_panel();
           init_codec();
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/init.ts
+      // core/pkjs/clay/builder/ts/theme/init.ts
       var init_exports = {};
       __export(init_exports, {
         init: () => init
@@ -1101,7 +1101,7 @@ module.exports = {
         root._tbSet(hidden.value || "");
       }
       var init_init = __esm({
-        "watchfaces/mosaic/core/pkjs/clay/builder/ts/theme/init.ts"() {
+        "core/pkjs/clay/builder/ts/theme/init.ts"() {
           init_palette();
           init_codec();
           init_model();
@@ -1111,9 +1111,9 @@ module.exports = {
         }
       });
 
-      // watchfaces/mosaic/core/pkjs/clay/builder/component-entry.js
+      // core/pkjs/clay/builder/component-entry.js
       var require_component_entry = __commonJS({
-        "watchfaces/mosaic/core/pkjs/clay/builder/component-entry.js"(exports, module) {
+        "core/pkjs/clay/builder/component-entry.js"(exports, module) {
           init_thumbs();
           init_overlay();
           init_io_panel();

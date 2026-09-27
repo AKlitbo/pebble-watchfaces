@@ -238,13 +238,24 @@ const char *gridlock_temp_unit_label(void);
 /** @} */
 
 /**
+ * @brief Whether an alternate time zone is picked at all.
+ *
+ * The setting is empty until the wearer picks a zone, and empty again once they clear the picker.
+ * Only index 0 holds a zone.
+ *
+ * @param index Which alternate zone to read. There is one, so this is 0.
+ * @return True when a zone is set.
+ */
+bool gridlock_time_zone_is_set(uint8_t index);
+
+/**
  * @brief How far the alternate time zone runs from UTC.
  *
  * The setting arrives from the config page as "offset,name", so this is the number in front of the
  * first comma. Only index 0 holds a zone, and any other index reads as zero.
  *
  * @param index Which alternate zone to read. There is one, so this is 0.
- * @return Minutes ahead of UTC, negative behind it.
+ * @return Minutes ahead of UTC, negative behind it, or 0 when no zone is set.
  */
 int16_t gridlock_time_zone_offset_minutes(uint8_t index);
 
@@ -252,10 +263,10 @@ int16_t gridlock_time_zone_offset_minutes(uint8_t index);
  * @brief The alternate time zone's name, for the panel header.
  *
  * Everything after the first comma of the setting, which the caller cuts down to fit. Only index 0
- * holds a zone, and any other index reads as "TZ".
+ * holds a zone, and any other index reads as empty.
  *
  * @param index Which alternate zone to read. There is one, so this is 0.
- * @return The name, never NULL.
+ * @return The name, or "" when there is none. Never NULL.
  */
 const char* gridlock_time_zone_name(uint8_t index);
 

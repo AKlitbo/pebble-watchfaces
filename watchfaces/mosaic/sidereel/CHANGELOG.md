@@ -4,6 +4,38 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed the temperature showing the old number with the new unit, such as 23F for 23°C, after switching units while the phone was offline, when a refresh already under way finished just after, on the first save after installing, or after the Pebble app's data was cleared.
+- Fixed your settings sometimes not coming back after an update, leaving the defaults until the Pebble app restarted. Going back to an older version could leave the defaults for good.
+- Fixed Goal Met Vibration still buzzing after it was set back to None.
+- Fixed the heart rate graph drawn just after installing being shifted back in time.
+- Fixed rain chance and UV showing 0 where the weather service had no reading for them. They show a dash instead.
+- Fixed the Pressure panel reading far too low with Open-Meteo, the default weather provider, the higher you live. It now shows sea level pressure like the other providers.
+- Fixed the sun panels when sunset falls after midnight, as in a northern summer. Daylight read as night, and the countdown to sunrise showed hours that were already daylight.
+- Fixed the Next Moon panel jumping to 29 days partway through the night of a new or full moon.
+- Fixed the Alternate Time Zone list on the settings page opening again after you picked a zone, where a stray tap could change your pick.
+- Fixed the UTC offset shown for a zone on the settings page sometimes reading a minute short. Typing an offset such as UTC+5 also showed a name that read as UTC-5.
+- Fixed a second finger on the screen moving or dropping the panel you were dragging in the layout editor.
+- Fixed a city typed on the settings page and saved without tapping one of the suggestions being lost. The settings page now asks you to pick a place from the list.
+- Fixed the Steps Graph bars shifting by an hour on the days the clocks change, with the current hour's bar near empty or doubled. An hour the clocks went back through could also read empty after the face reopened.
+- Fixed clearing the alternate time zone on the settings page leaving the old city on the watch. The panel now shows dashes whenever no zone is picked.
+- Fixed the wind reading 0 km/h rather than a dash when OpenWeatherMap had no wind reading.
+- Fixed the heart rate graph freezing for up to an hour after the watch's clock was set back. Coming back from a watchapp also left a gap for the time you were away, or a blank graph after an hour.
+- Fixed the weather showing clear skies when Open-Meteo, the default weather provider, had no reading for the current conditions.
+- Fixed the steps showing 0 with Health turned off. They show dashes until there is a reading.
+- Fixed sunrise and sunset, and what follows them, showing hours off when the weather location is in another time zone. Today's high, low, and rain chance could also come from the day before or after.
+- Fixed yesterday's high, low, UV, and rain chance staying on the watch as today's when part of the weather refresh kept failing.
+- Fixed a weather key that ran out of calls showing API ERROR and using up more calls on retries. It now shows RATE LIMIT until the next refresh.
+- Fixed the weather being fetched twice on every refresh, which used up a weather key's calls twice as fast.
+- Fixed the weather readouts sometimes staying on dashes for up to half an hour after the watchface started.
+
+### Notes
+
+- This release clears the saved weather once. The weather readouts show dashes until the first refresh after the update, and nothing needs doing to bring them back.
+
 ## [1.2.1] - 2026-09-22
 
 ### Changed

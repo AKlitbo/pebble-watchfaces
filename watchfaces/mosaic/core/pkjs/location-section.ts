@@ -8,15 +8,15 @@
  * the same way as the manual location, by searching for a place.
  */
 
-import type { ClayItem } from './types';
-import { heading, toggle } from './config-rows';
+import type { ClayConfigItem } from '../../lib/ts/clay/types';
+import { heading, toggle } from '../../lib/ts/pkjs/config-rows';
 
 /**
  * The whole section, ready to drop into the page.
  *
  * @return The Location section with the GPS toggles and the two place searches.
  */
-export function locationSection(): ClayItem {
+export function locationSection(): ClayConfigItem {
   return {
     type: 'section',
     items: [
@@ -34,6 +34,7 @@ export function locationSection(): ClayItem {
       {
         type: 'locationsearch',
         messageKey: 'CLOCK_TIMEZONE_1',
+        timeZone: true,
         label: 'Alternate Time Zone',
         description: "Sets the local time displayed by the 'Time Zone 1' module in your layout. Search a city, a zone name such as Europe/London, or type UTC or an offset like UTC+05:30.",
         attributes: {

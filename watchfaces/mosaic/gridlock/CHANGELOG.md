@@ -4,6 +4,64 @@ All notable changes to the Gridlock watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added support for stock symbols outside the US, indexes, and currency pairs, such as 7203.T, ^GSPC, EURUSD=X, and BTC/USD. The watch shows the first 11 characters.
+
+### Changed
+
+- Changed the Timeline panel to mark an event with no length, such as a reminder, as a thin sliver rather than leaving it out.
+
+### Fixed
+
+- Fixed the temperature showing the old number with the new unit, such as 23F for 23°C, after switching units while the phone was offline, when a refresh already under way finished just after, on the first save after installing, or after the Pebble app's data was cleared.
+- Fixed your settings sometimes not coming back after an update, leaving the defaults until the Pebble app restarted. Going back to an older version could leave the defaults for good.
+- Fixed Goal Met Vibration still buzzing after it was set back to None.
+- Fixed the heart rate graph drawn just after installing being shifted back in time.
+- Fixed rain chance and UV showing 0 where the weather service had no reading for them. They show a dash instead.
+- Fixed iCloud Subscribe calendar links, the ones starting webcal://, never loading.
+- Fixed the calendar no longer refreshing after its link was cleared while it was loading.
+- Fixed the watchlist and calendar staying out of date when a settings change landed in the first second after the face opened.
+- Fixed the calendar downloading your whole feed every 5 minutes, whatever Refresh Interval you picked. It now refreshes on your interval, which saves battery and data.
+- Fixed the Pressure panel reading far too low with Open-Meteo, the default weather provider, the higher you live. It now shows sea level pressure like the other providers.
+- Fixed the sun panels when sunset falls after midnight, as in a northern summer. Daylight read as night, and the countdown to sunrise showed hours that were already daylight.
+- Fixed the Next Moon panel jumping to 29 days partway through the night of a new or full moon.
+- Fixed the Alternate Time Zone list on the settings page opening again after you picked a zone, where a stray tap could change your pick.
+- Fixed the UTC offset shown for a zone on the settings page sometimes reading a minute short. Typing an offset such as UTC+5 also showed a name that read as UTC-5.
+- Fixed a second finger on the screen moving or dropping the panel you were dragging in the layout editor.
+- Fixed a stock outside the US showing NET ERROR on Finnhub's free plan, which only covers US stocks. It now shows NO ACCESS, and so does a symbol outside your Twelve Data plan, which showed INVALID KEY.
+- Fixed every settings save reloading the whole calendar.
+- Fixed the calendar no longer updating when your feed held one event it could not read. That event is now left off.
+- Fixed a city typed on the settings page and saved without tapping one of the suggestions being lost. The settings page now asks you to pick a place from the list.
+- Fixed your old watchlist coming back after you changed your stock symbols, when the first fetch for the new ones failed or a fetch for the old ones answered late. Changing your calendar link could do the same with the old calendar's events.
+- Fixed cancelled meetings still showing on the agenda and the Timeline.
+- Fixed an emoji in an event title showing as two or more question marks and crowding out the rest of the title. It now shows as one question mark.
+- Fixed the Steps Graph bars shifting by an hour on the days the clocks change, with the current hour's bar near empty or doubled. An hour the clocks went back through could also read empty after the face reopened.
+- Fixed a moved meeting sometimes missing from the agenda when its series repeats many times a day, or after the series itself was changed.
+- Fixed clearing the alternate time zone on the settings page leaving the old city on the watch. The panel now shows dashes whenever no zone is picked.
+- Fixed the wind reading 0 km/h rather than a dash when OpenWeatherMap had no wind reading.
+- Fixed a mistyped stock symbol using up a metered provider's calls for the day, one on every refresh.
+- Fixed the heart rate graph freezing for up to an hour after the watch's clock was set back. Coming back from a watchapp also left a gap for the time you were away, or a blank graph after an hour.
+- Fixed a missing reading from Open-Meteo, the default weather provider, showing as fog on the forecast or clear skies for the current weather. It now shows as unknown.
+- Fixed the forecast panels showing hours already gone and yesterday as their first day when only the forecast part of a refresh failed, or when the forecast reached the watch late. They now start at the current hour and today.
+- Fixed the steps showing 0 with Health turned off. They show dashes until there is a reading.
+- Fixed an all-day event on a day the clocks change running an hour into the next day, or ending an hour early.
+- Fixed the agenda dropping the evening of its last day, depending on the time of day the calendar refreshed.
+- Fixed a moment without signal replacing your watchlist with NET ERROR in every slot until the next good refresh. The last good quotes stay, and they also stay through a problem on Twelve Data's side, which showed INVALID KEY. An error you need to fix, such as INVALID KEY, still shows.
+- Fixed stocks not refreshing after the phone's clock was put back.
+- Fixed the watchlist and calendar staying blank after the phone app's data was cleared, until the next refresh, or on Alpha Vantage until a weekday evening.
+- Fixed sunrise and sunset, what follows them, and the forecast hours showing hours off when the weather location is in another time zone. Today's high, low, and rain chance could also come from the day before or after.
+- Fixed yesterday's high, low, UV, and rain chance staying on the watch as today's when part of the weather refresh kept failing.
+- Fixed a weather key that ran out of calls showing API ERROR and using up more calls on retries. It now shows RATE LIMIT until the next refresh.
+- Fixed the weather and the watchlist each being fetched twice on every refresh, which used up a weather key's or a stock provider's calls twice as fast.
+- Fixed the weather readouts sometimes staying on dashes for up to half an hour after the watchface started.
+
+### Notes
+
+- This release clears the saved weather once. The weather readouts show dashes until the first refresh after the update, and nothing needs doing to bring them back.
+
 ## [1.4.1] - 2026-09-22
 
 ### Changed

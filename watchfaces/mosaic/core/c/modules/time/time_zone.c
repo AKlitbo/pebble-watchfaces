@@ -13,6 +13,13 @@ static void time_zone_body(GridCtx *gctx, uint8_t index)
         return;
     }
 
+    // no zone picked yet, or the picker was cleared, so there is no clock to show
+    if (!gridlock_time_zone_is_set(index))
+    {
+        gh_stat_1x2(gctx, "--:--", NULL, FONT_TEKO_26, &ICON_GLOBE);
+        return;
+    }
+
     char val[16] = "--:--";
     bool h12 = false;
     bool is_am = false;
@@ -58,7 +65,7 @@ static const char* time_zone_1_get_label(ModuleSize size)
         i++;
     }
     s_tz_label[i] = '\0';
-    return s_tz_label;
+    return s_tz_label[0] ? s_tz_label : "ZONE 1";
 }
 
 const ModuleDef mod_time_zone_1_def = {

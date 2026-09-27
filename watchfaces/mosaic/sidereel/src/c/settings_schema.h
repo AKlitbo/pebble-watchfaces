@@ -166,6 +166,7 @@ uint8_t gridlock_active_layout_role(void);
 void gridlock_set_active_layout_role(uint8_t role);
 void gridlock_mark_system_dirty(void);
 void gridlock_before_rebuild(void);
+bool gridlock_time_zone_is_set(uint8_t index);
 int16_t gridlock_time_zone_offset_minutes(uint8_t index);
 const char *gridlock_time_zone_name(uint8_t index);
 bool gridlock_clock_is_24h(void);

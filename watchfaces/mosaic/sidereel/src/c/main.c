@@ -13,7 +13,6 @@
 #include "dev/dev.h"
 #include "io/appmessage/appmessage.h"
 #include "io/stores/health_store.h"
-#include "io/stores/location_store.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
@@ -43,7 +42,6 @@ static Window *s_window;
 static TimeConfig time_cfg(void)
 {
     return (TimeConfig){
-        .enabled = true,
         .live = true,
         .minute_tick = true,
         .beats = false,
@@ -150,17 +148,16 @@ static void init(void)
     // store from a fixed fixture (live=false) for deterministic screenshots
     if (!dev_seed_stores())
     {
-        system_store_init((SystemConfig){.enabled = true, .live = true, .vibe = vibe_bt_transition}, NULL);
+        system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
         // the history flags are what the two graph panels read. they cost a storage write per
         // minute, so they are only on because a cell can actually show them
-        health_store_init((HealthConfig){.enabled = true, .live = true, .calories = true,
+        health_store_init((HealthConfig){.live = true, .calories = true,
                                          .sleep = true, .active = true,
-                                         .hr_history = true, .step_history = true,
+                                         .hr_history = true, .step_history = true, .distance = true,
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
-        weather_store_init((WeatherConfig){.enabled = true, .live = true, .poll_min = WEATHER_POLL_MIN,
+        weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
-        location_store_init((LocationConfig){.enabled = true, .live = true}, NULL);
     }
 
     // settle which layout wins before the first build, so a watchface launched after dark comes
@@ -184,18 +181,17 @@ static void init(void)
     time_store_subscribe(on_time_tick);
     health_store_subscribe(on_health_changed);
     weather_store_subscribe(on_weather_changed);
-    location_store_subscribe(on_weather_changed);  // a move only ever shifts the weather widgets
     system_store_subscribe(on_system_changed);
     system_store_on_reconnect(on_phone_reconnected);
 
-    // weather_store + location_store own their channels. main only wires settings
+    // weather_store owns its channel. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);
 
     // the packed appearance string is too big for one persist slot, so it arrives and leaves
     // through its own pair of hooks rather than the settings field table
     appmessage_on_custom_colors(sidereel_set_custom_colors);
     appmessage_set_custom_colors_provider(sidereel_get_custom_colors);
-    appmessage_open();
+    appmessage_open(4096);
 
     dev_start(sidereel_apply_theme);
 }
