@@ -7,7 +7,6 @@
 #include "sketchbook/sky/sky.h"
 
 #include "sketchbook/config.h"
-#include "clock/clockstr.h"
 #include "clock/moon.h"
 #include "clock/solar.h"
 #include "io/stores/time_store.h"
@@ -33,8 +32,8 @@
  */
 static void sun_times(int *rise_out, int *set_out)
 {
-    int rise = clockstr_minutes(weather_store_sunrise());
-    int set = clockstr_minutes(weather_store_sunset());
+    int rise = weather_store_sunrise();
+    int set = weather_store_sunset();
 
     *rise_out = rise >= 0 ? rise : FALLBACK_RISE;
     *set_out = set >= 0 ? set : FALLBACK_SET;

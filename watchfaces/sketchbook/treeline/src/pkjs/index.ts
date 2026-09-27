@@ -6,11 +6,12 @@
  * on its arc, which is why its appinfo declares the extra weather keys. Everything else is
  * shared.
  */
-import app from '../../../../../lib/ts/pkjs/app';
+import app from '../../../lib/ts/pkjs/app';
+import weather from '../../../lib/ts/weather/feature';
 import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
-  // this face never displays coordinates so it sends none
-  formatCoords: () => ({}),
+  // weather with no coordinates, since this face never displays them
+  features: [weather],
 });

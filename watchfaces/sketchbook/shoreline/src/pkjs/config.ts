@@ -5,7 +5,7 @@
  * palette list and the wording this face uses for its stats row. Weather matters more here
  * than on most faces, since the condition is what the picture is drawn from.
  */
-import buildConfig from '../../../../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../../lib/ts/pkjs/config-builder';
 
 export default buildConfig({
   heading: 'Shoreline',

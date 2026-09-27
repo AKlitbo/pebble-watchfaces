@@ -6,7 +6,7 @@
  * than on most faces: the condition is what the picture is drawn from, and the wind is what
  * the chimney smoke leans on.
  */
-import buildConfig from '../../../../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../../lib/ts/pkjs/config-builder';
 
 export default buildConfig({
   heading: 'Treeline',
