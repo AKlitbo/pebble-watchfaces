@@ -4,7 +4,7 @@ All notable changes to the IDE VSCode watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.2] - 2026-09-27
 
 ### Fixed
 
@@ -14,8 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed the settings page opening on the default for a choice such as the temperature unit, rather than what the watch was set to.
 - Fixed a city typed on the settings page and saved without tapping one of the suggestions being lost. The settings page now asks you to pick a place from the list.
 - Fixed the weather showing clear skies when Open-Meteo, the default weather provider, had no reading for the current conditions.
-- Fixed the steps showing -1 just after the watchface opened, or 0 with Health turned off, and the Stats Readout set to distance reading 0.0 all day. It shows dashes until there is a reading.
-- Fixed a weather key that ran out of calls showing API ERROR and using up more calls on retries. It now shows RATE LIMIT until the next refresh.
+- Fixed the Stats Readout showing -1 just after the watchface opened, or 0 or 0.0 with Health turned off. It shows dashes until there is a reading.
+- Fixed the weather retrying when the key was wrong or out of calls, or no location was set, which used up more of the key's calls.
 - Fixed the weather being fetched twice on every refresh, which used up a weather key's calls twice as fast.
 - Fixed the weather readouts sometimes staying on dashes for up to half an hour after the watchface started.
 
