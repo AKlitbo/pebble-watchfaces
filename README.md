@@ -50,22 +50,23 @@ Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp bu
 
 ## Project Structure
 
-Each face and each family under `watchfaces/` is a [paf](https://github.com/AKlitbo/pebble-app-framework-cli) unit with its own copy of the shared [framework](https://github.com/AKlitbo/pebble-app-framework) in `lib/`, on the tag its `paf.json` names. A finished face can stay on the framework it was finished on while another moves ahead.
+Each face and each family under `watchfaces/` is a [paf](https://github.com/AKlitbo/pebble-app-framework-cli) unit with its own copy of the shared [framework](https://github.com/AKlitbo/pebble-app-framework) in `paf/`, on the tag its `paf.config.json` names. A finished face can stay on the framework it was finished on while another moves ahead.
 
-A face is any directory carrying a `config/pebble.appinfo.json`, at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
+A face is any directory carrying a `pebble.appinfo.json`, at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
 
-* **`watchfaces/<face>/`**: one face. `config/` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
+* **`watchfaces/<face>/`**: one face. `pebble.appinfo.json` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
 * **`watchfaces/<family>/core/`**: the family's shared code, staged into each member's build and reached as `<family>/...`.
-* **`paf.json`**, **`package.json`**, **`tsconfig.json`**: in each unit, the framework tag it is on, its scripts, and its phone code's type check.
-* **`lib/`**: in each unit, the shared framework, filled by `paf sync` and gitignored. It holds the base every face shares (`c/` device code, `ts/` PebbleKit JS, `py/` waf helpers, `css/` the Pebble-64 gamut), the build tooling under `tools/` with `build.sh`, and the shared tsconfig/eslint/vitest setup under `config/`.
+* **`paf.config.json`**, **`package.json`**: in each unit, the framework tag it is on with the plugins it uses, and its scripts.
+* **`config/`**: in each unit, its own lint, test, and typecheck setup in `eslint.config.ts`, `vitest.config.ts`, and the `tsconfig*.json` files. The unit's root `tsconfig.json` checks no files of its own and points an editor at them.
+* **`paf/`**: in each unit, the shared framework, filled by `paf sync` and gitignored. It holds the base every face shares (`c/` device code, `ts/` PebbleKit JS, `waf/` the build helpers), the build and generator tooling under `tools/`, and the plugins the unit lists under `plugins/`.
 * **`targets/<target>/`**: in each unit, the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
-* **`vendor/`**: third-party source SVGs every unit's `gen:icons` reads (gitignored, see [Third-Party Assets](#third-party-assets)).
+* **`vendor/`**: third-party source SVGs every unit's icons generator reads (gitignored, see [Third-Party Assets](#third-party-assets)).
 
-Anything with a `.g.` in the name is generated and should not be hand-edited: rerun the matching `npm run gen:*`. CI checks that the committed output still matches.
+Anything with a `.g.` in the name is generated and should not be hand-edited. Rerun the matching `paf gen <face> <kind>`. `paf check` says which Clay components, icon media, and thumbnails are out of date, and CI runs it. Mosaic's vibrant tables come from its own generator, `paf gen <face> vibrant`, which one of its specs checks for Gridlock.
 
 ### Adding a Face
 
-Create `watchfaces/<name>/` with the layout above, plus a `paf.json`, `package.json`, `tsconfig.json`, and `.gitignore` copied from another standalone face, then run `paf sync` and build it. The sandbox, manifest, and waf entry point are all generated from the face's name and appinfo. Add the face and its unit to the matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
+Create `watchfaces/<name>/` with the layout above, plus a `paf.config.json`, `package.json`, `config/`, `tsconfig.json`, and `.gitignore` copied from another standalone face, then run `paf pin <name> <tag>`, which writes its `package-lock.json` to commit too, and build it. The sandbox, manifest, and waf entry point are all generated from the face's name and appinfo. Add the face and its unit to the matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
 
 To join a family instead, create it at `watchfaces/<family>/<name>/`. It builds on the family's framework, and the family's `core/` is compiled in automatically because of where the face sits.
 
@@ -79,12 +80,12 @@ git tag radar-array-v1.7.0
 git push origin radar-array-v1.7.0
 ```
 
-The tag version must match `version` in that face's `config/pebble.appinfo.json`, the changelog entry must be dated, and the tag must not already be released. The workflow checks all three before it spends time on a build, so a mistake costs seconds.
+The tag version must match `version` in that face's `pebble.appinfo.json`, the changelog entry must be dated, and the tag must not already be released. The workflow checks all three before it spends time on a build, so a mistake costs seconds.
 
 ## Development
 
 ```sh
-paf sync                  # fills every unit's lib/ from its paf.json tag and installs its node_modules
+paf sync                  # fills every unit's paf/ from its paf.config.json tag and installs its node_modules
 paf build radar-array     # the .pbw, from WSL with the Pebble SDK installed
 ```
 
@@ -92,8 +93,8 @@ Every face-scoped command takes the face name, and runs in the unit that holds i
 
 ```sh
 paf build <face> [--clean]    # build a .pbw into the unit's targets/<face>/build/
-paf gen <face> <kind|all>     # icons, frame, clay, thumbnails, or every generator the face has inputs for
-paf run <face> <script>       # any other script in the face's unit, such as build:pkjs
+paf gen <face> <kind|all>     # icons, background, clay, thumbnails, Mosaic's vibrant, or every generator the face has inputs for
+paf tool <face> <name>        # a tool from a plugin the unit lists, such as clay-preview or tap-walk
 ```
 
 The checks run in every unit, each against its own framework:
@@ -102,6 +103,7 @@ The checks run in every unit, each against its own framework:
 paf test
 paf lint
 paf typecheck
+paf check                     # every committed generated file still matches its generator
 ```
 
 `paf pin <unit> <tag>` moves a unit to another framework release, and prints the framework's changelog between the two.
@@ -163,7 +165,7 @@ This repository bundles each face's fonts, its generated icon PNGs, and its bake
 
 ## License
 
-**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework each unit fills into `lib/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
+**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework each unit fills into `paf/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
 
 You may use, modify, fork, and share these faces under the AGPL. If you share a modified face, you share its source under the same license. See [LICENSE](LICENSE) for the full terms.
 
