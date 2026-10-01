@@ -1,10 +1,10 @@
-import configBuilder from '../../../lib/ts/pkjs/config-builder';
+import configBuilder from '../../../paf/ts/pkjs/config-builder';
 import moduleThumbnails from './clay/module-thumbnails.g';
 import moduleMeta from './clay/module-meta';
 import vibrantByType from './clay/vibrant.g';
-import type { ClayOption } from '../../../lib/ts/clay/types';
+import type { ClayOption } from '../../../paf/ts/clay/types';
 import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
-import { select, heading, VIBE_OPTIONS } from '../../../lib/ts/pkjs/config-rows';
+import { select, heading, VIBE_OPTIONS } from '../../../paf/ts/pkjs/config-rows';
 import { healthSection } from '../../../core/pkjs/health-section';
 import { locationSection } from '../../../core/pkjs/location-section';
 import { weatherSection } from '../../../core/pkjs/weather-section';

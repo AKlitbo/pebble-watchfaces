@@ -3,7 +3,7 @@
  *
  * The Gridlock face itself: the grid it resolves, its layouts, its night handling, theme, and
  * settings schema. Everything here is specific to this face. It sits on the @ref family-mosaic
- * tier, which carries the panel bodies it shares with Sidereel, and that sits on @ref lib.
+ * tier, which carries the panel bodies it shares with Sidereel, and that sits on the framework.
  *
  * The subgroups below split it up by job.
  */

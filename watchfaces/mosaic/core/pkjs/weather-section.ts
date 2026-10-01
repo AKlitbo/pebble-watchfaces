@@ -8,8 +8,8 @@
  * without anyone having to sign up for anything.
  */
 
-import type { ClayConfigItem } from '../../lib/ts/clay/types';
-import { select, heading } from '../../lib/ts/pkjs/config-rows';
+import type { ClayConfigItem } from '../../paf/ts/clay/types';
+import { select, heading } from '../../paf/ts/pkjs/config-rows';
 
 /**
  * The whole section, ready to drop into the page.

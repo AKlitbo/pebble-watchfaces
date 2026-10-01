@@ -1,0 +1,6 @@
+// typechecks what runs under node: the family's own tools, the builder manifests the Clay generator reads, and the unit's lint and test configs
+{
+  "extends": "../paf/tsconfig.tools.json",
+  "include": ["../core/tools/**/*.ts", "../core/pkjs/clay/builder/*.manifest.ts", "*.config.ts"],
+  "exclude": ["../node_modules", "../targets", "../**/*.spec.ts"]
+}

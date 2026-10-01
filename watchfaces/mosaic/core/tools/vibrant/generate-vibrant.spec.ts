@@ -4,15 +4,13 @@
  * resolveColors follows a module's alias to whichever module owns the family colour, which
  * is exactly where the Dew Point bug lived. validate is the guard that turns a palette typo
  * into a failed build instead of a box on the watch. The stale check asserts the committed
- * vibrant_table.g.h and vibrant.g.js still match what the generator produces, so the
- * firmware table and the config preview can never drift apart again.
+ * vibrant_table.g.h and every face's vibrant.g.js still match what the generator produces, so the
+ * firmware table and each config preview can never drift apart again.
  */
 
 import { describe, test, expect } from 'vitest';
 import fs from 'fs';
-
-// the C table is shared, the JS map is written per face. gridlock is the family's reference
-const FACE = 'gridlock';
+import { listFaceNames } from '../../../paf/tools/shared/faces.ts';
 import {
   CATALOG_H,
   SOURCE_JSON,
@@ -89,10 +87,14 @@ describe('generated files are current', () => {
     expect(result).toBe(fs.readFileSync(OUT_C, 'utf8'));
   });
 
-  /** A stale JS map means the config editor previews a colour the watch will not paint. */
-  test('vibrant.g.js matches the generator output', () => {
+  /**
+   * A stale JS map means the config editor previews a colour the watch will not paint. The C table is
+   * shared and the JS map is written per face, so regenerating one face left the other's map stale with
+   * every check passing.
+   */
+  test.each(listFaceNames())("%s's vibrant.g.js matches the generator output", (face) => {
     const result = buildJsMap(order, source);
 
-    expect(result).toBe(fs.readFileSync(outJs(FACE), 'utf8'));
+    expect(result).toBe(fs.readFileSync(outJs(face), 'utf8'));
   });
 });

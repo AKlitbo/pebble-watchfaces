@@ -1,7 +1,7 @@
 /**
  * @file icons.h
  * @brief The face's icon draw helpers. The low-level cache (load-once by resource id, the
- * palette tint, and the auto-trim margins) lives in the shared lib (ui/icon_cache.h). This
+ * palette tint, and the auto-trim margins) lives in the shared framework (ui/icon_cache.h). This
  * header adds the Gridlock-specific bits on top: the GridCtx-aware draw helpers and the named
  * specs that carry each icon's own little placement nudge.
  *

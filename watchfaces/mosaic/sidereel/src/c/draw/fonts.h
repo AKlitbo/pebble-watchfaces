@@ -2,7 +2,7 @@
  * @file fonts.h
  * @brief sidereel's font slots, one per font the face loads, named by the size you see on screen.
  *
- * These are the ids passed to the lib font registry (ui/fonts.h): layout.c registers a handle
+ * These are the ids passed to the framework's font registry (ui/fonts.h): layout.c registers a handle
  * under each and every drawer names its slot from here.
  *
  * The list is in two halves. The first is the face's own: the reel, the pennant, and the day

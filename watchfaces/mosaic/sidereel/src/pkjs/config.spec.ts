@@ -18,7 +18,7 @@ import config from './config';
 import { pageKeys } from '../../../core/pkjs/testing/page-keys';
 
 const appinfo = JSON.parse(
-  fs.readFileSync(path.resolve(import.meta.dirname, '../../config/pebble.appinfo.json'), 'utf8')
+  fs.readFileSync(path.resolve(import.meta.dirname, '../../pebble.appinfo.json'), 'utf8')
 ) as { messageKeys: string[] };
 
 /** The values the date format select offers, wherever on the page it sits. */

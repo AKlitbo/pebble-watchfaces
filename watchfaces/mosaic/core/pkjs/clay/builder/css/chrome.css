@@ -122,7 +122,7 @@ input[type='text'], input[type='email'], input[type='url'], input[type='search']
   background: #23262c !important;
 }
 
-/* the location search's suggestion dropdown. it ships light because it lives in lib, which
+/* the location search's suggestion dropdown. it ships light because it lives in the framework, which
    stays skin-agnostic, so the gridlock palette is painted on from here instead. this sheet is
    injected after the component's own style, so plain declarations are enough */
 .loc-search .loc-list {

@@ -2,7 +2,7 @@
  * The family's answers for the shared drag engine: what a block drag carries, where it may land,
  * and what happens when it gets there.
  *
- * The pointer handling itself lives in lib. What is here is the grid: turning a pointer position
+ * The pointer handling itself lives in the framework. What is here is the grid: turning a pointer position
  * into a row and column at the cell pitch, snapping a footprint to a legal column, and checking
  * it against what is already placed. Every mosaic face draws the same size cells, so the pitch is
  * shared, but what may sit where is each face's own and arrives through the env.
@@ -16,7 +16,7 @@
  */
 
 import { fillBlockVisual } from './visuals';
-import { createDrag } from '../../../../../../lib/ts/clay/builder/ts/drag';
+import { createDrag } from '../../../../../../paf/ts/clay/builder/ts/drag';
 import type { Block, ModuleInfo, SizeKey } from '../types';
 
 /** The module riding under the pointer mid drag, palette icon or lifted block. */

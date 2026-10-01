@@ -1,5 +1,5 @@
-// generated from core/pkjs/clay/builder/layout.manifest.ts by tools/clay-components/generate-components.ts
-// do not edit by hand: run `npm run gen:clay` after changing the sources
+// generated from core/pkjs/clay/builder/layout.manifest.ts by the Clay generator
+// do not edit by hand: run `paf gen <face> clay` after changing the sources
 /**
  * Clay custom component for the drag and drop layout builder.
  *
@@ -62,7 +62,7 @@ module.exports = {
       };
       var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-      // lib/ts/clay/builder/ts/shared/thumbs.ts
+      // paf/ts/clay/builder/ts/shared/thumbs.ts
       var thumbs_exports = {};
       __export(thumbs_exports, {
         thumbByLabel: () => thumbByLabel
@@ -72,11 +72,11 @@ module.exports = {
         return byModule && byModule[size] || null;
       }
       var init_thumbs = __esm({
-        "lib/ts/clay/builder/ts/shared/thumbs.ts"() {
+        "paf/ts/clay/builder/ts/shared/thumbs.ts"() {
         }
       });
 
-      // lib/ts/clay/builder/ts/shared/overlay.ts
+      // paf/ts/clay/builder/ts/shared/overlay.ts
       var overlay_exports = {};
       __export(overlay_exports, {
         createOverlayHost: () => createOverlayHost
@@ -110,11 +110,11 @@ module.exports = {
         return { open, close };
       }
       var init_overlay = __esm({
-        "lib/ts/clay/builder/ts/shared/overlay.ts"() {
+        "paf/ts/clay/builder/ts/shared/overlay.ts"() {
         }
       });
 
-      // lib/ts/clay/builder/ts/shared/io-panel.ts
+      // paf/ts/clay/builder/ts/shared/io-panel.ts
       var io_panel_exports = {};
       __export(io_panel_exports, {
         buildIoPanel: () => buildIoPanel
@@ -154,7 +154,7 @@ module.exports = {
         panel.appendChild(buttons);
       }
       var init_io_panel = __esm({
-        "lib/ts/clay/builder/ts/shared/io-panel.ts"() {
+        "paf/ts/clay/builder/ts/shared/io-panel.ts"() {
         }
       });
 
@@ -440,7 +440,7 @@ module.exports = {
         }
       });
 
-      // lib/ts/clay/builder/ts/drag.ts
+      // paf/ts/clay/builder/ts/drag.ts
       function createDrag(spec, doc = document) {
         const threshold = spec.threshold === void 0 ? DEFAULT_THRESHOLD : spec.threshold;
         let armed = null;
@@ -558,7 +558,7 @@ module.exports = {
       }
       var DEFAULT_THRESHOLD;
       var init_drag = __esm({
-        "lib/ts/clay/builder/ts/drag.ts"() {
+        "paf/ts/clay/builder/ts/drag.ts"() {
           DEFAULT_THRESHOLD = 10;
         }
       });

@@ -6,8 +6,8 @@
  * multi size module (Battery), a themeHidden module that hides behind another row (Forecast
  * 4-Day), a vibrant colour (Battery) and a 2x4 (Month Grid).
  *
- * Beside the family rather than in lib with the mount harness: every field here is grid and
- * panel vocabulary, which is the line lib does not cross.
+ * Beside the family rather than in the framework with the mount harness: every field here is grid and
+ * panel vocabulary, which is the line the framework does not cross.
  */
 
 import type { RawModule } from '../types';

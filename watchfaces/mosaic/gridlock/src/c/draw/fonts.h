@@ -2,7 +2,7 @@
  * @file fonts.h
  * @brief Gridlock's font slots, one per font the face loads, named by the size you see on screen.
  *
- * These are the ids passed to the lib font registry (ui/fonts.h): main.c load_fonts registers a
+ * These are the ids passed to the framework's font registry (ui/fonts.h): main.c load_fonts registers a
  * handle under each, metrics.c carries the per-slot metrics, and every text drawer names the slot
  * from here. Concrete size names where the slot is a fixed custom font. Semantic names for the
  * header (swapped at runtime) and the slots that fall back to a system font.

@@ -10,7 +10,7 @@
  * weather has arrived.
  */
 
-import type { ClayConfigItem } from '../../lib/ts/clay/types';
+import type { ClayConfigItem } from '../../paf/ts/clay/types';
 
 /** How the swap is triggered. The values line up with the watch's own NightSchedMode. */
 const MODE_OPTIONS = [

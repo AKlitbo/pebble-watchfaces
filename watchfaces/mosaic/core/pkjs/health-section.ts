@@ -9,8 +9,8 @@
  * so a picker only has to agree with it on the order.
  */
 
-import type { ClayConfigItem, ClayOption } from '../../lib/ts/clay/types';
-import { select, heading } from '../../lib/ts/pkjs/config-rows';
+import type { ClayConfigItem, ClayOption } from '../../paf/ts/clay/types';
+import { select, heading } from '../../paf/ts/pkjs/config-rows';
 
 // the Goal Met Vibe picks. the value IS what the watch plays, so the tune data lives here in the
 // config, not in the watch binary. a one-letter sentinel is a plain pulse (S/L/D), C means the

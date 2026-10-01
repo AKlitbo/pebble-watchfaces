@@ -7,7 +7,7 @@
  * The numbers belong to this face only. They describe the real fonts main.c hooks up
  * to each FontId (Teko at a few sizes and Share Tech Mono for the small labels). A
  * different face that hooks different fonts to the same ids keeps its own table. That
- * is why this lives in the face and not in the shared lib.
+ * is why this lives in the face and not in the shared framework.
  *
  * A custom font has some see-through padding above its cap line, so text drawn into a
  * box sits a few pixels lower than the box would suggest. top_pad is that padding. To

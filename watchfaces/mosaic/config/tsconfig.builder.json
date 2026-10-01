@@ -1,0 +1,7 @@
+// typechecks each face's Clay builder, and the framework's shared builder sources it imports
+// the Clay generator is what bundles those pieces into the committed components
+{
+  "extends": "../paf/tsconfig.json",
+  "include": ["../*/src/pkjs/clay/builder/**/*.ts", "../core/pkjs/clay/builder/**/*.ts"],
+  "exclude": ["../node_modules", "../targets", "../**/*.spec.ts", "../**/*.manifest.ts", "../**/testing/**"]
+}

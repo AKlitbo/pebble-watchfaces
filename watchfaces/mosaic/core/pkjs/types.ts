@@ -21,6 +21,6 @@ export type SizeKey = '1x2' | '2x2' | '1x4' | '2x4';
 
 /**
  * Per-module presentation metadata, keyed by module label. Carries no grid vocabulary, so it is
- * lib's and re-exported here for the two module-meta.ts files that read it by this path.
+ * the framework's and re-exported here for the two module-meta.ts files that read it by this path.
  */
-export type { ModuleMeta } from '../../lib/ts/clay/types';
+export type { ModuleMeta } from '../../paf/ts/clay/types';

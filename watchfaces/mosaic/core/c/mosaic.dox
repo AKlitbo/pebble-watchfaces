@@ -3,8 +3,8 @@
  * @brief The panel engine Gridlock and Sidereel share: the panel bodies themselves, the chrome
  * they are framed in, and the draw helpers that keep them all painting the same shapes.
  *
- * A tier between lib and a face. lib is skin-agnostic and reaches into no face; this is the
- * opposite by design, and it is why this code is not in lib: it knows a reading is drawn as a
+ * A tier between the framework and a face. The framework is skin-agnostic and reaches into no face. This is the
+ * opposite by design, and it is why this code is not in the framework: it knows a reading is drawn as a
  * panel in a cell, and it is compiled only into the faces that sit beside it.
  *
  * What it may reach back into is fixed and short:
@@ -14,7 +14,7 @@
  * - `theme/theme.h`, the face's `Palette`, whose panel channels this tier draws with
  * - `settings_schema.h`, the goals, units and week start a body reads, under the names it calls
  * - `dev/dev.h`, the face's dev switches
- * - anything from lib, the same as any face
+ * - anything from the framework, the same as any face
  *
  * Nothing else. A face's own layout, its persisted settings, its palette tables and the cells it
  * resolves stay with the face, because those are what make it that face rather than another one.

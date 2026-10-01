@@ -5,14 +5,14 @@
  *
  * Every mosaic face builds the same component from this one recipe. The pieces
  * below resolve per face, so a name found in the face's own builder wins over
- * the family's copy and both win over lib's. That is how the same list picks
+ * the family's copy and both win over the framework's. That is how the same list picks
  * up each face's grid rules, wire format and starter layouts.
  *
  * Piece order only groups the banners for reading. Function declarations
  * hoist across the assembled initialize, so order never changes behaviour.
  */
 
-import type { Manifest } from '../../../../lib/tools/clay-components/generate-components.ts';
+import type { Manifest } from '../../../../paf/tools/clay-components/generate-components.ts';
 
 export default {
   name: 'layoutBuilder',

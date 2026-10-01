@@ -62,7 +62,7 @@ A face is any directory carrying a `pebble.appinfo.json`, at `watchfaces/<face>/
 * **`targets/<target>/`**: in each unit, the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
 * **`vendor/`**: third-party source SVGs every unit's icons generator reads (gitignored, see [Third-Party Assets](#third-party-assets)).
 
-Anything with a `.g.` in the name is generated and should not be hand-edited. Rerun the matching `paf gen <face> <kind>`. `paf check` says which Clay components, icon media, and thumbnails are out of date, and CI runs it. Mosaic's vibrant tables come from its own generator, `paf gen <face> vibrant`, which one of its specs checks for Gridlock.
+Anything with a `.g.` in the name is generated and should not be hand-edited. Rerun the matching `paf gen <face> <kind>`. `paf check` says which Clay components, icon media, and thumbnails are out of date, and CI runs it. Mosaic's vibrant tables come from its own generator, `paf gen <face> vibrant`, which one of its specs checks for both of its faces.
 
 ### Adding a Face
 

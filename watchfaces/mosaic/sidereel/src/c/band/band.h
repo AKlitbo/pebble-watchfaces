@@ -6,7 +6,7 @@
  * The stretch the sun is up for is shaded apart from the rest, and a marker rides round it at the
  * current time, so a glance at the frame says where in the day you are without reading a number.
  *
- * The sums come from lib/c/core/clock/timeband, which measures everything as an offset from the
+ * The sums come from paf/c/core/clock/timeband, which measures everything as an offset from the
  * window's start in whatever unit the caller keeps. A ring hands it a full turn and asks for an
  * angle. This hands it the rectangle's perimeter and asks for a distance along the outline, so
  * nothing here ever has to think about midnight.

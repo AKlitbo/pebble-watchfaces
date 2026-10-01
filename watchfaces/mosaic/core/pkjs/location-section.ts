@@ -8,8 +8,8 @@
  * the same way as the manual location, by searching for a place.
  */
 
-import type { ClayConfigItem } from '../../lib/ts/clay/types';
-import { heading, toggle } from '../../lib/ts/pkjs/config-rows';
+import type { ClayConfigItem } from '../../paf/ts/clay/types';
+import { heading, toggle } from '../../paf/ts/pkjs/config-rows';
 
 /**
  * The whole section, ready to drop into the page.
