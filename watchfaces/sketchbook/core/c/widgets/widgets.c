@@ -120,7 +120,7 @@ static void draw_glyph(GContext *ctx, uint32_t res, GRect box, GColor color)
 /**
  * @brief How wide a stat reads on screen, and which of its two boxes it lands in.
  *
- * Mirrors the zone fit (see lib ui/zone.c): the big font wins unless it overruns the slot by
+ * Mirrors the zone fit (see the framework's ui/zone.c): the big font wins unless it overruns the slot by
  * more than its 2px safety margin, in which case the small one does and the layer moves to the
  * nudged fallback box. The glyph has to know which way that went, or it sits 2px out of line
  * on every long reading.

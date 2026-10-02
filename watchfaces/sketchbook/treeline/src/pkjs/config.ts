@@ -1,12 +1,12 @@
 /**
  * The Clay settings page for this face.
  *
- * Built from the shared template (see lib/ts/pkjs/config-builder.ts), tuned with the scene
+ * Built from the shared template (see paf/ts/pkjs/config-builder.ts), tuned with the scene
  * palette list and the wording this face uses for its stats row. Weather matters more here
  * than on most faces: the condition is what the picture is drawn from, and the wind is what
  * the chimney smoke leans on.
  */
-import buildConfig from '../../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../../paf/ts/pkjs/config-builder';
 
 export default buildConfig({
   heading: 'Treeline',

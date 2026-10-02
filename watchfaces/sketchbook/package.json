@@ -1,32 +1,33 @@
 {
   "name": "pebble-watchfaces-sketchbook",
   "author": "Null Syntax",
-  "version": "1.3.0",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "workspaces": [
-    "lib"
+    "paf",
+    "paf/plugins/*"
   ],
   "engines": {
-    "node": ">=24.2"
+    "node": "^22.18.0 || >=24.2.0"
   },
   "scripts": {
-    "test": "vitest run --config lib/config/vitest.config.ts",
-    "test:watch": "vitest --config lib/config/vitest.config.ts",
-    "test:coverage": "vitest run --config lib/config/vitest.config.ts --coverage",
-    "lint": "eslint . --config lib/config/eslint.config.ts",
-    "lint:fix": "eslint . --fix --config lib/config/eslint.config.ts",
-    "typecheck": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/typecheck.ts",
-    "build:pkjs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/pkjs/build-pkjs.ts",
-    "build:conditions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/build-conditions.ts",
-    "build:manifests": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/manifest/build-manifests.ts",
-    "gen:icons": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/icons/generate-icons.ts",
-    "gen:frame": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/frame/generate-frame.ts",
-    "gen:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/clay-components/generate-components.ts",
-    "gen:thumbnails": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/thumbnails/embed-thumbnails.ts",
-    "dev:clay": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/tools/dev/clay-preview.ts"
+    "test": "vitest run --config config/vitest.config.ts --passWithNoTests",
+    "test:watch": "vitest --config config/vitest.config.ts",
+    "test:coverage": "vitest run --config config/vitest.config.ts --coverage --passWithNoTests",
+    "lint": "eslint . --config config/eslint.config.ts",
+    "lint:fix": "eslint . --fix --config config/eslint.config.ts"
   },
-  "framework": {
-    "iconSources": "../../vendor"
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^24.19.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "jiti": "^2.7.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^4.1.11"
   }
 }

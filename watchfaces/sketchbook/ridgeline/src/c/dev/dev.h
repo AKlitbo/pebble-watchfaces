@@ -2,7 +2,8 @@
  * @file dev.h
  * @brief Per-face dev-walk switches. Keep DEV_MODE 0 for any build you ship. Flip it (plus the
  * walk toggle) to boot the face into a fixed fixture and tap-walk themes for screenshots.
- * The logic lives in lib `dev/dev_walk`. This only holds the switches.
+ * The logic lives in the dev plugin's `dev/dev_walk`, which builds only with `dev` listed under plugins
+ * in paf.config.json. This only holds the switches.
  *
  * @ingroup watchface-ridgeline
  */
@@ -12,7 +13,7 @@
 // ===== master switch (0 for any shipped build) =====
 #define DEV_MODE 0
 
-// the tap-walk screenshot harness lives in the shared lib's dev/dev_walk. nothing outside
+// the tap-walk screenshot harness lives in the dev plugin's dev/dev_walk. nothing outside
 // DEV_MODE touches it, so a shipping build (0) needs neither the include nor the walk macro
 #if DEV_MODE
 #include "dev/dev_walk.h"

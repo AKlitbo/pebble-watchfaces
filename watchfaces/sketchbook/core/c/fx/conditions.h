@@ -23,7 +23,7 @@
  */
 
 /**
- * @brief The condition vocabulary, in the order lib/ts/weather/conditions.ts lists it.
+ * @brief The condition vocabulary, in the order paf/ts/weather/conditions.ts lists it.
  *
  * A face indexes its own per-condition rules off these, so the values are the shared contract.
  */
