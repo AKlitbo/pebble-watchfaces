@@ -1,7 +1,7 @@
 @charset "utf-8";
 /*
   Neon radar palette, built from the Pebble-64 GColors in
-  lib/css/pebble-colors.css. Translucent overlays use color-mix against
+  the frame plugin's pebble-colors.css. Translucent overlays use color-mix against
   transparent, so each glow keeps its exact GColor at reduced opacity.
 */
 :root {

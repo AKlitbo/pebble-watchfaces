@@ -1,11 +1,11 @@
 /**
  * The Clay settings page for this face.
  *
- * Built from the shared template (see lib/ts/pkjs/config-builder.ts), tuned with the
+ * Built from the shared template (see paf/ts/pkjs/config-builder.ts), tuned with the
  * editor theme list, a compact date default that fits the terminal panel, and the
  * battery section this face's tab-strip readout needs.
  */
-import buildConfig from '../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../paf/ts/pkjs/config-builder';
 
 export default buildConfig({
   // the framework's default intro leaves weather out, and this face has it

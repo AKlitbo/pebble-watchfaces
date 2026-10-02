@@ -1,7 +1,7 @@
 @charset "utf-8";
 /*
   VS Code Dark+ palette for the frame chrome. Every value is a Pebble-64 GColor
-  pulled from lib/css/pebble-colors.css, so baked fills land on real colors with no
+  pulled from the frame plugin's pebble-colors.css, so baked fills land on real colors with no
   dithering. The dynamic readout vars (--time-fg / --date-fg / --stats-fg) name the
   same GColors theme.c draws with, so the preview matches the on-watch render.
 */

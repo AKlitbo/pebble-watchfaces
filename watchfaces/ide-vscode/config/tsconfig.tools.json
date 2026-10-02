@@ -1,0 +1,6 @@
+// typechecks what runs under node: the unit's lint and test configs
+{
+  "extends": "../paf/tsconfig.tools.json",
+  "include": ["*.config.ts"],
+  "exclude": ["../node_modules", "../targets", "../**/*.spec.ts"]
+}

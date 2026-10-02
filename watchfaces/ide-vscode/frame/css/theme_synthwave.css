@@ -1,7 +1,7 @@
 @charset "utf-8";
 /*
   SynthWave '84 palette (RobbOwen.synthwave-vscode) mapped into the Pebble-64 gamut
-  from lib/css/pebble-colors.css. Deep blue-purple field (#262335 -> GColorOxfordBlue)
+  from the frame plugin's pebble-colors.css. Deep blue-purple field (#262335 -> GColorOxfordBlue)
   with the signature neon pink (#ff7edb -> GColorShockingPink), plus yellow, electric
   cyan, and orange. The readout vars match the GColors theme.c draws with.
 */

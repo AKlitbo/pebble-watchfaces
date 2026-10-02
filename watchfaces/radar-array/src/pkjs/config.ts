@@ -1,11 +1,11 @@
 /**
  * The Clay settings page for this face.
  *
- * Built from the shared template (see lib/ts/pkjs/config-builder.ts), tuned with the
+ * Built from the shared template (see paf/ts/pkjs/config-builder.ts), tuned with the
  * radar theme list, GPS on by default, and the RANGE wording this face uses for its
  * stats slot.
  */
-import buildConfig from '../../lib/ts/pkjs/config-builder';
+import buildConfig from '../../paf/ts/pkjs/config-builder';
 
 export default buildConfig({
   // the framework's default intro leaves weather out, and this face has it

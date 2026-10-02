@@ -1,7 +1,7 @@
 @charset "utf-8";
 /*
   A plain black-and-white palette: no syntax colour at all, just white and gray on a
-  black field. Every value is a Pebble-64 GColor from lib/css/pebble-colors.css. The
+  black field. Every value is a Pebble-64 GColor from the frame plugin's pebble-colors.css. The
   readout vars name the same grays theme.c draws with, so chrome and text match.
 */
 :root {

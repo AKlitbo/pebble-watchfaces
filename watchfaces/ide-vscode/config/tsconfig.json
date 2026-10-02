@@ -1,0 +1,11 @@
+// typechecks the face's phone code against the framework's runtime, which it imports from paf/
+{
+  "extends": "../paf/tsconfig.json",
+  "include": ["../src/pkjs/**/*.ts", "../paf/ts/**/*.d.ts"],
+  "exclude": [
+    "../node_modules",
+    "../targets",
+    "../src/pkjs/clay/builder/**",
+    "../**/*.spec.ts"
+  ]
+}

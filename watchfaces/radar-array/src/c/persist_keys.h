@@ -7,7 +7,7 @@
  * scattered as literals) is what stops a new one from silently colliding with an existing one.
  *
  * The range is split by convention: settings blobs sit in a low band, store snapshots in a high
- * one, so the two groups grow toward each other with plenty of room between. The lib stores
+ * one, so the two groups grow toward each other with plenty of room between. The framework's stores
  * don't know their own key, the face hands it to each one through its config.
  *
  * @ingroup watchface-radar

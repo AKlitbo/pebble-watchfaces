@@ -1,0 +1,6 @@
+// typechecks the unit's specs, which run under Vitest
+{
+  "extends": "../paf/tsconfig.spec.json",
+  "include": ["../**/*.spec.ts", "../**/testing/**/*.ts"],
+  "exclude": ["../node_modules", "../targets", "../paf", "../paf.paf-*"]
+}

@@ -5,7 +5,7 @@
  * Named for the resource each one holds rather than the job it does, so a slot maps one to one
  * onto the manifest and two roles at the same size share a slot instead of loading it twice.
  *
- * These are the ids passed to the lib font registry (ui/fonts.h): layout.c load_fonts
+ * These are the ids passed to the framework's font registry (ui/fonts.h): layout.c load_fonts
  * registers a handle under each and the zone table names the slot from here. Listed in
  * registration order.
  *

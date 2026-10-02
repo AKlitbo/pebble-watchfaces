@@ -1,7 +1,7 @@
 @charset "utf-8";
 /*
   Terminal (hacker/phosphor) palette: pure-black field, neon-green everything, dashed
-  borders. Every value is a Pebble-64 GColor from lib/css/pebble-colors.css. The
+  borders. Every value is a Pebble-64 GColor from the frame plugin's pebble-colors.css. The
   green is GColorGreen - the same green theme.c draws the readouts in, so chrome and
   text match exactly.
 */
