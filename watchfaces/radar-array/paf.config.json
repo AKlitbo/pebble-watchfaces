@@ -6,6 +6,7 @@
       "sources": "../../vendor"
     },
     "frame": {},
-    "dev": {}
+    "dev": {},
+    "code-style": {}
   }
 }

@@ -1,4 +1,4 @@
-// typechecks what runs under node: the unit's lint and test configs
+// typechecks what runs under node: the unit's test config
 {
   "extends": "../paf/tsconfig.tools.json",
   "include": ["*.config.ts"],

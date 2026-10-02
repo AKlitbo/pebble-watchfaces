@@ -85,6 +85,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
       - run: paf lint
+      # passes with one line for each unit until it turns Prettier on in its paf.config.json
+      - run: paf format --check
 
   typecheck:
     runs-on: ubuntu-latest

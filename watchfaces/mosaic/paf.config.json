@@ -6,7 +6,8 @@
       "sources": "../../vendor"
     },
     "thumbnails": {},
-    "dev": {}
+    "dev": {},
+    "code-style": {}
   },
   "gen": {
     "vibrant": {

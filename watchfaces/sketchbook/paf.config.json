@@ -5,6 +5,7 @@
     "icons": {
       "sources": "../../vendor"
     },
-    "dev": {}
+    "dev": {},
+    "code-style": {}
   }
 }

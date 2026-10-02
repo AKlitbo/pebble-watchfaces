@@ -57,7 +57,7 @@ A face is any directory carrying a `pebble.appinfo.json`, at `watchfaces/<face>/
 * **`watchfaces/<face>/`**: one face. `pebble.appinfo.json` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
 * **`watchfaces/<family>/core/`**: the family's shared code, staged into each member's build and reached as `<family>/...`.
 * **`paf.config.json`**, **`package.json`**: in each unit, the framework tag it is on with the plugins it uses, and its scripts.
-* **`config/`**: in each unit, its own lint, test, and typecheck setup in `eslint.config.ts`, `vitest.config.ts`, and the `tsconfig*.json` files. The unit's root `tsconfig.json` checks no files of its own and points an editor at them.
+* **`config/`**: in each unit, its own test and typecheck setup in `vitest.config.ts` and the `tsconfig*.json` files. The lint comes from the framework's `code-style` plugin, which every unit lists, so no unit keeps an ESLint config. The unit's root `tsconfig.json` checks no files of its own and points an editor at them.
 * **`paf/`**: in each unit, the shared framework, filled by `paf sync` and gitignored. It holds the base every face shares (`c/` device code, `ts/` PebbleKit JS, `waf/` the build helpers), the build and generator tooling under `tools/`, and the plugins the unit lists under `plugins/`.
 * **`targets/<target>/`**: in each unit, the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
 * **`vendor/`**: third-party source SVGs every unit's icons generator reads (gitignored, see [Third-Party Assets](#third-party-assets)).
@@ -101,7 +101,7 @@ The checks run in every unit, each against its own framework:
 
 ```sh
 paf test
-paf lint
+paf lint [--fix]              # the house style, from the code-style plugin
 paf typecheck
 paf check                     # every committed generated file still matches its generator
 ```
