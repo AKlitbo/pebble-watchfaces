@@ -63,18 +63,22 @@ const CHANNELS: Array<keyof Channels> = ['accent', 'value', 'icon', 'subtitle'];
  */
 function parseModuleOrder(catalogText: string): string[] {
   const block = catalogText.match(/typedef enum\s*\{([\s\S]*?)\}\s*ModuleType\s*;/);
+
   if (!block) {
     throw new Error('could not find the ModuleType enum in catalog.h');
   }
 
   const names = [];
+
   for (const rawLine of block[1].split('\n')) {
     const line = rawLine.replace(/\/\/.*$/, '');
     const match = line.match(/\bMOD_[A-Z0-9_]+\b/);
+
     if (match && match[0] !== 'MOD_TYPE_COUNT') {
       names.push(match[0]);
     }
   }
+
   return names;
 }
 
@@ -84,9 +88,11 @@ function parseModuleOrder(catalogText: string): string[] {
  */
 function paletteNameSet(): Set<string> {
   const names = new Set<string>();
+
   for (const entry of buildPalette(PEBBLE_COLORS_CSV)) {
     names.add(entry.name);
   }
+
   return names;
 }
 
@@ -101,46 +107,57 @@ function gcolorConst(name: string): string {
  */
 function resolveColors(source: VibrantSource, name: string, seen?: Set<string>): Channels {
   seen = seen || new Set<string>();
+
   if (seen.has(name)) {
     throw new Error('alias cycle through ' + name);
   }
+
   seen.add(name);
 
   const entry = source[name];
+
   if (!entry) {
     throw new Error('no source entry for ' + name);
   }
+
   if (entry.alias) {
     return resolveColors(source, entry.alias, seen);
   }
 
   const colors: Channels = { accent: null, value: null, icon: null, subtitle: null };
+
   if (entry.color) {
     colors.accent = colors.value = colors.icon = entry.color;
   } else {
     for (const channel of CHANNELS) {
       const value = entry[channel];
+
       if (value) {
         colors[channel] = value;
       }
     }
   }
+
   return colors;
 }
 
 /** Fail loudly on a typo or a stray key before either output is written. */
 function validate(order: string[], source: VibrantSource, paletteNames: Set<string>): void {
   const known = new Set(order);
+
   for (const name of Object.keys(source)) {
     if (!known.has(name)) {
       throw new Error('unknown module ' + name + ' in module-vibrant.json');
     }
   }
+
   for (const name of order) {
     if (!source[name]) {
       throw new Error('module ' + name + ' is missing from module-vibrant.json');
     }
+
     const colors = resolveColors(source, name);
+
     for (const channel of CHANNELS) {
       if (colors[channel] && !paletteNames.has(colors[channel])) {
         throw new Error(name + '.' + channel + ' uses an unknown palette colour "' + colors[channel] + '"');
@@ -152,13 +169,17 @@ function validate(order: string[], source: VibrantSource, paletteNames: Set<stri
 /** The C table: one designated-initialiser row per coloured module, mono ones left out. */
 function buildHeader(order: string[], source: VibrantSource): string {
   const rows: string[] = [];
+
   for (const name of order) {
     const colors = resolveColors(source, name);
     const set = CHANNELS.filter((channel) => colors[channel]);
+
     if (set.length === 0) {
       continue;
     }
+
     const fields = set.map((channel) => '.' + channel + ' = ' + gcolorConst(colors[channel] as string)).join(', ');
+
     rows.push('    [' + name + '] = { ' + fields + ' },');
   }
 
@@ -179,9 +200,11 @@ function buildHeader(order: string[], source: VibrantSource): string {
 /** The JS map: ordinal -> the module's accent palette name, for the config Use Vibrant button. */
 function buildJsMap(order: string[], source: VibrantSource): string {
   const rows: string[] = [];
+
   order.forEach((name, ordinal) => {
     const colors = resolveColors(source, name);
     const vibrant = colors.accent || colors.value || colors.icon;
+
     if (vibrant) {
       rows.push('  ' + ordinal + ': "' + vibrant + '",');
     }
@@ -207,6 +230,7 @@ function main(face: string): void {
   validate(order, source, paletteNames);
 
   const outJsPath = outJs(face);
+
   fs.writeFileSync(OUT_C, buildHeader(order, source));
   fs.writeFileSync(outJsPath, buildJsMap(order, source));
   console.log('wrote the core C table and ' + path.relative(faceDir(face), outJsPath));
@@ -214,9 +238,11 @@ function main(face: string): void {
 
 if (isMainScript(import.meta)) {
   const face = process.argv[2];
+
   if (!face) {
     throw new Error('usage: generate-vibrant.ts <face>');
   }
+
   main(face);
 }
 

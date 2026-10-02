@@ -24,6 +24,7 @@ const MODE_OPTIONS = [
 const HALF_HOURS = Array.from({ length: 48 }, (_, slot) => {
   const hour = Math.floor(slot / 2);
   const minute = slot % 2 ? '30' : '00';
+
   return { label: (hour < 10 ? '0' : '') + hour + ':' + minute, value: slot };
 });
 

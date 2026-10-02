@@ -95,6 +95,7 @@ export function init(this: ClayComponentInstance): void {
    */
   function pushAssigned(selector: string, index: number): void {
     const input = document.querySelector(selector) as HTMLInputElement | null;
+
     if (!input) {
       return;
     }
@@ -111,6 +112,7 @@ export function init(this: ClayComponentInstance): void {
   // the modes bar owns which layout is being edited. asking it, rather than keeping a second copy
   // here, is what stops the two drifting apart and writing an edit into the wrong layout
   let modes: ModesBar | null = null;
+
   function selected(): number {
     return modes ? modes.selected() : library.day;
   }
@@ -127,9 +129,11 @@ export function init(this: ClayComponentInstance): void {
         // the parts of the watch the face draws itself are shown but never droppable, so the
         // grid reads as the whole screen instead of just the corner panels can go in
         let blocked = '';
+
         if (isBlocked(r, c)) {
           blocked = c >= REEL_COL ? ' blocked reel' : ' blocked pointer';
         }
+
         cell.className = 'lb-cell' + blocked + (grid[r][c] !== null ? ' occupied' : '');
         cell.style.gridRow = String(r + 1);
         cell.style.gridColumn = String(c + 1);
@@ -144,6 +148,7 @@ export function init(this: ClayComponentInstance): void {
         const b = blocks[idx];
         const info = modInfo(MODULES, b.module);
         const el = document.createElement('div');
+
         el.className = 'lb-block' + (b.h >= 2 ? ' big' : '');
         el.style.gridRow = b.row + 1 + ' / span ' + b.h;
         el.style.gridColumn = b.col + 1 + ' / span ' + b.w;
@@ -164,8 +169,10 @@ export function init(this: ClayComponentInstance): void {
       return b.module;
     });
     const palItems = root.querySelectorAll<HTMLElement>('.lb-pal-item');
+
     for (let k = 0; k < palItems.length; k++) {
       const modVal = parseInt(palItems[k].dataset.value || '', 10);
+
       if (placedModules.indexOf(modVal) !== -1) {
         palItems[k].classList.add('placed');
       } else {
@@ -205,23 +212,30 @@ export function init(this: ClayComponentInstance): void {
   ];
 
   const drawerWrap = document.createElement('div');
+
   drawerWrap.className = 'lb-drawer-wrap';
 
   const tabBar = document.createElement('div');
+
   tabBar.className = 'lb-tabs';
 
   const panes = document.createElement('div');
+
   panes.className = 'lb-drawer-panes';
 
   function activateGroup(tab: HTMLElement, pane: HTMLElement): void {
     const allTabs = tabBar.querySelectorAll('.lb-tab');
+
     for (let i = 0; i < allTabs.length; i++) {
       allTabs[i].classList.remove('active');
     }
+
     const allPanes = panes.querySelectorAll('.lb-drawer-pane');
+
     for (let j = 0; j < allPanes.length; j++) {
       allPanes[j].classList.remove('active');
     }
+
     tab.classList.add('active');
     pane.classList.add('active');
   }
@@ -232,26 +246,32 @@ export function init(this: ClayComponentInstance): void {
     const groupMods = MODULES.filter(function (m) {
       return m.sizes.indexOf(sg.key) !== -1;
     });
+
     if (groupMods.length === 0) {
       return;
     }
 
     const tab = document.createElement('button');
+
     tab.type = 'button';
     tab.className = 'lb-tab';
     tab.textContent = sg.title;
 
     const pane = document.createElement('div');
+
     pane.className = 'lb-drawer-pane';
 
     const drawer = document.createElement('div');
+
     drawer.className = 'lb-drawer';
 
     groupMods.forEach(function (m) {
       const el = document.createElement('div');
+
       el.className = 'lb-pal-item';
       el.dataset.value = String(m.value);
       const palThumb = thumbFor(THUMBS, MODULES, m.value, sg.key);
+
       if (palThumb) {
         el.style.background = '#000';
         el.innerHTML = '<img class="lb-pal-img" src="' + palThumb + '">';
@@ -292,9 +312,11 @@ export function init(this: ClayComponentInstance): void {
   });
 
   const presetBtns = root.querySelectorAll<HTMLElement>('.lb-preset');
+
   for (let i = 0; i < presetBtns.length; i++) {
     presetBtns[i].addEventListener('click', function (e) {
       const id = (e.target as HTMLElement).getAttribute('data-preset') || '';
+
       if (LAYOUT_PRESETS[id]) {
         blocks = parseLayoutString(LAYOUT_PRESETS[id]);
         render();
@@ -321,9 +343,11 @@ export function init(this: ClayComponentInstance): void {
   const overlay = createOverlayHost('lb-overlay', 'lb-panel', true);
 
   const ioBtn = root.querySelector('.lb-btn-io');
+
   if (ioBtn) {
     ioBtn.addEventListener('click', function () {
       const panel = overlay.open();
+
       buildIoPanel(panel, {
         title: 'Import / Export Layout',
         css: { title: 'lb-title', textarea: 'lb-io-textarea', buttons: 'lb-io-btns', button: 'lb-io-btn' },
@@ -342,6 +366,7 @@ export function init(this: ClayComponentInstance): void {
   // into whichever layout is assigned to day rather than whatever happens to be on screen
   root._lbSet = function (value) {
     library.layouts[library.day] = value || EMPTY_LAYOUT;
+
     // only follow it onto the grid while the day layout is the one being edited. Clay seeds this
     // at open, and yanking the user off the tab they were on would be its own small betrayal
     if (selected() === library.day) {
@@ -351,6 +376,7 @@ export function init(this: ClayComponentInstance): void {
       publish();
     }
   };
+
   root._lbGet = function () {
     return library.layouts[library.day] || EMPTY_LAYOUT;
   };
@@ -367,12 +393,14 @@ export function init(this: ClayComponentInstance): void {
       }
 
       const saved = readLibrary();
+
       if (saved.layouts.some(function (layout) { return layout !== EMPTY_LAYOUT; })) {
         library.layouts = saved.layouts;
         library.day = saved.day;
         library.night = saved.night;
         library.quiet = saved.quiet;
         blocks = parseLayoutString(library.layouts[library.day]);
+
         if (modes) {
           modes.refresh();
         }

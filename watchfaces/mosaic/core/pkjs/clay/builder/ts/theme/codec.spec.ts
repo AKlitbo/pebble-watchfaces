@@ -53,6 +53,7 @@ describe('flag packing', () => {
   test('packs headerless into bits 0..3 and borderless into bits 4..7 by SIZE_ORDER', () => {
     const headerless = {};
     const borderless = {};
+
     setFlag(headerless, 5, '1x2', true);
     setFlag(borderless, 5, '2x4', true);
 
@@ -98,6 +99,7 @@ describe('serializeAppearance', () => {
   test('writes the ~3 golden for one coloured and one flagged module', () => {
     const colors = { 1: { accent: 192, value: 193, icon: null, subtitle: 194 } };
     const headerless = {};
+
     SIZE_ORDER.forEach((size) => setFlag(headerless, 1, size, true));
 
     const result = serializeAppearance(colors, headerless, {});
@@ -164,6 +166,7 @@ describe('parseAppearance', () => {
     // named rather than spread over Object.values, which quietly depended on key order
     const roundTrip = (text: string): string => {
       const { colors, headerless, borderless } = parseAppearance(text);
+
       return serializeAppearance(colors, headerless, borderless);
     };
 

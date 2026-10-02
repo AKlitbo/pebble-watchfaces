@@ -54,6 +54,7 @@ export function modInfo(modules: ModuleInfo[], value: number): ModuleInfo {
 export function thumbFor(thumbs: Thumbs, modules: ModuleInfo[], value: number, key: string): string | null {
   const mod = modInfo(modules, value);
   let label = mod.label;
+
   if (mod.themeRows) {
     for (let i = 0; i < mod.themeRows.length; i++) {
       if (mod.themeRows[i].size === key && mod.themeRows[i].thumb) {
@@ -80,18 +81,22 @@ export function fillBlockVisual(el: HTMLElement, thumb: string | null, display: 
     el.style.borderRadius = '0';
 
     const img = document.createElement('img');
+
     img.className = 'lb-block-img';
     img.src = thumb;
+
     // the watch's 1x4 row is a touch taller than a 1x2 so a square-row cell would
     // letterbox it. stretch the full-width shot to fill instead (barely visible)
     if (w === 4) {
       img.style.objectFit = 'fill';
     }
+
     el.appendChild(img);
   } else {
     el.style.background = display.color;
 
     const icon = document.createElement('div');
+
     icon.className = 'lb-icon';
     icon.textContent = display.icon;
     icon.style.color = '#fff';
@@ -99,6 +104,7 @@ export function fillBlockVisual(el: HTMLElement, thumb: string | null, display: 
 
     if (display.label) {
       const name = document.createElement('div');
+
       name.className = 'lb-name';
       name.textContent = display.label;
       name.style.color = '#fff';

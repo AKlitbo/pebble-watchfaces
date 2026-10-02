@@ -17,6 +17,7 @@ import type { FlagMap, RawModule, SizeRow, ThemeModule } from '../types';
  */
 export function buildOptionByLabel(rawModules: RawModule[]): Record<string, RawModule> {
   const optionByLabel: Record<string, RawModule> = {};
+
   for (let i = 0; i < rawModules.length; i++) {
     if (rawModules[i]) {
       optionByLabel[rawModules[i].label] = rawModules[i];
@@ -45,6 +46,7 @@ export function sizeRowsFor(option: RawModule, optionByLabel: Record<string, Raw
       const panelHeaderless = row.alwaysHeaderless != null
         ? row.alwaysHeaderless
         : (src.alwaysHeaderless || option.alwaysHeaderless);
+
       return {
         size: row.size,
         thumbLabel: row.thumb || option.label,
@@ -74,8 +76,10 @@ export function sizeRowsFor(option: RawModule, optionByLabel: Record<string, Raw
 export function buildThemeModules(rawModules: RawModule[]): ThemeModule[] {
   const optionByLabel = buildOptionByLabel(rawModules);
   const modules: ThemeModule[] = [];
+
   for (let i = 0; i < rawModules.length; i++) {
     const option = rawModules[i];
+
     // themeHidden modules share another module's theming row (the forecast panels share
     // one "Forecast" entry) so they get no row of their own. themeLabel renames the shared row
     if (!option || option.value === 0 || option.themeHidden) {
@@ -83,6 +87,7 @@ export function buildThemeModules(rawModules: RawModule[]): ThemeModule[] {
     }
 
     const sizeRows = sizeRowsFor(option, optionByLabel);
+
     modules.push({
       value: option.value,
       label: option.themeLabel || option.label,
@@ -111,8 +116,10 @@ export function allSizesHidden(module: ThemeModule, map: FlagMap): boolean {
   if (!module.sizeRows || module.sizeRows.length === 0) {
     return false;
   }
+
   for (let s = 0; s < module.sizeRows.length; s++) {
     const row = module.sizeRows[s];
+
     if (!flagOn(map, row.value, row.size)) {
       return false;
     }

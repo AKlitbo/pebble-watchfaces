@@ -46,9 +46,11 @@ export function createSheet(env: SheetEnv): { open(): void } {
     if (!editorList) {
       return;
     }
+
     while (editorList.firstChild) {
       editorList.removeChild(editorList.firstChild);
     }
+
     for (let index = 0; index < env.modules.length; index++) {
       editorList.appendChild(env.buildRow(env.modules[index]));
     }
@@ -57,6 +59,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
   // share a colour string with someone else or paste one in
   function openIO(): void {
     const panel = ioHost.open();
+
     buildIoPanel(panel, {
       title: 'Import / Export Colours',
       css: { title: 'tb-pick-title', textarea: 'tb-io-textarea', buttons: 'tb-io-btns', button: 'tb-io-btn' },
@@ -86,6 +89,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
   // supports
   function buildBulkBar(): HTMLElement {
     const bar = document.createElement('div');
+
     bar.className = 'tb-bar';
 
     function mapFor(which: string): FlagMap {
@@ -98,13 +102,17 @@ export function createSheet(env: SheetEnv): { open(): void } {
     // different panel id)
     function anyStillOn(which: string): boolean {
       const map = mapFor(which);
+
       for (let index = 0; index < env.modules.length; index++) {
         const rows = env.modules[index].sizeRows;
+
         for (let sizeIndex = 0; sizeIndex < rows.length; sizeIndex++) {
           const subRow = rows[sizeIndex];
+
           if (which === 'header' && subRow.alwaysHeaderless) {
             continue;
           }
+
           if (!flagOn(map, subRow.value, subRow.size)) {
             return true;
           }
@@ -117,13 +125,17 @@ export function createSheet(env: SheetEnv): { open(): void } {
     // set every sub row's flag at once for this flag kind and key it off the sub row's own panel
     function setAll(which: string, on: boolean): void {
       const map = mapFor(which);
+
       for (let index = 0; index < env.modules.length; index++) {
         const rows = env.modules[index].sizeRows;
+
         for (let sizeIndex = 0; sizeIndex < rows.length; sizeIndex++) {
           const subRow = rows[sizeIndex];
+
           if (which === 'header' && subRow.alwaysHeaderless) {
             continue;
           }
+
           setFlag(map, subRow.value, subRow.size, on);
         }
       }
@@ -131,13 +143,16 @@ export function createSheet(env: SheetEnv): { open(): void } {
 
     function makeBulkButton(label: string, which: string): HTMLElement {
       const button = document.createElement('button');
+
       button.type = 'button';
       button.className = 'tb-bar-btn ghost';
+
       const paint = function () {
         button.textContent = anyStillOn(which)
           ? 'All ' + label + ' Off'
           : 'All ' + label + ' On';
       };
+
       paint();
       button.addEventListener('click', function () {
         // any still on -> hide them all. otherwise show them all again
@@ -158,9 +173,11 @@ export function createSheet(env: SheetEnv): { open(): void } {
   // the Reset / Import-Export / Done bar pinned at the bottom of the sheet
   function buildBar(isBottom: boolean): HTMLElement {
     const bar = document.createElement('div');
+
     bar.className = 'tb-bar' + (isBottom ? ' tb-bar-bottom' : '');
 
     const resetButton = document.createElement('button');
+
     resetButton.type = 'button';
     resetButton.className = 'tb-bar-btn ghost';
     resetButton.textContent = 'Reset';
@@ -172,6 +189,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
     bar.appendChild(resetButton);
 
     const ioButton = document.createElement('button');
+
     ioButton.type = 'button';
     ioButton.className = 'tb-bar-btn io';
     ioButton.textContent = 'Import/Export';
@@ -179,6 +197,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
     bar.appendChild(ioButton);
 
     const doneButton = document.createElement('button');
+
     doneButton.type = 'button';
     doneButton.className = 'tb-bar-btn';
     doneButton.textContent = 'Done';
@@ -192,6 +211,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
     const panel = sheetHost.open();
 
     const legend = document.createElement('div');
+
     legend.className = 'tb-legend';
     // a two column grid (fixed term column with flexible description) keeps every term word
     // and every description flush at one x. the dot sits in a fixed slot so H/B which
@@ -218,6 +238,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
     // the legend and the bulk sweep bar and the list all scroll together so the visible
     // list area stays as tall as possible on a small screen. only the footer stays pinned
     const scroller = document.createElement('div');
+
     scroller.className = 'tb-scroll';
     scroller.appendChild(legend);
     scroller.appendChild(buildBulkBar());

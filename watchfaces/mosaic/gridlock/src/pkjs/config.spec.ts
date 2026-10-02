@@ -26,15 +26,19 @@ function dateFormatValues(items: unknown): string[] {
       node.forEach(walk);
       return;
     }
+
     if (!node || typeof node !== 'object') {
       return;
     }
+
     const item = node as { messageKey?: unknown; options?: unknown; items?: unknown };
+
     if (item.messageKey === 'CLOCK_DATE_FORMAT' && Array.isArray(item.options)) {
       for (const option of item.options as Array<{ value?: unknown }>) {
         found.push(String(option.value));
       }
     }
+
     if (item.items) {
       walk(item.items);
     }

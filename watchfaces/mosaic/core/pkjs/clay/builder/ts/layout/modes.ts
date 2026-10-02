@@ -62,9 +62,11 @@ export interface ModesBar {
 /** An index that is a real layout, or -1. */
 function clampIndex(value: unknown, fallback: number): number {
   const index = typeof value === 'number' ? value : parseInt(String(value), 10);
+
   if (isNaN(index) || index < 0 || index >= LAYOUT_COUNT) {
     return fallback;
   }
+
   return index;
 }
 
@@ -99,8 +101,10 @@ export function readLibrary(): LayoutLibrary {
   }
 
   const layouts: string[] = [];
+
   for (let i = 0; i < LAYOUT_COUNT; i++) {
     const value = raw.layouts && raw.layouts[i];
+
     layouts.push(typeof value === 'string' && value ? value : EMPTY_LAYOUT);
   }
 
@@ -115,6 +119,7 @@ export function readLibrary(): LayoutLibrary {
 /** Writes the library back so Clay saves it, reporting whether there was anywhere to write. */
 export function writeLibrary(library: LayoutLibrary): boolean {
   const input = storeInput();
+
   if (!input) {
     return false;
   }
@@ -142,6 +147,7 @@ export function seedLibrary(library: LayoutLibrary, existing: string): LayoutLib
   }
 
   const layouts = library.layouts.slice();
+
   layouts[0] = existing;
   return { layouts: layouts, day: 0, night: library.night, quiet: library.quiet };
 }
@@ -162,9 +168,11 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   let selected = library.day;
 
   const tabs = document.createElement('div');
+
   tabs.className = 'lb-ltabs';
 
   const assignments = document.createElement('div');
+
   assignments.className = 'lb-assign';
 
   // only offered where the page has a store to keep the answer in
@@ -181,13 +189,16 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
     const marks = (library.day === index ? '☀' : '')
       + (library.night === index ? '☽' : '')
       + (library.quiet === index ? '⊘' : '');
+
     return marks ? index + 1 + ' ' + marks : String(index + 1);
   }
 
   function redraw(): void {
     const buttons = tabs.querySelectorAll<HTMLElement>('.lb-ltab');
+
     for (let i = 0; i < buttons.length; i++) {
       buttons[i].textContent = label(i);
+
       if (i === selected) {
         buttons[i].classList.add('active');
       } else {
@@ -198,6 +209,7 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
     // the rows were built in this order, and the quiet one may not be there at all
     const order: LayoutRole[] = quietWanted ? ['day', 'night', 'quiet'] : ['day', 'night'];
     const selects = assignments.querySelectorAll<HTMLSelectElement>('select');
+
     for (let i = 0; i < selects.length && i < order.length; i++) {
       selects[i].value = String(library[order[i]]);
     }
@@ -206,12 +218,14 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   for (let i = 0; i < LAYOUT_COUNT; i++) {
     (function (index) {
       const tab = document.createElement('button');
+
       tab.type = 'button';
       tab.className = 'lb-ltab';
       tab.addEventListener('click', function () {
         if (index === selected) {
           return;
         }
+
         keep(); // the grid is about to be replaced, so bank it first
         selected = index;
         opts.onSelect(library.layouts[index], index);
@@ -224,18 +238,22 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   /** One assignment row: a caption and a picker over every layout in the library. */
   function assignRow(name: string, role: LayoutRole): void {
     const row = document.createElement('div');
+
     row.className = 'lb-assign-row';
 
     const caption = document.createElement('span');
+
     caption.className = 'lb-assign-lbl';
     caption.textContent = name;
 
     const select = document.createElement('select');
+
     select.className = 'lb-assign-sel';
 
     // day always has a layout, so only the jobs that can be skipped offer None
     if (role !== 'day') {
       const none = document.createElement('option');
+
       none.value = String(ROLE_NONE);
       none.textContent = 'None';
       select.appendChild(none);
@@ -243,6 +261,7 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
 
     for (let i = 0; i < LAYOUT_COUNT; i++) {
       const option = document.createElement('option');
+
       option.value = String(i);
       option.textContent = 'Layout ' + (i + 1);
       select.appendChild(option);
@@ -263,6 +282,7 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
 
   assignRow('Day', 'day');
   assignRow('Night', 'night');
+
   if (quietWanted) {
     assignRow('Quiet Time', 'quiet');
   }

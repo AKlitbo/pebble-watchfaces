@@ -36,6 +36,7 @@ export const PEBBLE_COLORS_CSV =
 export function buildPalette(csv: string): PaletteEntry[] {
   const entries = csv.split(',');
   const palette: PaletteEntry[] = [];
+
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
     const hex = entry.substr(0, 6);
@@ -47,6 +48,7 @@ export function buildPalette(csv: string): PaletteEntry[] {
       Math.round(red / 85) * 16 +
       Math.round(green / 85) * 4 +
       Math.round(blue / 85);
+
     palette.push({ argb: argb, css: '#' + hex, name: entry.substr(7) });
   }
 
@@ -59,6 +61,7 @@ export function buildPalette(csv: string): PaletteEntry[] {
  */
 export function buildArgbByName(palette: PaletteEntry[]): Record<string, number> {
   const argbByName: Record<string, number> = {};
+
   for (let i = 0; i < palette.length; i++) {
     argbByName[palette[i].name] = palette[i].argb;
   }
@@ -69,6 +72,7 @@ export function buildArgbByName(palette: PaletteEntry[]): Record<string, number>
 /** A number (0 to 255) as two uppercase hex digits. */
 export function toHexByte(number: number): string {
   const text = number.toString(16).toUpperCase();
+
   return text.length < 2 ? '0' + text : text;
 }
 

@@ -220,13 +220,16 @@ const MODULE_BASE = [
 const MODULE_OPTIONS = MODULE_BASE.map(function (option) {
   const meta = moduleMeta[option.label];
   const merged: Record<string, unknown> = {};
+
   Object.assign(merged, option, meta);
   // the VIBRANT colour is generated per module id (vibrant.g.js) and shared with the
   // firmware so the theme editor's Use Vibrant button reads the same colour the watch paints
   const vibrant = (vibrantByType as Record<string, unknown>)[option.value];
+
   if (vibrant) {
     merged.vibrant = vibrant;
   }
+
   return merged;
 });
 

@@ -36,6 +36,7 @@ export default function resetFaceColors(this: ClayPage): void {
       // this only restages the pickers. the user still saves to push them to the watch
       keys.forEach((key) => {
         const row = this.getItemByMessageKey(key);
+
         row.set(row.config.defaultValue);
       });
     });

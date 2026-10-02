@@ -23,6 +23,7 @@ import { moduleOptionsFixture } from './ts/testing/fixtures';
 /** Mounts the theme builder with the shared module fixture and no thumbnails. */
 function mountTheme() {
   const mounted = mount(component, { moduleOptions: moduleOptionsFixture, moduleThumbnails: {} });
+
   mounted.ctx.initialize();
   return mounted;
 }
@@ -30,6 +31,7 @@ function mountTheme() {
 /** Mounts, opens the editor sheet, and returns the mount plus the rendered rows. */
 function openEditor() {
   const mounted = mountTheme();
+
   mounted.root.querySelector<HTMLElement>('.tb-edit-btn').click();
   return { ...mounted, rows: document.querySelectorAll<HTMLElement>('.tb-row') };
 }
@@ -37,11 +39,13 @@ function openEditor() {
 /** Finds a button by its visible label among the sheet's bar buttons. */
 function barButton(label: string): HTMLElement | null {
   const buttons = document.querySelectorAll<HTMLElement>('.tb-bar-btn');
+
   for (const button of buttons) {
     if (button.textContent === label) {
       return button;
     }
   }
+
   return null;
 }
 
@@ -139,6 +143,7 @@ describe('editor sheet', () => {
   /** A broken Reset would leave colours the user cannot clear without a reinstall. */
   test('Reset clears every colour and flag', () => {
     const { ctx, root } = mountTheme();
+
     ctx.set('~3Cw...|CB.');
     root.querySelector<HTMLElement>('.tb-edit-btn').click();
 
@@ -166,6 +171,7 @@ describe('bulk bar', () => {
 
     barButton('All borders Off').click();
     const afterOff = ctx.get();
+
     barButton('All borders On').click();
     const afterOn = ctx.get();
 
@@ -195,6 +201,7 @@ describe('colour picker', () => {
 
     rows[1].querySelectorAll<HTMLElement>('.tb-swatch')[0].click();
     const options = document.querySelectorAll<HTMLElement>('.tb-mv-opt');
+
     options[1].click();
     document.querySelector<HTMLElement>('.tb-pick .tb-io-btn.primary').click();
     const result = ctx.get();

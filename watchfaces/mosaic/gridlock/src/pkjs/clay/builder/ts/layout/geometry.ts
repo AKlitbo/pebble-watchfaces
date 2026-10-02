@@ -32,12 +32,14 @@ export function sizeKey(w: number, h: number): SizeKey | null {
 /** A row by column map of which block index covers each cell, null for empty. */
 export function occupancyGrid(blocks: Block[]): Array<Array<number | null>> {
   const grid: Array<Array<number | null>> = [];
+
   for (let r = 0; r < GRID_ROWS; r++) {
     grid[r] = [null, null, null, null];
   }
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
+
     for (let row = block.row; row < block.row + block.h; row++) {
       for (let col = block.col; col < block.col + block.w; col++) {
         if (row < GRID_ROWS && col < GRID_COLS) {
@@ -66,14 +68,17 @@ export function canPlace(
   if (row < 0 || col < 0 || row + h > GRID_ROWS || col + w > GRID_COLS) {
     return false;
   }
+
   if (w === 2 && col !== 0 && col !== 2) {
     return false;
   }
+
   if (w === 4 && col !== 0) {
     return false;
   }
 
   const grid = occupancyGrid(blocks);
+
   for (let r = row; r < row + h; r++) {
     for (let c = col; c < col + w; c++) {
       if (grid[r][c] !== null && grid[r][c] !== ignoreIdx) {
@@ -92,11 +97,13 @@ export function canPlace(
  */
 export function snapDrop(target: { r: number; c: number }, w: number, h: number): { row: number; col: number } {
   let col = target.c < 2 ? 0 : 2;
+
   if (w === 4) {
     col = 0;
   }
 
   let row = target.r;
+
   if (row + h > GRID_ROWS) {
     row = GRID_ROWS - h;
   }

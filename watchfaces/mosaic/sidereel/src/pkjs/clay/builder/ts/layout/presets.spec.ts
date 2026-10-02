@@ -28,6 +28,7 @@ describe('LAYOUT_PRESETS', () => {
       const result = serializeLayout(blocks);
 
       const normalized = LAYOUT_PRESETS[presetId].split(';').sort().join(';');
+
       expect(result.split(';').sort().join(';')).toBe(normalized);
     });
 

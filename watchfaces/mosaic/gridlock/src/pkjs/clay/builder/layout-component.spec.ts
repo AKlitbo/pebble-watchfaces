@@ -22,6 +22,7 @@ import { moduleOptionsFixture } from '../../../../../core/pkjs/clay/builder/ts/t
 /** Mounts the layout builder with the shared module fixture and no thumbnails. */
 function mountLayout() {
   const mounted = mount(component, { moduleOptions: moduleOptionsFixture, moduleThumbnails: {} });
+
   mounted.ctx.initialize();
   return mounted;
 }
@@ -35,11 +36,13 @@ function mountLayout() {
 function mountStores(): { library: HTMLInputElement; night: HTMLInputElement; quiet: HTMLInputElement } {
   function input(extra: string): HTMLInputElement {
     const element = document.createElement('input');
+
     element.type = 'hidden';
     element.className = 'gl-store ' + extra;
     document.body.appendChild(element);
     return element;
   }
+
   return { library: input('gl-library'), night: input('gl-night'), quiet: input('gl-quiet') };
 }
 
@@ -136,6 +139,7 @@ describe('actions bar', () => {
    */
   test('Clear empties the layout to the sentinel', () => {
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1;3,0,2,2,1');
 
     root.querySelector<HTMLElement>('.lb-btn-clear').click();
@@ -147,10 +151,12 @@ describe('actions bar', () => {
   /** A dead import path would strand users who share layouts as text. */
   test('Import/Export applies a pasted layout string and closes the panel', () => {
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     root.querySelector<HTMLElement>('.lb-btn-io').click();
     const textarea = document.querySelector<HTMLTextAreaElement>('.lb-io-textarea');
+
     expect(textarea.value).toBe('2,0,0,2,1');
     textarea.value = '3,1,2,2,1';
     document.querySelector<HTMLElement>('.lb-io-btn.primary').click();
@@ -167,6 +173,7 @@ describe('drag and drop', () => {
     const { ctx, root } = mountLayout();
 
     const batteryItem = root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]');
+
     batteryItem.dispatchEvent(pointer('pointerdown', 5, 5));
     document.dispatchEvent(pointer('pointermove', 6, 6));
     document.dispatchEvent(pointer('pointerup', 5, 5));
@@ -180,9 +187,11 @@ describe('drag and drop', () => {
   /** If dragging off grid stops removing, the only way to clear one block is Clear all. */
   test('dragging a placed block off the grid removes it', () => {
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     const block = root.querySelector<HTMLElement>('.lb-block');
+
     block.dispatchEvent(pointer('pointerdown', 5, 5));
     document.dispatchEvent(pointer('pointermove', 100, 100));
     document.dispatchEvent(pointer('pointerup', 500, 500));
@@ -195,9 +204,11 @@ describe('drag and drop', () => {
   /** A tap that never moved must not turn a later pointer move into a phantom drag. */
   test('a tap on a block without dragging leaves the layout alone', () => {
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     const block = root.querySelector<HTMLElement>('.lb-block');
+
     block.dispatchEvent(pointer('pointerdown', 5, 5));
     document.dispatchEvent(pointer('pointerup', 5, 5));
     document.dispatchEvent(pointer('pointermove', 100, 100));
@@ -232,6 +243,7 @@ describe('the layout library', () => {
   test('LAYOUT stays the day layout while another tab is being edited', () => {
     const stores = mountStores();
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     // move to layout 2 and build something different there
@@ -246,6 +258,7 @@ describe('the layout library', () => {
   test('assigning night publishes that layout to the night store', () => {
     const stores = mountStores();
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     // build something on layout 3, then come back so the day grid is the one on screen
@@ -253,6 +266,7 @@ describe('the layout library', () => {
     root.querySelector<HTMLElement>('.lb-btn-clear').click();
     root.querySelectorAll<HTMLElement>('.lb-ltab')[0].click();
     const night = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[1];
+
     night.value = '2';
     night.dispatchEvent(new Event('change'));
 
@@ -266,6 +280,7 @@ describe('the layout library', () => {
     const { root } = mountLayout();
 
     const night = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[1];
+
     night.value = '1';
     night.dispatchEvent(new Event('change'));
     night.value = '-1';
@@ -279,6 +294,7 @@ describe('the layout library', () => {
   test('assigning Quiet Time publishes that layout to the quiet store', () => {
     const stores = mountStores();
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     // build something on layout 3, then come back so the day grid is the one on screen
@@ -286,6 +302,7 @@ describe('the layout library', () => {
     root.querySelector<HTMLElement>('.lb-btn-clear').click();
     root.querySelectorAll<HTMLElement>('.lb-ltab')[0].click();
     const quiet = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[2];
+
     quiet.value = '2';
     quiet.dispatchEvent(new Event('change'));
 
@@ -297,9 +314,11 @@ describe('the layout library', () => {
   test('night and Quiet Time publish to their own stores', () => {
     const stores = mountStores();
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     const selects = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel');
+
     selects[1].value = '1';
     selects[1].dispatchEvent(new Event('change'));
     selects[2].value = '2';
@@ -331,6 +350,7 @@ describe('the layout library', () => {
     const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,0,0,4,1'], day: 0, night: -1 });
     const { root } = mountLayout(); // no stores yet, exactly as Clay would have it
     const stores = mountStores();
+
     stores.library.value = saved;
 
     root.querySelectorAll<HTMLElement>('.lb-ltab')[1].click();
@@ -343,6 +363,7 @@ describe('the layout library', () => {
     const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,0,0,4,1'], day: 2, night: 3 });
     const { root } = mountLayout();
     const stores = mountStores();
+
     stores.library.value = saved;
 
     await new Promise((resolve) => { setTimeout(resolve, 0); }); // let the deferred re-read run
@@ -362,6 +383,7 @@ describe('the layout library', () => {
     const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,0,0,4,1'], day: 0, night: 1, quiet: 2 });
     const { root } = mountLayout();
     const stores = mountStores();
+
     stores.library.value = saved;
 
     await new Promise((resolve) => { setTimeout(resolve, 0); }); // let the deferred re-read run

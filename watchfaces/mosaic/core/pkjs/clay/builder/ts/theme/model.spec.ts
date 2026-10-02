@@ -73,6 +73,7 @@ describe('allSizesHidden', () => {
 
     setFlag(map, 2, '1x2', true);
     const partial = allSizesHidden(battery, map);
+
     setFlag(map, 2, '2x2', true);
     const full = allSizesHidden(battery, map);
 

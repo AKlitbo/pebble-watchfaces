@@ -72,21 +72,26 @@ export function buildExampleBox(
   hideBorder: boolean
 ): ExampleBox {
   const box = document.createElement('div');
+
   box.className = 'tb-ex';
 
   const header = document.createElement('div');
+
   header.className = 'tb-ex-hdr';
   header.textContent = (module.label || 'Module').toUpperCase();
 
   const value = document.createElement('div');
+
   value.className = 'tb-ex-val';
   value.textContent = '8,423';
 
   const subtitle = document.createElement('div');
+
   subtitle.className = 'tb-ex-sub';
   subtitle.textContent = 'OF 10,000';
 
   const icon = document.createElement('div');
+
   icon.className = 'tb-ex-icon';
   icon.textContent = '●'; // a plain dot stands in for the panel icon (tintable, unlike an emoji)
 
@@ -94,6 +99,7 @@ export function buildExampleBox(
   if (!hideHeader) {
     box.appendChild(header);
   }
+
   box.appendChild(value);
   box.appendChild(subtitle);
   box.appendChild(icon);
@@ -101,10 +107,12 @@ export function buildExampleBox(
   function paintChannel(key: ChannelKey, byte: number | null): void {
     if (key === 'accent') {
       const accentCss = channelCss('accent', byte);
+
       if (!hideHeader) {
         header.style.background = accentCss;
         header.style.color = contrastText(byte);
       }
+
       box.style.border = '1px solid ' + (hideBorder ? 'transparent' : accentCss);
     } else if (key === 'value') {
       value.style.color = channelCss('value', byte);

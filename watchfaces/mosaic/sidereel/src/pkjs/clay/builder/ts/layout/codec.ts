@@ -25,8 +25,10 @@ export function serializeLayout(blocks: Block[]): string {
   });
 
   const out = [];
+
   for (let i = 0; i < sorted.length; i++) {
     const block = sorted[i];
+
     out.push(block.module + ',' + block.row + ',' + block.col + ',' + block.w + ',' + block.h);
   }
 
@@ -45,15 +47,19 @@ export function parseLayoutString(str: string): Block[] {
 
   for (let i = 0; i < segs.length; i++) {
     const seg = segs[i];
+
     if (!seg) {
       continue;
     }
+
     const parts = seg.split(',');
+
     if (parts.length < 5) {
       continue;
     }
 
     const module = parseInt(parts[0], 10) || 0;
+
     if (!module) {
       continue; // module 0 or junk is not a real block
     }
@@ -63,20 +69,25 @@ export function parseLayoutString(str: string): Block[] {
     const h = parseInt(parts[4], 10) >= 2 ? 2 : 1;
 
     let row = parseInt(parts[1], 10) || 0;
+
     if (row < 0) {
       row = 0;
     }
+
     if (row + h > GRID_ROWS) {
       row = GRID_ROWS - h;
     }
+
     // an imported string can name a block on the pointer, which is a shape the face cannot
     // draw. pull it to the nearer half rather than dropping it
     if (spansPointer(row, h)) {
       row = row < POINTER_ROW ? POINTER_ROW - h : POINTER_ROW + 1;
     }
+
     if (row < 0) {
       row = 0;
     }
+
     if (row + h > GRID_ROWS) {
       row = GRID_ROWS - h;
     }

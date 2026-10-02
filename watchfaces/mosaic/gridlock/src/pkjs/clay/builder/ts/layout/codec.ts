@@ -25,8 +25,10 @@ export function serializeLayout(blocks: Block[]): string {
   });
 
   const out = [];
+
   for (let i = 0; i < sorted.length; i++) {
     const block = sorted[i];
+
     out.push(block.module + ',' + block.row + ',' + block.col + ',' + block.w + ',' + block.h);
   }
 
@@ -45,15 +47,19 @@ export function parseLayoutString(str: string): Block[] {
 
   for (let i = 0; i < segs.length; i++) {
     const seg = segs[i];
+
     if (!seg) {
       continue;
     }
+
     const parts = seg.split(',');
+
     if (parts.length < 5) {
       continue;
     }
 
     const module = parseInt(parts[0], 10) || 0;
+
     if (!module) {
       continue; // module 0 or junk is not a real block
     }
@@ -64,9 +70,11 @@ export function parseLayoutString(str: string): Block[] {
     // (same rule placement enforces). otherwise clamp to the two valid start columns
     const col = w === 4 ? 0 : (parseInt(parts[2], 10) >= 2 ? 2 : 0);
     let row = parseInt(parts[1], 10) || 0;
+
     if (row < 0) {
       row = 0;
     }
+
     if (row + h > GRID_ROWS) {
       row = GRID_ROWS - h;
     }

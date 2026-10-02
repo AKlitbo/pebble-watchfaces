@@ -15,6 +15,7 @@ import { EMPTY_LAYOUT } from './wire';
 /** The hidden store the library lives in, the way the config page renders it. */
 function mountStore(value = ''): HTMLInputElement {
   const input = document.createElement('input');
+
   input.type = 'hidden';
   input.className = 'gl-store gl-library';
   input.value = value;
@@ -25,6 +26,7 @@ function mountStore(value = ''): HTMLInputElement {
 /** The Quiet Time store, whose presence is what makes the builder offer a Quiet Time row. */
 function mountQuietStore(): HTMLInputElement {
   const input = document.createElement('input');
+
   input.type = 'hidden';
   input.className = 'gl-store gl-quiet';
   document.body.appendChild(input);
@@ -82,6 +84,7 @@ describe('writeLibrary', () => {
   test('writes the store and nudges Clay', () => {
     const input = mountStore();
     let changes = 0;
+
     input.addEventListener('change', () => { changes++; });
 
     const result = writeLibrary({ layouts: ['a', 'b', 'c', 'd'], day: 1, night: 2, quiet: ROLE_NONE });
@@ -180,6 +183,7 @@ describe('buildModesBar', () => {
 
     buildModesBar(host, library, { getCurrent: () => 'a', onSelect: () => {}, onAssign: () => { assigned++; }, save: () => {} });
     const night = host.querySelectorAll<HTMLSelectElement>('select')[1];
+
     night.value = String(ROLE_NONE);
     night.dispatchEvent(new Event('change'));
 
@@ -228,6 +232,7 @@ describe('buildModesBar', () => {
 
     buildModesBar(host, library, { getCurrent: () => 'a', onSelect: () => {}, onAssign: () => {}, save: () => {} });
     const quiet = host.querySelectorAll<HTMLSelectElement>('select')[2];
+
     quiet.value = '3';
     quiet.dispatchEvent(new Event('change'));
 

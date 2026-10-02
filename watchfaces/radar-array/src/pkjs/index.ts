@@ -20,6 +20,7 @@ function fmtCoord(value: number | undefined, positive: string, negative: string)
   }
 
   const hemisphere = value >= 0 ? positive : negative;
+
   return Math.abs(value).toFixed(2) + hemisphere;
 }
 

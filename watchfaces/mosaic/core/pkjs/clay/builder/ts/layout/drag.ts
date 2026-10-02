@@ -97,6 +97,7 @@ export function createDragEngine(env: DragEnv): DragEngine {
 
   function clearHighlight(): void {
     const cells = env.gridEl.querySelectorAll('.lb-cell');
+
     for (let i = 0; i < cells.length; i++) {
       cells[i].classList.remove('selecting');
     }
@@ -107,7 +108,9 @@ export function createDragEngine(env: DragEnv): DragEngine {
 
     ghost(dragged) {
       const ghost = document.createElement('div');
+
       ghost.className = 'lb-ghost lb-block';
+
       if (dragged.h >= 2) {
         ghost.classList.add('big');
       }
@@ -128,11 +131,13 @@ export function createDragEngine(env: DragEnv): DragEngine {
 
     allows(dragged, cell) {
       const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+
       return rules.canPlace(env.getBlocks(), snap.row, snap.col, dragged.w, dragged.h);
     },
 
     highlight(dragged, cell, allowed) {
       clearHighlight();
+
       if (!dragged || cell === null || !allowed) {
         return;
       }
@@ -140,9 +145,11 @@ export function createDragEngine(env: DragEnv): DragEngine {
       // light the whole footprint the block would cover, not just the cell under the pointer
       const snap = rules.snapDrop(cell, dragged.w, dragged.h);
       const cells = env.gridEl.querySelectorAll<HTMLElement>('.lb-cell');
+
       for (let i = 0; i < cells.length; i++) {
         const cr = parseInt(cells[i].dataset.row as string, 10);
         const cc = parseInt(cells[i].dataset.col as string, 10);
+
         if (cr >= snap.row && cr < snap.row + dragged.h && cc >= snap.col && cc < snap.col + dragged.w) {
           cells[i].classList.add('selecting');
         }
@@ -151,6 +158,7 @@ export function createDragEngine(env: DragEnv): DragEngine {
 
     drop(dragged, cell) {
       const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+
       env.getBlocks().push({
         module: dragged.value,
         row: snap.row,

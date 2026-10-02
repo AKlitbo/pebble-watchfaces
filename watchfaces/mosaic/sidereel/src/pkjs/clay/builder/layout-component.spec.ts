@@ -19,6 +19,7 @@ import { moduleOptionsFixture } from '../../../../../core/pkjs/clay/builder/ts/t
 /** Mounts the layout builder with the shared module fixture and no thumbnails. */
 function mountLayout() {
   const mounted = mount(component, { moduleOptions: moduleOptionsFixture, moduleThumbnails: {} });
+
   mounted.ctx.initialize();
   return mounted;
 }
@@ -32,11 +33,13 @@ function mountLayout() {
 function mountStores(): { library: HTMLInputElement; night: HTMLInputElement; quiet: HTMLInputElement } {
   function input(extra: string): HTMLInputElement {
     const element = document.createElement('input');
+
     element.type = 'hidden';
     element.className = 'gl-store ' + extra;
     document.body.appendChild(element);
     return element;
   }
+
   return { library: input('gl-library'), night: input('gl-night'), quiet: input('gl-quiet') };
 }
 
@@ -54,9 +57,11 @@ describe('layout assignments', () => {
   test('assigning Quiet Time publishes that layout to the quiet store', () => {
     const stores = mountStores();
     const { ctx, root } = mountLayout();
+
     ctx.set('2,0,0,2,1');
 
     const quiet = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[2];
+
     quiet.value = '2';
     quiet.dispatchEvent(new Event('change'));
 
@@ -74,12 +79,14 @@ describe('layout assignments', () => {
    */
   test('night and Quiet Time publish to their own stores', () => {
     const stores = mountStores();
+
     stores.library.value = JSON.stringify({
       layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '0', '0'], day: 0, night: -1, quiet: -1,
     });
     const { root } = mountLayout();
 
     const selects = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel');
+
     selects[1].value = '1';
     selects[1].dispatchEvent(new Event('change'));
     selects[2].value = '2';
@@ -100,6 +107,7 @@ describe('layout assignments', () => {
     const saved = JSON.stringify({ layouts: ['2,0,0,2,1', '3,0,0,2,1', '6,0,0,2,1', '1,3,0,2,1'], day: 0, night: 1, quiet: 2 });
     const { root } = mountLayout();
     const stores = mountStores();
+
     stores.library.value = saved;
 
     await new Promise((resolve) => { setTimeout(resolve, 0); }); // let the deferred re-read run

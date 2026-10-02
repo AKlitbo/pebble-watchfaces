@@ -65,6 +65,7 @@ export function init(this: ClayComponentInstance): void {
     if (!colors[moduleValue]) {
       colors[moduleValue] = { accent: null, value: null, icon: null, subtitle: null };
     }
+
     colors[moduleValue][channelKey] = byte;
     persist();
   }
@@ -99,6 +100,7 @@ export function init(this: ClayComponentInstance): void {
     },
     applyImport: function (text) {
       const parsed = parseAppearance(text);
+
       colors = parsed.colors;
       headerless = parsed.headerless;
       borderless = parsed.borderless;
@@ -122,11 +124,13 @@ export function init(this: ClayComponentInstance): void {
   // expose set/get to the manipulator
   root._tbSet = function (value) {
     const parsed = parseAppearance(value);
+
     colors = parsed.colors;
     headerless = parsed.headerless;
     borderless = parsed.borderless;
     persist();
   };
+
   root._tbGet = function () {
     return serializeAppearance(colors, headerless, borderless);
   };

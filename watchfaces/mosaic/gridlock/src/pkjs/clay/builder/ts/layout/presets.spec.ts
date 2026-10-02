@@ -20,6 +20,7 @@ describe('LAYOUT_PRESETS', () => {
       const result = serializeLayout(blocks);
 
       const normalized = LAYOUT_PRESETS[presetId].split(';').sort().join(';');
+
       expect(result.split(';').sort().join(';')).toBe(normalized);
     });
 
@@ -29,6 +30,7 @@ describe('LAYOUT_PRESETS', () => {
 
       blocks.forEach((block, index) => {
         const others = blocks.filter((candidate, otherIndex) => otherIndex !== index);
+
         expect(canPlace(others, block.row, block.col, block.w, block.h)).toBe(true);
       });
     });

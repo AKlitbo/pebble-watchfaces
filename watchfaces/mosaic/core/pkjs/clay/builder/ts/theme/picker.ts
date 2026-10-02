@@ -73,14 +73,18 @@ export function createPicker(env: PickerEnv): Picker {
 
     // header row: ‹  Editing: X  ›  so you can step through the channels without leaving
     const nav = document.createElement('div');
+
     nav.className = 'tb-pick-nav';
     const prevButton = document.createElement('button');
+
     prevButton.type = 'button';
     prevButton.className = 'tb-nav-btn';
     prevButton.textContent = '‹';
     const titleLabel = document.createElement('div');
+
     titleLabel.className = 'tb-pick-title';
     const nextButton = document.createElement('button');
+
     nextButton.type = 'button';
     nextButton.className = 'tb-nav-btn';
     nextButton.textContent = '›';
@@ -102,19 +106,23 @@ export function createPicker(env: PickerEnv): Picker {
     const hideHeader = module.alwaysHeaderless || allSizesHidden(module, env.getHeaderless());
     const hideBorder = allSizesHidden(module, env.getBorderless());
     const example = buildExampleBox(module, stagedColors, hideHeader, hideBorder);
+
     panel.appendChild(example.box);
 
     // light up the palette to match the active channel's staged colour
     function refreshHighlight(): void {
       const byte = stagedColors[active];
+
       if (monoOption) {
         monoOption.classList.toggle('sel', byte == null);
       }
+
       // a palette colour equal to the vibrant byte lights both the Vibrant option and its
       // grid cell which is fine. they are the same colour
       if (vibrantOption) {
         vibrantOption.classList.toggle('sel', vibrantByte != null && byte === vibrantByte);
       }
+
       for (let k = 0; k < cells.length; k++) {
         cells[k].el.classList.toggle('sel', byte != null && cells[k].argb === byte);
       }
@@ -131,8 +139,10 @@ export function createPicker(env: PickerEnv): Picker {
     function step(delta: number): void {
       const order = env.channels.map(function (channel) { return channel.key; });
       const at = order.indexOf(active);
+
       setActive(order[(at + delta + order.length) % order.length]);
     }
+
     prevButton.addEventListener('click', function () { step(-1); });
     nextButton.addEventListener('click', function () { step(1); });
 
@@ -147,6 +157,7 @@ export function createPicker(env: PickerEnv): Picker {
     // default. Vibrant snaps it to the module's signature colour. the Vibrant half only
     // shows when the module has one so a colourless module still just offers Mono
     const mvRow = document.createElement('div');
+
     mvRow.className = 'tb-mv';
 
     monoOption = document.createElement('div');
@@ -159,6 +170,7 @@ export function createPicker(env: PickerEnv): Picker {
       vibrantOption = document.createElement('div');
       vibrantOption.className = 'tb-mv-opt';
       const vibrantDot = document.createElement('span');
+
       vibrantDot.className = 'tb-mv-ind';
       vibrantDot.style.background = argbToCss(vibrantByte);
       vibrantOption.appendChild(vibrantDot);
@@ -170,10 +182,13 @@ export function createPicker(env: PickerEnv): Picker {
     panel.appendChild(mvRow);
 
     const grid = document.createElement('div');
+
     grid.className = 'tb-grid';
+
     for (let index = 0; index < env.palette.length; index++) {
       (function (entry: PaletteEntry) {
         const cell = document.createElement('div');
+
         cell.className = 'tb-cell';
         cell.style.background = entry.css;
         cell.title = entry.name;
@@ -182,12 +197,15 @@ export function createPicker(env: PickerEnv): Picker {
         cells.push({ el: cell, argb: entry.argb });
       })(env.palette[index]);
     }
+
     panel.appendChild(grid);
 
     const bar = document.createElement('div');
+
     bar.className = 'tb-pick-bar';
 
     const cancelButton = document.createElement('button');
+
     cancelButton.type = 'button';
     cancelButton.className = 'tb-io-btn';
     cancelButton.textContent = 'Cancel';
@@ -195,6 +213,7 @@ export function createPicker(env: PickerEnv): Picker {
     bar.appendChild(cancelButton);
 
     const applyButton = document.createElement('button');
+
     applyButton.type = 'button';
     applyButton.className = 'tb-io-btn primary';
     applyButton.textContent = 'Apply';

@@ -21,13 +21,17 @@ export function pageKeys(items: unknown): string[] {
       node.forEach(walk);
       return;
     }
+
     if (!node || typeof node !== 'object') {
       return;
     }
+
     const item = node as { messageKey?: unknown; items?: unknown };
+
     if (typeof item.messageKey === 'string') {
       found.push(item.messageKey);
     }
+
     if (item.items) {
       walk(item.items);
     }

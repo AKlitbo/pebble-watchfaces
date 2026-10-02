@@ -60,6 +60,7 @@ export function flagToken(sixBits: number): string {
 /** One flag char back to its 0..63 value, 0 for "." or any junk. */
 export function flagValue(ch: string): number {
   const idx = COLOR_ALPHABET.indexOf(ch);
+
   return idx < 0 ? 0 : idx;
 }
 
@@ -71,6 +72,7 @@ export function idToken(id: number): string {
 /** One colour char back into its argb byte, or null when it names no colour. */
 export function decodeChannel(ch: string): number | null {
   const idx = COLOR_ALPHABET.indexOf(ch);
+
   return idx < 0 ? null : 192 + idx;
 }
 
@@ -84,6 +86,7 @@ export function setFlag(map: FlagMap, moduleValue: number, size: string, on: boo
   if (!map[moduleValue]) {
     map[moduleValue] = {};
   }
+
   map[moduleValue][size] = on;
 }
 
@@ -94,11 +97,14 @@ export function setFlag(map: FlagMap, moduleValue: number, size: string, on: boo
  */
 export function packFlags(headerless: FlagMap, borderless: FlagMap, id: number): number {
   let byte = 0;
+
   for (let s = 0; s < SIZE_ORDER.length; s++) {
     const size = SIZE_ORDER[s];
+
     if (flagOn(headerless, id, size)) {
       byte |= 1 << s;
     }
+
     if (flagOn(borderless, id, size)) {
       byte |= 1 << (4 + s);
     }
@@ -114,9 +120,11 @@ export function packFlags(headerless: FlagMap, borderless: FlagMap, id: number):
 export function unpackFlags(headerless: FlagMap, borderless: FlagMap, id: number, byte: number): void {
   for (let s = 0; s < SIZE_ORDER.length; s++) {
     const size = SIZE_ORDER[s];
+
     if (byte & (1 << s)) {
       setFlag(headerless, id, size, true);
     }
+
     if (byte & (1 << (4 + s))) {
       setFlag(borderless, id, size, true);
     }
@@ -146,28 +154,37 @@ export function readColours(colors: ColorMap, text: string, id: number, offset: 
 export function serializeAppearance(colors: ColorMap, headerless: FlagMap, borderless: FlagMap): string {
   const colorIds = Object.keys(colors).sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); });
   const colorRecs = [];
+
   for (let i = 0; i < colorIds.length; i++) {
     const id = parseInt(colorIds[i], 10);
     const c = colors[id];
+
     if (!c || (c.accent == null && c.value == null && c.icon == null && c.subtitle == null)) {
       continue;
     }
+
     colorRecs.push(idToken(id) + channelToken(c.accent) + channelToken(c.value) +
                    channelToken(c.icon) + channelToken(c.subtitle));
   }
 
   const flagSeen: Record<string, boolean> = {};
   let key;
+
   for (key in headerless) { flagSeen[key] = true; }
+
   for (key in borderless) { flagSeen[key] = true; }
+
   const flagIds = Object.keys(flagSeen).sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); });
   const flagRecs = [];
+
   for (let j = 0; j < flagIds.length; j++) {
     const fid = parseInt(flagIds[j], 10);
     const byte = packFlags(headerless, borderless, fid);
+
     if (byte === 0) {
       continue;
     }
+
     flagRecs.push(idToken(fid) + flagToken(byte & 63) + flagToken((byte >> 6) & 63));
   }
 
@@ -201,55 +218,71 @@ export function parseAppearance(text: string): AppearanceMaps {
     const colorPart = bar < 0 ? sparse : sparse.substring(0, bar);
     const flagPart = bar < 0 ? '' : sparse.substring(bar + 1);
     let o;
+
     for (o = 0; o + 5 <= colorPart.length; o += 5) {
       const cid = COLOR_ALPHABET.indexOf(colorPart.charAt(o));
+
       if (cid > 0) {
         readColours(colors, colorPart, cid, o + 1);
       }
     }
+
     for (o = 0; o + 3 <= flagPart.length; o += 3) {
       const fid = COLOR_ALPHABET.indexOf(flagPart.charAt(o));
+
       if (fid > 0) {
         const fbyte = flagValue(flagPart.charAt(o + 1)) | (flagValue(flagPart.charAt(o + 2)) << 6);
+
         unpackFlags(headerless, borderless, fid, fbyte);
       }
     }
+
     return result;
   }
 
   // ~ (positional): a fixed 6-char record per id. migrated on the next save to ~3
   if (text.charAt(0) === FORMAT_MARKER) {
     const body = text.substring(1);
+
     for (let offset = 0; offset + 6 <= body.length; offset += 6) {
       const id = offset / 6;
+
       if (id === 0) {
         continue; // module 0 is Empty
       }
+
       readColours(colors, body, id, offset);
       const byte = flagValue(body.charAt(offset + 4)) | (flagValue(body.charAt(offset + 5)) << 6);
+
       unpackFlags(headerless, borderless, id, byte);
     }
+
     return result;
   }
 
   // oldest: fixed 5-char slots with one readable flags char per module. migrate it
   for (let oldOffset = 0; oldOffset + 5 <= text.length; oldOffset += 5) {
     const oldId = oldOffset / 5;
+
     if (oldId === 0) {
       continue;
     }
+
     readColours(colors, text, oldId, oldOffset);
     const flag = text.charAt(oldOffset + 4);
     const hideHeader = flag === 'H' || flag === 'X';
     const hideBorder = flag === 'B' || flag === 'X';
+
     for (let s = 0; s < SIZE_ORDER.length; s++) {
       if (hideHeader) {
         setFlag(headerless, oldId, SIZE_ORDER[s], true);
       }
+
       if (hideBorder) {
         setFlag(borderless, oldId, SIZE_ORDER[s], true);
       }
     }
   }
+
   return result;
 }
