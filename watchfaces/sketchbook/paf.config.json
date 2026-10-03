@@ -6,6 +6,8 @@
       "sources": "../../vendor"
     },
     "dev": {},
-    "code-style": {}
+    "code-style": {
+      "prettier": true
+    }
   }
 }

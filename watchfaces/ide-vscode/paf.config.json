@@ -7,6 +7,8 @@
     },
     "frame": {},
     "dev": {},
-    "code-style": {}
+    "code-style": {
+      "prettier": true
+    }
   }
 }

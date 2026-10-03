@@ -7,39 +7,39 @@
   preview matches the on-watch render.
 */
 :root {
-    --editor-bg:       var(--GColorBlack);
-    --editor-fg:       var(--GColorLightGray);
+  --editor-bg: var(--GColorBlack);
+  --editor-fg: var(--GColorLightGray);
 
-    --activity-bg:     var(--GColorBlack);
-    --activity-fg:     var(--GColorLightGray);
-    --activity-active: var(--GColorWhite);
-    --activity-border: none;
-    --accent:          var(--GColorFolly);
+  --activity-bg: var(--GColorBlack);
+  --activity-fg: var(--GColorLightGray);
+  --activity-active: var(--GColorWhite);
+  --activity-border: none;
+  --accent: var(--GColorFolly);
 
-    --tabbar-bg:       var(--GColorBlack);
-    --tab-active-bg:   var(--GColorBlack);
-    --tab-fg:          var(--GColorWhite);
-    --tab-icon:        var(--GColorVividCerulean);
-    --tab-accent:      1px solid var(--GColorFolly);
+  --tabbar-bg: var(--GColorBlack);
+  --tab-active-bg: var(--GColorBlack);
+  --tab-fg: var(--GColorWhite);
+  --tab-icon: var(--GColorVividCerulean);
+  --tab-accent: 1px solid var(--GColorFolly);
 
-    --time-fg:         var(--GColorFolly);
-    --date-fg:         var(--GColorVividCerulean);
-    --stats-fg:        var(--GColorIcterine);
+  --time-fg: var(--GColorFolly);
+  --date-fg: var(--GColorVividCerulean);
+  --stats-fg: var(--GColorIcterine);
 
-    /* terminal panel: black field, scarlet prompt, yellow command, neon syntax values */
-    --panel-bg:            var(--GColorBlack);
-    --panel-border:        1px solid var(--GColorFolly);
-    --panel-tab-fg:        var(--GColorDarkGray);
-    --panel-tab-active-fg: var(--GColorWhite);
-    --prompt-fg:           var(--GColorFolly);
-    --cmd-fg:              var(--GColorIcterine);
-    --val-date-fg:         var(--GColorVividCerulean);
-    --val-cond-fg:         var(--GColorIcterine);
-    --val-temp-fg:         var(--GColorIcterine);
-    --val-hr-fg:           var(--GColorFolly);
-    --val-steps-fg:        var(--GColorShockingPink);
+  /* terminal panel: black field, scarlet prompt, yellow command, neon syntax values */
+  --panel-bg: var(--GColorBlack);
+  --panel-border: 1px solid var(--GColorFolly);
+  --panel-tab-fg: var(--GColorDarkGray);
+  --panel-tab-active-fg: var(--GColorWhite);
+  --prompt-fg: var(--GColorFolly);
+  --cmd-fg: var(--GColorIcterine);
+  --val-date-fg: var(--GColorVividCerulean);
+  --val-cond-fg: var(--GColorIcterine);
+  --val-temp-fg: var(--GColorIcterine);
+  --val-hr-fg: var(--GColorFolly);
+  --val-steps-fg: var(--GColorShockingPink);
 
-    --status-bg:       var(--GColorFolly);
-    --status-fg:       var(--GColorWhite);
-    --status-border:   none;
+  --status-bg: var(--GColorFolly);
+  --status-fg: var(--GColorWhite);
+  --status-border: none;
 }

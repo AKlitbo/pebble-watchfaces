@@ -38,7 +38,7 @@
   border-radius: 0;
   padding: 8px;
   border: 2px solid #3d434d;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: stretch;
   gap: 8px;
@@ -108,7 +108,8 @@
   color: #ff6a1f;
 }
 
-.lb-btn-io:hover, .lb-btn-slots:hover {
+.lb-btn-io:hover,
+.lb-btn-slots:hover {
   border-color: #ff6a1f;
 }
 
@@ -231,7 +232,7 @@
   cursor: grab;
   touch-action: none;
   position: relative;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   transition: opacity 0.2s;
 }
 
@@ -275,7 +276,7 @@
   padding: 4px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   touch-action: none;
 }
 
@@ -312,7 +313,7 @@
   opacity: 0.9;
   transform: translate(-50%, -50%);
   border-radius: 0;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -325,7 +326,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(8,9,11,0.8);
+  background: rgba(8, 9, 11, 0.8);
   z-index: 50000;
 }
 
@@ -338,7 +339,7 @@
   border-radius: 0;
   padding: 14px;
   box-sizing: border-box;
-  box-shadow: 0 20px 60px -20px rgba(0,0,0,0.9);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.9);
   min-width: 240px;
   max-width: 300px;
   left: 50%;
@@ -429,11 +430,8 @@
   cursor: default;
 }
 
-
-
-
-
-.platform-ios .button, .platform-ios button {
+.platform-ios .button,
+.platform-ios button {
   padding: 0px;
 }
 

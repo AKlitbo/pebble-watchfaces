@@ -6,39 +6,39 @@
   cyan, and orange. The readout vars match the GColors theme.c draws with.
 */
 :root {
-    --editor-bg:       var(--GColorOxfordBlue);
-    --editor-fg:       var(--GColorLightGray);
+  --editor-bg: var(--GColorOxfordBlue);
+  --editor-fg: var(--GColorLightGray);
 
-    --activity-bg:     var(--GColorBlack);
-    --activity-fg:     var(--GColorLightGray);
-    --activity-active: var(--GColorWhite);
-    --activity-border: none;
-    --accent:          var(--GColorShockingPink);
+  --activity-bg: var(--GColorBlack);
+  --activity-fg: var(--GColorLightGray);
+  --activity-active: var(--GColorWhite);
+  --activity-border: none;
+  --accent: var(--GColorShockingPink);
 
-    --tabbar-bg:       var(--GColorOxfordBlue);
-    --tab-active-bg:   var(--GColorOxfordBlue);
-    --tab-fg:          var(--GColorWhite);
-    --tab-icon:        var(--GColorShockingPink);
-    --tab-accent:      1px solid var(--GColorShockingPink);
+  --tabbar-bg: var(--GColorOxfordBlue);
+  --tab-active-bg: var(--GColorOxfordBlue);
+  --tab-fg: var(--GColorWhite);
+  --tab-icon: var(--GColorShockingPink);
+  --tab-accent: 1px solid var(--GColorShockingPink);
 
-    --time-fg:         var(--GColorShockingPink);
-    --date-fg:         var(--GColorIcterine);
-    --stats-fg:        var(--GColorElectricBlue);
+  --time-fg: var(--GColorShockingPink);
+  --date-fg: var(--GColorIcterine);
+  --stats-fg: var(--GColorElectricBlue);
 
-    /* terminal panel: blue field, pink prompt, yellow command, neon syntax values */
-    --panel-bg:            var(--GColorOxfordBlue);
-    --panel-border:        1px solid var(--GColorShockingPink);
-    --panel-tab-fg:        var(--GColorLiberty);
-    --panel-tab-active-fg: var(--GColorWhite);
-    --prompt-fg:           var(--GColorShockingPink);
-    --cmd-fg:              var(--GColorIcterine);
-    --val-date-fg:         var(--GColorIcterine);
-    --val-cond-fg:         var(--GColorElectricBlue);
-    --val-temp-fg:         var(--GColorElectricBlue);
-    --val-hr-fg:           var(--GColorFolly);
-    --val-steps-fg:        var(--GColorRajah);
+  /* terminal panel: blue field, pink prompt, yellow command, neon syntax values */
+  --panel-bg: var(--GColorOxfordBlue);
+  --panel-border: 1px solid var(--GColorShockingPink);
+  --panel-tab-fg: var(--GColorLiberty);
+  --panel-tab-active-fg: var(--GColorWhite);
+  --prompt-fg: var(--GColorShockingPink);
+  --cmd-fg: var(--GColorIcterine);
+  --val-date-fg: var(--GColorIcterine);
+  --val-cond-fg: var(--GColorElectricBlue);
+  --val-temp-fg: var(--GColorElectricBlue);
+  --val-hr-fg: var(--GColorFolly);
+  --val-steps-fg: var(--GColorRajah);
 
-    --status-bg:       var(--GColorImperialPurple);
-    --status-fg:       var(--GColorWhite);
-    --status-border:   none;
+  --status-bg: var(--GColorImperialPurple);
+  --status-fg: var(--GColorWhite);
+  --status-border: none;
 }

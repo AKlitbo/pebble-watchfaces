@@ -41,7 +41,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(8,9,11,0.8);
+  background: rgba(8, 9, 11, 0.8);
   z-index: 50000;
 }
 
@@ -54,7 +54,9 @@
   bottom: 0;
   z-index: 50001;
   background-color: #131519;
-  background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 22px 22px;
   display: flex;
   flex-direction: column;
@@ -405,7 +407,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(8,9,11,0.7);
+  background: rgba(8, 9, 11, 0.7);
   z-index: 60000;
 }
 
@@ -419,7 +421,7 @@
   border: 2px solid #3d434d;
   border-radius: 0;
   padding: 14px;
-  box-shadow: 0 20px 60px -20px rgba(0,0,0,0.9);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.9);
   width: 280px;
   max-width: 90vw;
 }
@@ -444,7 +446,7 @@
   width: 100%;
   padding-bottom: 100%;
   border-radius: 0;
-  border: 1px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
   box-sizing: border-box;
   position: relative;
@@ -506,7 +508,7 @@
   border-radius: 0;
   flex-shrink: 0;
   box-sizing: border-box;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 /* the live example panel in the colour picker (watch content, kept black so channel colours read true) */
@@ -517,7 +519,10 @@
   border: 1px solid #fff;
   border-radius: 0;
   overflow: hidden;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 .tb-ex-hdr {
@@ -545,7 +550,7 @@
   font-weight: 700;
   letter-spacing: 0.4px;
   text-align: center;
-  color: #AAA;
+  color: #aaa;
   padding: 1px 4px 0;
 }
 

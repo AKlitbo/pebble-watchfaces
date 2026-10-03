@@ -5,18 +5,18 @@
   transparent, so each glow keeps its exact GColor at reduced opacity.
 */
 :root {
-    --bg:            var(--GColorBlack);
-    --primary:       var(--GColorMagenta);
-    --secondary:     var(--GColorCyan);
-    --secondary-dim: var(--GColorTiffanyBlue);
-    --tertiary:      var(--GColorYellow);
-    --grid-primary:      color-mix(in srgb, var(--GColorMagenta) 6%, transparent);
-    --crosshair-primary: color-mix(in srgb, var(--GColorPurple) 55%, transparent);
-    --ring-primary:      color-mix(in srgb, var(--GColorPurple) 70%, transparent);
-    --grid-secondary:    color-mix(in srgb, var(--GColorCyan) 22%, transparent);
-    --bezel:             color-mix(in srgb, var(--GColorCyan) 45%, transparent);
-    --time-glow:         color-mix(in srgb, var(--GColorMagenta) 70%, transparent);
-    --data-glow:         color-mix(in srgb, var(--GColorMagenta) 60%, transparent);
-    --banner-glow:       color-mix(in srgb, var(--GColorCyan) 50%, transparent);
-    --scanline:          color-mix(in srgb, var(--GColorBlack) 22%, transparent);
+  --bg: var(--GColorBlack);
+  --primary: var(--GColorMagenta);
+  --secondary: var(--GColorCyan);
+  --secondary-dim: var(--GColorTiffanyBlue);
+  --tertiary: var(--GColorYellow);
+  --grid-primary: color-mix(in srgb, var(--GColorMagenta) 6%, transparent);
+  --crosshair-primary: color-mix(in srgb, var(--GColorPurple) 55%, transparent);
+  --ring-primary: color-mix(in srgb, var(--GColorPurple) 70%, transparent);
+  --grid-secondary: color-mix(in srgb, var(--GColorCyan) 22%, transparent);
+  --bezel: color-mix(in srgb, var(--GColorCyan) 45%, transparent);
+  --time-glow: color-mix(in srgb, var(--GColorMagenta) 70%, transparent);
+  --data-glow: color-mix(in srgb, var(--GColorMagenta) 60%, transparent);
+  --banner-glow: color-mix(in srgb, var(--GColorCyan) 50%, transparent);
+  --scanline: color-mix(in srgb, var(--GColorBlack) 22%, transparent);
 }

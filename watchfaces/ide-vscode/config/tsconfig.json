@@ -2,10 +2,5 @@
 {
   "extends": "../paf/tsconfig.json",
   "include": ["../src/pkjs/**/*.ts", "../paf/ts/**/*.d.ts"],
-  "exclude": [
-    "../node_modules",
-    "../targets",
-    "../src/pkjs/clay/builder/**",
-    "../**/*.spec.ts"
-  ]
+  "exclude": ["../node_modules", "../targets", "../src/pkjs/clay/builder/**", "../**/*.spec.ts"]
 }

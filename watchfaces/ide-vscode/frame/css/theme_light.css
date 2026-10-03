@@ -5,39 +5,39 @@
   name the dark GColors theme.c draws with, to stay readable.
 */
 :root {
-    --editor-bg:       var(--GColorWhite);
-    --editor-fg:       var(--GColorDarkGray);
+  --editor-bg: var(--GColorWhite);
+  --editor-fg: var(--GColorDarkGray);
 
-    --activity-bg:     var(--GColorDarkGray);
-    --activity-fg:     var(--GColorLightGray);
-    --activity-active: var(--GColorWhite);
-    --activity-border: none;
-    --accent:          var(--GColorCobaltBlue);
+  --activity-bg: var(--GColorDarkGray);
+  --activity-fg: var(--GColorLightGray);
+  --activity-active: var(--GColorWhite);
+  --activity-border: none;
+  --accent: var(--GColorCobaltBlue);
 
-    --tabbar-bg:       var(--GColorWhite);
-    --tab-active-bg:   var(--GColorWhite);
-    --tab-fg:          var(--GColorDarkGray);
-    --tab-icon:        var(--GColorCobaltBlue);
-    --tab-accent:      1px solid var(--GColorCobaltBlue);
+  --tabbar-bg: var(--GColorWhite);
+  --tab-active-bg: var(--GColorWhite);
+  --tab-fg: var(--GColorDarkGray);
+  --tab-icon: var(--GColorCobaltBlue);
+  --tab-accent: 1px solid var(--GColorCobaltBlue);
 
-    --time-fg:         var(--GColorBlueMoon);
-    --date-fg:         var(--GColorDarkCandyAppleRed);
-    --stats-fg:        var(--GColorDarkGreen);
+  --time-fg: var(--GColorBlueMoon);
+  --date-fg: var(--GColorDarkCandyAppleRed);
+  --stats-fg: var(--GColorDarkGreen);
 
-    /* terminal panel: white field, dark values so they read on light */
-    --panel-bg:            var(--GColorWhite);
-    --panel-border:        1px solid var(--GColorLightGray);
-    --panel-tab-fg:        var(--GColorDarkGray);
-    --panel-tab-active-fg: var(--GColorBlack);
-    --prompt-fg:           var(--GColorBlue);
-    --cmd-fg:              var(--GColorArmyGreen);
-    --val-date-fg:         var(--GColorDarkCandyAppleRed);
-    --val-cond-fg:         var(--GColorDarkGreen);
-    --val-temp-fg:         var(--GColorDarkGreen);
-    --val-hr-fg:           var(--GColorDarkCandyAppleRed);
-    --val-steps-fg:        var(--GColorBlue);
+  /* terminal panel: white field, dark values so they read on light */
+  --panel-bg: var(--GColorWhite);
+  --panel-border: 1px solid var(--GColorLightGray);
+  --panel-tab-fg: var(--GColorDarkGray);
+  --panel-tab-active-fg: var(--GColorBlack);
+  --prompt-fg: var(--GColorBlue);
+  --cmd-fg: var(--GColorArmyGreen);
+  --val-date-fg: var(--GColorDarkCandyAppleRed);
+  --val-cond-fg: var(--GColorDarkGreen);
+  --val-temp-fg: var(--GColorDarkGreen);
+  --val-hr-fg: var(--GColorDarkCandyAppleRed);
+  --val-steps-fg: var(--GColorBlue);
 
-    --status-bg:       var(--GColorCobaltBlue);
-    --status-fg:       var(--GColorWhite);
-    --status-border:   none;
+  --status-bg: var(--GColorCobaltBlue);
+  --status-fg: var(--GColorWhite);
+  --status-border: none;
 }

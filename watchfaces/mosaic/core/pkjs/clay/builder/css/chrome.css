@@ -8,9 +8,11 @@
    top padding at all, so padding-top here is what puts the same gap above the first section */
 body {
   background-color: #101216 !important;
-  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 22px 22px;
-  padding-top: .7rem !important;
+  padding-top: 0.7rem !important;
   padding-bottom: 40px !important;
 }
 
@@ -47,7 +49,12 @@ select {
   font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace !important;
 }
 
-input[type='text'], input[type='email'], input[type='url'], input[type='search'], input[type='number'], input[type='password'] {
+input[type='text'],
+input[type='email'],
+input[type='url'],
+input[type='search'],
+input[type='number'],
+input[type='password'] {
   background: #14161a !important;
   color: #eceef2 !important;
   border: 1px solid #3d434d !important;
@@ -57,7 +64,8 @@ input[type='text'], input[type='email'], input[type='url'], input[type='search']
 
 /* submit is a bare <button type=submit> in .component-submit, small + centred (min-width 12rem).
    target it by type (the builder only makes type=button) so it goes full-width without touching .lb-* */
-.component-submit button, button[type='submit'] {
+.component-submit button,
+button[type='submit'] {
   display: block !important;
   width: 100% !important;
   min-width: 0 !important;
@@ -77,15 +85,17 @@ input[type='text'], input[type='email'], input[type='url'], input[type='search']
 /* padding on the submit's own wrapper is the only gap that survives (margin collapses, and
    body padding-bottom does not add scroll space in the config webview) */
 .component-submit {
-  padding-bottom: .7rem !important;
+  padding-bottom: 0.7rem !important;
 }
 
-.component-submit button:hover, button[type='submit']:hover {
+.component-submit button:hover,
+button[type='submit']:hover {
   background: #ff7d38 !important;
   border-color: #ff7d38 !important;
 }
 
-.component-submit button:active, button[type='submit']:active {
+.component-submit button:active,
+button[type='submit']:active {
   background: #e85e15 !important;
   border-color: #e85e15 !important;
 }
@@ -136,7 +146,8 @@ input[type='text'], input[type='email'], input[type='url'], input[type='search']
   border-bottom: 1px solid #2c3038;
 }
 
-.loc-search .loc-item:hover, .loc-search .loc-item:active {
+.loc-search .loc-item:hover,
+.loc-search .loc-item:active {
   background: #ff6a1f;
   color: #1a0c03;
 }
