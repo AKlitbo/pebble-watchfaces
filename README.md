@@ -1,6 +1,14 @@
 # Pebble Watchfaces
 
-A collection of watchfaces for current Pebble hardware, built on one shared framework. Each face shows the time, date, weather and battery, wrapped in its own interface, with themes selectable from a Clay settings page. Most also show heart rate and steps where the watch has the sensors for them.
+These are my Pebble watchfaces, all built on my shared [framework](https://github.com/AKlitbo/pebble-app-framework). Radar Array, IDE VSCode, Gridlock, and Sidereel run on the Pebble Time 2 (**Emery**). The Sketchbook faces run on the Time 2 and the Round 2 (**Gabbro**). Each one shows the time, the date, the weather, and the battery, and most add steps and heart rate where the watch has the sensors for them. You set each one up from its settings page on your phone.
+
+## Install
+
+Grab a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone.
+
+Each face has its own version, and each release's notes are that version's entry in the face's changelog. A face for one watch has that watch in the file name, so `radar-array-emery-1.6.0.pbw` is for Emery only. A Sketchbook face holds a build for each watch, so its file is named by version alone, and `ridgeline-1.2.0.pbw` installs on the Time 2 and the Round 2.
+
+Gridlock comes as two files built from the same code, a watchface (`gridlock-face-emery-<version>.pbw`) and a watchapp (`gridlock-app-emery-<version>.pbw`). They share a UUID, so only one can be on the watch at a time. The watchface sits in your watchface carousel and is the one on the appstore. The watchapp lives in the launcher instead.
 
 ## Watchfaces
 
@@ -9,13 +17,13 @@ A collection of watchfaces for current Pebble hardware, built on one shared fram
 | Watchface | Preview |
 | :--- | :--- |
 | **Radar Array**<br>[changelog](watchfaces/radar-array/CHANGELOG.md) | <img src=".github/images/radar-array/theme_default.png" width="75" title="Default"> <img src=".github/images/radar-array/theme_crimson.png" width="75" title="Crimson"> <img src=".github/images/radar-array/theme_neon.png" width="75" title="Neon"> <img src=".github/images/radar-array/theme_phosphor.png" width="75" title="Phosphor"> <img src=".github/images/radar-array/theme_rescue.png" width="75" title="Rescue"> <img src=".github/images/radar-array/theme_stealth.png" width="75" title="Stealth"> <img src=".github/images/radar-array/theme_mono.png" width="75" title="Mono"> |
-| **IDE VSCode**<br>[changelog](watchfaces/ide-vscode/CHANGELOG.md) | <img src=".github/images/ide-vscode/theme_dark.png" width="75" title="Dark"> <img src=".github/images/ide-vscode/theme_light.png" width="75" title="Light"> <img src=".github/images/ide-vscode/theme_terminal.png" width="75" title="Terminal"> <img src=".github/images/ide-vscode/theme_cyberpunk.png" width="75" title="Cyberpunk"> <img src=".github/images/ide-vscode/theme_synthwave.png" width="75" title="Synthwave"> <img src=".github/images/ide-vscode/theme_mono.png" width="75" title="Mono"> |
+| **IDE VSCode**<br>[changelog](watchfaces/ide-vscode/CHANGELOG.md) | <img src=".github/images/ide-vscode/theme_dark.png" width="75" title="Dark"> <img src=".github/images/ide-vscode/theme_light.png" width="75" title="Light"> <img src=".github/images/ide-vscode/theme_terminal.png" width="75" title="Terminal"> <img src=".github/images/ide-vscode/theme_cyberpunk.png" width="75" title="Cyberpunk"> <img src=".github/images/ide-vscode/theme_synthwave.png" width="75" title="Synthwave '84"> <img src=".github/images/ide-vscode/theme_mono.png" width="75" title="Mono"> |
 
 ### Mosaic
 
-Assembled rather than themed, out of one shared catalogue of [panels](watchfaces/mosaic/MODULES.md). Gridlock has no fixed screen, so its previews are layouts rather than colourways, built with the per-panel colours and the header and border toggles the settings page offers. You can build four layouts rather than one and assign two as your day and night screens. Gridlock swaps between them at sunrise and sunset or at times you set.
+The Mosaic faces have no fixed screen. You put them together in the settings page from one shared catalogue of [panels](watchfaces/mosaic/MODULES.md), and it keeps five layouts for you. One is your day screen. You can hand another the night, from sunset to sunrise or between times you set, and one more Quiet Time. Gridlock's previews are layouts rather than colourways, built with the per-panel colours and the header and border toggles its settings page offers.
 
-Sidereel has no presets either. Every colour is drawn rather than baked, so the settings page hands you a swatch grid per part of the face and the watch's full palette to pick from. The two halves down its left side each take a stacked pair of panels or a single tall one, and the day wraps the outside edge as a track with the daylight hours shaded and a marker riding round at the current time.
+Sidereel reads the time off a reel of minutes on the right, with an hour pointer on the left. The two boxes on the left each take a stacked pair of panels or one tall one. The day wraps the outside edge as a track, with the daylight hours shaded and a marker riding round at the current time. Beside the two Mono themes, Vibrant, and Custom, you can pick the pointer and the reel colours yourself from the watch's full palette.
 
 | Watchface | Preview |
 | :--- | :--- |
@@ -24,7 +32,7 @@ Sidereel has no presets either. Every colour is drawn rather than baked, so the 
 
 ### Sketchbook
 
-These run on both the Pebble Time 2 (**Emery**) and the Round 2 (**Gabbro**). On the round screen they carry their reading in the scene rather than in a row of stats: on the boat's pennant, on a trail sign, on the cabin.
+On the round screen the reading sits in the scene rather than in a row of stats, on Shoreline's pennant, Ridgeline's trail sign, and Treeline's cabin.
 
 | Watchface | Preview |
 | :--- | :--- |
@@ -34,25 +42,85 @@ These run on both the Pebble Time 2 (**Emery**) and the Round 2 (**Gabbro**). On
 
 ### Separate Repository
 
-LCARS Stardate is built in [its own repository](https://github.com/AKlitbo/pebble-watchface-lcars), because its artwork follows the *Star Trek* fan-project guidelines and carries a noncommercial licence the rest of the collection does not. Its `.pbw` is published on that repository's releases page. Bugs and feature requests for it are tracked [here](https://github.com/AKlitbo/pebble-watchfaces/issues) with every other face.
+LCARS Stardate lives in [its own repository](https://github.com/AKlitbo/pebble-watchface-lcars), because its artwork follows the *Star Trek* fan project guidelines and carries a noncommercial licence the rest of these faces don't. Its `.pbw` is on that repository's releases page.
 
 | Watchface | Preview |
 | :--- | :--- |
 | **LCARS Stardate**<br>[changelog](https://github.com/AKlitbo/pebble-watchface-lcars/blob/main/CHANGELOG.md) | <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_classic.png" width="75" title="Classic"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_nemesis-blue.png" width="75" title="Nemesis Blue"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_mono.png" width="75" title="Classic Mono"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_voyager.png" width="75" title="Voyager"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_voyager-mono.png" width="75" title="Voyager Mono"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_lower-decks.png" width="75" title="Lower Decks"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_lower-decks-mono.png" width="75" title="Lower Decks Mono"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_lower-decks-padd.png" width="75" title="Lower Decks PADD"> <img src="https://raw.githubusercontent.com/AKlitbo/pebble-watchface-lcars/main/.github/images/lcars-stardate/theme_lower-decks-padd-mono.png" width="75" title="Lower Decks PADD Mono"> |
 
-## Install
+## Weather Sources
 
-Download a face's `.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone.
+You pick the weather source in each face's settings page.
 
-Faces version independently, so releases are tagged per face as `<face>-v<version>`. Release notes are that version's `CHANGELOG.md` entry. A face built for a single watch names its platform in the asset, so `radar-array-emery-1.6.0.pbw` is Emery only. A face that runs on more than one is named by version alone, since naming one watch would not be true of it. `ridgeline-1.2.0.pbw` holds a build for the Pebble Time 2 and one for the Round 2, and installs on both.
+- **Open-Meteo**: the default. It's free and needs no account or key.
+- **OpenWeatherMap**: free tier, needs an account and an API key.
+- **WeatherAPI.com**: free tier, needs an account and an API key.
 
-Most faces carry one `.pbw`. Gridlock carries two, a watchface and a watchapp built from the same source. They share a UUID, so only one can be on the watch at a time: the watchface build sits in your watchface carousel and is the one on the appstore, and the watchapp build lives in the launcher instead. Take whichever you want from the releases page.
+Any of them gives the faces temperature, conditions, wind, humidity, pressure, feels like, sunrise, and sunset. OpenWeatherMap's free tier has no UV index, dew point, today's high and low, chance of rain, or forecast, so the faces fill those in from Open-Meteo.
 
-## Project Structure
+## Calendar
 
-Each face and each family under `watchfaces/` is a [paf](https://github.com/AKlitbo/pebble-app-framework-cli) unit with its own copy of the shared [framework](https://github.com/AKlitbo/pebble-app-framework) in `paf/`, on the tag its `paf.config.json` names. A finished face can stay on the framework it was finished on while another moves ahead.
+Gridlock's calendar panels read a private iCal (`.ics`) feed, so any service that publishes one works. Google Calendar's secret address is the usual one. Paste the feed URL into the settings page and upcoming events come in on their own.
 
-A face is any directory carrying a `pebble.appinfo.json`, at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
+Only each event's time, title, and location go to the watch, and events more than a week away are left out.
+
+The feeds are read with [ical.js](https://github.com/kewisch/ical.js), which handles recurring events, exceptions, cancellations, and time zones. It's under the MPL 2.0 and ships as a separate file, see [NOTICES](NOTICES.md).
+
+Alarms and attendees are left out.
+
+## Stock Sources
+
+Gridlock's Stock and Watchlist panels take their quotes from the source you pick in its settings page, where you also set your tickers and key. All of them are free, and all but Yahoo need an account and an API key.
+
+- **Finnhub**: the default. Real-time US quotes, on your refresh interval.
+- **Yahoo**: real-time, no API key, and the widest coverage (US and international stocks, ETFs, indices, and crypto). It's an unofficial feed, so it can break without notice.
+- **Twelve Data**: global markets. It follows your interval while markets are open, no faster than every 15 minutes, then slows down after hours to stay within its daily limits.
+- **Alpha Vantage**: one end-of-day quote after the close, with a small daily request allowance.
+
+Each one gives the last price, the change and the percentage change, and the latest trading day.
+
+## Bugs and Requests
+
+I keep the issues for all my faces in one place, LCARS Stardate included, so please open bugs and requests in [Issues](https://github.com/AKlitbo/pebble-watchfaces/issues).
+
+## Building Them Yourself
+
+If you want to build a face yourself, you need [`paf`](https://github.com/AKlitbo/pebble-app-framework-cli#install) and the Pebble SDK. I run everything from WSL, because the build needs the SDK and `paf sync` installs `node_modules` for whichever system runs it. `paf doctor` tells you if anything is missing.
+
+```sh
+paf sync                      # fills every unit's paf/ from the framework tag in its paf.config.json and installs node_modules
+paf build <face> [--clean]    # the .pbw, into the unit's targets/<face>/build/, from WSL with the Pebble SDK installed
+paf build all                 # every face
+```
+
+The generators and tools work on one face, so they take its name and run in the unit that holds it:
+
+```sh
+paf gen <face> all             # every generator the face has inputs for
+paf gen <face> <kind>          # one of clay, icons, thumbnails, background, or Mosaic's vibrant
+paf tool <face> clay-preview   # the settings page in a browser, from the dev plugin
+paf tool <face> tap-walk       # screenshot every state of the dev walk, from WSL
+```
+
+CI runs these checks in every unit, each against its own framework:
+
+```sh
+paf test
+paf lint [--fix]       # the house style, from the code-style plugin
+paf format --check     # the CSS, JSON, and YAML formatting
+paf typecheck
+paf check              # the Clay components, icons, and thumbnails are still current
+```
+
+`paf pin <unit> <tag>` moves a unit to another framework release. It prints the breaking changes between the two tags first.
+
+Anything with a `.g.` in the name is generated, so I never edit those by hand. Rerun the matching `paf gen <face> <kind>`, and `paf check` says which one is out of date. Mosaic's vibrant tables are checked by a spec in `paf test` instead, and `mosaic/core/c/draw/value_bearing.g.h` comes from Gridlock's `src/tools/fonts/generate-bearing.py`.
+
+### Project Structure
+
+Each face of its own and each family under `watchfaces/` is a [paf](https://github.com/AKlitbo/pebble-app-framework-cli) unit, with its own copy of the shared [framework](https://github.com/AKlitbo/pebble-app-framework) in `paf/` on the tag its `paf.config.json` names. One unit can stay on a framework release while another moves ahead, and the faces in a family move together.
+
+A face is any folder holding a `pebble.appinfo.json`, at `watchfaces/<face>/` or inside a family at `watchfaces/<family>/<face>/`. A family is a group of related faces plus the code only they share.
 
 * **`watchfaces/<face>/`**: one face. `pebble.appinfo.json` holds its identity (uuid, version, message keys, resources), `src/c/` the device code, `src/pkjs/` the Clay config page and phone-side bridge, `resources/` its fonts and PNGs, and `CHANGELOG.md` its own release history. Some also carry a `frame/`, the HTML the backgrounds are baked from, or a `src/tools/` of generators only that face uses.
 * **`watchfaces/<family>/core/`**: the family's shared code, staged into each member's build and reached as `<family>/...`.
@@ -62,17 +130,15 @@ A face is any directory carrying a `pebble.appinfo.json`, at `watchfaces/<face>/
 * **`targets/<target>/`**: in each unit, the build sandbox waf runs in, generated and gitignored. Usually `targets/<face>/`, unless the face declares a `targets` map in its appinfo and gets one sandbox per target.
 * **`vendor/`**: third-party source SVGs every unit's icons generator reads (gitignored, see [Third-Party Assets](#third-party-assets)).
 
-Anything with a `.g.` in the name is generated and should not be hand-edited. Rerun the matching `paf gen <face> <kind>`. `paf check` says which Clay components, icon media, and thumbnails are out of date, and CI runs it. Mosaic's vibrant tables come from its own generator, `paf gen <face> vibrant`, which one of its specs checks for both of its faces.
-
 ### Adding a Face
 
-Create `watchfaces/<name>/` with the layout above, plus a `paf.config.json`, `package.json`, `config/`, `tsconfig.json`, and `.gitignore` copied from another standalone face, then run `paf pin <name> <tag>`, which writes its `package-lock.json` to commit too, and build it. The sandbox, manifest, and waf entry point are all generated from the face's name and appinfo. Add the face and its unit to the matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
+To add a face, create `watchfaces/<name>/` with the layout above. Copy `paf.config.json`, `package.json`, `config/`, `tsconfig.json`, and `.gitignore` from another face of its own, then run `paf pin <name> <tag>`, which also writes the `package-lock.json` to commit. The sandbox, manifest, and waf entry point all come from the face's name and appinfo. Add the face and its unit to the matrix in [.github/workflows/ci.yml](.github/workflows/ci.yml) so it builds on every push.
 
-To join a family instead, create it at `watchfaces/<family>/<name>/`. It builds on the family's framework, and the family's `core/` is compiled in automatically because of where the face sits.
+To join a family instead, create it at `watchfaces/<family>/<name>/`. It builds on the family's framework, and the family's `core/` is compiled in because of where the face sits.
 
-## Releasing
+## How I Release Them
 
-A release starts when a `<face>-v<version>` tag is pushed. [release.yml](.github/workflows/release.yml) then builds that face, takes its notes from the matching `CHANGELOG.md` section, and publishes the `.pbw`.
+I release a face by pushing a `<face>-v<version>` tag. [release.yml](.github/workflows/release.yml) then builds that face, takes the notes from the matching section of its changelog, and publishes the `.pbw`.
 
 ```sh
 # date the [1.7.0] heading in watchfaces/radar-array/CHANGELOG.md first, then
@@ -80,64 +146,7 @@ git tag radar-array-v1.7.0
 git push origin radar-array-v1.7.0
 ```
 
-The tag version must match `version` in that face's `pebble.appinfo.json`, the changelog entry must be dated, and the tag must not already be released. The workflow checks all three before it spends time on a build, so a mistake costs seconds.
-
-## Development
-
-```sh
-paf sync                  # fills every unit's paf/ from its paf.config.json tag and installs its node_modules
-paf build radar-array     # the .pbw, from WSL with the Pebble SDK installed
-```
-
-Every face-scoped command takes the face name, and runs in the unit that holds it:
-
-```sh
-paf build <face> [--clean]    # build a .pbw into the unit's targets/<face>/build/
-paf gen <face> <kind|all>     # icons, background, clay, thumbnails, Mosaic's vibrant, or every generator the face has inputs for
-paf tool <face> <name>        # a tool from a plugin the unit lists, such as clay-preview or tap-walk
-```
-
-The checks run in every unit, each against its own framework:
-
-```sh
-paf test
-paf lint [--fix]              # the house style, from the code-style plugin
-paf typecheck
-paf check                     # every committed generated file still matches its generator
-```
-
-`paf pin <unit> <tag>` moves a unit to another framework release, and prints the framework's changelog between the two.
-
-## Weather Providers
-
-Selectable in Settings:
-
-- **Open-Meteo** *(recommended)*: free, no account or API key.
-- **WeatherAPI**: free tier, needs an account and API key.
-- **OpenWeatherMap**: free tier, needs an account and API key.
-
-All cover the basics: temperature, conditions, wind, humidity, pressure, feels like, and sunrise/sunset. OpenWeatherMap's free tier leaves out UV index, dew point, today's high/low, and chance of rain, so those are backfilled from Open-Meteo.
-
-## Calendar (iCal)
-
-On a face that supports it, calendar comes from a private iCal (`.ics`) feed, so any service that publishes one works (Google Calendar's secret address is the usual choice). Paste the feed URL into Settings and upcoming events are fetched automatically.
-
-Only event time, title, and location are sent to the watch, and events more than a week away are ignored.
-
-Feeds are parsed with [ical.js](https://github.com/kewisch/ical.js), including recurring events, exceptions, cancellations, and time zones. It is licensed under MPL 2.0 and included as a separate file. See [NOTICES](NOTICES.md).
-
-Alarms and attendees are currently ignored.
-
-## Stock Providers
-
-On a face that supports it, the providers below are selectable in Settings. All are free, and all except Yahoo need an account and API key. Set your ticker(s) and key there too.
-
-- **Finnhub** *(recommended)*: real-time US quotes, follows your refresh interval.
-- **Yahoo**: real-time, no API key, and the widest coverage (US and international stocks, ETFs, indices, and crypto). Unofficial feed, so it can break without notice.
-- **Twelve Data**: global markets. Follows your interval while markets are open, no faster than every 15 minutes, then slows down after hours to stay within daily limits.
-- **Alpha Vantage**: one end-of-day quote after the close, with a small daily request allowance.
-
-All return the same core quote data: last price, price change, percentage change, and latest trading day.
+Before it builds anything, the workflow checks that the tag matches `version` in the face's `pebble.appinfo.json`, that the changelog entry is dated, that the tag isn't already released, and that the unit's `paf/` holds a framework with a release version.
 
 ---
 
@@ -149,25 +158,25 @@ All return the same core quote data: last price, price change, percentage change
   * **Typography**: [Teko](https://fonts.google.com/specimen/Teko) and [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono).
 * **Mosaic Faces**
   * **Typography**: [Teko](https://fonts.google.com/specimen/Teko) and [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono) for the clock and values, with [LECO 2014](https://www.1001fonts.com/leco-2014-font.html), [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), [Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans), [Aldrich](https://fonts.google.com/specimen/Aldrich), [Kode Mono](https://fonts.google.com/specimen/Kode+Mono), [Electrolize](https://fonts.google.com/specimen/Electrolize), and [Quantico](https://fonts.google.com/specimen/Quantico) as header options.
-  * **Glyphs**: Heart, step, distance, thermometer, UV, fire, snooze, late, clock, globe, calendar, and volume icons from [UXWing](https://uxwing.com).
+  * **Glyphs**: Heart, step, distance, thermometer, UV, fire, snooze, late, clock, globe, calendar, alarm, and volume icons from [UXWing](https://uxwing.com).
+  * **Calendar Reading**: [ical.js](https://github.com/kewisch/ical.js) by Philipp Kewisch, in Gridlock.
 * **Sketchbook Faces**
   * **Typography**: [Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand).
-  * **Glyphs**: Heart, step, thermometer, and muted-speaker icons from [UXWing](https://uxwing.com).
+  * **Glyphs**: Heart, step, thermometer, and speaker icons from [UXWing](https://uxwing.com).
 * **General**
   * **Weather Icons**: [Erik Flowers](https://github.com/erikflowers/weather-icons).
   * **Bluetooth Icons**: Bluetooth on / slash icons from [SVG Repo](https://www.svgrepo.com).
-  * **Calendar Reading**: [ical.js](https://github.com/kewisch/ical.js) by Philipp Kewisch (shared bundle).
   * **Built With**: [Pebble SDK](https://developer.repebble.com) and [Clay](https://github.com/pebble-dev/clay).
 
 ## Third-Party Assets
 
-This repository bundles each face's fonts, its generated icon PNGs, and its baked background PNGs. The weather and glyph icons' SVG sources are *not* bundled and must be fetched to regenerate them. Everything bundled keeps its own licence, listed per face with its source and terms in [NOTICES](NOTICES.md).
+The repo holds each face's fonts, icon PNGs, and baked backgrounds, each under its own licence, listed per face in [NOTICES](NOTICES.md). The SVGs behind the icons aren't mine to share, so they aren't in the repo. To regenerate the icons, download them into `vendor/weather-icons/`, `vendor/uxwing/`, and `vendor/svgrepo/`.
 
-## License
+## Licence
 
-**Source Code:** © 2026 Andrew Klitbo (Null Syntax), licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework each unit fills into `paf/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, see the LICENSE in that repository.
+**Source Code:** © 2026 Andrew Klitbo (Null Syntax). I release it under the [GNU Affero General Public License v3.0 or later](LICENSE). The shared framework in each unit's `paf/` is dual-licensed under the AGPL or the PolyForm Noncommercial License, and the LICENSE in its repository has the details.
 
-You may use, modify, fork, and share these faces under the AGPL. If you share a modified face, you share its source under the same license. See [LICENSE](LICENSE) for the full terms.
+You can use, change, fork, and share these faces under the AGPL. If you share a changed face, you share its source under the same licence. See [LICENSE](LICENSE) for the full terms.
 
 Earlier history and releases of this repository were published under the PolyForm Noncommercial License 1.0.0, and copies taken from them keep those terms.
 
@@ -179,4 +188,4 @@ Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an un
 
 Please do not use this repository or its contents for training, fine-tuning, or evaluating artificial intelligence or machine learning models, including large language models. That includes scraping, dataset construction, and inclusion in training corpora.
 
-This is a request and not a term of the license. The AGPL does not allow further restrictions to be added to it.
+This is a request and not a term of the licence. The AGPL does not allow further restrictions to be added to it.
