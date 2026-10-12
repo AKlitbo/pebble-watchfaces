@@ -3,10 +3,10 @@
 #include "ui/weather/icons.h"
 #include <string.h>
 
-// owns the picture because the shared icon cache only keys on fixed resource ids, and the
-// weather glyph's id comes from the condition string. sized to match the weather hub's
-// cond[32] so a long condition isn't truncated into the cache (which would defeat the
-// strcmp and reload every repaint)
+// owns its one picture rather than going through the shared icon cache. each glyph the cache
+// loads stays there until a full cache pushes it out, so a day of changing weather would hold
+// several at once. sized to match the weather store's cond[32] so a long condition is not cut
+// short here, which would make the strcmp miss and reload on every repaint
 static GBitmap *s_bmp;
 static IconMargins s_margin;
 static char s_cached[32];

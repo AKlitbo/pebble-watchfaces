@@ -10,8 +10,8 @@
 /**
  * What an empty grid sends instead of an empty string.
  *
- * The watch discards an empty cstring rather than storing it (see
- * settings_apply_inbox), so "" cannot say "I cleared this" — the old layout
- * would just stay. A single character that parses to no blocks can.
+ * The watch keeps an empty string only for a setting whose default is empty, and
+ * every layout has a default, so "" would leave the old layout in place. A single
+ * character that parses to no blocks clears it.
  */
 export const EMPTY_LAYOUT = '0';

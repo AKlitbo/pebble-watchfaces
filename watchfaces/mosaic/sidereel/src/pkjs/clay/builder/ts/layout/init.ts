@@ -36,7 +36,7 @@ export function init(this: ClayComponentInstance): void {
   const root = self.$element[0] as HTMLElement & LbHooks;
   const cfg = self.config || {};
   const rawModules: RawModule[] = cfg.moduleOptions || [];
-  const THUMBS: Thumbs = cfg.moduleThumbnails || {}; // value -> { sizeKey -> data url } of real panel shots
+  const THUMBS: Thumbs = cfg.moduleThumbnails || {}; // label -> { sizeKey -> data url } of real panel shots
 
   const hidden = root.querySelector('.lb-value') as HTMLInputElement;
   const gridEl = root.querySelector('.lb-grid') as HTMLElement;

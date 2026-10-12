@@ -9,7 +9,7 @@
 #include "settings_schema.h"
 #include "system/vibe/vibe.h"
 
-// most segments a pattern can hold. the phone caps its list to match, and the parser drops the rest
+// most segments a pattern can hold. the parser drops any past this
 #define GOAL_VIBE_MAX_SEGMENTS 40
 
 // the movement goals we watch, in the order the readings and goals are read below
@@ -30,11 +30,8 @@ static int  s_yday;              // the day the latches belong to (tm_yday), -1 
 // each to what the SDK allows, and buzzes the rhythm. a list with no numbers stays silent
 static void play_pattern_string(const char *s)
 {
-    // static, not a stack buffer. vibes_enqueue_custom_pattern queues the pattern and keeps
-    // reading these durations while it plays, so a stack array would be freed out from under the
-    // vibe controller the moment this returns. the SDK's own example passes a static array for
-    // the same reason. only one pattern is ever queued at a time (goal_vibe_update buzzes once
-    // per pass), so a single shared buffer cannot be overwritten mid-play
+    // the firmware copies each duration into its own queue as the pattern is queued, so the
+    // buffer only has to last for the call. it stays static to keep 160 bytes off the stack
     static uint32_t buf[GOAL_VIBE_MAX_SEGMENTS];
     int      count = 0;
     uint32_t value = 0;

@@ -12,8 +12,8 @@
 #define HR_SLOTS 60
 
 // the plot is pinned to a fixed window so the trace's height reads as absolute bpm rather than
-// just the day's own range. the floor is the baseline. the ceiling holds unless the day-high
-// pushes past it. both are tunable
+// just the last hour's own range. the floor is the baseline. the ceiling holds unless the
+// hour's high pushes past it. both are tunable
 #define HR_FLOOR 40
 #define HR_CEIL 120
 
@@ -87,7 +87,7 @@ static void health_hr_graph_body(GridCtx *gctx)
     int last = 0;
     int valid = series_range(history, HR_SLOTS, 0, &lo, &hi, &last);
 
-    // the day's low on the top left and high on the top right, small, to frame the trend
+    // the last hour's low on the top left and high on the top right, small, to frame the trend
     if (valid >= 1)
     {
         char lobuf[6];
@@ -118,7 +118,7 @@ static void health_hr_graph_body(GridCtx *gctx)
         graph.origin.x += HR_SCALE_W;
         graph.size.w -= HR_SCALE_W;
 
-        // ceiling holds at HR_CEIL, but expands to the day-high so a hard peak never clips
+        // ceiling holds at HR_CEIL, but grows to the hour's high so a hard peak never clips
         int top = hi > HR_CEIL ? hi : HR_CEIL;
 
         // two ticks down the gutter: ceiling at the top, floor at the bottom. edge-anchored so
