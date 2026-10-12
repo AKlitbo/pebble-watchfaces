@@ -78,10 +78,14 @@ static int32_t tide_minutes(void)
     return days * 1440 + now->tm_hour * 60 + now->tm_min;
 }
 
-/** @brief The waterline's baseline for a given tide level, before the shore curve bends it. */
+/**
+ * @brief The waterline's baseline for a given tide level, before the shore curve bends it. It rounds
+ * to the nearest pixel, so the water holds its high mark about as long as its low one rather than
+ * reaching it only at a level of exactly 100.
+ */
 static int waterline_base(int level)
 {
-    return TIDE_LO_Y + ((TIDE_HI_Y - TIDE_LO_Y) * level) / 100;
+    return TIDE_LO_Y + ((TIDE_HI_Y - TIDE_LO_Y) * level + 50) / 100;
 }
 
 /**
