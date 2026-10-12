@@ -25,8 +25,10 @@ static bool s_quiet_was_on;
 /**
  * @brief Whether the night window is open right now.
  *
- * The sun times are used however old they are. A sunset from last month is still within half an
- * hour of tonight's, which beats dropping to the fixed fallback for a reason nobody can see.
+ * The sun times are used however old they are. Near the solstices last month's sunset is within
+ * minutes of tonight's, but near the equinoxes it moves about an hour a month, so night can switch
+ * on up to an hour off. That costs less than dropping to the fixed hours for a reason nobody can
+ * see.
  */
 static bool night_is_on(void)
 {
@@ -94,7 +96,6 @@ void layout_switch_tick(void)
         // a swap moves every cell, which is more than a repaint can express. this covers the
         // Quiet Time panels too, so there is nothing else to do
         engine_rebuild();
-        engine_mark_dirty();
         return;
     }
 

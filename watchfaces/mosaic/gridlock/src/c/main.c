@@ -12,6 +12,7 @@
 #include "io/stores/stock_store.h"
 #include "io/stores/calendar_store.h"
 #include "io/stores/health_store.h"
+#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "ui/fonts.h"
 #include "draw/fonts.h"
@@ -106,29 +107,21 @@ static void on_settings_changed(bool time_or_date_changed)
     window_set_background_color(s_window, theme_background(settings_u8(SETTING_THEME)));
     apply_header_font();
     engine_rebuild();
-    engine_mark_dirty();
 
-    // the stock poll interval may have changed so move its next poll onto the new one. dev/seed
-    // paths never reach here since they get no phone settings pushes
-    stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
-    // the calendar poll interval may have changed too, so move that one the same way
-    calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
-}
-
-// buzz once at the top of the hour with the pattern the user picked. the minute tick drives this
-// so it lands exactly when tm_min hits 0, and vibe_pulse stays silent during quiet time
-static void hourly_vibe(void)
-{
-    if (time_store_tm()->tm_min == 0)
+    // the stock and calendar poll intervals may have changed, so move each next poll onto the new one
+    // a dev build leaves its seeded stores alone, since starting them live here would fetch real
+    // quotes and agendas over the fixture
+    if (!DEV_MODE)
     {
-        vibe_choice(gridlock_hourly_vibe());
+        stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
+        calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
     }
 }
 
 // buzz for an upcoming calendar event. only runs when a Calendar panel is on the layout so a face
 // without one stays quiet. each reminder fires as its lead time crosses. the 60s window means the
 // once-a-minute tick lands in it exactly once so a reminder never buzzes twice and a fresh launch
-// never buzzes for an event already past the mark. vibe_pulse stays silent during quiet time
+// never buzzes for an event already past the mark. vibe_choice stays silent during quiet time
 static void calendar_vibe(void)
 {
     if (!gridlock_has_module_either(MOD_CALENDAR_COUNTDOWN) &&
@@ -184,23 +177,21 @@ static void calendar_vibe(void)
 
 // each store notifies through its own hub tag, so the engine only repaints the cells that read
 // from it instead of the whole grid
-static void on_time_changed(void)    { hourly_vibe(); calendar_vibe(); layout_switch_tick(); engine_mark_dirty_tags(FEATURE_TIME); }
+// vibe_hourly buzzes once at the top of each hour with the pattern the user picked, and its first
+// call after launch only remembers the hour, so reopening the face in minute 0 stays quiet
+static void on_time_changed(void)
+{
+    vibe_hourly(time_store_tm(), gridlock_hourly_vibe());
+    calendar_vibe();
+    layout_switch_tick();
+    engine_mark_dirty_tags(FEATURE_TIME);
+}
+
 static void on_weather_changed(void) { layout_switch_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
 static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }
 static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR); }
 static void on_health_changed(void)  { goal_vibe_update(); engine_mark_dirty_tags(FEATURE_HEALTH); }
 static void on_system_changed(void)  { engine_mark_dirty_tags(FEATURE_SYSTEM); }
-
-// a readout is worth re-requesting when it never synced, or is at least its own poll interval
-// old. a feature with polling off (poll_min 0) is left alone, same as its store
-static bool reconnect_should_refresh(int age_s, int poll_min)
-{
-    if (poll_min <= 0)
-    {
-        return false;
-    }
-    return age_s < 0 || age_s >= poll_min * 60;
-}
 
 // the phone app just reconnected. its pkjs may have been closed while away, so catch up any
 // readout that went stale during the gap rather than waiting out the poll (weather is 30 min).
@@ -209,15 +200,15 @@ static bool reconnect_should_refresh(int age_s, int poll_min)
 // the outbox nack/retry wakes an asleep pkjs
 static void on_phone_reconnected(void)
 {
-    if (reconnect_should_refresh(weather_store_age_s(), WEATHER_POLL_MIN))
+    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
     {
         appmessage_request_weather();
     }
-    if (reconnect_should_refresh(stock_store_age_s(), gridlock_stock_poll_min()))
+    if (store_poll_reconnect_due(stock_store_age_s(), gridlock_stock_poll_min()))
     {
         appmessage_request_stock();
     }
-    if (reconnect_should_refresh(calendar_store_age_s(), gridlock_calendar_poll_min()))
+    if (store_poll_reconnect_due(calendar_store_age_s(), gridlock_calendar_poll_min()))
     {
         appmessage_request_calendar();
     }

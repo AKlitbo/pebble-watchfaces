@@ -13,6 +13,7 @@
 #include "dev/dev.h"
 #include "io/appmessage/appmessage.h"
 #include "io/stores/health_store.h"
+#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
@@ -42,7 +43,7 @@ static Window *s_window;
 static TimeConfig time_cfg(void)
 {
     return (TimeConfig){
-        .live = true,
+        .live = !DEV_MODE,  // a dev build keeps the clock its fixture pinned
         .minute_tick = true,
         .beats = false,
     };
@@ -69,27 +70,15 @@ static void on_settings_changed(bool time_or_date_changed)
     time_store_reconfigure(time_cfg());
 }
 
-/**
- * @brief Buzz once at the top of the hour with the pattern the user picked.
- *
- * The minute tick drives this so it lands exactly when tm_min hits 0, and vibe_choice stays
- * silent during quiet time (and for VIBE_NONE).
- */
-static void hourly_vibe(void)
-{
-    if (time_store_tm()->tm_min == 0)
-    {
-        vibe_choice(settings_u8(SETTING_HOURLY_VIBE));
-    }
-}
-
 static void on_time_tick(void)
 {
     // the reel marks its own tag, and starts the scroll if this was a plain one-minute step
     reel_set_minute(time_store_tm()->tm_min, true);
 
     engine_mark_dirty_tags(TAG_TIME);
-    hourly_vibe();
+
+    // buzzes once at the top of each hour, and stays quiet when the face reopens in minute 0
+    vibe_hourly(time_store_tm(), settings_u8(SETTING_HOURLY_VIBE));
     layout_switch_tick();
 }
 
@@ -113,27 +102,13 @@ static void on_system_changed(void)
 }
 
 /**
- * @brief Whether a reading is worth re-requesting: it never synced, or it is at least its own
- * poll interval old. Polling turned off (poll_min 0) is left alone, same as its store.
- */
-static bool reconnect_should_refresh(int age_s, int poll_min)
-{
-    if (poll_min <= 0)
-    {
-        return false;
-    }
-
-    return age_s < 0 || age_s >= poll_min * 60;
-}
-
-/**
  * @brief The phone app just reconnected, so catch up a reading that went stale while it was away.
  *
  * Gating on age means bluetooth flapping cannot re-fetch faster than the normal cadence.
  */
 static void on_phone_reconnected(void)
 {
-    if (reconnect_should_refresh(weather_store_age_s(), WEATHER_POLL_MIN))
+    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
     {
         appmessage_request_weather();
     }
