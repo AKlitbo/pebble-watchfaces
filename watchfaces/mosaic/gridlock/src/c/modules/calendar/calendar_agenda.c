@@ -18,10 +18,10 @@ static void calendar_agenda_body(GridCtx *gctx)
     }
 
     GRect body = gctx->body;
-    const CalendarStrip *strip = calendar_store_strip();
+    time_t now = time(NULL);
 
-    // no reading yet so show one centred placeholder instead of an empty list
-    if (strip->count == 0)
+    // nothing left to come, so show one centred placeholder instead of an empty list
+    if (!cal_upcoming(0, now))
     {
         cal_draw_text(gctx, "Nothing Scheduled", FONT_STM_14, gctx->color_subtitle,
                       GRect(body.origin.x, body.origin.y + body.size.h / 2 - 8, body.size.w, 16),
@@ -30,21 +30,22 @@ static void calendar_agenda_body(GridCtx *gctx)
     }
 
     int rows = body.size.h / CAL_ROW_H; // however many rows fit the body
-    if (rows > strip->count)
-    {
-        rows = strip->count;
-    }
 
     for (int i = 0; i < rows; i++)
     {
-        cal_draw_agenda_row(gctx, &strip->event[i], body, body.origin.y + i * CAL_ROW_H);
+        const CalendarEvent *event = cal_upcoming(i, now);
+        if (!event)
+        {
+            break;
+        }
+        cal_draw_agenda_row(gctx, event, body, body.origin.y + i * CAL_ROW_H);
     }
 }
 
 const ModuleDef mod_calendar_agenda_def = {
     .label = "AGENDA",
     .sizes = SZ_2x4,
-    .features = FEATURE_CALENDAR,
+    .features = FEATURE_CALENDAR | FEATURE_TIME,  // the minute drops an event once it ends
     .theme_alias = MOD_CALENDAR_COUNTDOWN, // borrow the Calendar group's colour
     .body = calendar_agenda_body
 };

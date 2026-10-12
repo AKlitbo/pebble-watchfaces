@@ -1,6 +1,6 @@
 /**
  * @file calendar_countdown.c
- * @brief The "Next Event" panel, drawn at two sizes from the next event (index 0) in the store.
+ * @brief The "Next Event" panel, drawn at two sizes from the next event that has not ended yet.
  *   2x2  the goal-panel look: the event time up top (big, with a small grey am/pm like the
  *        clock), the title and place below, a date icon bottom-right, and a bar that fills as
  *        the event approaches.
@@ -105,9 +105,9 @@ static void draw_1x4(GridCtx *gctx, const CalendarEvent *event)
 
 static void calendar_countdown_body(GridCtx *gctx)
 {
-    const CalendarEvent *event = calendar_store_event(0);
+    const CalendarEvent *event = cal_upcoming(0, time(NULL));
 
-    // no reading yet: a placeholder that suits each size
+    // nothing left to come: a placeholder that suits each size
     if (!event)
     {
         if (gctx->size == MSIZE_2x2)
@@ -136,6 +136,6 @@ static void calendar_countdown_body(GridCtx *gctx)
 const ModuleDef mod_calendar_countdown_def = {
     .label = "NEXT EVENT",
     .sizes = SZ_2x2 | SZ_1x4,
-    .features = FEATURE_CALENDAR,
+    .features = FEATURE_CALENDAR | FEATURE_TIME,  // the minute drops an event once it ends
     .body = calendar_countdown_body
 };

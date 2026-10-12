@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Fixed the calendar panels showing a meeting that had already finished until the next calendar refresh.
 - Fixed Hourly Vibration buzzing twice when you return to the watchface in the first minute of the hour.
 - Fixed a reset or reinstalled watch staying on the default settings until you pressed Save. Its weather, stocks, and calendar also stopped refreshing when due.
 - Fixed a second clock showing the wrong hour for a while after its city changed its clocks.

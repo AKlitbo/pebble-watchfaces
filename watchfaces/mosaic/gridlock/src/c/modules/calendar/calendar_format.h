@@ -61,3 +61,18 @@ void cal_draw_text(GridCtx *gctx, const char *text, FontId font, GColor color, G
  * @param y The row's top, body-relative already applied by the caller.
  */
 void cal_draw_agenda_row(GridCtx *gctx, const CalendarEvent *event, GRect body, int y);
+
+/**
+ * @brief The event at a place in the agenda once anything already over is skipped, or NULL when
+ * there are not that many left.
+ *
+ * The store keeps the agenda as the phone sent it, so a meeting that finished since the last
+ * refresh stays in it until the next one lands. A long meeting still running can sit ahead of a
+ * short one that has ended, so every event is checked rather than starting from the first one
+ * still on.
+ *
+ * @param index Which upcoming event to read, 0 for the next one.
+ * @param now The time to measure against.
+ * @return The event, or NULL.
+ */
+const CalendarEvent *cal_upcoming(uint8_t index, time_t now);

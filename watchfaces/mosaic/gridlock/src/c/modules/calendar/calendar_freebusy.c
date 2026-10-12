@@ -126,18 +126,17 @@ static void draw_timeline(GridCtx *gctx, GRect area, int hours)
 static void draw_1x4(GridCtx *gctx)
 {
     GRect body = gctx->body;
-    const CalendarStrip *strip = calendar_store_strip();
 
     GRect bar = GRect(body.origin.x + PANEL_PAD, body.origin.y + 2, body.size.w - PANEL_PAD * 2, BAR_H);
     draw_timeline(gctx, bar, FREEBUSY_HOURS);
 
     // name the next event under the strip, or say the window is clear
     GRect caption_rect = GRect(bar.origin.x, bar.origin.y + BAR_H, bar.size.w, 14);
-    if (strip->count > 0)
+    const CalendarEvent *next = cal_upcoming(0, time(NULL));
+    if (next)
     {
         // colour the parts like the Next Event 1x4: a grey day code, the accent time, then the
         // title in the value colour so the event name reads in the vibrant colour
-        const CalendarEvent *next = &strip->event[0];
         int x = caption_rect.origin.x;
         int right = caption_rect.origin.x + caption_rect.size.w;
 
@@ -171,14 +170,14 @@ static void draw_1x4(GridCtx *gctx)
 static void draw_2x4(GridCtx *gctx)
 {
     GRect body = gctx->body;
-    const CalendarStrip *strip = calendar_store_strip();
+    time_t now = time(NULL);
 
     GRect bar = GRect(body.origin.x + PANEL_PAD, body.origin.y + 2, body.size.w - PANEL_PAD * 2, BAR_H);
     draw_timeline(gctx, bar, FREEBUSY_HOURS);
 
     int list_top = bar.origin.y + BAR_H + 4;
 
-    if (strip->count == 0)
+    if (!cal_upcoming(0, now))
     {
         cal_draw_text(gctx, "Nothing Scheduled", FONT_STM_14, gctx->color_subtitle,
                       GRect(body.origin.x, list_top + 8, body.size.w, 16), GTextAlignmentCenter);
@@ -186,10 +185,14 @@ static void draw_2x4(GridCtx *gctx)
     }
 
     // the next few events under the strip, up to three
-    int rows = strip->count < 3 ? strip->count : 3;
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < 3; i++)
     {
-        cal_draw_agenda_row(gctx, &strip->event[i], body, list_top + i * CAL_ROW_H);
+        const CalendarEvent *event = cal_upcoming(i, now);
+        if (!event)
+        {
+            break;
+        }
+        cal_draw_agenda_row(gctx, event, body, list_top + i * CAL_ROW_H);
     }
 }
 
@@ -197,7 +200,7 @@ static void draw_2x4(GridCtx *gctx)
 
 static void draw_2x2(GridCtx *gctx)
 {
-    const CalendarEvent *event = calendar_store_event(0);
+    const CalendarEvent *event = cal_upcoming(0, time(NULL));
 
     if (!event)
     {
@@ -259,7 +262,7 @@ static void calendar_freebusy_body(GridCtx *gctx)
 const ModuleDef mod_calendar_freebusy_def = {
     .label = "TIMELINE",
     .sizes = SZ_1x4 | SZ_2x4 | SZ_2x2,
-    .features = FEATURE_CALENDAR,
+    .features = FEATURE_CALENDAR | FEATURE_TIME,  // the minute drops an event once it ends
     .theme_alias = MOD_CALENDAR_COUNTDOWN, // borrow the Calendar group's colour
     .body = calendar_freebusy_body
 };

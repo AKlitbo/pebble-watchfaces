@@ -119,3 +119,24 @@ void cal_draw_agenda_row(GridCtx *gctx, const CalendarEvent *event, GRect body, 
     cal_draw_text(gctx, event->title, FONT_STM_14, gctx->color_value,
                   GRect(this_title_x, y, title_w, CAL_ROW_H), GTextAlignmentLeft);
 }
+
+const CalendarEvent *cal_upcoming(uint8_t index, time_t now)
+{
+    const CalendarStrip *strip = calendar_store_strip();
+
+    for (uint8_t slot = 0; slot < strip->count; slot++)
+    {
+        const CalendarEvent *event = &strip->event[slot];
+        if (event->end <= now)
+        {
+            continue;
+        }
+        if (index == 0)
+        {
+            return event;
+        }
+        index--;
+    }
+
+    return NULL;
+}
