@@ -24,15 +24,11 @@ enum
     FONT_TEKO_72,   // big-digit night panels fallback (digits and colon)
     FONT_TEKO_54,   // 1x4 clock readout
     FONT_TEKO_46,   // clock readout
-    FONT_TIME_SM,   // clock readout fallback for the wide .beats token (system font)
     FONT_STM_14,    // Share Tech Mono date banner
-    FONT_DATE_SM,   // date banner fallback for wide formats (system font)
-    FONT_DATE_XS,   // date banner fallback for the widest formats (system font)
     FONT_TEKO_26,   // standard 1x2 / stat value
     FONT_TEKO_22,   // tightest shrink fallback
     FONT_TEKO_24,   // one step below TEKO_26 (1x2 time shrink)
     FONT_TEKO_34,   // big stat values (heartrate / steps)
-    FONT_COORD,     // lat / lon (system font)
     FONT_STM_12,    // Share Tech Mono caption / AM-PM unit
     FONT_HEADER,    // panel header label (user-selectable, swapped at runtime)
     FONT_COUNT

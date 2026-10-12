@@ -128,12 +128,6 @@ static void load_fonts(void)
     // FONT_HEADER is the one slot the user picks, so it is loaded through its own swap rather
     // than pinned here. apply_header_font runs again on every settings push
     sidereel_apply_header_font();
-
-    // the system-font fallbacks the panel bodies reach for when a custom size overflows
-    fonts_register_system(FONT_TIME_SM, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
-    fonts_register_system(FONT_DATE_SM, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-    fonts_register_system(FONT_DATE_XS, fonts_get_system_font(FONT_KEY_GOTHIC_14));
-    fonts_register_system(FONT_COORD, fonts_get_system_font(FONT_KEY_GOTHIC_14));
 }
 
 /**
