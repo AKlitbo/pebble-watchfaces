@@ -22,7 +22,7 @@ export function locationSection(): ClayConfigItem {
     items: [
       heading('Location Settings'),
       toggle('LOCATION_USE_GPS', 'Enable Phone GPS', 'Automatically fetch weather for your current location.', true),
-      toggle('LOCATION_GPS_FALLBACK', 'Fallback to Manual Location', 'If GPS is disabled or unavailable, use the city typed below.', true),
+      toggle('LOCATION_GPS_FALLBACK', 'Fallback to Manual Location', 'If GPS is on but cannot find you, use the city picked below.', true),
       {
         type: 'locationsearch',
         messageKey: 'LOCATION_NAME',

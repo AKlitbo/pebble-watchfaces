@@ -69,7 +69,7 @@ export function healthSection(): ClayConfigItem {
         description: 'Your own rhythm as comma-separated on and off times in milliseconds, starting with a buzz. Used only when Goal Met Vibration is set to Custom.',
         attributes: {
           placeholder: '100,80,100,80,300',
-          limit: 120,
+          maxlength: 120,
         },
       },
     ],

@@ -9,8 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - Fixed Hourly Vibration buzzing twice when you return to the watchface in the first minute of the hour.
+- Fixed the Custom Vibe Pattern box on the settings page taking more than the 120 characters the watch keeps.
 - Fixed a reset or reinstalled watch staying on the default settings until you pressed Save. Its weather also stopped refreshing when due.
 - Fixed a second clock showing the wrong hour for a while after its city changed its clocks.
+- Fixed the settings page describing Fallback to Manual Location wrongly. It only applies when Enable Phone GPS is on but cannot find you.
 
 ## [1.2.3] - 2026-09-27
 

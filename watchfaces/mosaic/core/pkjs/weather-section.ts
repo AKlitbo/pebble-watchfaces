@@ -43,7 +43,7 @@ export function weatherSection(): ClayConfigItem {
         description: 'Only required if you selected OpenWeatherMap or WeatherAPI above.',
         attributes: {
           placeholder: 'Paste your private API key here...',
-          limit: 64,
+          maxlength: 64,
         },
       },
     ],

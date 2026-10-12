@@ -422,7 +422,7 @@ const config = [
         description: 'Paste any calendar\'s private iCal (.ics) address. Google Calendar: Settings and sharing, Integrate calendar, "Secret address in iCal format". Apple iCloud: share a calendar as Public. Outlook: publish the calendar. Treat the link like a password: anyone with it can read your calendar.',
         attributes: {
           placeholder: 'https://.../calendar.ics',
-          limit: 512,
+          maxlength: 512,
         },
       },
       select('CALENDAR_POLL', 'Refresh Interval', [
@@ -461,7 +461,7 @@ const config = [
         description: 'Grab a free key from your chosen provider and paste it here. Yahoo needs no key, so leave this blank when you pick it.',
         attributes: {
           placeholder: 'Paste your private API key here...',
-          limit: 64,
+          maxlength: 64,
         },
       },
       {
@@ -471,7 +471,7 @@ const config = [
         description: 'One symbol for the 2x2 Stock panel, or up to four comma-separated for the Watchlist (e.g. AAPL, MSFT, TSLA, NVDA).',
         attributes: {
           placeholder: 'AAPL, MSFT, TSLA, NVDA',
-          limit: 64,
+          maxlength: 64,
         },
       },
       select('STOCK_POLL', 'Refresh Interval', [
