@@ -4,6 +4,13 @@ All notable changes to the Ridgeline watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed a reset or reinstalled watch staying on the default settings until you pressed Save. Its weather also stopped refreshing when due.
+- Fixed the settings page describing Fallback to Manual Location wrongly. It only applies when Enable Phone GPS is on but cannot find you.
+
 ## [1.4.2] - 2026-09-27
 
 ### Fixed
