@@ -31,7 +31,8 @@ static Zone s_zones[ZONE_COUNT] = {
     [ZONE_STEPS]    = {.rect = SLOT_STEPS,    .font_id = FONT_STM_18, .align = GTextAlignmentCenter, .color = GColorGreen},
     [ZONE_LAT]      = {.rect = SLOT_COORD,    .font_id = FONT_STM_14, .align = GTextAlignmentCenter, .color = COORD_TEXT_COLOR},
     // ZONE_COND and ZONE_LON are omitted: no condition glyph and the coordinate readout is
-    // a single combined lat/lon string the phone sends in ZONE_LAT
+    // a single combined lat/lon string the phone sends in ZONE_LAT. the phone still fills the
+    // longitude key, since the location store saves a fix only when both keys hold a number
 };
 
 /**
@@ -131,6 +132,10 @@ void radar_setup(Window *window)
     layer_add_child(root, bitmap_layer_get_layer(s_frame_layer));
     load_frame(theme);
 }
+
+// the build below writes all eight slots without reading max, so the engine's cap has to hold them
+// a slot added below raises this count too
+_Static_assert(ENGINE_SLOTS_MAX >= 8, "radar_build writes eight slots");
 
 uint8_t radar_build(EngineSlot *out, uint8_t max, GRect bounds)
 {

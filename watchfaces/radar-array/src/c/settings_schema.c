@@ -66,7 +66,7 @@ static const SettingsSchema s_schema = {
     // this to a literal byte count and bump the version on any further field append
     .min_versioned_size = sizeof(RadarSettings),
     .blob = &s_settings,
-    .blob_size = sizeof(RadarSettings),
+    .blob_size = SETTINGS_BLOB_SIZE(RadarSettings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,  // no legacy blobs. this face never existed without these fields
