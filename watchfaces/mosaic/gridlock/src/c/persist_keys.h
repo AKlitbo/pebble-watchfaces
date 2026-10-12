@@ -25,9 +25,9 @@
 #define GRIDLOCK_ANALOG_KEY       9
 #define GRIDLOCK_CALENDAR_KEY     10
 #define GRIDLOCK_GOAL_VIBE_KEY    11
-// the night layout keeps its own key rather than riding the core blob: core is already 131 bytes
-// and a second 128-byte layout would push it past the 256 a persist key holds, which
-// persist_write_data reports by writing nothing at all
+// the night layout keeps its own key rather than riding the core blob. core is 132 bytes, and a
+// second 128-byte layout would push it past the 256 a persist key holds. the watch saves only
+// the first 256 bytes of a longer write, so the end of the blob would come back as defaults
 #define GRIDLOCK_NIGHT_KEY        12
 // and the Quiet Time layout its own again, for the same reason
 #define GRIDLOCK_QUIET_KEY        13

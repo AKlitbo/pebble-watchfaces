@@ -105,11 +105,11 @@
 // fields keep their defaults
 #define GRIDLOCK_CALENDAR_V1_SIZE 2
 
-// the night layout rides its own key rather than the core blob. core is already 131 bytes and a
-// second 128-byte layout would take it to 259, past the 256 a persist key holds, and
-// persist_write_data does not report that: it simply writes nothing, so every core setting would
-// stop persisting at once. min_versioned_size is pinned to the v1 size from the first release so
-// appending a field later cannot wipe a night layout in the field
+// the night layout rides its own key rather than the core blob. core is 132 bytes, and a second
+// 128-byte layout would take it to 260, past the 256 a persist key holds. the watch saves only
+// the first 256 bytes of a longer write, so whatever sits past that would come back as its
+// default on every launch. min_versioned_size is pinned to the v1 size from the first release
+// so appending a field later cannot wipe a night layout in the field
 #define GRIDLOCK_NIGHT_VERSION 1
 #define GRIDLOCK_NIGHT_SIZE    132
 #define GRIDLOCK_NIGHT_V1_SIZE 132
@@ -120,9 +120,9 @@
 #define GRIDLOCK_QUIET_SIZE    129
 #define GRIDLOCK_QUIET_V1_SIZE 129
 
-// the wire value for "no night layout". an empty string cannot say this: settings_apply_inbox
-// skips an empty cstring rather than storing it, so a cleared grid would never reach the watch.
-// the same sentinel the custom colours use for their own empty state
+// the wire value for "no night layout". settings_apply_inbox keeps an empty string only for a
+// setting whose default is empty, and this is the default, so an empty one would leave the old
+// grid in place. the custom colours use the same marker for their own empty state
 #define GRIDLOCK_NO_LAYOUT "0"
 
 // four themes. 0 mono. 1 vibrant. 2 custom. 3 mono inverse (see theme.h GridlockTheme)
@@ -298,10 +298,8 @@ static const SettingField s_core_fields[] = {
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT, .type = SETTING_CSTRING,
       .offset = offsetof(GridlockCore, layout), .size = sizeof(s_core.layout),
       .default_str = GRIDLOCK_DEFAULT_LAYOUT },
-    // shared id (not FACE_ENUM) so the header font is readable with settings_u8(SETTING_HEADER_FONT)
-    { .id = SETTING_HEADER_FONT, .message_key = &MESSAGE_KEY_APPEARANCE_HEADER_FONT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(GridlockCore, header_font),
-      .enum_count = HEADER_FONT_COUNT, .default_num = 0 },
+    // the catalogue's entry, so the header font reads back with settings_u8(SETTING_HEADER_FONT)
+    KNOWN_HEADER_FONT(offsetof(GridlockCore, header_font), HEADER_FONT_COUNT),
     FACE_ENUM(GridlockCore, panel_style, APPEARANCE_PANEL_STYLE, PANEL_STYLE_COUNT, 0),
 };
 
@@ -437,7 +435,7 @@ static const SettingsSchema s_calendar_schema = {
     .version = GRIDLOCK_CALENDAR_VERSION,
     .min_versioned_size = GRIDLOCK_CALENDAR_V1_SIZE,
     .blob = &s_calendar,
-    .blob_size = sizeof(s_calendar),
+    .blob_size = SETTINGS_BLOB_SIZE(s_calendar),
     .fields = s_calendar_fields,
     .field_count = ARRAY_LENGTH(s_calendar_fields),
     .migrate = NULL,
@@ -448,7 +446,7 @@ static const SettingsSchema s_analog_schema = {
     .version = GRIDLOCK_ANALOG_VERSION,
     .min_versioned_size = GRIDLOCK_ANALOG_SIZE,
     .blob = &s_analog,
-    .blob_size = sizeof(s_analog),
+    .blob_size = SETTINGS_BLOB_SIZE(s_analog),
     .fields = s_analog_fields,
     .field_count = ARRAY_LENGTH(s_analog_fields),
     .migrate = NULL,
@@ -460,7 +458,7 @@ static const SettingsSchema s_stocks_schema = {
     .version = GRIDLOCK_STOCKS_VERSION,
     .min_versioned_size = GRIDLOCK_STOCKS_SIZE,
     .blob = &s_stocks,
-    .blob_size = sizeof(s_stocks),
+    .blob_size = SETTINGS_BLOB_SIZE(s_stocks),
     .fields = s_stocks_fields,
     .field_count = ARRAY_LENGTH(s_stocks_fields),
     .migrate = NULL,
@@ -472,7 +470,7 @@ static const SettingsSchema s_bluetooth_schema = {
     .version = GRIDLOCK_BLUETOOTH_VERSION,
     .min_versioned_size = GRIDLOCK_BLUETOOTH_SIZE,
     .blob = &s_bluetooth,
-    .blob_size = sizeof(s_bluetooth),
+    .blob_size = SETTINGS_BLOB_SIZE(s_bluetooth),
     .fields = s_bluetooth_fields,
     .field_count = ARRAY_LENGTH(s_bluetooth_fields),
     .migrate = NULL,
@@ -484,7 +482,7 @@ static const SettingsSchema s_clock_schema = {
     .version = GRIDLOCK_CLOCK_VERSION,
     .min_versioned_size = GRIDLOCK_CLOCK_V1_SIZE,
     .blob = &s_clock,
-    .blob_size = sizeof(s_clock),
+    .blob_size = SETTINGS_BLOB_SIZE(s_clock),
     .fields = s_clock_fields,
     .field_count = ARRAY_LENGTH(s_clock_fields),
     .migrate = NULL,
@@ -496,7 +494,7 @@ static const SettingsSchema s_health_schema = {
     .version = GRIDLOCK_HEALTH_VERSION,
     .min_versioned_size = GRIDLOCK_HEALTH_SIZE,
     .blob = &s_health,
-    .blob_size = sizeof(s_health),
+    .blob_size = SETTINGS_BLOB_SIZE(s_health),
     .fields = s_health_fields,
     .field_count = ARRAY_LENGTH(s_health_fields),
     .migrate = NULL,
@@ -508,7 +506,7 @@ static const SettingsSchema s_weather_schema = {
     .version = GRIDLOCK_WEATHER_VERSION,
     .min_versioned_size = GRIDLOCK_WEATHER_SIZE,
     .blob = &s_weather,
-    .blob_size = sizeof(s_weather),
+    .blob_size = SETTINGS_BLOB_SIZE(s_weather),
     .fields = s_weather_fields,
     .field_count = ARRAY_LENGTH(s_weather_fields),
     .migrate = NULL,
@@ -522,7 +520,7 @@ static const SettingsSchema s_custom_flags_schema = {
     .version = GRIDLOCK_CUSTOM_FLAGS_VERSION,
     .min_versioned_size = GRIDLOCK_CUSTOM_FLAGS_SIZE,
     .blob = &s_custom_flags,
-    .blob_size = sizeof(s_custom_flags),
+    .blob_size = SETTINGS_BLOB_SIZE(s_custom_flags),
     .fields = NULL,
     .field_count = 0,
     .migrate = NULL,
@@ -534,7 +532,7 @@ static const SettingsSchema s_custom_theme_schema = {
     .version = GRIDLOCK_CUSTOM_THEME_VERSION,
     .min_versioned_size = GRIDLOCK_CUSTOM_THEME_SIZE,
     .blob = &s_custom_theme,
-    .blob_size = sizeof(s_custom_theme),
+    .blob_size = SETTINGS_BLOB_SIZE(s_custom_theme),
     .fields = NULL,
     .field_count = 0,
     .migrate = NULL,
@@ -546,36 +544,35 @@ static const SettingsSchema s_goal_vibe_schema = {
     .version = GRIDLOCK_GOAL_VIBE_VERSION,
     .min_versioned_size = GRIDLOCK_GOAL_VIBE_SIZE,
     .blob = &s_goal_vibe,
-    .blob_size = sizeof(s_goal_vibe),
+    .blob_size = SETTINGS_BLOB_SIZE(s_goal_vibe),
     .fields = s_goal_vibe_fields,
     .field_count = ARRAY_LENGTH(s_goal_vibe_fields),
     .migrate = NULL,
     .companion = &s_custom_theme_schema,
 };
 
-// chained straight after night for the same reason night is chained after core: all three
-// layouts stay at the front of the walk, clear of the tail a squeezed outbox would drop
+// chained straight after night, so the three layouts sit together
 static const SettingsSchema s_quiet_schema = {
     .key = GRIDLOCK_QUIET_KEY,
     .version = GRIDLOCK_QUIET_VERSION,
     .min_versioned_size = GRIDLOCK_QUIET_V1_SIZE,
     .blob = &s_quiet,
-    .blob_size = sizeof(s_quiet),
+    .blob_size = SETTINGS_BLOB_SIZE(s_quiet),
     .fields = s_quiet_fields,
     .field_count = ARRAY_LENGTH(s_quiet_fields),
     .migrate = NULL,
     .companion = &s_goal_vibe_schema,
 };
 
-// chained straight after core on purpose: settings_serialize walks the chain in order and stops
-// at the first dict failure, so keeping the layouts at the front keeps them out of the tail that
-// a squeezed outbox would drop
+// chained straight after core, so the three layouts sit together. the order changes nothing on
+// the wire, since the outbox opens big enough for every field and a reply that still does not
+// fit goes out empty rather than short
 static const SettingsSchema s_night_schema = {
     .key = GRIDLOCK_NIGHT_KEY,
     .version = GRIDLOCK_NIGHT_VERSION,
     .min_versioned_size = GRIDLOCK_NIGHT_V1_SIZE,
     .blob = &s_night,
-    .blob_size = sizeof(s_night),
+    .blob_size = SETTINGS_BLOB_SIZE(s_night),
     .fields = s_night_fields,
     .field_count = ARRAY_LENGTH(s_night_fields),
     .migrate = NULL,
@@ -587,7 +584,7 @@ static const SettingsSchema s_core_schema = {
     .version = GRIDLOCK_CORE_VERSION,
     .min_versioned_size = GRIDLOCK_CORE_V1_SIZE,
     .blob = &s_core,
-    .blob_size = sizeof(s_core),
+    .blob_size = SETTINGS_BLOB_SIZE(s_core),
     .fields = s_core_fields,
     .field_count = ARRAY_LENGTH(s_core_fields),
     .migrate = NULL,
@@ -655,11 +652,6 @@ static void ensure_parsed(void)
         int vals[5] = {0, 0, 0, 0, 0};
         for (int i = 0; i < 5; i++)
         {
-            while (*p == ' ')
-            {
-                p++;
-            }
-
             // a number too big for any field comes back as -1, which every check below drops
             vals[i] = layout_parse_int(&p);
             if (*p == ',')

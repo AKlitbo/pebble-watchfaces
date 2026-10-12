@@ -35,8 +35,9 @@
 #define SIDEREEL_NIGHT_SIZE (4 + SIDEREEL_LAYOUT_LEN)
 #define SIDEREEL_QUIET_SIZE (1 + SIDEREEL_LAYOUT_LEN)
 
-// the wire value for "no layout here". an empty string cannot say this: settings_apply_inbox
-// skips an empty cstring rather than storing it, so a cleared grid would never reach the watch
+// the wire value for "no layout here". settings_apply_inbox keeps an empty string only for a
+// setting whose default is empty, and this is the default, so an empty one would leave the old
+// grid in place
 #define SIDEREEL_NO_LAYOUT "0"
 
 // the Goal Met Vibe strings, sized as gridlock sizes them: the longest preset dropdown value
@@ -203,12 +204,10 @@ static const SettingField s_fields[] = {
     FACE_ENUM(wind_unit,     WEATHER_WIND_UNIT,    4, 0),
     FACE_ENUM(week_start,    CLOCK_WEEK_START,     2, 0),
 
-    // how the face is framed. the header font is a shared id so panel.c can read it with
+    // how the face is framed. the header font is the catalogue's entry, so panel.c reads it with
     // settings_u8(SETTING_HEADER_FONT) rather than reaching into this struct
     FACE_ENUM(panel_style, APPEARANCE_PANEL_STYLE, PANEL_STYLE_COUNT, 0),
-    { .id = SETTING_HEADER_FONT, .message_key = &MESSAGE_KEY_APPEARANCE_HEADER_FONT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(SidereelSettings, header_font),
-      .enum_count = HEADER_FONT_COUNT, .default_num = 0 },
+    KNOWN_HEADER_FONT(offsetof(SidereelSettings, header_font), HEADER_FONT_COUNT),
 
     // the four face colours, and their switch. they start on the Vibrant row's chrome, so
     // turning them on lands somewhere other than mono before a single pick
@@ -260,7 +259,7 @@ static const SettingsSchema s_goal_vibe_schema = {
     .version = SIDEREEL_GOAL_VIBE_VERSION,
     .min_versioned_size = SIDEREEL_GOAL_VIBE_SIZE,
     .blob = &s_goal_vibe,
-    .blob_size = sizeof(s_goal_vibe),
+    .blob_size = SETTINGS_BLOB_SIZE(s_goal_vibe),
     .fields = s_goal_vibe_fields,
     .field_count = ARRAY_LENGTH(s_goal_vibe_fields),
     .migrate = NULL,
@@ -275,7 +274,7 @@ static const SettingsSchema s_quiet_schema = {
     .version = SIDEREEL_QUIET_VERSION,
     .min_versioned_size = SIDEREEL_QUIET_SIZE,
     .blob = &s_quiet,
-    .blob_size = sizeof(s_quiet),
+    .blob_size = SETTINGS_BLOB_SIZE(s_quiet),
     .fields = s_quiet_fields,
     .field_count = ARRAY_LENGTH(s_quiet_fields),
     .migrate = NULL,
@@ -287,7 +286,7 @@ static const SettingsSchema s_night_schema = {
     .version = SIDEREEL_NIGHT_VERSION,
     .min_versioned_size = SIDEREEL_NIGHT_SIZE,
     .blob = &s_night,
-    .blob_size = sizeof(s_night),
+    .blob_size = SETTINGS_BLOB_SIZE(s_night),
     .fields = s_night_fields,
     .field_count = ARRAY_LENGTH(s_night_fields),
     .migrate = NULL,
@@ -301,7 +300,7 @@ static const SettingsSchema s_schema = {
     // literal byte count and bump the version on any further field append
     .min_versioned_size = sizeof(SidereelSettings),
     .blob = &s_settings,
-    .blob_size = sizeof(SidereelSettings),
+    .blob_size = SETTINGS_BLOB_SIZE(s_settings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,  // v1 is the only shape a stored blob can have, so nothing to bring forward
