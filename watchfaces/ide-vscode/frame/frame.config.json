@@ -4,5 +4,6 @@
   "supportsTheme": true,
   "bareBackgroundBase": null,
   "clearTextSelectors": [".time", ".data"],
-  "hideSelectors": []
+  "hideSelectors": [],
+  "maxColors": 16
 }

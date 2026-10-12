@@ -67,7 +67,7 @@ static const SettingsSchema s_schema = {
     // unshipped fields all landed in v1 so the current struct is the v1 size
     .min_versioned_size = sizeof(VscodeSettings),
     .blob = &s_settings,
-    .blob_size = sizeof(VscodeSettings),
+    .blob_size = SETTINGS_BLOB_SIZE(VscodeSettings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,  // no legacy blobs. this face never existed without these fields

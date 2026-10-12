@@ -130,6 +130,10 @@ void vscode_setup(Window *window)
     load_frame(theme);
 }
 
+// the build below writes all seven slots without reading max, so the engine's cap has to hold them
+// a slot added below raises this count too
+_Static_assert(ENGINE_SLOTS_MAX >= 7, "vscode_build writes seven slots");
+
 uint8_t vscode_build(EngineSlot *out, uint8_t max, GRect bounds)
 {
     uint8_t i = 0;
