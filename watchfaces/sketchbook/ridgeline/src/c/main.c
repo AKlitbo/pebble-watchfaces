@@ -13,6 +13,7 @@
 #include "ui/engine/engine.h"
 #include "ui/readouts.h"
 #include "io/stores/health_store.h"
+#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
@@ -41,18 +42,22 @@ static Window *s_window;
 static TimeConfig time_cfg(void)
 {
     bool clock_beats = settings_u8(SETTING_TIME_FORMAT) == TIME_FORMAT_BEATS;
+    bool hourly = settings_u8(SETTING_HOURLY_VIBE) != VIBE_NONE;
+
     return (TimeConfig){
-        .live = true,
+        .live = !DEV_MODE,            // a dev build keeps the clock its fixture pinned
         .minute_tick = !clock_beats,  // .beats replaces the clock, and only the clock
         .beats = clock_beats || readout_date_shows_beats(),
+        .hourly = hourly,             // a .beats clock still wakes on the hour for the buzz
     };
 }
 
 /**
  * @brief Redraw after a settings change: re-theme, rebuild the slots, re-arm the ticker.
  *
- * @param time_or_date_changed True if the time or date format changed (unused: a rebuild
- * re-pulls every readout anyway).
+ * @param time_or_date_changed True if a time or date format changed (unused: a rebuild re-pulls
+ * every readout anyway, and the ticker is re-armed on every change, since Hourly Vibration picks it
+ * too).
  */
 static void on_settings_changed(bool time_or_date_changed)
 {
@@ -61,29 +66,21 @@ static void on_settings_changed(bool time_or_date_changed)
     ridgeline_apply_theme();
     engine_rebuild();
 
-    time_store_reconfigure(time_cfg());  // swaps to the .beats ticker if the format changed
+    time_store_reconfigure(time_cfg());  // on every change, since the formats and the buzz both pick it
 }
 
 /**
- * @brief Buzz once at the top of the hour with the pattern the user picked.
- *
- * The minute tick drives this so it lands exactly when tm_min hits 0, and vibe_choice stays
- * silent during quiet time (and for VIBE_NONE).
- */
-static void hourly_vibe(void)
-{
-    if (time_store_tm()->tm_min == 0)
-    {
-        vibe_choice(settings_u8(SETTING_HOURLY_VIBE));
-    }
-}
-
-/**
- * @brief Minute-tick callback: repaint the scene and the slots, and fire the hourly vibe.
+ * @brief Tick callback: repaint the scene and the slots, and fire the hourly vibe.
  *
  * On the one minute the sun comes up or goes down the whole palette changes, and the text
  * colours are baked into the slot layers, so that minute needs a rebuild rather than a
  * repaint. Every other minute takes the cheap path.
+ *
+ * vibe_hourly buzzes once per hour however many tickers land in minute 0, and stays silent during
+ * quiet time and for VIBE_NONE. On a .beats clock the hour tick time_cfg asks for is what lands it
+ * there. The SDK sends no hour tick for the hour the clocks repeat in autumn, so on a .beats clock
+ * that hour buzzes only when a beat lands in its minute 0. Catching the rest would take the minute
+ * tick, sixty wakes an hour all year for one buzz a year.
  */
 static void on_time_tick(void)
 {
@@ -96,20 +93,7 @@ static void on_time_tick(void)
         engine_mark_dirty();
     }
 
-    hourly_vibe();
-}
-
-/**
- * @brief Whether a reading is worth re-requesting: it never synced, or it is at least its own
- * poll interval old. Polling turned off (poll_min 0) is left alone, same as its store.
- */
-static bool reconnect_should_refresh(int age_s, int poll_min)
-{
-    if (poll_min <= 0)
-    {
-        return false;
-    }
-    return age_s < 0 || age_s >= poll_min * 60;
+    vibe_hourly(time_store_tm(), settings_u8(SETTING_HOURLY_VIBE));
 }
 
 /**
@@ -121,7 +105,7 @@ static bool reconnect_should_refresh(int age_s, int poll_min)
  */
 static void on_phone_reconnected(void)
 {
-    if (reconnect_should_refresh(weather_store_age_s(), WEATHER_POLL_MIN))
+    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
     {
         appmessage_request_weather();
     }

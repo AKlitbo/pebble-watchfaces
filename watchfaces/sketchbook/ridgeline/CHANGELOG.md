@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Fixed Hourly Vibration skipping some hours with the clock set to .beats in a time zone a half hour or 45 minutes off the hour, such as India or Newfoundland.
+- Fixed Hourly Vibration buzzing twice in most hours with a date format ending in .beats.
+- Fixed Hourly Vibration buzzing twice when you return to the watchface in the first minute of the hour.
 - Fixed a reset or reinstalled watch staying on the default settings until you pressed Save. Its weather also stopped refreshing when due.
 - Fixed the settings page describing Fallback to Manual Location wrongly. It only applies when Enable Phone GPS is on but cannot find you.
 

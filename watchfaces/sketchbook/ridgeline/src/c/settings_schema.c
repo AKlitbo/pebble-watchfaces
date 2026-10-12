@@ -94,7 +94,7 @@ static const SettingsSchema s_schema = {
     // frozen at what 1.0.0 shipped, so a blob from a watch running it is still accepted
     .min_versioned_size = RIDGELINE_SETTINGS_V1_SIZE,
     .blob = &s_settings,
-    .blob_size = sizeof(RidgelineSettings),
+    .blob_size = SETTINGS_BLOB_SIZE(RidgelineSettings),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     // nothing to migrate: v1 and v2 differ only by an appended field, which the loader handles

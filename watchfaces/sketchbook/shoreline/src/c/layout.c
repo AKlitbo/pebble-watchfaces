@@ -265,6 +265,10 @@ void shoreline_setup(Window *window)
     window_set_background_color(window, GColorBlack);
 }
 
+// the build below writes up to seven slots without reading max, so the engine's cap has to hold
+// them. a slot added below raises this count too
+_Static_assert(ENGINE_SLOTS_MAX >= 7, "shoreline_build writes up to seven slots");
+
 uint8_t shoreline_build(EngineSlot *out, uint8_t max, GRect bounds)
 {
     uint8_t i = 0;
