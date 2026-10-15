@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Gave the settings page a hand-drawn paper look, with a night version that follows your phone's light or dark mode.
 
+### Fixed
+
+- Fixed the Quiet Time speaker icon showing clipped, with its sound waves cut off. Its slot was a little too narrow for the full icon.
+
 ## [1.3.3] - 2026-10-12
 
 ### Fixed

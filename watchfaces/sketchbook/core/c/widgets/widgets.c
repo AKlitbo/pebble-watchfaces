@@ -368,12 +368,6 @@ void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, 
         GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 }
 
-void widgets_draw_qt(GContext *ctx, GColor color)
-{
-    graphics_context_set_compositing_mode(ctx, GCompOpSet);
-    draw_glyph(ctx, RESOURCE_ID_ICON_VOLUME_MUTED, QT_ICON, color);
-}
-
 void widgets_draw_qt_state(GContext *ctx, GColor color, bool active)
 {
 #if defined(HAS_QUIET_PAIR)
@@ -381,11 +375,6 @@ void widgets_draw_qt_state(GContext *ctx, GColor color, bool active)
     // its shape instead of going lopsided whenever Quiet Time is off
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
     draw_glyph(ctx, active ? RESOURCE_ID_ICON_QUIET_ON : RESOURCE_ID_ICON_QUIET_OFF, QT_ICON, color);
-#else
-    if (active)
-    {
-        widgets_draw_qt(ctx, color);
-    }
 #endif
 }
 

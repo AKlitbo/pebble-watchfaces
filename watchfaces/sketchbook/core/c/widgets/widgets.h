@@ -127,21 +127,10 @@ void widgets_draw_meridiem_beside(GContext *ctx, GColor color, GRect clock_slot,
 void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, FontId clock_font, int top);
 
 /**
- * @brief Draw the muted-speaker glyph that marks Quiet Time, left of the bluetooth glyph.
- *
- * The caller decides whether Quiet Time is on and whether the user asked to see it, so this
- * just paints.
- *
- * @param ctx The graphics context.
- * @param color The colour to paint it.
- */
-void widgets_draw_qt(GContext *ctx, GColor color);
-
-/**
  * @brief Draw the Quiet Time mark for either state, where the face bundles a pair for it.
  *
  * Bluetooth already works this way, and an always-filled slot is what stops the strip looking
- * lopsided half the time. Falls back to drawing only the muted mark where there is no pair.
+ * lopsided half the time. A face that bundles no pair draws nothing here.
  *
  * @param ctx The graphics context.
  * @param color The colour to paint it.

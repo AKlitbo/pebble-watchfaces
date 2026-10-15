@@ -193,7 +193,7 @@ enum
 #define QT_ICON GRect(94, 6, 18, 14)    // quiet time flanks left, 18 wide for the pair
 #else
 #define BT_ICON GRect(185, 3, 14, 14)
-#define QT_ICON GRect(167, 3, 14, 14)  // quiet time, just left of the bluetooth glyph
+#define QT_ICON GRect(163, 3, 18, 14)  // quiet time, 18 wide for the pair, just left of the bluetooth glyph
 #endif
 
 // --- Battery Gauge ---
