@@ -1,0 +1,8 @@
+{
+  "bluetooth":       { "svg": "sr/bluetooth-on",      "size": [14, 14] },
+  "bluetooth-slash": { "svg": "sr/bluetooth-slash",   "size": [14, 14] },
+  "volume-muted":    { "svg": "ux/volume-muted-icon", "size": [14, 14] },
+  "heart":           { "svg": "ux/heart-pulse-icon",  "size": [24, 17], "trim": true },
+  "feet":            { "svg": "ux/steps-icon",        "size": [24, 17], "trim": true },
+  "thermometer":     { "svg": "ux/thermometer-icon",  "size": [13, 17], "trim": true }
+}
