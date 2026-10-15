@@ -1,10 +1,11 @@
 {
-  "framework": "v4.3.0",
-  "commit": "69a549ea335d7bd45e16e5dda298494c2c0a45bc",
+  "framework": "v4.4.0",
+  "commit": "d47384c326b91983088296fdaf5261a8ce2c8c23",
   "plugins": {
     "icons": {
       "sources": "../../vendor"
     },
+    "thumbnails": {},
     "dev": {},
     "code-style": {
       "prettier": true
