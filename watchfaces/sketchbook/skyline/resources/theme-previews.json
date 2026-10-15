@@ -1,0 +1,10 @@
+{
+  "0": ["../../../.github/images/skyline/emery_sketchbook.png", "../../../.github/images/skyline/emery_sketchbook_night.png"],
+  "1": ["../../../.github/images/skyline/emery_daybreak.png", "../../../.github/images/skyline/emery_daybreak_night.png"],
+  "2": ["../../../.github/images/skyline/emery_alpenglow.png", "../../../.github/images/skyline/emery_alpenglow_night.png"],
+  "3": ["../../../.github/images/skyline/emery_blueprint.png", "../../../.github/images/skyline/emery_blueprint_night.png"],
+  "4": ["../../../.github/images/skyline/emery_forest.png", "../../../.github/images/skyline/emery_forest_night.png"],
+  "5": ["../../../.github/images/skyline/emery_mono.png", "../../../.github/images/skyline/emery_mono_night.png"],
+  "6": ["../../../.github/images/skyline/emery_cyberpunk.png", "../../../.github/images/skyline/emery_cyberpunk_night.png"],
+  "7": ["../../../.github/images/skyline/emery_neo-tokyo.png", "../../../.github/images/skyline/emery_neo-tokyo_night.png"]
+}

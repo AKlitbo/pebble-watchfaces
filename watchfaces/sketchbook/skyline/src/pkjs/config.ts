@@ -6,6 +6,7 @@
  * than on most faces, since the condition is what the picture is drawn from.
  */
 import buildConfig from '../../../paf/ts/pkjs/config-builder';
+import themePreviews from './clay/theme-previews.g';
 
 // the eight palettes, shared by the Scene Palette picker and the night and Quiet Time pickers
 const paletteOptions = [
@@ -26,6 +27,7 @@ export default buildConfig({
     label: 'Scene Palette',
     description: 'Colours for the sky, the water, the bridge, and the linework. Each one has a day and a night version, and the face swaps between them at sunrise and sunset.',
     options: paletteOptions,
+    previews: themePreviews,
   },
   appearanceItems: [
     {
