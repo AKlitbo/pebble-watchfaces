@@ -4,6 +4,17 @@ All notable changes to the Shoreline watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - Unreleased
+
+### Added
+
+- Added a picture of each palette, in its day and its night colours, to the Scene Palette picker, so you can see the water and the sand before you choose.
+- Added a Palette Mode in settings. Keep one palette fixed as before, Shuffle through them all on a schedule from every 15 minutes up to once a day, or pick Day / Night / Quiet to paint one palette by day and a different one after dark or while Quiet Time is on.
+
+### Changed
+
+- Gave the settings page a hand-drawn paper look, with a night version that follows your phone's light or dark mode.
+
 ## [1.3.3] - 2026-10-12
 
 ### Fixed

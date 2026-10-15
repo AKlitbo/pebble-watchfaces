@@ -8,10 +8,13 @@
  */
 import app from '../../../paf/ts/pkjs/app';
 import weather from '../../../paf/ts/weather/feature';
+import sketchbookChrome from '../../../core/pkjs/clay/chrome-component';
 import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
+  // the paper-and-ink restyle of the settings page, shared by every Sketchbook face
+  components: [sketchbookChrome],
   // weather with no coordinates, since this face never displays them
   features: [weather],
 });

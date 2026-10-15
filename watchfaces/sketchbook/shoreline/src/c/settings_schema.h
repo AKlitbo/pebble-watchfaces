@@ -6,6 +6,7 @@
  */
 #pragma once
 #include "system/settings/settings.h"
+#include "sketchbook/theme/palette_active.h"
 
 /**
  * @addtogroup watchface-shoreline
@@ -51,5 +52,16 @@ uint8_t shoreline_layout(void);
  * @return True to draw it.
  */
 bool shoreline_show_meridiem(void);
+
+/**
+ * @brief Fills a pick from the palette settings, ready for sketchbook_active_theme.
+ *
+ * It sets the mode, the day/night/Quiet themes, and whether each override is on. The night and
+ * Quiet Time readings are live, so it leaves night_on and quiet_on off for the caller to fill from
+ * the clock and Quiet Time.
+ *
+ * @param out The pick to fill.
+ */
+void shoreline_palette_pick(PalettePick *out);
 
 /** @} */

@@ -84,7 +84,7 @@ static void on_settings_changed(bool time_or_date_changed)
  */
 static void on_time_tick(void)
 {
-    if (ridgeline_daylight_changed())
+    if (ridgeline_palette_changed())
     {
         engine_rebuild();
     }

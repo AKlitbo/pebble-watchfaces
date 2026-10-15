@@ -7,6 +7,19 @@
  * the chimney smoke leans on.
  */
 import buildConfig from '../../../paf/ts/pkjs/config-builder';
+import themePreviews from './clay/theme-previews.g';
+
+// the eight palettes, shared by the Scene Palette picker and the night and Quiet Time pickers
+const paletteOptions = [
+  { label: 'Sketchbook', value: 0 },
+  { label: 'Daybreak', value: 1 },
+  { label: 'Alpenglow', value: 2 },
+  { label: 'Blueprint', value: 3 },
+  { label: 'Forest', value: 4 },
+  { label: 'Cyberpunk', value: 6 },
+  { label: 'Neo Tokyo', value: 7 },
+  { label: 'Mono (Black & White)', value: 5 },
+];
 
 export default buildConfig({
   heading: 'Treeline',
@@ -14,18 +27,70 @@ export default buildConfig({
   theme: {
     label: 'Scene Palette',
     description: 'Colours for the sky, the firs, the clearing, and the linework. Each one has a day and a night version, and the face swaps between them at sunrise and sunset.',
-    options: [
-      { label: 'Sketchbook', value: 0 },
-      { label: 'Daybreak', value: 1 },
-      { label: 'Alpenglow', value: 2 },
-      { label: 'Blueprint', value: 3 },
-      { label: 'Forest', value: 4 },
-      { label: 'Cyberpunk', value: 6 },
-      { label: 'Neo Tokyo', value: 7 },
-      { label: 'Mono (Black & White)', value: 5 },
-    ],
+    options: paletteOptions,
+    previews: themePreviews,
   },
   appearanceItems: [
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_PALETTE_MODE',
+      'label': 'Palette Mode',
+      'description': 'How the palette above is used. Fixed keeps it. Shuffle rotates through them all. Day / Night / Quiet keeps it by day and swaps to another after dark or while Quiet Time is on.',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'Fixed', 'value': 0 },
+        { 'label': 'Shuffle', 'value': 1 },
+        { 'label': 'Day / Night / Quiet', 'value': 2 },
+      ],
+    },
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_SHUFFLE_INTERVAL',
+      'visibleWhen': { 'key': 'APPEARANCE_PALETTE_MODE', 'in': [1] },
+      'label': 'Shuffle Every',
+      'description': 'How long each palette stays up in Shuffle mode. It has no effect in the other modes.',
+      'defaultValue': 2,
+      'options': [
+        { 'label': '15 Minutes', 'value': 0 },
+        { 'label': '30 Minutes', 'value': 1 },
+        { 'label': 'Hour', 'value': 2 },
+        { 'label': '3 Hours', 'value': 3 },
+        { 'label': '6 Hours', 'value': 4 },
+        { 'label': 'Day', 'value': 5 },
+      ],
+    },
+    {
+      'type': 'toggle',
+      'messageKey': 'APPEARANCE_NIGHT_PALETTE_ON',
+      'visibleWhen': { 'key': 'APPEARANCE_PALETTE_MODE', 'in': [2] },
+      'label': 'Use Night Palette',
+      'description': 'In Day / Night / Quiet mode, paint a different palette after dark. Off keeps the daytime one all night.',
+      'defaultValue': false,
+    },
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_NIGHT_PALETTE',
+      'visibleWhen': [{ 'key': 'APPEARANCE_PALETTE_MODE', 'in': [2] }, { 'key': 'APPEARANCE_NIGHT_PALETTE_ON', 'in': [true] }],
+      'label': 'Night Palette',
+      'defaultValue': 0,
+      'options': paletteOptions,
+    },
+    {
+      'type': 'toggle',
+      'messageKey': 'APPEARANCE_QUIET_PALETTE_ON',
+      'visibleWhen': { 'key': 'APPEARANCE_PALETTE_MODE', 'in': [2] },
+      'label': 'Use Quiet Time Palette',
+      'description': 'In Day / Night / Quiet mode, paint a different palette while Quiet Time is on. Quiet Time wins over night.',
+      'defaultValue': false,
+    },
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_QUIET_PALETTE',
+      'visibleWhen': [{ 'key': 'APPEARANCE_PALETTE_MODE', 'in': [2] }, { 'key': 'APPEARANCE_QUIET_PALETTE_ON', 'in': [true] }],
+      'label': 'Quiet Time Palette',
+      'defaultValue': 0,
+      'options': paletteOptions,
+    },
     {
       'type': 'select',
       'messageKey': 'APPEARANCE_LAYOUT',

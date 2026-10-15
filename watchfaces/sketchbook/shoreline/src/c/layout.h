@@ -231,16 +231,16 @@ uint8_t shoreline_build(EngineSlot *out, uint8_t max, GRect bounds);
 void shoreline_apply_theme(void);
 
 /**
- * @brief Re-check whether the sun has come up or gone down since the last tick, re-colouring
- * the zones when it has.
+ * @brief Re-pick the palette for this tick, re-colouring the zones, and say whether it moved.
  *
- * The palette flips at sunrise and sunset, and the text colours ride on the palette, so the
- * minute tick has to notice. It only reports a change on the one minute it actually happens,
- * which is what keeps the caller from rebuilding the slots every minute.
+ * The palette can move at sunrise or sunset, when a Shuffle rolls to the next theme, or when a
+ * day/night/Quiet Time swap lands on a different one. The text colours ride on the palette, so the
+ * minute tick has to notice. It only reports a change on the minute it actually happens, which is
+ * what keeps the caller from rebuilding the slots every minute.
  *
- * @return True when the palette flipped and the slots need rebuilding.
+ * @return True when the palette moved and the slots need rebuilding.
  */
-bool shoreline_daylight_changed(void);
+bool shoreline_palette_changed(void);
 
 /**
  * @brief Tear down the fonts and the icon cache.

@@ -18,7 +18,9 @@
 #include "theme/theme.h"
 #include "sketchbook/widgets/widgets.h"
 #include "settings_schema.h"
+#include "sketchbook/theme/palette_active.h"
 #include "io/stores/system_store.h"
+#include "io/stores/time_store.h"
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
 
@@ -26,6 +28,9 @@
 // looked up per draw so the scene, the chrome, and the text can't disagree inside one frame
 static const Palette *s_pal;
 static bool s_night;
+// the theme index the palette was chosen for, so a Shuffle rollover or a day/night/Quiet swap that
+// lands on a different one is noticed and repainted
+static uint8_t s_theme;
 
 // --- Zone Table ---
 // the clock on the sand with the date beneath it and the stats row along the bottom. the colours
@@ -48,13 +53,24 @@ static Zone s_zones[ZONE_COUNT] = {
 /**
  * @brief Point the palette at the current theme and daylight, and colour the zones from it.
  *
- * The clock sits on the sand and everything else sits over the sky, which is why the clock
- * takes `text` and the rest take `dim`.
+ * Which theme is up depends on the palette mode: the fixed one, a Shuffle that rotates with the
+ * clock, or a day/night/Quiet Time swap. Whichever it lands on still takes its day or night colours
+ * from the actual daylight. The clock sits on the sand and everything else sits over the sky, which
+ * is why the clock takes `text` and the rest take `dim`.
  */
 static void apply_theme_colors(void)
 {
     s_night = sketchbook_sky_night();
-    s_pal = palette_for_theme(settings_u8(SETTING_THEME), s_night);
+
+    PalettePick pick;
+    shoreline_palette_pick(&pick);
+    pick.night_on = s_night;
+    pick.quiet_on = quiet_time_is_active();
+
+    const struct tm *now = time_store_tm();
+    s_theme = sketchbook_active_theme(&pick, now->tm_year, now->tm_yday, now->tm_hour, now->tm_min);
+
+    s_pal = palette_for_theme(s_theme, s_night);
 
     s_zones[ZONE_TIME].color = s_pal->text;
     s_zones[ZONE_DATE].color = s_pal->dim;
@@ -309,12 +325,15 @@ void shoreline_apply_theme(void)
     apply_theme_colors();
 }
 
-bool shoreline_daylight_changed(void)
+bool shoreline_palette_changed(void)
 {
     bool was_night = s_night;
+    uint8_t was_theme = s_theme;
     apply_theme_colors();
 
-    return s_night != was_night;
+    // a repaint is enough unless the palette really moved, which is the sun coming up or going down,
+    // a Shuffle rolling to the next theme, or a day/night/Quiet swap landing on a different one
+    return s_night != was_night || s_theme != was_theme;
 }
 
 void shoreline_teardown(void)
