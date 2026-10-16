@@ -1,28 +1,82 @@
 {
-  "0": [
-    "../../../.github/images/treeline/emery_sketchbook.png",
-    "../../../.github/images/treeline/emery_sketchbook_night.png"
-  ],
-  "1": [
-    "../../../.github/images/treeline/emery_daybreak.png",
-    "../../../.github/images/treeline/emery_daybreak_night.png"
-  ],
-  "2": [
-    "../../../.github/images/treeline/emery_alpenglow.png",
-    "../../../.github/images/treeline/emery_alpenglow_night.png"
-  ],
-  "3": [
-    "../../../.github/images/treeline/emery_blueprint.png",
-    "../../../.github/images/treeline/emery_blueprint_night.png"
-  ],
-  "4": ["../../../.github/images/treeline/emery_forest.png", "../../../.github/images/treeline/emery_forest_night.png"],
-  "5": ["../../../.github/images/treeline/emery_mono.png", "../../../.github/images/treeline/emery_mono_night.png"],
-  "6": [
-    "../../../.github/images/treeline/emery_cyberpunk.png",
-    "../../../.github/images/treeline/emery_cyberpunk_night.png"
-  ],
-  "7": [
-    "../../../.github/images/treeline/emery_neo-tokyo.png",
-    "../../../.github/images/treeline/emery_neo-tokyo_night.png"
-  ]
+  "0": {
+    "emery": [
+      "../../../.github/images/treeline/emery_sketchbook.png",
+      "../../../.github/images/treeline/emery_sketchbook_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_sketchbook.png",
+      "../../../.github/images/treeline/gabbro_sketchbook_night.png"
+    ]
+  },
+  "1": {
+    "emery": [
+      "../../../.github/images/treeline/emery_daybreak.png",
+      "../../../.github/images/treeline/emery_daybreak_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_daybreak.png",
+      "../../../.github/images/treeline/gabbro_daybreak_night.png"
+    ]
+  },
+  "2": {
+    "emery": [
+      "../../../.github/images/treeline/emery_alpenglow.png",
+      "../../../.github/images/treeline/emery_alpenglow_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_alpenglow.png",
+      "../../../.github/images/treeline/gabbro_alpenglow_night.png"
+    ]
+  },
+  "3": {
+    "emery": [
+      "../../../.github/images/treeline/emery_blueprint.png",
+      "../../../.github/images/treeline/emery_blueprint_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_blueprint.png",
+      "../../../.github/images/treeline/gabbro_blueprint_night.png"
+    ]
+  },
+  "4": {
+    "emery": [
+      "../../../.github/images/treeline/emery_forest.png",
+      "../../../.github/images/treeline/emery_forest_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_forest.png",
+      "../../../.github/images/treeline/gabbro_forest_night.png"
+    ]
+  },
+  "5": {
+    "emery": [
+      "../../../.github/images/treeline/emery_mono.png",
+      "../../../.github/images/treeline/emery_mono_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_mono.png",
+      "../../../.github/images/treeline/gabbro_mono_night.png"
+    ]
+  },
+  "6": {
+    "emery": [
+      "../../../.github/images/treeline/emery_cyberpunk.png",
+      "../../../.github/images/treeline/emery_cyberpunk_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_cyberpunk.png",
+      "../../../.github/images/treeline/gabbro_cyberpunk_night.png"
+    ]
+  },
+  "7": {
+    "emery": [
+      "../../../.github/images/treeline/emery_neo-tokyo.png",
+      "../../../.github/images/treeline/emery_neo-tokyo_night.png"
+    ],
+    "gabbro": [
+      "../../../.github/images/treeline/gabbro_neo-tokyo.png",
+      "../../../.github/images/treeline/gabbro_neo-tokyo_night.png"
+    ]
+  }
 }
