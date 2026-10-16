@@ -8,6 +8,10 @@
 import buildConfig from '../../../paf/ts/pkjs/config-builder';
 import themePreviews from './clay/theme-previews.g';
 
+// Shoreline is retired. Its final release points the settings page at Sketchbook Horizon, which
+// carries this scene and three others
+const HORIZON_URL = 'https://apps.repebble.com/36830cf6f39645b9a91d5e12';
+
 // the eight palettes, shared by the Scene Palette picker and the night and Quiet Time pickers
 const paletteOptions = [
   { label: 'Sketchbook', value: 0 },
@@ -22,7 +26,7 @@ const paletteOptions = [
 
 export default buildConfig({
   heading: 'Shoreline',
-  intro: 'Pick a palette for the sea and the sky, then set up your weather so the scene knows what it is drawing.',
+  intro: `Shoreline is no longer being updated. It now lives in <a href="${HORIZON_URL}">Sketchbook Horizon</a>, one watchface with the sea and three other scenes you pick in settings. Everything below still works.`,
   theme: {
     label: 'Scene Palette',
     description: 'Colours for the sky, the water, the sand, and the linework. Each one has a day and a night version, and the face swaps between them at sunrise and sunset.',
