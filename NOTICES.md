@@ -32,7 +32,7 @@ All fonts below are under the SIL Open Font License 1.1, published at <https://o
 
 The faces in this family all set their type in the same face, and each bundles its own copy.
 
-- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012 Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's [OFL.txt](watchfaces/sketchbook/ridgeline/resources/fonts/OFL.txt)
+- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012 Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's [OFL.txt](watchfaces/sketchbook-horizon/resources/fonts/OFL.txt)
 
 ### Mosaic
 
