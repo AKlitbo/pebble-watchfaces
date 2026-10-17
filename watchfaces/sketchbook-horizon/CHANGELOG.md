@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Sketchbook Horizon brings the four separate Ridgeline, Shoreline, Skyline, and Treeline faces together into one. For the history of those faces, see their changelogs below.
 
-- [Ridgeline](retired/sketchbook/ridgeline/CHANGELOG.md)
-- [Shoreline](retired/sketchbook/shoreline/CHANGELOG.md)
-- [Skyline](retired/sketchbook/skyline/CHANGELOG.md)
-- [Treeline](retired/sketchbook/treeline/CHANGELOG.md)
+- [Ridgeline](.retired/sketchbook/ridgeline/CHANGELOG.md)
+- [Shoreline](.retired/sketchbook/shoreline/CHANGELOG.md)
+- [Skyline](.retired/sketchbook/skyline/CHANGELOG.md)
+- [Treeline](.retired/sketchbook/treeline/CHANGELOG.md)
