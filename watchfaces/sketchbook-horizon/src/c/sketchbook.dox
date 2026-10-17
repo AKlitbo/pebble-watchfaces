@@ -1,0 +1,23 @@
+/**
+ * @addtogroup watchface-sketchbook
+ *
+ * One face, four scenes. The wearer picks a scene in settings (Ridgeline's mountains, Shoreline's
+ * sea, Skyline's bridge, Treeline's forest) and the face draws that one. All four share the sky and
+ * its sun and moon, the weather laid over them, the painted chrome, and the eight palettes, and
+ * differ in what stands under it and where the clock and readouts sit.
+ *
+ * The shared engine is in `sky/`, `fx/`, `widgets/`, `theme/palette*` and `fx/conditions`. It paints
+ * with a `CommonPalette`, the nine fields every scene's palette leads with, and reads where a scene's
+ * sky and weather sit from a `SceneGeometry` the active scene hands over through
+ * `sketchbook_scene_geometry` (see `scene/geometry.h`). One scene is up at a time, so that geometry
+ * and that palette are all the shared code needs.
+ *
+ * A scene lives in three files: `scene/<name>` draws its landscape and supplies its geometry,
+ * `theme/<name>` holds its palette type and the day and night table for every theme, and
+ * `layout/<name>` places the clock, the date and the readouts and hands the dispatcher a SceneDef.
+ * The dispatcher in `scene/scene` runs whichever one the Scene setting names. Adding a scene is a new
+ * SceneId, a row in the dispatcher, and those three files: nothing in the shared engine moves.
+ *
+ * @{
+ * @}
+ */

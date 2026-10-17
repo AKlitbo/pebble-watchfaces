@@ -1,0 +1,11 @@
+// points an editor at the unit's projects in config/, since it only looks for a tsconfig.json
+// above the file it opens
+// it holds no files of its own, so tsc passes it at once and paf typecheck checks each project on its own
+{
+  "files": [],
+  "references": [
+    { "path": "./config/tsconfig.json" },
+    { "path": "./config/tsconfig.spec.json" },
+    { "path": "./config/tsconfig.tools.json" }
+  ]
+}

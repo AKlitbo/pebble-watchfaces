@@ -1,0 +1,14 @@
+{
+  "framework": "v4.6.0",
+  "commit": "f530a391e02d0b49c9855ef3ef5f5582df2e6bed",
+  "plugins": {
+    "icons": {
+      "sources": "../../vendor"
+    },
+    "thumbnails": {},
+    "dev": {},
+    "code-style": {
+      "prettier": true
+    }
+  }
+}

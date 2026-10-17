@@ -1,0 +1,118 @@
+{
+  "name": "sketchbook-horizon",
+  "displayName": "Sketchbook Horizon",
+  "version": "1.0.0",
+  "watchface": true,
+  "uuid": "1e5c651c-afd0-472e-8f87-f0ff31656657",
+  "sdkVersion": "3",
+  "enableMultiJS": true,
+  "targetPlatforms": [
+    "emery",
+    "gabbro"
+  ],
+  "capabilities": [
+    "location",
+    "configurable",
+    "health"
+  ],
+  "messageKeys": [
+    "WEATHER_TEMPERATURE",
+    "WEATHER_CONDITIONS",
+    "WEATHER_REQUEST",
+    "SETTINGS_REQUEST",
+    "SETTINGS_FRESH",
+    "WEATHER_OK",
+    "LOCATION_LATITUDE",
+    "LOCATION_LONGITUDE",
+    "LOCATION_NAME",
+    "LOCATION_USE_GPS",
+    "LOCATION_GPS_FALLBACK",
+    "WEATHER_PROVIDER",
+    "WEATHER_API_KEY",
+    "WEATHER_TEMPERATURE_UNIT",
+    "WEATHER_HUMIDITY",
+    "WEATHER_WIND_SPEED",
+    "WEATHER_WIND_DIR",
+    "WEATHER_SUNRISE",
+    "WEATHER_SUNSET",
+    "CLOCK_DATE_FORMAT",
+    "APPEARANCE_THEME",
+    "APPEARANCE_SCENE",
+    "APPEARANCE_QUIET_TIME_ICON",
+    "APPEARANCE_LAYOUT",
+    "APPEARANCE_PALETTE_MODE",
+    "APPEARANCE_SHUFFLE_INTERVAL",
+    "APPEARANCE_NIGHT_PALETTE_ON",
+    "APPEARANCE_NIGHT_PALETTE",
+    "APPEARANCE_QUIET_PALETTE_ON",
+    "APPEARANCE_QUIET_PALETTE",
+    "CLOCK_MERIDIEM",
+    "HEALTH_STEPS_MODE",
+    "CLOCK_TIME_FORMAT",
+    "CLOCK_HOURLY_VIBE",
+    "CONNECTION_BLUETOOTH_ICON",
+    "CONNECTION_VIBE_CONNECT",
+    "CONNECTION_VIBE_DISCONNECT"
+  ],
+  "resources": {
+    "media": [
+      { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
+      { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_OFF", "file": "icons/quiet-off.png" },
+      { "type": "bitmap", "name": "ICON_HEART", "file": "icons/heart.png" },
+      { "type": "bitmap", "name": "ICON_FEET", "file": "icons/feet.png" },
+      { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png" },
+      {
+        "type": "font",
+        "name": "FONT_HAND_72",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_64",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_82",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]",
+        "targetPlatforms": [
+          "gabbro"
+        ]
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_92",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_22",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_18",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_HAND_16",
+        "file": "fonts/PatrickHand-Regular.ttf",
+        "characterRegex": "[A-Z0-9 ./-]"
+      },
+      {
+        "type": "raw",
+        "name": "NOTICE",
+        "file": "notice.txt"
+      }
+    ]
+  }
+}

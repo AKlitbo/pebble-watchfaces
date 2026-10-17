@@ -26,6 +26,7 @@ jobs:
           - { face: ridgeline, unit: watchfaces/sketchbook }
           - { face: shoreline, unit: watchfaces/sketchbook }
           - { face: treeline, unit: watchfaces/sketchbook }
+          - { face: sketchbook-horizon, unit: watchfaces/sketchbook-horizon }
     steps:
       - uses: actions/checkout@v7
 

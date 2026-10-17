@@ -1,0 +1,225 @@
+/**
+ * @file fx.c
+ * @brief The cloud, precipitation, wash and lightning draws.
+ *
+ * @ingroup watchface-sketchbook
+ */
+#include "fx/fx.h"
+
+#include "scene/geometry.h"
+
+/**
+ * @addtogroup watchface-sketchbook
+ * @{
+ */
+
+/**
+ * @brief Draw a group of puffs as one cloud.
+ *
+ * Every puff is laid down twice: once a couple of pixels fatter in the ink colour across the
+ * whole group, then once at size in the cloud colour. Outlining the group rather than each
+ * puff is what merges overlapping puffs into a single fluffy silhouette. Outline each puff on
+ * its own and every seam shows straight through the middle.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ * @param puffs The puffs making up the cloud.
+ * @param count How many puffs there are.
+ */
+static void draw_puffs(GContext *ctx, const CommonPalette *pal, const Puff *puffs, int count)
+{
+    for (int pass = 0; pass < 2; pass++)
+    {
+        int grow = pass == 0 ? 2 : 0;
+        graphics_context_set_fill_color(ctx, pass == 0 ? pal->ink : pal->cloud);
+
+        for (int i = 0; i < count; i++)
+        {
+            int x = puffs[i].x;
+            int y = puffs[i].y;
+            int half_w = puffs[i].half_w;
+            int lobe = puffs[i].lobe;
+
+            // five bumps at four different heights, tallest just off-centre, so the top edge
+            // reads as fluff instead of a row of matching humps
+            graphics_fill_circle(ctx, GPoint(x - half_w + lobe, y - lobe + 2), lobe + grow);
+            graphics_fill_circle(ctx, GPoint(x - half_w / 2, y - lobe - 3), lobe + 1 + grow);
+            graphics_fill_circle(ctx, GPoint(x, y - lobe - 6), lobe + 3 + grow);
+            graphics_fill_circle(ctx, GPoint(x + half_w / 2, y - lobe - 2), lobe + grow);
+            graphics_fill_circle(ctx, GPoint(x + half_w - lobe, y - lobe + 1), lobe - 1 + grow);
+            graphics_fill_rect(ctx, GRect(x - half_w - grow, y - lobe, half_w * 2 + grow * 2, lobe + grow), 0, GCornerNone);
+        }
+    }
+}
+
+void sketchbook_fx_draw_clouds(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, GPoint disc)
+{
+    const SceneGeometry *g = sketchbook_scene_geometry();
+
+    if (sky->clouds == CLOUDS_NONE)
+    {
+        return;
+    }
+
+    // the overcast band is the scene's own: puffs spaced closer than their own width so they run
+    // into each other and come out as one lumpy mass rather than a row of separate clouds, with
+    // bases set low enough to keep the tops clear of the status bar and high enough to keep the
+    // whole band off the scene's ground
+    if (sky->clouds == CLOUDS_OVERCAST)
+    {
+        draw_puffs(ctx, pal, g->overcast, g->overcast_count);
+        return;
+    }
+
+    // a single drifting cloud, parked on the disc so a peeking sun always reads as
+    // half-covered, and kept clear of the edges wherever the disc has got to. two puffs so
+    // even the lone cloud has some fluff to it
+    int x = disc.x + 14;
+    if (x < 52)
+    {
+        x = 52;
+    }
+    if (x > 146)
+    {
+        x = 146;
+    }
+
+    // the low end of the clamp is what keeps the taller lobe out from under the status bar when
+    // the disc is high; the high end keeps the cloud off the face's ground when it is low
+    int y = disc.y + g->cloud_drop;
+    if (y < g->cloud_y_min)
+    {
+        y = g->cloud_y_min;
+    }
+    if (y > g->cloud_y_max)
+    {
+        y = g->cloud_y_max;
+    }
+
+    const Puff drifting[] = {
+        {x - 16, y, 18, g->drift_lobe_a},
+        {x + 14, y - 4, 20, g->drift_lobe_b},
+    };
+    draw_puffs(ctx, pal, drifting, ARRAY_LENGTH(drifting));
+}
+
+/**
+ * @brief Draw one falling particle.
+ *
+ * @param ctx The graphics context.
+ * @param kind A PrecipKind.
+ * @param at Where the particle sits.
+ * @param index The particle's number, which picks the half of a mixed fall.
+ */
+static void draw_particle(GContext *ctx, uint8_t kind, GPoint at, int index)
+{
+    if (kind == PRECIP_MIXED)
+    {
+        kind = (index & 1) ? PRECIP_DROPS : PRECIP_DASHES;
+    }
+
+    if (kind == PRECIP_DASHES)
+    {
+        graphics_draw_line(ctx, at, GPoint(at.x - 2, at.y + 6));
+        return;
+    }
+
+    if (kind == PRECIP_FLAKES)
+    {
+        graphics_draw_line(ctx, GPoint(at.x - 2, at.y), GPoint(at.x + 2, at.y));
+        graphics_draw_line(ctx, GPoint(at.x, at.y - 2), GPoint(at.x, at.y + 2));
+        return;
+    }
+
+    graphics_fill_circle(ctx, at, 1);
+}
+
+void sketchbook_fx_draw_precip(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, int minute)
+{
+    const SceneGeometry *g = sketchbook_scene_geometry();
+
+    if (sky->precip == PRECIP_NONE)
+    {
+        return;
+    }
+
+    graphics_context_set_stroke_color(ctx, pal->precip);
+    graphics_context_set_fill_color(ctx, pal->precip);
+
+    // only odd stroke widths render, so rain gets the fat one and everything finer stays at 1
+    graphics_context_set_stroke_width(ctx, sky->precip == PRECIP_DASHES ? 3 : 1);
+
+    // the two strides are coprime with the span, so the particles spread out instead of
+    // lining up, and the minute slides the whole field along. the band stops short of the
+    // clock's cap line, so the digits never have rain drawn through them
+    //
+    // the span follows the screen, and the count with it: the table's numbers are tuned for the
+    // rectangle, and spreading that many drops over a wider screen turns a downpour into drizzle
+    int span = PBL_DISPLAY_WIDTH - 12;
+    int drops = (sky->drops * PBL_DISPLAY_WIDTH) / 200;
+
+    for (int i = 0; i < drops; i++)
+    {
+        int x = 6 + (i * 41 + minute * 13) % span;
+        int y = g->precip_top + (i * 27 + minute * 19) % g->precip_h;
+        draw_particle(ctx, sky->precip, GPoint(x, y), i);
+    }
+
+    graphics_context_set_stroke_width(ctx, 1);
+}
+
+void sketchbook_fx_draw_wash(GContext *ctx, const CommonPalette *pal)
+{
+    const SceneGeometry *g = sketchbook_scene_geometry();
+
+    // the watch has no alpha, so the wash is stippled instead: rows of cloud-coloured dots over
+    // the ground, packed tight low down and thinning as they rise. drawn as a wash rather than
+    // as banks because solid lines read as bars ruled across the scene
+    graphics_context_set_stroke_color(ctx, pal->cloud);
+
+    for (int y = g->wash_top; y < g->wash_bottom; y += 2)
+    {
+        int step = 9 - (y - g->wash_top) / 6;
+        if (step < 2)
+        {
+            step = 2;
+        }
+
+        // the row's start shifts with y so the dots never stack into vertical stripes
+        for (int x = (y / 2) % step; x < PBL_DISPLAY_WIDTH; x += step)
+        {
+            graphics_draw_pixel(ctx, GPoint(x, y));
+        }
+    }
+
+    // a couple of solid wisps through the densest part, which gives the wash an edge to read
+    // against and stops it looking like flat noise
+    graphics_context_set_stroke_width(ctx, 3);
+    graphics_draw_line(ctx, GPoint(18, g->wash_wisp_hi_y), GPoint(74, g->wash_wisp_hi_y));
+    graphics_draw_line(ctx, GPoint(96, g->wash_wisp_lo_y), GPoint(158, g->wash_wisp_lo_y));
+    graphics_context_set_stroke_width(ctx, 1);
+}
+
+void sketchbook_fx_draw_bolt(GContext *ctx, const CommonPalette *pal)
+{
+    // a zigzag out of the cloud base, the scene's own legs, drawn as lines rather than a path so
+    // it needs no allocation and keeps the same hand-drawn weight as the rest of the linework
+    const SceneGeometry *g = sketchbook_scene_geometry();
+
+    // laid down fat in ink first, then narrower in the disc colour, so the fork keeps an
+    // outline and stays legible against a pale sky and through the rain in front of it
+    for (int pass = 0; pass < 2; pass++)
+    {
+        graphics_context_set_stroke_color(ctx, pass == 0 ? pal->ink : pal->disc);
+        graphics_context_set_stroke_width(ctx, pass == 0 ? 7 : 3);
+
+        for (unsigned i = 0; i < g->bolt_count; i++)
+        {
+            graphics_draw_line(ctx, g->bolt_stroke[i][0], g->bolt_stroke[i][1]);
+        }
+    }
+
+    graphics_context_set_stroke_width(ctx, 1);
+}
+
+/** @} */
