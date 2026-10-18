@@ -1,12 +1,12 @@
 /**
- * The APPEARANCE_CUSTOM_COLORS wire string in all three of its lives: the
- * current sparse ~3 format it writes, plus the ~ positional and the oldest
- * 5 char per module formats it still reads and migrates. This whole string
+ * The APPEARANCE_CUSTOM_COLORS wire string in all its lives: the sparse ~3
+ * and ~4 formats it writes, plus the ~ positional and the oldest 5 char per
+ * module formats it still reads and migrates. This whole string
  * is the interchange format the import/export textarea and the one
  * APPEARANCE_CUSTOM_COLORS key carry, the watch splits it into two persist
  * keys internally.
  *
- * What this writes has to match the C decoder exactly, so keep the ~3 encoder
+ * What this writes has to match the C decoder exactly, so keep the encoder
  * in step with it or the watch reads the string wrong. Gridlock decodes in its
  * settings_schema.c, sidereel in its theme/custom_colors.c.
  *
@@ -40,6 +40,14 @@ export const COLOR_ALPHABET =
 // as a record. mirrors the C marker
 export const FORMAT_MARKER = '~';
 
+// a module id from 64 up is written as this then one base64 char for id - 64, so ids 64 to 127
+// fit. a string holding one is tagged ~4 rather than ~3, and ~3 strings never contain it. must
+// not be a base64 char, ".", "|" or the marker. mirrors the C decoders
+export const ID_ESCAPE = '!';
+
+/** The highest module id the wire string can carry. */
+export const MAX_WIRE_ID = 127;
+
 // the four placement sizes in the bit order the packed flags use. mirrors
 // ModuleSize in the C catalog so JS and firmware agree on which bit is which size
 export const SIZE_ORDER = ['1x2', '2x2', '1x4', '2x4'];
@@ -64,9 +72,32 @@ export function flagValue(ch: string): number {
   return idx < 0 ? 0 : idx;
 }
 
-/** One char per module id (base64). Ids stay well under 64 so one char is plenty. */
+/**
+ * A module id as its wire token: one base64 char for 1 to 63, or the escape and one char for 64
+ * to 127.
+ *
+ * @param id The module id, 1 to MAX_WIRE_ID.
+ * @return The token to write in front of the record.
+ */
 export function idToken(id: number): string {
-  return COLOR_ALPHABET.charAt(id & 63);
+  return id < 64 ? COLOR_ALPHABET.charAt(id) : ID_ESCAPE + COLOR_ALPHABET.charAt(id - 64);
+}
+
+/**
+ * Reads the module id token at offset, escaped or not.
+ *
+ * @param text The section being walked.
+ * @param offset Where the token starts.
+ * @return The id, -1 for a char that names none, and how many chars the token took.
+ */
+export function readIdToken(text: string, offset: number): { id: number; length: number } {
+  if (text.charAt(offset) === ID_ESCAPE) {
+    const low = COLOR_ALPHABET.indexOf(text.charAt(offset + 1));
+
+    return { id: low < 0 ? -1 : 64 + low, length: 2 };
+  }
+
+  return { id: COLOR_ALPHABET.indexOf(text.charAt(offset)), length: 1 };
 }
 
 /** One colour char back into its argb byte, or null when it names no colour. */
@@ -144,12 +175,14 @@ export function readColours(colors: ColorMap, text: string, id: number, offset: 
 }
 
 /**
- * Builds the sparse ~3 wire string: a colour section then "|" then a flag
- * section. Colour records (5 chars: id + four channels) are keyed by the
+ * Builds the sparse wire string: a colour section then "|" then a flag
+ * section. Colour records (an id token + four channels) are keyed by the
  * group's primary id, so a grouped member emits nothing and inherits at draw
- * time. Flag records (3 chars: id + two packed flag chars) are keyed by each
- * module's own id, so every panel toggles independently. An empty table
- * serialises to "0".
+ * time. Flag records (an id token + two packed flag chars) are keyed by each
+ * module's own id, so every panel toggles independently. The string is ~3
+ * unless an id needs the escape, then ~4, so a watch that only reads ~3 still
+ * reads every string it can. An empty table serializes to "0". An id past
+ * MAX_WIRE_ID is left out, since no token can carry it.
  */
 export function serializeAppearance(colors: ColorMap, headerless: FlagMap, borderless: FlagMap): string {
   const colorIds = Object.keys(colors).sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); });
@@ -159,7 +192,7 @@ export function serializeAppearance(colors: ColorMap, headerless: FlagMap, borde
     const id = parseInt(colorIds[i], 10);
     const c = colors[id];
 
-    if (!c || (c.accent == null && c.value == null && c.icon == null && c.subtitle == null)) {
+    if (id > MAX_WIRE_ID || !c || (c.accent == null && c.value == null && c.icon == null && c.subtitle == null)) {
       continue;
     }
 
@@ -181,7 +214,7 @@ export function serializeAppearance(colors: ColorMap, headerless: FlagMap, borde
     const fid = parseInt(flagIds[j], 10);
     const byte = packFlags(headerless, borderless, fid);
 
-    if (byte === 0) {
+    if (fid > MAX_WIRE_ID || byte === 0) {
       continue;
     }
 
@@ -192,12 +225,14 @@ export function serializeAppearance(colors: ColorMap, headerless: FlagMap, borde
     return '0';
   }
 
-  return FORMAT_MARKER + '3' + colorRecs.join('') + '|' + flagRecs.join('');
+  const body = colorRecs.join('') + '|' + flagRecs.join('');
+
+  return FORMAT_MARKER + (body.indexOf(ID_ESCAPE) < 0 ? '3' : '4') + body;
 }
 
 /**
- * Reads a wire string back into fresh colour and flag maps. A ~3 string is
- * the current sparse format, a bare ~ one is the positional format, and an
+ * Reads a wire string back into fresh colour and flag maps. A ~3 or ~4 string
+ * is the current sparse format, a bare ~ one is the positional format, and an
  * untagged one is the oldest per module format. The older two migrate in
  * place, the single legacy flag applying to every size.
  */
@@ -211,30 +246,50 @@ export function parseAppearance(text: string): AppearanceMaps {
     return result;
   }
 
-  // ~3 sparse: "~3" + 5-char colour records + "|" + 3-char flag records
-  if (text.charAt(0) === FORMAT_MARKER && text.charAt(1) === '3') {
+  // sparse: "~3" or "~4", then colour records (id token + 4 chars), "|", flag records (id token
+  // + 2 chars). only ~4 may hold an escaped id, so a ~3 string reads exactly as it always has
+  const tag = text.charAt(1);
+
+  if (text.charAt(0) === FORMAT_MARKER && (tag === '3' || tag === '4')) {
     const sparse = text.substring(2);
     const bar = sparse.indexOf('|');
     const colorPart = bar < 0 ? sparse : sparse.substring(0, bar);
     const flagPart = bar < 0 ? '' : sparse.substring(bar + 1);
-    let o;
+    const readId = (part: string, at: number): { id: number; length: number } =>
+      tag === '4' ? readIdToken(part, at) : { id: COLOR_ALPHABET.indexOf(part.charAt(at)), length: 1 };
+    let o = 0;
 
-    for (o = 0; o + 5 <= colorPart.length; o += 5) {
-      const cid = COLOR_ALPHABET.indexOf(colorPart.charAt(o));
+    while (o < colorPart.length) {
+      const token = readId(colorPart, o);
 
-      if (cid > 0) {
-        readColours(colors, colorPart, cid, o + 1);
+      if (o + token.length + 4 > colorPart.length) {
+        break;
       }
+
+      if (token.id > 0) {
+        readColours(colors, colorPart, token.id, o + token.length);
+      }
+
+      o += token.length + 4;
     }
 
-    for (o = 0; o + 3 <= flagPart.length; o += 3) {
-      const fid = COLOR_ALPHABET.indexOf(flagPart.charAt(o));
+    o = 0;
 
-      if (fid > 0) {
-        const fbyte = flagValue(flagPart.charAt(o + 1)) | (flagValue(flagPart.charAt(o + 2)) << 6);
+    while (o < flagPart.length) {
+      const token = readId(flagPart, o);
 
-        unpackFlags(headerless, borderless, fid, fbyte);
+      if (o + token.length + 2 > flagPart.length) {
+        break;
       }
+
+      if (token.id > 0) {
+        const at = o + token.length;
+        const fbyte = flagValue(flagPart.charAt(at)) | (flagValue(flagPart.charAt(at + 1)) << 6);
+
+        unpackFlags(headerless, borderless, token.id, fbyte);
+      }
+
+      o += token.length + 2;
     }
 
     return result;

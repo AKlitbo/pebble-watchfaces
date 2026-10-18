@@ -22,8 +22,9 @@
 #define SIDEREEL_CUSTOM_THEME_KEY 2
 #define SIDEREEL_CUSTOM_FLAGS_KEY 3
 
-// how long each half may run. 44 panels is 220 characters of colour and 132 of flags, so both
-// sit inside a slot with room to append
+// how long each half may run. 46 panels is at most 230 characters of colour and 140 of flags,
+// counting the two ids past 63 that take an extra character, so both sit inside a slot with room
+// to append
 #define SIDEREEL_CUSTOM_COLORS_LEN 250
 #define SIDEREEL_CUSTOM_FLAGS_LEN  160
 

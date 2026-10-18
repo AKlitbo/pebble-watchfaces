@@ -11,11 +11,12 @@
  * swatch).
  *
  * The value it round trips is the APPEARANCE_CUSTOM_COLORS wire string the
- * watch parses. The current sparse "~3" format is a colour section then "|"
- * then a flag section. A colour record is 5 chars (id + four channels), a
- * colour char is one url-safe base64 symbol holding the palette index 0..63
- * or "." to leave that channel mono. A flag record is 3 chars (id + two
- * packed flag chars). "0" means nothing set. The colours apply under the
+ * watch parses. The sparse "~3" format is a colour section then "|" then a
+ * flag section. A colour record is an id + four channels, a colour char is
+ * one url-safe base64 symbol holding the palette index 0..63 or "." to leave
+ * that channel mono. A flag record is an id + two packed flag chars. An id
+ * is one symbol, and "~4" is the same but writes an id from 64 up as "!" and
+ * one more symbol. "0" means nothing set. The colours apply under the
  * Custom theme, the header and border flags in every theme. The codec also
  * reads and migrates the two older formats, see ts/theme/codec.ts.
  *
@@ -226,6 +227,8 @@ module.exports = {
       __export(codec_exports, {
         COLOR_ALPHABET: () => COLOR_ALPHABET,
         FORMAT_MARKER: () => FORMAT_MARKER,
+        ID_ESCAPE: () => ID_ESCAPE,
+        MAX_WIRE_ID: () => MAX_WIRE_ID,
         SIZE_ORDER: () => SIZE_ORDER,
         channelToken: () => channelToken,
         decodeChannel: () => decodeChannel,
@@ -236,6 +239,7 @@ module.exports = {
         packFlags: () => packFlags,
         parseAppearance: () => parseAppearance,
         readColours: () => readColours,
+        readIdToken: () => readIdToken,
         serializeAppearance: () => serializeAppearance,
         setFlag: () => setFlag,
         unpackFlags: () => unpackFlags
@@ -251,7 +255,14 @@ module.exports = {
         return idx < 0 ? 0 : idx;
       }
       function idToken(id) {
-        return COLOR_ALPHABET.charAt(id & 63);
+        return id < 64 ? COLOR_ALPHABET.charAt(id) : ID_ESCAPE + COLOR_ALPHABET.charAt(id - 64);
+      }
+      function readIdToken(text, offset) {
+        if (text.charAt(offset) === ID_ESCAPE) {
+          const low = COLOR_ALPHABET.indexOf(text.charAt(offset + 1));
+          return { id: low < 0 ? -1 : 64 + low, length: 2 };
+        }
+        return { id: COLOR_ALPHABET.indexOf(text.charAt(offset)), length: 1 };
       }
       function decodeChannel(ch) {
         const idx = COLOR_ALPHABET.indexOf(ch);
@@ -307,7 +318,7 @@ module.exports = {
         for (let i = 0; i < colorIds.length; i++) {
           const id = parseInt(colorIds[i], 10);
           const c = colors[id];
-          if (!c || c.accent == null && c.value == null && c.icon == null && c.subtitle == null) {
+          if (id > MAX_WIRE_ID || !c || c.accent == null && c.value == null && c.icon == null && c.subtitle == null) {
             continue;
           }
           colorRecs.push(idToken(id) + channelToken(c.accent) + channelToken(c.value) + channelToken(c.icon) + channelToken(c.subtitle));
@@ -327,7 +338,7 @@ module.exports = {
         for (let j = 0; j < flagIds.length; j++) {
           const fid = parseInt(flagIds[j], 10);
           const byte = packFlags(headerless, borderless, fid);
-          if (byte === 0) {
+          if (fid > MAX_WIRE_ID || byte === 0) {
             continue;
           }
           flagRecs.push(idToken(fid) + flagToken(byte & 63) + flagToken(byte >> 6 & 63));
@@ -335,7 +346,8 @@ module.exports = {
         if (colorRecs.length === 0 && flagRecs.length === 0) {
           return "0";
         }
-        return FORMAT_MARKER + "3" + colorRecs.join("") + "|" + flagRecs.join("");
+        const body = colorRecs.join("") + "|" + flagRecs.join("");
+        return FORMAT_MARKER + (body.indexOf(ID_ESCAPE) < 0 ? "3" : "4") + body;
       }
       function parseAppearance(text) {
         const colors = {};
@@ -345,24 +357,36 @@ module.exports = {
         if (!text || text === "0") {
           return result;
         }
-        if (text.charAt(0) === FORMAT_MARKER && text.charAt(1) === "3") {
+        const tag = text.charAt(1);
+        if (text.charAt(0) === FORMAT_MARKER && (tag === "3" || tag === "4")) {
           const sparse = text.substring(2);
           const bar = sparse.indexOf("|");
           const colorPart = bar < 0 ? sparse : sparse.substring(0, bar);
           const flagPart = bar < 0 ? "" : sparse.substring(bar + 1);
-          let o;
-          for (o = 0; o + 5 <= colorPart.length; o += 5) {
-            const cid = COLOR_ALPHABET.indexOf(colorPart.charAt(o));
-            if (cid > 0) {
-              readColours(colors, colorPart, cid, o + 1);
+          const readId = (part, at) => tag === "4" ? readIdToken(part, at) : { id: COLOR_ALPHABET.indexOf(part.charAt(at)), length: 1 };
+          let o = 0;
+          while (o < colorPart.length) {
+            const token = readId(colorPart, o);
+            if (o + token.length + 4 > colorPart.length) {
+              break;
             }
+            if (token.id > 0) {
+              readColours(colors, colorPart, token.id, o + token.length);
+            }
+            o += token.length + 4;
           }
-          for (o = 0; o + 3 <= flagPart.length; o += 3) {
-            const fid = COLOR_ALPHABET.indexOf(flagPart.charAt(o));
-            if (fid > 0) {
-              const fbyte = flagValue(flagPart.charAt(o + 1)) | flagValue(flagPart.charAt(o + 2)) << 6;
-              unpackFlags(headerless, borderless, fid, fbyte);
+          o = 0;
+          while (o < flagPart.length) {
+            const token = readId(flagPart, o);
+            if (o + token.length + 2 > flagPart.length) {
+              break;
             }
+            if (token.id > 0) {
+              const at = o + token.length;
+              const fbyte = flagValue(flagPart.charAt(at)) | flagValue(flagPart.charAt(at + 1)) << 6;
+              unpackFlags(headerless, borderless, token.id, fbyte);
+            }
+            o += token.length + 2;
           }
           return result;
         }
@@ -399,11 +423,13 @@ module.exports = {
         }
         return result;
       }
-      var COLOR_ALPHABET, FORMAT_MARKER, SIZE_ORDER;
+      var COLOR_ALPHABET, FORMAT_MARKER, ID_ESCAPE, MAX_WIRE_ID, SIZE_ORDER;
       var init_codec = __esm({
         "core/pkjs/clay/builder/ts/theme/codec.ts"() {
           COLOR_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
           FORMAT_MARKER = "~";
+          ID_ESCAPE = "!";
+          MAX_WIRE_ID = 127;
           SIZE_ORDER = ["1x2", "2x2", "1x4", "2x4"];
         }
       });

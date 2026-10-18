@@ -826,10 +826,11 @@ void gridlock_set_night_mode(uint8_t mode)
 // --- custom colour string parsing ---
 //
 // the wire string is "~3" then a colour section then a flag section, sparse: only a customised
-// module gets a record, so the string stays small. a colour record is 5 chars, the module id
-// then [accent][value][icon][subtitle]. a flag record is 3 chars, the module id then two packed
-// flag chars. every id and colour char is one base64 symbol holding 0..63, and '.' (or any
-// non-base64 char) leaves that channel mono.
+// module gets a record, so the string stays small. a colour record is the module id then
+// [accent][value][icon][subtitle]. a flag record is the module id then two packed flag chars.
+// every id and colour char is one base64 symbol holding 0..63, and '.' (or any non-base64 char)
+// leaves that channel mono. a "~4" string is the same, except an id from 64 up is written as
+// '!' and one more char
 //
 // the two flag chars carry an 8-bit value split across two base64 symbols (6 bits each, 8
 // used) so the header/border toggles can be kept PER SIZE rather than per module. the byte is
@@ -838,7 +839,7 @@ void gridlock_set_night_mode(uint8_t mode)
 // alphabet[(byte >> 6) & 63]. that makes the flag section opaque codes rather than readable
 // letters, but keeps the packed table well under the persist ceiling.
 //
-// only the "~3" shape carries records here. the phone decodes the older layouts and re-sends
+// only the "~3" and "~4" shapes carry records here. the phone decodes the older layouts and re-sends
 // them as "~3" (see parseAppearance in src/pkjs/clay/builder/ts/theme/codec.ts), so anything
 // else reaching the watch reads as plain, as do the "0" default and the empty string. a record
 // that runs past the end of its section is unset. the colours only apply under THEME_CUSTOM but
@@ -847,6 +848,10 @@ void gridlock_set_night_mode(uint8_t mode)
 // leads the string so we can tell it from an empty or unrecognized one. keep in step with
 // src/pkjs/clay/builder/ts/theme/codec.ts
 #define CUSTOM_FORMAT_MARKER '~'
+
+// a ~4 string writes a module id from 64 up as this and one more char, for ids 64 to 127. a ~3
+// string never holds it, so there it stays a junk id. keep in step with ID_ESCAPE in the JS encoder
+#define CUSTOM_ID_ESCAPE '!'
 
 // the url-safe base64 alphabet, one symbol per 64-colour palette index. keep in step with
 // the JS encoder in src/pkjs/clay/builder/ts/theme/codec.ts: both map index 0..63 onto the same char
@@ -875,6 +880,29 @@ static int color_index(char ch)
     }
     const char *at = strchr(s_color_alphabet, ch);
     return at ? (int)(at - s_color_alphabet) : -1;
+}
+
+/**
+ * @brief Reads the module id token at off, escaped or not.
+ *
+ * @param text The section being walked.
+ * @param len How many chars of it are readable.
+ * @param off Where the token starts.
+ * @param escapes Whether the string is ~4, the only shape that may hold an escaped id.
+ * @param token Filled in with how many chars the token took.
+ * @return The id, or -1 for a token that names none.
+ */
+static int read_id(const char *text, size_t len, size_t off, bool escapes, size_t *token)
+{
+    if (escapes && text[off] == CUSTOM_ID_ESCAPE)
+    {
+        *token = 2;
+        int low = off + 1 < len ? color_index(text[off + 1]) : -1;
+        return low < 0 ? -1 : 64 + low;
+    }
+
+    *token = 1;
+    return color_index(text[off]);
 }
 
 /**
@@ -956,9 +984,9 @@ static void ensure_custom_parsed(void)
     const char *colors = s_custom_theme.colors;
     size_t colors_len = bounded_find(colors, sizeof(s_custom_theme.colors), '\0');
 
-    // only a tagged "~3" string carries records. the "0" default, the empty string and any blob
-    // the phone has not re-sent in that shape leave every module plain
-    if (colors_len < 2 || colors[0] != CUSTOM_FORMAT_MARKER || colors[1] != '3')
+    // only a tagged "~3" or "~4" string carries records. the "0" default, the empty string and any
+    // blob the phone has not re-sent in that shape leave every module plain
+    if (colors_len < 2 || colors[0] != CUSTOM_FORMAT_MARKER || (colors[1] != '3' && colors[1] != '4'))
     {
         return;
     }
@@ -982,29 +1010,52 @@ static void ensure_custom_parsed(void)
 
     // colours are keyed by the group's primary id, so a grouped member inherits through
     // resolve_theme_module. flags are keyed by each module's own id
-    for (size_t off = 0; off + 5 <= body_len; off += 5)
+    // a ~3 record's id is always one char. a ~4 one may be the escape and one more, so each walk
+    // steps by the token's own length
+    bool escapes = colors[1] == '4';
+    size_t off = 0;
+    while (off < body_len)
     {
-        int id = color_index(body[off]);
+        size_t token;
+        int id = read_id(body, body_len, off, escapes, &token);
+        if (off + token + 4 > body_len)
+        {
+            break;
+        }
+
+        const char *rec = body + off + token;
+        off += token + 4;
         if (id <= 0 || id >= MOD_TYPE_COUNT)
         {
             continue;
         }
+
         GridlockCustomColor color = {0};
-        color.accent_set   = read_channel(body[off + 1], &color.accent);
-        color.value_set    = read_channel(body[off + 2], &color.value);
-        color.icon_set     = read_channel(body[off + 3], &color.icon);
-        color.subtitle_set = read_channel(body[off + 4], &color.subtitle);
+        color.accent_set   = read_channel(rec[0], &color.accent);
+        color.value_set    = read_channel(rec[1], &color.value);
+        color.icon_set     = read_channel(rec[2], &color.icon);
+        color.subtitle_set = read_channel(rec[3], &color.subtitle);
         s_custom[id] = color;
     }
 
-    for (size_t off = 0; off + 3 <= flag_len; off += 3)
+    off = 0;
+    while (off < flag_len)
     {
-        int id = color_index(flags[off]);
+        size_t token;
+        int id = read_id(flags, flag_len, off, escapes, &token);
+        if (off + token + 2 > flag_len)
+        {
+            break;
+        }
+
+        const char *rec = flags + off + token;
+        off += token + 2;
         if (id <= 0 || id >= MOD_TYPE_COUNT)
         {
             continue;
         }
-        unpack_flags((uint8_t)id, color_index(flags[off + 1]), color_index(flags[off + 2]));
+
+        unpack_flags((uint8_t)id, color_index(rec[0]), color_index(rec[1]));
     }
 }
 

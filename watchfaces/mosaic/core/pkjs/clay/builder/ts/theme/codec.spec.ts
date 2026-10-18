@@ -10,6 +10,7 @@
 import { describe, test, expect } from 'vitest';
 import {
   SIZE_ORDER,
+  MAX_WIRE_ID,
   channelToken,
   flagToken,
   flagValue,
@@ -118,6 +119,38 @@ describe('serializeAppearance', () => {
 
     expect(result).toBe('~3CB...JA...|');
   });
+
+  /** Module ids run past 63, and one base64 char per id would write module 64 as module 0. */
+  test('writes an id from 64 up as the escape and one char, tagged ~4', () => {
+    const colors = { 65: { accent: 192, value: 193, icon: null, subtitle: 194 } };
+    const headerless = {};
+
+    SIZE_ORDER.forEach((size) => setFlag(headerless, 64, size, true));
+
+    const result = serializeAppearance(colors, headerless, {});
+
+    expect(result).toBe('~4!BAB.C|!AP.');
+  });
+
+  /** A string with no high id stays ~3, so a watch that reads only ~3 keeps every colour it can. */
+  test('keeps the ~3 tag when no id needs the escape', () => {
+    const colors = { 63: { accent: 192, value: null, icon: null, subtitle: null } };
+
+    const result = serializeAppearance(colors, {}, {});
+
+    expect(result).toBe('~3_A...|');
+  });
+
+  /** An id no token can carry would wrap onto a real module and paint the wrong panel. */
+  test('leaves out an id past MAX_WIRE_ID', () => {
+    const headerless = {};
+
+    setFlag(headerless, MAX_WIRE_ID + 1, '1x2', true);
+
+    const result = serializeAppearance({}, headerless, {});
+
+    expect(result).toBe('0');
+  });
 });
 
 describe('parseAppearance', () => {
@@ -129,6 +162,30 @@ describe('parseAppearance', () => {
     const result = serializeAppearance(parsed.colors, parsed.headerless, parsed.borderless);
 
     expect(result).toBe(text);
+  });
+
+  /** A ~4 round trip that drifts would move a high panel's colours onto another one on each open. */
+  test('round trips a ~4 string with low and high ids mixed', () => {
+    const text = '~4BAB.C!BA...|BP.!AP.';
+
+    const parsed = parseAppearance(text);
+    const result = serializeAppearance(parsed.colors, parsed.headerless, parsed.borderless);
+
+    expect(result).toBe(text);
+  });
+
+  /** Only ~4 may hold the escape, so a ~3 string reads exactly as the watch always read it. */
+  test('reads the escape in a ~3 string as a junk id, not an escape', () => {
+    const parsed = parseAppearance('~3|!P.BP.');
+
+    expect(Object.keys(parsed.headerless)).toEqual(['1']);
+  });
+
+  /** A string cut off inside an escaped record must not invent a module from the leftovers. */
+  test('drops an escaped record cut short at the end', () => {
+    const parsed = parseAppearance('~4|BP.!AP');
+
+    expect(Object.keys(parsed.headerless)).toEqual(['1']);
   });
 
   /** A user upgrading from the positional format would lose their colours if this breaks. */

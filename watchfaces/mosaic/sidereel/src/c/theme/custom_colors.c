@@ -11,8 +11,9 @@
  * byte, where bit s is "hide header" at size s and bit 4+s is "hide border". Every character is
  * one symbol of the url-safe base64 alphabet, and "." means a channel was left alone.
  *
- * Only the "~3" shape carries records. The "0" default, an empty string, and anything the phone
- * has not re-sent in that shape all read as plain.
+ * A "~4" string is the same, except a module id from 64 up is written as "!" and one more
+ * character. Only the "~3" and "~4" shapes carry records. The "0" default, an empty string, and
+ * anything the phone has not re-sent in those shapes all read as plain.
  *
  * @ingroup watchface-sidereel
  */
@@ -29,6 +30,10 @@
 
 // leads the string so it can be told from an empty or unrecognised one
 #define CUSTOM_FORMAT_MARKER '~'
+
+// a ~4 string writes a module id from 64 up as this and one more char, for ids 64 to 127. a ~3
+// string never holds it, so there it stays a junk id. keep in step with ID_ESCAPE in the JS encoder
+#define CUSTOM_ID_ESCAPE '!'
 
 // the url-safe base64 alphabet, one symbol per 64-colour palette index. keep in step with the
 // JS encoder: both map index 0..63 onto the same character
@@ -99,6 +104,29 @@ static int color_index(char ch)
     const char *at = strchr(s_alphabet, ch);
 
     return at ? (int)(at - s_alphabet) : -1;
+}
+
+/**
+ * @brief Reads the module id token at off, escaped or not.
+ *
+ * @param text The section being walked.
+ * @param len How many chars of it are readable.
+ * @param off Where the token starts.
+ * @param escapes Whether the string is ~4, the only shape that may hold an escaped id.
+ * @param token Filled in with how many chars the token took.
+ * @return The id, or -1 for a token that names none.
+ */
+static int read_id(const char *text, size_t len, size_t off, bool escapes, size_t *token)
+{
+    if (escapes && text[off] == CUSTOM_ID_ESCAPE)
+    {
+        *token = 2;
+        int low = off + 1 < len ? color_index(text[off + 1]) : -1;
+        return low < 0 ? -1 : 64 + low;
+    }
+
+    *token = 1;
+    return color_index(text[off]);
 }
 
 /**
@@ -182,7 +210,7 @@ static void ensure_parsed(void)
     const char *colors = s_theme.colors;
     size_t colors_len = bounded_len(colors, sizeof(s_theme.colors));
 
-    if (colors_len < 2 || colors[0] != CUSTOM_FORMAT_MARKER || colors[1] != '3')
+    if (colors_len < 2 || colors[0] != CUSTOM_FORMAT_MARKER || (colors[1] != '3' && colors[1] != '4'))
     {
         return;
     }
@@ -204,31 +232,52 @@ static void ensure_parsed(void)
         body_len = bar;
     }
 
-    for (size_t off = 0; off + 5 <= body_len; off += 5)
+    // a ~3 record's id is always one char. a ~4 one may be the escape and one more, so each walk
+    // steps by the token's own length
+    bool escapes = colors[1] == '4';
+    size_t off = 0;
+    while (off < body_len)
     {
-        int id = color_index(body[off]);
+        size_t token;
+        int id = read_id(body, body_len, off, escapes, &token);
+        if (off + token + 4 > body_len)
+        {
+            break;
+        }
+
+        const char *rec = body + off + token;
+        off += token + 4;
         if (id <= 0 || id >= MOD_TYPE_COUNT)
         {
             continue;
         }
 
         SidereelCustomColor color = {0};
-        color.accent_set = read_channel(body[off + 1], &color.accent);
-        color.value_set = read_channel(body[off + 2], &color.value);
-        color.icon_set = read_channel(body[off + 3], &color.icon);
-        color.subtitle_set = read_channel(body[off + 4], &color.subtitle);
+        color.accent_set = read_channel(rec[0], &color.accent);
+        color.value_set = read_channel(rec[1], &color.value);
+        color.icon_set = read_channel(rec[2], &color.icon);
+        color.subtitle_set = read_channel(rec[3], &color.subtitle);
         s_custom[id] = color;
     }
 
-    for (size_t off = 0; off + 3 <= flag_len; off += 3)
+    off = 0;
+    while (off < flag_len)
     {
-        int id = color_index(flags[off]);
+        size_t token;
+        int id = read_id(flags, flag_len, off, escapes, &token);
+        if (off + token + 2 > flag_len)
+        {
+            break;
+        }
+
+        const char *rec = flags + off + token;
+        off += token + 2;
         if (id <= 0 || id >= MOD_TYPE_COUNT)
         {
             continue;
         }
 
-        unpack_flags((uint8_t)id, color_index(flags[off + 1]), color_index(flags[off + 2]));
+        unpack_flags((uint8_t)id, color_index(rec[0]), color_index(rec[1]));
     }
 }
 
