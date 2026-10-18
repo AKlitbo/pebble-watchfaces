@@ -17,8 +17,6 @@
 #define BAR_H_TALL 4    // the bar along the bottom of the 2x2
 #define BAR_H_TALL_WIDE 6 // the same on the 2x4, which has more body to spare
 #define BAR_ICON_GAP 6  // between a bottom bar and the corner icon, as in draw_progress_bar
-#define BAR_GROW_HEADERLESS 3 // extra bar thickness when the header strip is gone
-#define BAR_GROW_BORDERLESS 1 // and when the border is gone
 #define VALUE_H_SMALL 22 // the 1x2 value box, one Teko 22 line
 #define VALUE_DY_HEADED -5     // nudges that seat the 1x2 value and icon above the bar,
 #define VALUE_DY_HEADERLESS 2  // found in the emulator for the headed and headerless bodies
@@ -40,15 +38,8 @@ static void progress_bar(GridCtx *gctx, GRect bar, int pct)
     }
 }
 
-// how much thicker a bar gets when the tile has room to spare. a tile with no header owns the
-// taller body, and one with no border gives a pixel back, so both let the bar be read at a glance
-static int bar_grow(const GridCtx *gctx)
-{
-    return (gctx->headerless ? BAR_GROW_HEADERLESS : 0) + (gctx->borderless ? BAR_GROW_BORDERLESS : 0);
-}
-
 // the bar the two taller tiles carry along their bottom edge, left of the icon. the geometry is
-// the shared draw_progress_bar's, at a height of our own, so it can grow with the room
+// the shared draw_progress_bar's, at a height of our own
 static void progress_bar_bottom(GridCtx *gctx, int pct, int icon_w, int h)
 {
     int w = gctx->body.size.w - PANEL_PAD * 2 - icon_w - BAR_ICON_GAP;
@@ -62,8 +53,8 @@ static void progress_bar_bottom(GridCtx *gctx, int pct, int icon_w, int h)
 
 // the small tile: the percent and icon on top and a bar under them across the whole tile. a
 // headed body is only about 25px tall, so the value steps down to Teko 22 to leave the bar room.
-// with no header the tile is taller, so the value keeps Teko 26 and the bar gets thicker, and the
-// value and icon are centred in the space the bar leaves rather than left to the stock 1x2
+// with no header the tile is taller, so the value keeps Teko 26, and the value and icon are
+// centred in the space the bar leaves rather than left to the stock 1x2
 static void progress_draw_1x2(GridCtx *gctx, int pct, const IconSpec *icon)
 {
     char val[8];
@@ -83,7 +74,7 @@ static void progress_draw_1x2(GridCtx *gctx, int pct, const IconSpec *icon)
     icon_draw(gctx, icon, GAlignTopRight, -EDGE_PAD(gctx), icon_dy);
 
     GRect bar = grid_anchor(gctx, GSize(gctx->body.size.w - EDGE_PAD(gctx) * 2,
-                                        BAR_H_SMALL + bar_grow(gctx)), GAlignBottom, 0, -2);
+                                        BAR_H_SMALL), GAlignBottom, 0, -2);
     progress_bar(gctx, bar, pct);
 }
 
@@ -114,7 +105,7 @@ static void progress_draw_1x4(GridCtx *gctx, int pct, const IconSpec *icon)
     {
         return;
     }
-    int bar_h = BAR_H_WIDE + bar_grow(gctx);
+    int bar_h = BAR_H_WIDE;
     GRect bar = GRect(left, gctx->body.origin.y + (gctx->body.size.h - bar_h) / 2,
                       right - left, bar_h);
     progress_bar(gctx, bar, pct);
@@ -145,7 +136,7 @@ static void progress_draw_2x4(GridCtx *gctx, int pct, const char *line1, const c
                        GTextAlignmentRight, NULL);
 
     icon_draw(gctx, icon, GAlignBottomRight, -EDGE_PAD(gctx), -5);
-    progress_bar_bottom(gctx, pct, icon_size(icon->res).w, BAR_H_TALL_WIDE + bar_grow(gctx));
+    progress_bar_bottom(gctx, pct, icon_size(icon->res).w, BAR_H_TALL_WIDE);
 }
 
 // the small tile is the percent with a little % after it, the big tile the percent over a bar
@@ -164,7 +155,7 @@ static void progress_draw(GridCtx *gctx, int pct, const char *line1, const char 
     case MSIZE_2x2:
         snprintf(val, sizeof(val), "%d%%", pct);
         gh_stat_2x2(gctx, val, line1, line2, icon, -1);
-        progress_bar_bottom(gctx, pct, icon_size(icon->res).w, BAR_H_TALL + bar_grow(gctx));
+        progress_bar_bottom(gctx, pct, icon_size(icon->res).w, BAR_H_TALL);
         break;
     case MSIZE_1x4:
         progress_draw_1x4(gctx, pct, icon);
