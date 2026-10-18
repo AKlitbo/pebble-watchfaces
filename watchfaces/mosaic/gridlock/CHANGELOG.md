@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added 1x2, 2x2, and 1x4 Year Progress, Day Progress, Hour Progress, and Week Progress panels showing how far through each you are, as a percent over a progress bar. The 2x2 also says where you are, such as day 195 of 365. The week starts on the first day of the week you picked in settings. Thanks to @SlyeghtlyRye for building them.
+- Added 1x2 Step Goal, Distance Goal, Calorie Goal, Sleep Goal, and Activity Goal panels showing your reading with a bar filling toward your goal.
 
 ### Changed
 

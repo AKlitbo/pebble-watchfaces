@@ -35,3 +35,4 @@ static const StatPanelDesc calories_desc = {
 };
 
 STAT_PANEL_GOAL(health_calories, "CALORIES", SZ_1x2 | SZ_2x2, FEATURE_HEALTH, 0, &calories_desc);
+STAT_PANEL_GOAL_BAR(health_calories_goal, "CALORIE GOAL", FEATURE_HEALTH, MOD_HEALTH_CALORIES, &calories_desc);

@@ -260,6 +260,8 @@ typedef struct
     uint8_t has_icon;
     uint8_t headerless;
     FontId  base;   // the caller's font, which is itself a rung, so it picks the answer too
+    FontId  top;    // the ladder's first rung and its length. the plain 1x2 and the bar 1x2 climb
+    uint8_t rungs;  // different ladders from the same base, so they must not share an entry
     FontId  font;   // the rung that won
     int16_t text_w; // measured width of val in the chosen font, needed to place the trailing unit
     bool    used;
@@ -293,7 +295,8 @@ static FontId fit_value_font(const char *val, const FontId *rungs, int rung_coun
         FontFitEntry *entry = &s_fit_cache[i];
         if (entry->used && entry->avail == avail && entry->trail_w == trail_w
             && entry->has_icon == (has_icon ? 1 : 0) && entry->headerless == (headerless ? 1 : 0)
-            && entry->base == base && strcmp(entry->val, val) == 0)
+            && entry->base == base && entry->top == rungs[0] && entry->rungs == rung_count
+            && strcmp(entry->val, val) == 0)
         {
             *text_w_out = entry->text_w;
             return entry->font;
@@ -319,12 +322,117 @@ static FontId fit_value_font(const char *val, const FontId *rungs, int rung_coun
     slot->has_icon = has_icon ? 1 : 0;
     slot->headerless = headerless ? 1 : 0;
     slot->base = base;
+    slot->top = rungs[0];
+    slot->rungs = (uint8_t)rung_count;
     slot->font = draw_font;
     slot->text_w = (int16_t)ts.w;
     slot->used = true;
 
     *text_w_out = ts.w;
     return draw_font;
+}
+
+// the bar under a 1x2 value, and the gap it leaves before the corner icon
+#define BAR_1X2_H 3
+#define BAR_ICON_GAP 6
+
+// the box a 1x2 bar tile's value sits in, one Teko 22 line plus its pad
+#define BAR_VALUE_H 26
+
+// nudges that seat the value above the bar, found in the emulator for the headed and headerless
+// bodies
+#define BAR_VALUE_DY_HEADED -5
+#define BAR_VALUE_DY_HEADERLESS 2
+
+void gh_progress_bar(GridCtx *gctx, GRect bar, int pct)
+{
+    graphics_context_set_stroke_color(gctx->ctx, gctx->color_accent);
+    graphics_draw_rect(gctx->ctx, bar);
+    int fill_w = (bar.size.w - 2) * pct / 100;
+    if (fill_w > 0)
+    {
+        graphics_context_set_fill_color(gctx->ctx, gctx->color_accent);
+        graphics_fill_rect(gctx->ctx, GRect(bar.origin.x + 1, bar.origin.y + 1, fill_w,
+                                            bar.size.h - 2), 0, GCornerNone);
+    }
+}
+
+void gh_bar_1x2(GridCtx *gctx, const char *val, const char *trailing, const IconSpec *icon, int pct)
+{
+    const int trail_gap = 1;
+
+    int icon_w = icon ? icon_size(icon->res).w : 0;
+    int avail = gctx->body.size.w - icon_w - PANEL_PAD * 2;
+
+    int trail_w = 0;
+    if (trailing && trailing[0])
+    {
+        trail_w = trail_gap + graphics_text_layout_get_content_size(trailing,
+                      fonts_get(FONT_STM_12),
+                      GRect(0, 0, 1000, 14), GTextOverflowModeFill, GTextAlignmentLeft).w;
+    }
+
+    // a headed body is only about 25px tall, so the value tops out at Teko 22 to leave the bar
+    // room. with no header the tile is taller, so it starts at Teko 26 and steps down to fit
+    FontId rungs[3];
+    int rung_count = 0;
+    if (gctx->headerless)
+    {
+        rungs[rung_count++] = FONT_TEKO_26;
+        rungs[rung_count++] = FONT_TEKO_24;
+    }
+    rungs[rung_count++] = FONT_TEKO_22;
+
+    int text_w = 0;
+    FontId font = fit_value_font(val, rungs, rung_count, avail, trail_w, icon_w != 0,
+                                 gctx->headerless, rungs[0], &text_w);
+
+    // a value that still crowds the icon on the smallest rung drops its unit. the number is what
+    // the tile is for, and the unit would land on the icon. the ladder runs again without the
+    // unit, so the value gets back whatever size it fits at on its own
+    if (trail_w && text_w + trail_w > avail)
+    {
+        trail_w = 0;
+        font = fit_value_font(val, rungs, rung_count, avail, 0, icon_w != 0, gctx->headerless,
+                              rungs[0], &text_w);
+    }
+
+    // the value draws full width, the same as gh_stat_1x2. clipping it to avail would cut a
+    // long value off rather than let it run to the icon's edge
+    int value_dy = gctx->headerless ? BAR_VALUE_DY_HEADERLESS : BAR_VALUE_DY_HEADED;
+    GRect box = grid_anchor(gctx, GSize(gctx->body.size.w - PANEL_PAD, BAR_VALUE_H), GAlignTopLeft,
+                            EDGE_PAD(gctx), value_dy);
+    box = metric_baseline(font, box);
+    graphics_context_set_text_color(gctx->ctx, gctx->color_value);
+    graphics_draw_text(gctx->ctx, val, fonts_get(font), box, GTextOverflowModeFill,
+                       GTextAlignmentLeft, NULL);
+
+    if (trail_w)
+    {
+        // sits on the value's baseline the same way gh_stat_1x2 seats its unit
+        const FontMetric *vm = metric_for(font);
+        const FontMetric *tm = metric_for(FONT_STM_12);
+        int trail_y = box.origin.y + vm->top_pad + vm->cap_h - (tm->top_pad + tm->cap_h) - 3;
+        graphics_context_set_text_color(gctx->ctx, gctx->color_subtitle);
+        graphics_draw_text(gctx->ctx, trailing, fonts_get(FONT_STM_12),
+                           GRect(box.origin.x + text_w + trail_gap, trail_y, trail_w - trail_gap, 14),
+                           GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+    }
+
+    if (icon)
+    {
+        gh_icon_bottom_of(gctx, icon, box, font);
+    }
+
+    // the bar stops short of the icon, the same as the 2x2 bar does
+    int bar_w = gctx->body.size.w - EDGE_PAD(gctx) * 2 - icon_w - (icon ? BAR_ICON_GAP : 0);
+    if (bar_w <= 0)
+    {
+        return;
+    }
+    GRect bar = grid_anchor(gctx, GSize(bar_w, BAR_1X2_H), GAlignBottomLeft,
+                            EDGE_PAD(gctx), -2);
+    gh_progress_bar(gctx, bar, pct);
 }
 
 void gh_stat_1x2(GridCtx *gctx, const char *val, const char *trailing, FontId font,

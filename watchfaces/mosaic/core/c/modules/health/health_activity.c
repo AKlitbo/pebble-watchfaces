@@ -31,3 +31,4 @@ static const StatPanelDesc activity_desc = {
 };
 
 STAT_PANEL_GOAL(health_activity, "ACTIVITY", SZ_1x2 | SZ_2x2, FEATURE_HEALTH, 0, &activity_desc);
+STAT_PANEL_GOAL_BAR(health_activity_goal, "ACTIVE GOAL", FEATURE_HEALTH, MOD_HEALTH_ACTIVITY, &activity_desc);

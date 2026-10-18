@@ -6,3 +6,9 @@
  * @ingroup mosaic_mod_health
  */
 extern const ModuleDef mod_health_calories_def;
+
+/**
+ * @brief The calorie goal panel. Your calories with a bar filling toward the goal.
+ * @ingroup mosaic_mod_health
+ */
+extern const ModuleDef mod_health_calories_goal_def;

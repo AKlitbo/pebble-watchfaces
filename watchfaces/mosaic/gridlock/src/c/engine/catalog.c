@@ -140,6 +140,11 @@ const ModuleDef *module_def(ModuleType type)
         case MOD_TIME_DAY_PROGRESS: return &mod_time_day_progress_def;
         case MOD_TIME_HOUR_PROGRESS: return &mod_time_hour_progress_def;
         case MOD_TIME_WEEK_PROGRESS: return &mod_time_week_progress_def;
+        case MOD_HEALTH_STEPS_GOAL: return &mod_health_steps_goal_def;
+        case MOD_HEALTH_DISTANCE_GOAL: return &mod_health_distance_goal_def;
+        case MOD_HEALTH_CALORIES_GOAL: return &mod_health_calories_goal_def;
+        case MOD_HEALTH_SLEEP_GOAL: return &mod_health_sleep_goal_def;
+        case MOD_HEALTH_ACTIVITY_GOAL: return &mod_health_activity_goal_def;
         case MOD_SYSTEM_STATUS: return &mod_system_status_def;
         case MOD_TIME_HOUR_BIG: return &mod_time_hour_big_def;
         case MOD_TIME_MIN_BIG: return &mod_time_min_big_def;

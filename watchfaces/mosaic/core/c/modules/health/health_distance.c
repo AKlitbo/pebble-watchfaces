@@ -56,3 +56,4 @@ static const StatPanelDesc distance_desc = {
 };
 
 STAT_PANEL_GOAL(health_distance, "DISTANCE", SZ_1x2 | SZ_2x2, FEATURE_HEALTH, 0, &distance_desc);
+STAT_PANEL_GOAL_BAR(health_distance_goal, "DIST GOAL", FEATURE_HEALTH, MOD_HEALTH_DISTANCE, &distance_desc);

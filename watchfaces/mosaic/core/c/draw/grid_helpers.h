@@ -178,6 +178,27 @@ void gh_stat_goal_2x2(GridCtx *gctx, const char *val, const char *goal_str, cons
                       const IconSpec *icon, int value, int goal);
 
 /**
+ * @brief Draws a progress bar in the accent colour: an outline with the done part filled in.
+ *
+ * @param gctx The grid context.
+ * @param bar Where the bar goes, outline included.
+ * @param pct How much of it to fill, 0 to 100.
+ */
+void gh_progress_bar(GridCtx *gctx, GRect bar, int pct);
+
+/**
+ * @brief A 1x2 with a bar. The value sits up top with an optional little unit after it, a bar
+ * runs under it, and the icon pins to the bottom right corner the way the plain 1x2 has it.
+ *
+ * @param gctx The grid context.
+ * @param val The value text.
+ * @param trailing A small label after the value if you want one. Pass NULL or "" for none.
+ * @param icon The icon for the corner. Its own little nudge is added for you.
+ * @param pct How much of the bar to fill, 0 to 100.
+ */
+void gh_bar_1x2(GridCtx *gctx, const char *val, const char *trailing, const IconSpec *icon, int pct);
+
+/**
  * @brief The shared 1x2 stat panel. A value on the left with an optional little unit
  * label after it and an icon on the right whose bottom matches the value's bottom.
  *

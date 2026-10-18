@@ -64,4 +64,9 @@ static const ModuleColors MODULE_VIBRANT[MOD_TYPE_COUNT] = {
     [MOD_TIME_DAY_PROGRESS] = { .accent = GColorBrilliantRose, .value = GColorBrilliantRose, .icon = GColorBrilliantRose },
     [MOD_TIME_HOUR_PROGRESS] = { .accent = GColorBrilliantRose, .value = GColorBrilliantRose, .icon = GColorBrilliantRose },
     [MOD_TIME_WEEK_PROGRESS] = { .accent = GColorPictonBlue, .value = GColorPictonBlue, .icon = GColorPictonBlue },
+    [MOD_HEALTH_STEPS_GOAL] = { .accent = GColorKellyGreen, .value = GColorKellyGreen, .icon = GColorKellyGreen },
+    [MOD_HEALTH_DISTANCE_GOAL] = { .accent = GColorJaegerGreen, .value = GColorJaegerGreen, .icon = GColorJaegerGreen },
+    [MOD_HEALTH_CALORIES_GOAL] = { .accent = GColorWindsorTan, .value = GColorWindsorTan, .icon = GColorWindsorTan },
+    [MOD_HEALTH_SLEEP_GOAL] = { .accent = GColorLavenderIndigo, .value = GColorLavenderIndigo, .icon = GColorLavenderIndigo },
+    [MOD_HEALTH_ACTIVITY_GOAL] = { .accent = GColorSpringBud, .value = GColorSpringBud, .icon = GColorSpringBud },
 };

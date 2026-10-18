@@ -6,3 +6,9 @@
  * @ingroup mosaic_mod_health
  */
 extern const ModuleDef mod_health_activity_def;
+
+/**
+ * @brief The activity goal panel. Your active minutes with a bar filling toward the goal.
+ * @ingroup mosaic_mod_health
+ */
+extern const ModuleDef mod_health_activity_goal_def;

@@ -61,4 +61,9 @@ module.exports = {
   58: "Brilliant Rose",
   59: "Brilliant Rose",
   60: "Picton Blue",
+  61: "Kelly Green",
+  62: "Jaeger Green",
+  63: "Windsor Tan",
+  64: "Lavender Indigo",
+  65: "Spring Bud",
 };

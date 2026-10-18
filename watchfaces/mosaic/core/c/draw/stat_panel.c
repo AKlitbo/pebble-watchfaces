@@ -1,4 +1,5 @@
 #include "mosaic/draw/stat_panel.h"
+#include "math/pct.h"
 
 void stat_panel_draw_1x2(GridCtx *gctx, const StatPanel1x2 *desc)
 {
@@ -52,4 +53,24 @@ void stat_panel_draw_goal(GridCtx *gctx, const StatPanelDesc *desc)
 
         gh_stat_goal_2x2(gctx, val, goal_str, desc->goal_caption, desc->base.icon, value, goal);
     }
+}
+
+void stat_panel_draw_goal_bar(GridCtx *gctx, const StatPanelDesc *desc)
+{
+    if (gctx->size != MSIZE_1x2)
+    {
+        return;
+    }
+
+    char val[24];
+    const char *unit = NULL;
+    desc->base.value_1x2(val, sizeof(val), &unit);
+
+    char goal_str[24];
+    int value = 0;
+    int goal = 0;
+    desc->goal_2x2(goal_str, sizeof(goal_str), &value, &goal);
+
+    // pct_of reads the no-reading marker as 0, so a panel with no reading yet shows an empty bar
+    gh_bar_1x2(gctx, val, unit, desc->base.icon, pct_of(value, goal));
 }

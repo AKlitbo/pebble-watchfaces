@@ -59,3 +59,4 @@ static const StatPanelDesc sleep_desc = {
 };
 
 STAT_PANEL_GOAL(health_sleep, "SLEEP", SZ_1x2 | SZ_2x2, FEATURE_HEALTH, 0, &sleep_desc);
+STAT_PANEL_GOAL_BAR(health_sleep_goal, "SLEEP GOAL", FEATURE_HEALTH, MOD_HEALTH_SLEEP, &sleep_desc);

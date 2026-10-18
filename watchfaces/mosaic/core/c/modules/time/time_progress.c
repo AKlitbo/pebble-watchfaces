@@ -13,70 +13,6 @@
 
 #define BAR_GAP 8   // room between a bar and whatever sits beside it on the 1x4
 #define BAR_H_WIDE 6 // the 1x4 bar, a touch thicker than the 4px one the taller tiles carry
-#define BAR_H_SMALL 3   // the bar under the 1x2 value
-#define BAR_H_TALL 4    // the bar along the bottom of the 2x2
-#define BAR_ICON_GAP 6  // between a bottom bar and the corner icon, as in draw_progress_bar
-#define VALUE_H_SMALL 22 // the 1x2 value box, one Teko 22 line
-#define VALUE_DY_HEADED -5     // nudges that seat the 1x2 value above the bar,
-#define VALUE_DY_HEADERLESS 2  // found in the emulator for the headed and headerless bodies
-
-// a progress bar in the accent colour: an outline with the done part filled inside it
-static void progress_bar(GridCtx *gctx, GRect bar, int pct)
-{
-    graphics_context_set_stroke_color(gctx->ctx, gctx->color_accent);
-    graphics_draw_rect(gctx->ctx, bar);
-    int fill_w = (bar.size.w - 2) * pct / 100;
-    if (fill_w > 0)
-    {
-        graphics_context_set_fill_color(gctx->ctx, gctx->color_accent);
-        graphics_fill_rect(gctx->ctx, GRect(bar.origin.x + 1, bar.origin.y + 1, fill_w,
-                                            bar.size.h - 2), 0, GCornerNone);
-    }
-}
-
-// the bar the 2x2 carries along its bottom edge, left of the icon. the geometry is
-// the shared draw_progress_bar's, at a height of our own
-static void progress_bar_bottom(GridCtx *gctx, int pct, int icon_w, int h)
-{
-    int w = gctx->body.size.w - PANEL_PAD * 2 - icon_w - BAR_ICON_GAP;
-    if (w <= 0)
-    {
-        return;
-    }
-    GRect bar = grid_anchor(gctx, GSize(w, h), GAlignBottomLeft, PANEL_PAD + 1, -5);
-    progress_bar(gctx, bar, pct);
-}
-
-// the small tile: the percent up top with a bar under it, and the icon in the bottom right corner
-// where every other 1x2 keeps it. the bar stops short of the icon, the same as on the 2x2. a
-// headed body is only about 25px tall, so the value steps down to Teko 22 to leave the bar room.
-// with no header the tile is taller, so the value keeps Teko 26
-static void progress_draw_1x2(GridCtx *gctx, int pct, const IconSpec *icon)
-{
-    char val[8];
-    snprintf(val, sizeof(val), "%d%%", pct);
-
-    FontId font = gctx->headerless ? FONT_TEKO_26 : FONT_TEKO_22;
-    int value_dy = gctx->headerless ? VALUE_DY_HEADERLESS : VALUE_DY_HEADED;
-
-    int iw = icon_size(icon->res).w;
-    GRect box = grid_anchor(gctx, GSize(gctx->body.size.w - iw - PANEL_PAD * 2, VALUE_H_SMALL + 4),
-                            GAlignTopLeft, EDGE_PAD(gctx), value_dy);
-    box = metric_baseline(font, box);
-    graphics_context_set_text_color(gctx->ctx, gctx->color_value);
-    graphics_draw_text(gctx->ctx, val, fonts_get(font), box, GTextOverflowModeFill,
-                       GTextAlignmentLeft, NULL);
-    gh_icon_bottom_of(gctx, icon, box, font);
-
-    int bar_w = gctx->body.size.w - EDGE_PAD(gctx) * 2 - iw - BAR_ICON_GAP;
-    if (bar_w <= 0)
-    {
-        return;
-    }
-    GRect bar = grid_anchor(gctx, GSize(bar_w, BAR_H_SMALL), GAlignBottomLeft,
-                            EDGE_PAD(gctx), -2);
-    progress_bar(gctx, bar, pct);
-}
 
 // the wide small tile: the percent on the left, the bar across the middle and the icon on the
 // right, so a full width row reads the same at a glance as the half width one
@@ -108,7 +44,7 @@ static void progress_draw_1x4(GridCtx *gctx, int pct, const IconSpec *icon)
     int bar_h = BAR_H_WIDE;
     GRect bar = GRect(left, gctx->body.origin.y + (gctx->body.size.h - bar_h) / 2,
                       right - left, bar_h);
-    progress_bar(gctx, bar, pct);
+    gh_progress_bar(gctx, bar, pct);
 }
 
 // every size shows the percent over a bar. the 2x2 adds two captions saying how far through the
@@ -121,12 +57,12 @@ static void progress_draw(GridCtx *gctx, int pct, const char *line1, const char 
     switch (gctx->size)
     {
     case MSIZE_1x2:
-        progress_draw_1x2(gctx, pct, icon);
+        snprintf(val, sizeof(val), "%d%%", pct);
+        gh_bar_1x2(gctx, val, NULL, icon, pct);
         break;
     case MSIZE_2x2:
         snprintf(val, sizeof(val), "%d%%", pct);
-        gh_stat_2x2(gctx, val, line1, line2, icon, -1);
-        progress_bar_bottom(gctx, pct, icon_size(icon->res).w, BAR_H_TALL);
+        gh_stat_2x2(gctx, val, line1, line2, icon, pct);
         break;
     case MSIZE_1x4:
         progress_draw_1x4(gctx, pct, icon);
