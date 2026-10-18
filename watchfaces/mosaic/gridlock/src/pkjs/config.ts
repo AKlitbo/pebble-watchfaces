@@ -68,6 +68,7 @@ const MODULE_BASE = [
       { size: '2x2', thumb: 'Steps' },
       { size: '2x2', thumb: 'Steps Graph' },
       { size: '1x2', thumb: 'Step Goal' },
+      { size: '1x4', thumb: 'Step Goal' },
     ],
   },
   {
@@ -78,6 +79,7 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Distance' },
       { size: '2x2', thumb: 'Distance' },
       { size: '1x2', thumb: 'Distance Goal' },
+      { size: '1x4', thumb: 'Distance Goal' },
     ],
   },
   {
@@ -88,6 +90,7 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Calories' },
       { size: '2x2', thumb: 'Calories' },
       { size: '1x2', thumb: 'Calorie Goal' },
+      { size: '1x4', thumb: 'Calorie Goal' },
     ],
   },
   {
@@ -98,6 +101,7 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Sleep' },
       { size: '2x2', thumb: 'Sleep' },
       { size: '1x2', thumb: 'Sleep Goal' },
+      { size: '1x4', thumb: 'Sleep Goal' },
     ],
   },
   {
@@ -108,16 +112,17 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Activity' },
       { size: '2x2', thumb: 'Activity' },
       { size: '1x2', thumb: 'Activity Goal' },
+      { size: '1x4', thumb: 'Activity Goal' },
     ],
   },
   // the goal bar panels borrow their health panel's colour set (see theme_alias in C), so each hides
   // under that panel's swatch. each still gets its own row there, because the header and border
   // toggles act on the module a row names
-  { label: 'Step Goal', value: 61, sizes: ['1x2'], themeHidden: true },
-  { label: 'Distance Goal', value: 62, sizes: ['1x2'], themeHidden: true },
-  { label: 'Calorie Goal', value: 63, sizes: ['1x2'], themeHidden: true },
-  { label: 'Sleep Goal', value: 64, sizes: ['1x2'], themeHidden: true },
-  { label: 'Activity Goal', value: 65, sizes: ['1x2'], themeHidden: true },
+  { label: 'Step Goal', value: 61, sizes: ['1x2', '1x4'], themeHidden: true },
+  { label: 'Distance Goal', value: 62, sizes: ['1x2', '1x4'], themeHidden: true },
+  { label: 'Calorie Goal', value: 63, sizes: ['1x2', '1x4'], themeHidden: true },
+  { label: 'Sleep Goal', value: 64, sizes: ['1x2', '1x4'], themeHidden: true },
+  { label: 'Activity Goal', value: 65, sizes: ['1x2', '1x4'], themeHidden: true },
   { label: 'Humidity', value: 10, sizes: ['1x2'] },
   { label: 'Wind Speed', value: 11, sizes: ['1x2'] },
   { label: 'Sunrise', value: 12, sizes: ['1x2'] },

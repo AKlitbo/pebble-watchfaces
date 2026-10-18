@@ -63,7 +63,8 @@ void stat_panel_draw_1x2(GridCtx *gctx, const StatPanel1x2 *desc);
 void stat_panel_draw_goal(GridCtx *gctx, const StatPanelDesc *desc);
 
 /**
- * @brief Draws a goal bar panel: the 1x2 value with a bar under it filled toward the goal.
+ * @brief Draws a goal bar panel: the value with a bar filled toward the goal, under it on the 1x2
+ * and beside it on the 1x4.
  *
  * It reads the same descriptor as the plain goal panel, so the value, the icon, and the goal
  * all come from the one place.
@@ -87,12 +88,12 @@ void stat_panel_draw_goal_bar(GridCtx *gctx, const StatPanelDesc *desc);
         .label = (LABEL), .sizes = (SIZES), .features = (FEAT),                        \
         .theme_alias = (ALIAS), .body = name##_body }
 
-// a 1x2 goal bar panel built from another panel's goal descriptor. ALIAS is that panel, so the
-// two share a colour set
+// a 1x2 and 1x4 goal bar panel built from another panel's goal descriptor. ALIAS is that panel,
+// so the two share a colour set
 #define STAT_PANEL_GOAL_BAR(name, LABEL, FEAT, ALIAS, DESCPTR)                            \
     static void name##_body(GridCtx *gctx) { stat_panel_draw_goal_bar(gctx, (DESCPTR)); } \
     const ModuleDef mod_##name##_def = {                                                  \
-        .label = (LABEL), .sizes = SZ_1x2, .features = (FEAT),                            \
+        .label = (LABEL), .sizes = SZ_1x2 | SZ_1x4, .features = (FEAT),                   \
         .theme_alias = (ALIAS), .body = name##_body }
 
 /** @} */

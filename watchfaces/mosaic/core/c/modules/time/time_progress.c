@@ -11,42 +11,6 @@
 #include "settings_schema.h"
 #include <stdio.h>
 
-#define BAR_GAP 8   // room between a bar and whatever sits beside it on the 1x4
-#define BAR_H_WIDE 6 // the 1x4 bar, a touch thicker than the 4px one the taller tiles carry
-
-// the wide small tile: the percent on the left, the bar across the middle and the icon on the
-// right, so a full width row reads the same at a glance as the half width one
-static void progress_draw_1x4(GridCtx *gctx, int pct, const IconSpec *icon)
-{
-    char val[8];
-    snprintf(val, sizeof(val), "%d%%", pct);
-
-    int value_h = 30;
-    int iw = icon_size(icon->res).w;
-    GSize text = graphics_text_layout_get_content_size(val, fonts_get(FONT_TEKO_26),
-                     GRect(0, 0, 1000, value_h), GTextOverflowModeFill, GTextAlignmentLeft);
-
-    GRect base = grid_anchor(gctx, GSize(text.w + 2, value_h), GAlignLeft, EDGE_PAD(gctx), 0);
-    base = metric_baseline(FONT_TEKO_26, base);
-    graphics_context_set_text_color(gctx->ctx, gctx->color_value);
-    graphics_draw_text(gctx->ctx, val, fonts_get(FONT_TEKO_26), base, GTextOverflowModeFill,
-                       GTextAlignmentLeft, NULL);
-
-    icon_draw(gctx, icon, GAlignRight, -EDGE_PAD(gctx), 0);
-
-    // the bar fills whatever the value and the icon leave, centred on the row
-    int left = gctx->body.origin.x + EDGE_PAD(gctx) + text.w + BAR_GAP;
-    int right = gctx->body.origin.x + gctx->body.size.w - EDGE_PAD(gctx) - iw - BAR_GAP;
-    if (right - left < 8)
-    {
-        return;
-    }
-    int bar_h = BAR_H_WIDE;
-    GRect bar = GRect(left, gctx->body.origin.y + (gctx->body.size.h - bar_h) / 2,
-                      right - left, bar_h);
-    gh_progress_bar(gctx, bar, pct);
-}
-
 // every size shows the percent over a bar. the 2x2 adds two captions saying how far through the
 // period that is in its own units, and the 1x4 lays the percent, bar, and icon out in one row
 static void progress_draw(GridCtx *gctx, int pct, const char *line1, const char *line2,
@@ -65,7 +29,8 @@ static void progress_draw(GridCtx *gctx, int pct, const char *line1, const char 
         gh_stat_2x2(gctx, val, line1, line2, icon, pct);
         break;
     case MSIZE_1x4:
-        progress_draw_1x4(gctx, pct, icon);
+        snprintf(val, sizeof(val), "%d%%", pct);
+        gh_bar_1x4(gctx, val, NULL, icon, pct);
         break;
     default:
         break;

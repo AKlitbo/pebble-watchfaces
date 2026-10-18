@@ -57,7 +57,7 @@ void stat_panel_draw_goal(GridCtx *gctx, const StatPanelDesc *desc)
 
 void stat_panel_draw_goal_bar(GridCtx *gctx, const StatPanelDesc *desc)
 {
-    if (gctx->size != MSIZE_1x2)
+    if (gctx->size != MSIZE_1x2 && gctx->size != MSIZE_1x4)
     {
         return;
     }
@@ -72,5 +72,13 @@ void stat_panel_draw_goal_bar(GridCtx *gctx, const StatPanelDesc *desc)
     desc->goal_2x2(goal_str, sizeof(goal_str), &value, &goal);
 
     // pct_of reads the no-reading marker as 0, so a panel with no reading yet shows an empty bar
-    gh_bar_1x2(gctx, val, unit, desc->base.icon, pct_of(value, goal));
+    int pct = pct_of(value, goal);
+    if (gctx->size == MSIZE_1x4)
+    {
+        gh_bar_1x4(gctx, val, unit, desc->base.icon, pct);
+    }
+    else
+    {
+        gh_bar_1x2(gctx, val, unit, desc->base.icon, pct);
+    }
 }

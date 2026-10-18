@@ -199,6 +199,19 @@ void gh_progress_bar(GridCtx *gctx, GRect bar, int pct);
 void gh_bar_1x2(GridCtx *gctx, const char *val, const char *trailing, const IconSpec *icon, int pct);
 
 /**
+ * @brief A 1x4 with a bar. The value sits on the left with an optional little unit after it, the
+ * icon on the right, and the bar fills the room between them, so a full width row reads the same
+ * at a glance as the half width one.
+ *
+ * @param gctx The grid context.
+ * @param val The value text.
+ * @param trailing A small label after the value if you want one. Pass NULL or "" for none.
+ * @param icon The icon for the right end. Its own little nudge is added for you.
+ * @param pct How much of the bar to fill, 0 to 100.
+ */
+void gh_bar_1x4(GridCtx *gctx, const char *val, const char *trailing, const IconSpec *icon, int pct);
+
+/**
  * @brief The shared 1x2 stat panel. A value on the left with an optional little unit
  * label after it and an icon on the right whose bottom matches the value's bottom.
  *

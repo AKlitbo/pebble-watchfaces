@@ -46,6 +46,8 @@ Gridlock's are Default, Activity, Weather, Data, Sleep, and Creator.
 | **Digital Clock**<br>![](gridlock/resources/thumbnails/clock-1x4.png) | **Forecast (Hourly)**<br>![](gridlock/resources/thumbnails/forecast-hourly-1x4.png) | **Forecast (4-Day)**<br>![](gridlock/resources/thumbnails/forecast-daily-1x4.png) |
 | **Next Event**<br>![](gridlock/resources/thumbnails/next-event-1x4.png) | **Timeline**<br>![](gridlock/resources/thumbnails/timeline-1x4.png) | **Year Progress**<br>![](gridlock/resources/thumbnails/year-progress-1x4.png) |
 | **Day Progress**<br>![](gridlock/resources/thumbnails/day-progress-1x4.png) | **Hour Progress**<br>![](gridlock/resources/thumbnails/hour-progress-1x4.png) | **Week Progress**<br>![](gridlock/resources/thumbnails/week-progress-1x4.png) |
+| **Step Goal**<br>![](gridlock/resources/thumbnails/step-goal-1x4.png) | **Distance Goal**<br>![](gridlock/resources/thumbnails/distance-goal-1x4.png) | **Calorie Goal**<br>![](gridlock/resources/thumbnails/calorie-goal-1x4.png) |
+| **Sleep Goal**<br>![](gridlock/resources/thumbnails/sleep-goal-1x4.png) | **Activity Goal**<br>![](gridlock/resources/thumbnails/activity-goal-1x4.png) | |
 
 ### 2×4
 

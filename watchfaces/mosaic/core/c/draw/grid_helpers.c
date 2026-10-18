@@ -336,6 +336,11 @@ static FontId fit_value_font(const char *val, const FontId *rungs, int rung_coun
 #define BAR_1X2_H 3
 #define BAR_ICON_GAP 6
 
+// the 1x4 bar, a touch thicker than the 4px one the taller tiles carry, and the room it leaves
+// between itself and the value and icon either side
+#define BAR_1X4_H 6
+#define BAR_1X4_GAP 8
+
 // the box a 1x2 bar tile's value sits in, one Teko 22 line plus its pad
 #define BAR_VALUE_H 26
 
@@ -343,6 +348,37 @@ static FontId fit_value_font(const char *val, const FontId *rungs, int rung_coun
 // bodies
 #define BAR_VALUE_DY_HEADED -5
 #define BAR_VALUE_DY_HEADERLESS 2
+
+// the gap between a value and the small unit after it
+#define TRAIL_GAP 1
+
+// how wide a trailing unit is with the gap before it, or 0 for none
+static int trailing_width(const char *trailing)
+{
+    if (!trailing || !trailing[0])
+    {
+        return 0;
+    }
+
+    return TRAIL_GAP + graphics_text_layout_get_content_size(trailing, fonts_get(FONT_STM_12),
+                           GRect(0, 0, 1000, 14), GTextOverflowModeFill, GTextAlignmentLeft).w;
+}
+
+// draws a trailing unit (FONT_STM_12, Share Tech Mono 12) just past the value, bottom-aligned
+// to the value's cap bottom so it stays put across value font steps. -3 trims the unit's extra
+// descender room so it sits flush on the value baseline. it draws in the width it measured, so
+// a long unit (UV 11 reads EXTREME) is never clipped by a fixed box
+static void draw_trailing(GridCtx *gctx, const char *trailing, int trail_w, GRect value_box,
+                          FontId value_font, int text_w)
+{
+    const FontMetric *vm = metric_for(value_font);
+    const FontMetric *tm = metric_for(FONT_STM_12);
+    int trail_y = value_box.origin.y + vm->top_pad + vm->cap_h - (tm->top_pad + tm->cap_h) - 3;
+    graphics_context_set_text_color(gctx->ctx, gctx->color_subtitle);
+    graphics_draw_text(gctx->ctx, trailing, fonts_get(FONT_STM_12),
+                       GRect(value_box.origin.x + text_w + TRAIL_GAP, trail_y, trail_w - TRAIL_GAP, 14),
+                       GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+}
 
 void gh_progress_bar(GridCtx *gctx, GRect bar, int pct)
 {
@@ -359,18 +395,9 @@ void gh_progress_bar(GridCtx *gctx, GRect bar, int pct)
 
 void gh_bar_1x2(GridCtx *gctx, const char *val, const char *trailing, const IconSpec *icon, int pct)
 {
-    const int trail_gap = 1;
-
     int icon_w = icon ? icon_size(icon->res).w : 0;
     int avail = gctx->body.size.w - icon_w - PANEL_PAD * 2;
-
-    int trail_w = 0;
-    if (trailing && trailing[0])
-    {
-        trail_w = trail_gap + graphics_text_layout_get_content_size(trailing,
-                      fonts_get(FONT_STM_12),
-                      GRect(0, 0, 1000, 14), GTextOverflowModeFill, GTextAlignmentLeft).w;
-    }
+    int trail_w = trailing_width(trailing);
 
     // a headed body is only about 25px tall, so the value tops out at Teko 22 to leave the bar
     // room. with no header the tile is taller, so it starts at Teko 26 and steps down to fit
@@ -409,14 +436,7 @@ void gh_bar_1x2(GridCtx *gctx, const char *val, const char *trailing, const Icon
 
     if (trail_w)
     {
-        // sits on the value's baseline the same way gh_stat_1x2 seats its unit
-        const FontMetric *vm = metric_for(font);
-        const FontMetric *tm = metric_for(FONT_STM_12);
-        int trail_y = box.origin.y + vm->top_pad + vm->cap_h - (tm->top_pad + tm->cap_h) - 3;
-        graphics_context_set_text_color(gctx->ctx, gctx->color_subtitle);
-        graphics_draw_text(gctx->ctx, trailing, fonts_get(FONT_STM_12),
-                           GRect(box.origin.x + text_w + trail_gap, trail_y, trail_w - trail_gap, 14),
-                           GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+        draw_trailing(gctx, trailing, trail_w, box, font, text_w);
     }
 
     if (icon)
@@ -435,11 +455,47 @@ void gh_bar_1x2(GridCtx *gctx, const char *val, const char *trailing, const Icon
     gh_progress_bar(gctx, bar, pct);
 }
 
+void gh_bar_1x4(GridCtx *gctx, const char *val, const char *trailing, const IconSpec *icon, int pct)
+{
+    const int value_h = 30;
+
+    int icon_w = icon ? icon_size(icon->res).w : 0;
+    int trail_w = trailing_width(trailing);
+    GSize text = graphics_text_layout_get_content_size(val, fonts_get(FONT_TEKO_26),
+                     GRect(0, 0, 1000, value_h), GTextOverflowModeFill, GTextAlignmentLeft);
+
+    GRect box = grid_anchor(gctx, GSize(text.w + 2, value_h), GAlignLeft, EDGE_PAD(gctx), 0);
+    box = metric_baseline(FONT_TEKO_26, box);
+    graphics_context_set_text_color(gctx->ctx, gctx->color_value);
+    graphics_draw_text(gctx->ctx, val, fonts_get(FONT_TEKO_26), box, GTextOverflowModeFill,
+                       GTextAlignmentLeft, NULL);
+
+    if (trail_w)
+    {
+        draw_trailing(gctx, trailing, trail_w, box, FONT_TEKO_26, text.w);
+    }
+
+    if (icon)
+    {
+        icon_draw(gctx, icon, GAlignRight, -EDGE_PAD(gctx), 0);
+    }
+
+    // the bar fills whatever the value and the icon leave, centred on the row
+    int left = gctx->body.origin.x + EDGE_PAD(gctx) + text.w + trail_w + BAR_1X4_GAP;
+    int right = gctx->body.origin.x + gctx->body.size.w - EDGE_PAD(gctx) - icon_w
+                - (icon ? BAR_1X4_GAP : 0);
+    if (right - left < 8)
+    {
+        return;
+    }
+    GRect bar = GRect(left, gctx->body.origin.y + (gctx->body.size.h - BAR_1X4_H) / 2,
+                      right - left, BAR_1X4_H);
+    gh_progress_bar(gctx, bar, pct);
+}
+
 void gh_stat_1x2(GridCtx *gctx, const char *val, const char *trailing, FontId font,
                  const IconSpec *icon)
 {
-    const int trail_gap = 1;
-
     // content budget: from the left pad across to the icon. PANEL_PAD*2 is the left pad
     // plus the icon's matching right inset (same as gh_mini_row)
     int icon_w = icon ? icon_size(icon->res).w : 0;
@@ -447,13 +503,7 @@ void gh_stat_1x2(GridCtx *gctx, const char *val, const char *trailing, FontId fo
 
     // the trailing unit (AM/PM, MIN, ...) is pinned just past the value, so it slides left
     // when the value font shrinks. measure it once and fold it into the collision test
-    int trail_w = 0;
-    if (trailing && trailing[0])
-    {
-        trail_w = trail_gap + graphics_text_layout_get_content_size(trailing,
-                      fonts_get(FONT_STM_12),
-                      GRect(0, 0, 1000, 14), GTextOverflowModeFill, GTextAlignmentLeft).w;
-    }
+    int trail_w = trailing_width(trailing);
 
     // pick the largest value font that clears the icon, then step down: Teko 26 -> 24 -> 22,
     // mirroring the date ladder in time_date.c. no-header tiles are taller, so they get an
@@ -481,21 +531,9 @@ void gh_stat_1x2(GridCtx *gctx, const char *val, const char *trailing, FontId fo
 
     GRect r = gh_value_left(gctx, val, draw_font, box_w, value_h, PANEL_PAD);
 
-    if (trailing && trailing[0])
+    if (trail_w)
     {
-        // bottom-align the unit (FONT_STM_12, Share Tech Mono 12) to the value's cap-bottom so
-        // it stays put across value font steps: value_bottom - the unit's own cap reach
-        const FontMetric *vm = metric_for(draw_font);
-        const FontMetric *tm = metric_for(FONT_STM_12);
-        // -3 trims the unit's extra descender room so it sits flush on the value baseline
-        int trail_y = r.origin.y + vm->top_pad + vm->cap_h - (tm->top_pad + tm->cap_h) - 3;
-        // draw in the width the unit actually measured. the font ladder already reserved exactly
-        // this much room for it, so a fixed box would clip a long one (UV 11 reads EXTREME) even
-        // though the fit test had allowed for every letter
-        graphics_context_set_text_color(gctx->ctx, gctx->color_subtitle);
-        graphics_draw_text(gctx->ctx, trailing, fonts_get(FONT_STM_12),
-                           GRect(r.origin.x + text_w + trail_gap, trail_y, trail_w - trail_gap, 14),
-                           GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+        draw_trailing(gctx, trailing, trail_w, r, draw_font, text_w);
     }
 
     if (icon)
