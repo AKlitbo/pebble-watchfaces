@@ -462,9 +462,10 @@ const config = [
         { label: '1 hour', value: 5 },
       ], 4, 'How often the watch pulls a fresh copy of your calendar feed. A tighter interval uses more battery.'),
       select('CALENDAR_VIBE_MODE', 'Event Reminders', CALENDAR_VIBE_MODE_OPTIONS, 0, 'Buzz before a timed event starts. Silenced during Quiet Time, and only when a Calendar panel is on your layout. Pick the pattern for each reminder below.'),
-      select('CALENDAR_VIBE_15MIN', 'Reminder: 15m Vibration', VIBE_TYPE_OPTIONS, 1),
-      select('CALENDAR_VIBE_5MIN', 'Reminder: 5m Vibration', VIBE_TYPE_OPTIONS, 3),
-      select('CALENDAR_VIBE_START', 'Reminder: Start Vibration', VIBE_TYPE_OPTIONS, 2),
+      // each pattern shows only under the reminder modes that fire it
+      { ...select('CALENDAR_VIBE_15MIN', 'Reminder: 15m Vibration', VIBE_TYPE_OPTIONS, 1), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1] } },
+      { ...select('CALENDAR_VIBE_5MIN', 'Reminder: 5m Vibration', VIBE_TYPE_OPTIONS, 3), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1, 2] } },
+      { ...select('CALENDAR_VIBE_START', 'Reminder: Start Vibration', VIBE_TYPE_OPTIONS, 2), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1, 2, 3] } },
     ],
   },
   // --- Stocks ---
@@ -486,11 +487,12 @@ const config = [
         type: 'input',
         messageKey: 'STOCK_API_KEY',
         label: 'API Key',
-        description: 'Grab a free key from your chosen provider and paste it here. Yahoo needs no key, so leave this blank when you pick it.',
+        description: 'Grab a free key from your chosen provider and paste it here.',
         attributes: {
           placeholder: 'Paste your private API key here...',
           maxlength: 64,
         },
+        visibleWhen: { key: 'STOCK_PROVIDER', in: ['finnhub', 'twelvedata', 'alphavantage'] },
       },
       {
         type: 'input',

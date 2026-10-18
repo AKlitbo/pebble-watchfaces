@@ -50,6 +50,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       defaultValue: 42, // 21:00
       options: HALF_HOURS,
       description: 'When the night layout takes over. Used for custom times, and as the fallback whenever the watch has no sunset reading.',
+      visibleWhen: { key: 'LAYOUT_NIGHT_MODE', in: [1, 2] },
     },
     {
       type: 'select',
@@ -58,6 +59,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       defaultValue: 14, // 07:00
       options: HALF_HOURS,
       description: 'And when the day layout comes back.',
+      visibleWhen: { key: 'LAYOUT_NIGHT_MODE', in: [1, 2] },
     },
   ];
 }

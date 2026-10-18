@@ -66,11 +66,12 @@ export function healthSection(): ClayConfigItem {
         type: 'input',
         messageKey: 'HEALTH_GOAL_VIBE_CUSTOM',
         label: 'Custom Vibe Pattern',
-        description: 'Your own rhythm as comma-separated on and off times in milliseconds, starting with a buzz. Used only when Goal Met Vibration is set to Custom.',
+        description: 'Your own rhythm as comma-separated on and off times in milliseconds, starting with a buzz.',
         attributes: {
           placeholder: '100,80,100,80,300',
           maxlength: 120,
         },
+        visibleWhen: { key: 'HEALTH_GOAL_VIBE', in: ['C'] },
       },
     ],
   };

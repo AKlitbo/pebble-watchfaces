@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added 1x2, 2x2, and 1x4 Year Progress, Day Progress, Hour Progress, and Week Progress panels showing how far through each you are, as a percent over a progress bar. The 2x2 also says where you are, such as day 195 of 365. The week starts on the first day of the week you picked in settings. Thanks to @SlyeghtlyRye for building them.
 
+### Changed
+
+- Changed the settings page to hide options that do nothing with your current choices, such as the stock API key when Yahoo is picked, or the custom goal vibration unless Goal Met Vibration is Custom.
+
 ## [1.5.1] - 2026-10-12
 
 ### Fixed
