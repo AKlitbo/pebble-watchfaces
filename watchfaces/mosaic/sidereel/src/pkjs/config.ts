@@ -1,5 +1,4 @@
 import configBuilder from '../../../paf/ts/pkjs/config-builder';
-import resetFaceColors from './clay/reset-face-colors';
 import moduleThumbnails from './clay/module-thumbnails.g';
 import moduleMeta from './clay/module-meta';
 import vibrantByType from './clay/vibrant.g';
@@ -238,10 +237,11 @@ const config = [
       color('APPEARANCE_REEL_INK', 'Reel Text Colour',
         'The minutes on the reel.', 0x000000),
       {
-        type: 'button',
+        type: 'resetButton',
         id: 'resetFaceColors',
         defaultValue: 'Reset Face Colours',
         description: 'Puts the four colours above back to their starting values.',
+        resetKeys: ['APPEARANCE_POINTER_COLOR', 'APPEARANCE_POINTER_INK', 'APPEARANCE_REEL_COLOR', 'APPEARANCE_REEL_INK'],
       },
       {
         type: 'themeBuilder',
@@ -369,9 +369,5 @@ const config = [
     defaultValue: 'Save & Apply to Watch',
   },
 ];
-
-// the code Clay runs inside the config page itself, named beside the rows it wires up so both
-// the runtime and the preview tool find it the same way
-export const customClay = resetFaceColors;
 
 export default config;

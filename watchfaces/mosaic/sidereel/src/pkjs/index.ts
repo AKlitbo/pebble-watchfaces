@@ -11,12 +11,12 @@ import app from '../../../paf/ts/pkjs/app';
 import layoutComponent from './clay/layout-component.g';
 import themeComponent from './clay/theme-component.g';
 import hiddenStoreComponent from '../../../paf/ts/clay/hidden-store-component';
+import resetButtonComponent from './clay/reset-button-component';
 import weather from '../../../paf/ts/weather/feature';
-import clayConfig, { customClay } from './config';
+import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
-  components: [layoutComponent, themeComponent, hiddenStoreComponent],
-  customClay,
+  components: [layoutComponent, themeComponent, hiddenStoreComponent, resetButtonComponent],
   features: [weather],
 });
