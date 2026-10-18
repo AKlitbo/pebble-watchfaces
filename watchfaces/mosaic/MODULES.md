@@ -52,8 +52,7 @@ Gridlock's are Default, Activity, Weather, Data, Sleep, and Creator.
 |:--:|:--:|:--:|
 | **Big Time**<br>![](gridlock/resources/thumbnails/big-time-2x4.png) | **Forecast (Hourly)**<br>![](gridlock/resources/thumbnails/forecast-hourly-2x4.png) | **Forecast (4-Day)**<br>![](gridlock/resources/thumbnails/forecast-daily-2x4.png) |
 | **Agenda**<br>![](gridlock/resources/thumbnails/agenda-2x4.png) | **Timeline**<br>![](gridlock/resources/thumbnails/timeline-2x4.png) | **Watchlist**<br>![](gridlock/resources/thumbnails/watchlist-2x4.png) |
-| **Month Grid**<br>![](gridlock/resources/thumbnails/month-2x4.png) | **Year Progress**<br>![](gridlock/resources/thumbnails/year-progress-2x4.png) | **Day Progress**<br>![](gridlock/resources/thumbnails/day-progress-2x4.png) |
-| **Hour Progress**<br>![](gridlock/resources/thumbnails/hour-progress-2x4.png) | **Week Progress**<br>![](gridlock/resources/thumbnails/week-progress-2x4.png) |  |
+| **Month Grid**<br>![](gridlock/resources/thumbnails/month-2x4.png) | | |
 
 ## Sidereel
 

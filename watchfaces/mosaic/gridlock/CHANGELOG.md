@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added four progress panels that show how far through the year, the day, the hour and the week you are, as a percent: Year Progress, Day Progress, Hour Progress and Week Progress. Each comes in every size. Every size shows the percent with a progress bar, and the larger ones add a line saying where you are, such as day 195 of 365. The week follows the first day of the week you chose in settings, and the year knows about leap years. The four share one colour in the appearance editor.
+- Added 1x2, 2x2, and 1x4 Year Progress, Day Progress, Hour Progress, and Week Progress panels showing how far through each you are, as a percent over a progress bar. The 2x2 also says where you are, such as day 195 of 365. The week starts on the first day of the week you picked in settings.
 
 ## [1.5.1] - 2026-10-12
 

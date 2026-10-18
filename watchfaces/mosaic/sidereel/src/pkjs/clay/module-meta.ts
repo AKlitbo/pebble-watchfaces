@@ -56,10 +56,10 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Julian Date':   { icon: '🔭', blockColor: '#3d5afe', slug: 'julian' },
   'Weeks Left':    { icon: '🔢', blockColor: '#0288d1', slug: 'weeksleft' },
   'Next Alarm':    { icon: '🔔', blockColor: '#ef5350', slug: 'alarm' },
-  'Year Progress': { icon: '📈', blockColor: '#ec407a', slug: 'year-progress' },
+  'Year Progress': { icon: '📈', blockColor: '#00897b', slug: 'year-progress' },
   'Day Progress':  { icon: '🌗', blockColor: '#ec407a', slug: 'day-progress' },
   'Hour Progress': { icon: '⌛', blockColor: '#ec407a', slug: 'hour-progress' },
-  'Week Progress': { icon: '🗓', blockColor: '#ec407a', slug: 'week-progress' },
+  'Week Progress': { icon: '🗓', blockColor: '#0288d1', slug: 'week-progress' },
 };
 
 // the block sizes this face's thumbnails come in. embed-thumbnails.ts refuses a png in any other size

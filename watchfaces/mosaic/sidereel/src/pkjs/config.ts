@@ -108,6 +108,8 @@ const MODULE_BASE = [
     themeRows: [
       { size: '1x2', thumb: 'Week Number' },
       { size: '1x2', thumb: 'Weeks Left' },
+      { size: '1x2', thumb: 'Week Progress' },
+      { size: '2x2', thumb: 'Week Progress' },
     ],
   },
   {
@@ -118,6 +120,8 @@ const MODULE_BASE = [
     themeRows: [
       { size: '1x2', thumb: 'Day of Year' },
       { size: '1x2', thumb: 'Days Left' },
+      { size: '1x2', thumb: 'Year Progress' },
+      { size: '2x2', thumb: 'Year Progress' },
     ],
   },
   {
@@ -139,26 +143,24 @@ const MODULE_BASE = [
   // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
   { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
   { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
-  // the four progress panels share one colour set (see theme_alias in C): Year Progress owns it and
-  // the others borrow it so they group under one "Progress" swatch in the appearance editor. every
-  // panel gets its own rows because the header and border toggles act on the module a row names
+  // Year Progress and Week Progress borrow the Day of Year and Week Number colour sets (see
+  // theme_alias in C) so they hide under the Year Count and Week Count swatches. Hour Progress
+  // borrows Day Progress's, so the two share a Time Progress swatch. each panel still gets its own
+  // rows because the header and border toggles act on the module a row names, not the one it
+  // borrows from
+  { label: 'Year Progress', value: 57, sizes: ['1x2', '2x2'], themeHidden: true },
   {
-    label: 'Year Progress',
-    value: 57,
+    label: 'Day Progress',
+    value: 58,
     sizes: ['1x2', '2x2'],
-    themeLabel: 'Progress',
+    themeLabel: 'Time Progress',
     themeRows: [
-      { size: '1x2', thumb: 'Year Progress' },
-      { size: '2x2', thumb: 'Year Progress' },
       { size: '1x2', thumb: 'Day Progress' },
       { size: '2x2', thumb: 'Day Progress' },
       { size: '1x2', thumb: 'Hour Progress' },
       { size: '2x2', thumb: 'Hour Progress' },
-      { size: '1x2', thumb: 'Week Progress' },
-      { size: '2x2', thumb: 'Week Progress' },
     ],
   },
-  { label: 'Day Progress', value: 58, sizes: ['1x2', '2x2'], themeHidden: true },
   { label: 'Hour Progress', value: 59, sizes: ['1x2', '2x2'], themeHidden: true },
   { label: 'Week Progress', value: 60, sizes: ['1x2', '2x2'], themeHidden: true },
 ];

@@ -57,8 +57,8 @@ module.exports = {
   54: "Vivid Cerulean",
   55: "Vivid Cerulean",
   56: "Sunset Orange",
-  57: "Melon",
-  58: "Melon",
-  59: "Melon",
-  60: "Melon",
+  57: "Jaeger Green",
+  58: "Brilliant Rose",
+  59: "Brilliant Rose",
+  60: "Picton Blue",
 };

@@ -74,10 +74,10 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Big Minutes':   { icon: '🕧', blockColor: '#b0bec5', slug: 'big-min' },
   'Big Time':      { icon: '🌙', blockColor: '#b0bec5', slug: 'big-time' },
   'Next Alarm':    { icon: '🔔', blockColor: '#ef5350', slug: 'alarm' },
-  'Year Progress': { icon: '📈', blockColor: '#ec407a', slug: 'year-progress' },
+  'Year Progress': { icon: '📈', blockColor: '#00897b', slug: 'year-progress' },
   'Day Progress':  { icon: '🌗', blockColor: '#ec407a', slug: 'day-progress' },
   'Hour Progress': { icon: '⌛', blockColor: '#ec407a', slug: 'hour-progress' },
-  'Week Progress': { icon: '🗓', blockColor: '#ec407a', slug: 'week-progress' },
+  'Week Progress': { icon: '🗓', blockColor: '#0288d1', slug: 'week-progress' },
 };
 
 // the block sizes this face's layout places, and so the sizes its thumbnails come in.
