@@ -1,6 +1,6 @@
 {
-  "framework": "v4.3.0",
-  "commit": "69a549ea335d7bd45e16e5dda298494c2c0a45bc",
+  "framework": "v4.6.0",
+  "commit": "f530a391e02d0b49c9855ef3ef5f5582df2e6bed",
   "plugins": {
     "icons": {
       "sources": "../../vendor"
