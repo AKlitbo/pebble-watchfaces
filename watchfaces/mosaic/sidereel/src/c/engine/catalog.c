@@ -36,6 +36,7 @@
 #include "mosaic/modules/time/time_weekday_dots.h"
 #include "mosaic/modules/time/time_weeknum.h"
 #include "mosaic/modules/time/time_weeksleft.h"
+#include "mosaic/modules/time/time_progress.h"
 #include "mosaic/modules/time/time_yearend.h"
 #include "mosaic/modules/time/time_zone.h"
 #include "mosaic/modules/weather/weather_conditions.h"
@@ -92,6 +93,10 @@ const ModuleDef *module_def(ModuleType type)
         case MOD_TIME_WEEKDAY_DOTS: return &mod_time_weekday_dots_def;
         case MOD_TIME_WEEKNUM: return &mod_time_weeknum_def;
         case MOD_TIME_WEEKSLEFT: return &mod_time_weeksleft_def;
+        case MOD_TIME_YEAR_PROGRESS: return &mod_time_year_progress_def;
+        case MOD_TIME_DAY_PROGRESS: return &mod_time_day_progress_def;
+        case MOD_TIME_HOUR_PROGRESS: return &mod_time_hour_progress_def;
+        case MOD_TIME_WEEK_PROGRESS: return &mod_time_week_progress_def;
         case MOD_TIME_YEAREND: return &mod_time_yearend_def;
         case MOD_TIME_ZONE_1: return &mod_time_zone_1_def;
 

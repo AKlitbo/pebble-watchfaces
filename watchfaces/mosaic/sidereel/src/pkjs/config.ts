@@ -139,6 +139,28 @@ const MODULE_BASE = [
   // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
   { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
   { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
+  // the four progress panels share one colour set (see theme_alias in C): Year Progress owns it and
+  // the others borrow it so they group under one "Progress" swatch in the appearance editor. every
+  // panel gets its own rows because the header and border toggles act on the module a row names
+  {
+    label: 'Year Progress',
+    value: 57,
+    sizes: ['1x2', '2x2'],
+    themeLabel: 'Progress',
+    themeRows: [
+      { size: '1x2', thumb: 'Year Progress' },
+      { size: '2x2', thumb: 'Year Progress' },
+      { size: '1x2', thumb: 'Day Progress' },
+      { size: '2x2', thumb: 'Day Progress' },
+      { size: '1x2', thumb: 'Hour Progress' },
+      { size: '2x2', thumb: 'Hour Progress' },
+      { size: '1x2', thumb: 'Week Progress' },
+      { size: '2x2', thumb: 'Week Progress' },
+    ],
+  },
+  { label: 'Day Progress', value: 58, sizes: ['1x2', '2x2'], themeHidden: true },
+  { label: 'Hour Progress', value: 59, sizes: ['1x2', '2x2'], themeHidden: true },
+  { label: 'Week Progress', value: 60, sizes: ['1x2', '2x2'], themeHidden: true },
 ];
 
 const MODULE_OPTIONS = MODULE_BASE.map(function (option) {

@@ -55,5 +55,9 @@
   "MOD_TIME_HOUR_BIG": { "alias": "MOD_COMPOSITE_DATETIME" },
   "MOD_TIME_MIN_BIG": { "alias": "MOD_COMPOSITE_DATETIME" },
   "MOD_TIME_BIGCLOCK": { "alias": "MOD_COMPOSITE_DATETIME" },
-  "MOD_SYSTEM_ALARM": { "color": "Sunset Orange" }
+  "MOD_SYSTEM_ALARM": { "color": "Sunset Orange" },
+  "MOD_TIME_YEAR_PROGRESS": { "color": "Melon" },
+  "MOD_TIME_DAY_PROGRESS": { "alias": "MOD_TIME_YEAR_PROGRESS" },
+  "MOD_TIME_HOUR_PROGRESS": { "alias": "MOD_TIME_YEAR_PROGRESS" },
+  "MOD_TIME_WEEK_PROGRESS": { "alias": "MOD_TIME_YEAR_PROGRESS" }
 }

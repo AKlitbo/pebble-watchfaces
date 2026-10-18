@@ -4,6 +4,12 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - Unreleased
+
+### Added
+
+- Added four progress panels that show how far through the year, the day, the hour and the week you are, as a percent: Year Progress, Day Progress, Hour Progress and Week Progress. Both sizes show the percent with a progress bar, and the larger size adds a line saying where you are, such as day 195 of 365. The week follows the first day of the week you chose in settings, and the year knows about leap years. The four share one colour in the appearance editor.
+
 ## [1.2.4] - 2026-10-12
 
 ### Fixed

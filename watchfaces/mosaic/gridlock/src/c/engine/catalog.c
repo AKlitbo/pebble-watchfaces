@@ -59,6 +59,7 @@
 #include "modules/time/time_month.h"
 #include "mosaic/modules/time/time_julian.h"
 #include "mosaic/modules/time/time_weeksleft.h"
+#include "mosaic/modules/time/time_progress.h"
 #include "modules/time/time_bignum.h"
 
 #include <string.h>
@@ -135,6 +136,10 @@ const ModuleDef *module_def(ModuleType type)
         case MOD_TIME_MONTH: return &mod_time_month_def;
         case MOD_TIME_JULIAN: return &mod_time_julian_def;
         case MOD_TIME_WEEKSLEFT: return &mod_time_weeksleft_def;
+        case MOD_TIME_YEAR_PROGRESS: return &mod_time_year_progress_def;
+        case MOD_TIME_DAY_PROGRESS: return &mod_time_day_progress_def;
+        case MOD_TIME_HOUR_PROGRESS: return &mod_time_hour_progress_def;
+        case MOD_TIME_WEEK_PROGRESS: return &mod_time_week_progress_def;
         case MOD_SYSTEM_STATUS: return &mod_system_status_def;
         case MOD_TIME_HOUR_BIG: return &mod_time_hour_big_def;
         case MOD_TIME_MIN_BIG: return &mod_time_min_big_def;
