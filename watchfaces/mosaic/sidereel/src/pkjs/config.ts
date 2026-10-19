@@ -17,157 +17,8 @@ import { weatherSection } from '../../../core/pkjs/weather-section';
 // the stock, calendar and analog panels) are absent rather than reshaped
 const MODULE_BASE = [
   { label: 'Empty', value: 0, sizes: [] },
-  // gridlock groups Status under Battery's swatch. this face has no Status panel, so Battery is
-  // left with its own two rows
-  {
-    label: 'Battery',
-    value: 2,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Battery' },
-      { size: '2x2', thumb: 'Battery' },
-    ],
-  },
-  { label: 'Weather', value: 3, sizes: ['1x2', '2x2'] },
-  {
-    label: 'Temperature',
-    value: 4,
-    sizes: ['1x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Temperature' },
-      { size: '1x2', thumb: 'Feels Like' },
-    ],
-  },
-  {
-    label: 'Heart Rate',
-    value: 5,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Heart Rate' },
-      { size: '2x2', thumb: 'Heart Rate' },
-      { size: '2x2', thumb: 'HR Graph' },
-    ],
-  },
-  {
-    label: 'Steps',
-    value: 6,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Steps' },
-      { size: '2x2', thumb: 'Steps' },
-      { size: '2x2', thumb: 'Steps Graph' },
-      { size: '1x2', thumb: 'Step Goal' },
-    ],
-  },
-  {
-    label: 'Distance',
-    value: 24,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Distance' },
-      { size: '2x2', thumb: 'Distance' },
-      { size: '1x2', thumb: 'Distance Goal' },
-    ],
-  },
-  {
-    label: 'Calories',
-    value: 7,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Calories' },
-      { size: '2x2', thumb: 'Calories' },
-      { size: '1x2', thumb: 'Calorie Goal' },
-    ],
-  },
-  {
-    label: 'Sleep',
-    value: 8,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Sleep' },
-      { size: '2x2', thumb: 'Sleep' },
-      { size: '1x2', thumb: 'Sleep Goal' },
-    ],
-  },
-  {
-    label: 'Activity',
-    value: 9,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Activity' },
-      { size: '2x2', thumb: 'Activity' },
-      { size: '1x2', thumb: 'Activity Goal' },
-    ],
-  },
-  // the goal bar panels borrow their health panel's colour set (see theme_alias in C), so each hides
-  // under that panel's swatch. each still gets its own row there, because the header and border
-  // toggles act on the module a row names
-  { label: 'Step Goal', value: 61, sizes: ['1x2'], themeHidden: true },
-  { label: 'Distance Goal', value: 62, sizes: ['1x2'], themeHidden: true },
-  { label: 'Calorie Goal', value: 63, sizes: ['1x2'], themeHidden: true },
-  { label: 'Sleep Goal', value: 64, sizes: ['1x2'], themeHidden: true },
-  { label: 'Activity Goal', value: 65, sizes: ['1x2'], themeHidden: true },
-  { label: 'Humidity', value: 10, sizes: ['1x2'] },
-  { label: 'Wind Speed', value: 11, sizes: ['1x2'] },
-  { label: 'Sunrise', value: 12, sizes: ['1x2'] },
-  { label: 'Sunset', value: 13, sizes: ['1x2'] },
-  { label: 'Daylight', value: 14, sizes: ['2x2'], themeHidden: true },
-  { label: 'Conditions', value: 15, sizes: ['2x2'] },
-  { label: 'Beats', value: 16, sizes: ['1x2', '2x2'] },
-  { label: 'Date', value: 17, sizes: ['1x2'] },
   { label: 'Time Zone 1', value: 19, sizes: ['1x2'], themeLabel: 'Alternate Time' },
-  { label: 'UV', value: 21, sizes: ['1x2', '2x2'], themeLabel: 'UV Index' },
-  { label: 'Hi/Low', value: 22, sizes: ['1x2'], themeLabel: 'Temperature Hi/Lo' },
-  {
-    label: 'Precipitation',
-    value: 23,
-    sizes: ['1x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Precipitation' },
-      { size: '1x2', thumb: 'Dew Point' },
-    ],
-  },
-  {
-    label: 'Sun',
-    value: 28,
-    sizes: ['1x2', '2x2'],
-    themeLabel: 'Day/Night Tracker',
-    themeRows: [
-      { size: '1x2', thumb: 'Sun' },
-      { size: '2x2', thumb: 'Sun' },
-      { size: '2x2', thumb: 'Daylight' },
-    ],
-  },
-  { label: 'HR Graph', value: 32, sizes: ['2x2'], themeHidden: true },
-  { label: 'Moon', value: 33, sizes: ['1x2', '2x2'] },
-  { label: 'Feels Like', value: 35, sizes: ['1x2'], themeHidden: true },
-  { label: 'Pressure', value: 36, sizes: ['1x2'] },
-  { label: 'Dew Point', value: 37, sizes: ['1x2'], themeHidden: true },
-  { label: 'Steps Graph', value: 39, sizes: ['2x2'], themeHidden: true },
-  {
-    label: 'Week Number',
-    value: 43,
-    sizes: ['1x2'],
-    themeLabel: 'Week Count',
-    themeRows: [
-      { size: '1x2', thumb: 'Week Number' },
-      { size: '1x2', thumb: 'Weeks Left' },
-      { size: '1x2', thumb: 'Week Progress' },
-      { size: '2x2', thumb: 'Week Progress' },
-    ],
-  },
-  {
-    label: 'Day of Year',
-    value: 44,
-    sizes: ['1x2'],
-    themeLabel: 'Year Count',
-    themeRows: [
-      { size: '1x2', thumb: 'Day of Year' },
-      { size: '1x2', thumb: 'Days Left' },
-      { size: '1x2', thumb: 'Year Progress' },
-      { size: '2x2', thumb: 'Year Progress' },
-    ],
-  },
+  { label: 'Beats', value: 16, sizes: ['1x2', '2x2'] },
   {
     label: 'Epoch Clock',
     value: 45,
@@ -178,21 +29,7 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Julian Date' },
     ],
   },
-  { label: 'Days Left', value: 46, sizes: ['1x2'], themeHidden: true },
-  { label: 'Weekday Dots', value: 47, sizes: ['1x2'] },
-  // Next Moon borrows the Moon panel's colour set (see theme_alias in C) so it hides
-  // behind the Moon swatch in the appearance editor
-  { label: 'Next Moon', value: 48, sizes: ['1x2'], themeHidden: true },
   { label: 'Julian Date', value: 50, sizes: ['1x2'], themeHidden: true },
-  // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
-  { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
-  { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
-  // Year Progress and Week Progress borrow the Day of Year and Week Number colour sets (see
-  // theme_alias in C) so they hide under the Year Count and Week Count swatches. Hour Progress
-  // borrows Day Progress's, so the two share a Time Progress swatch. each panel still gets its own
-  // rows because the header and border toggles act on the module a row names, not the one it
-  // borrows from
-  { label: 'Year Progress', value: 57, sizes: ['1x2', '2x2'], themeHidden: true },
   {
     label: 'Day Progress',
     value: 58,
@@ -206,7 +43,170 @@ const MODULE_BASE = [
     ],
   },
   { label: 'Hour Progress', value: 59, sizes: ['1x2', '2x2'], themeHidden: true },
+  { label: 'Date', value: 17, sizes: ['1x2'] },
+  { label: 'Weekday Dots', value: 47, sizes: ['1x2'] },
+  {
+    label: 'Week Number',
+    value: 43,
+    sizes: ['1x2'],
+    themeLabel: 'Week Count',
+    themeRows: [
+      { size: '1x2', thumb: 'Week Number' },
+      { size: '1x2', thumb: 'Weeks Left' },
+      { size: '1x2', thumb: 'Week Progress' },
+      { size: '2x2', thumb: 'Week Progress' },
+    ],
+  },
+  // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
+  { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
   { label: 'Week Progress', value: 60, sizes: ['1x2', '2x2'], themeHidden: true },
+  {
+    label: 'Day of Year',
+    value: 44,
+    sizes: ['1x2'],
+    themeLabel: 'Year Count',
+    themeRows: [
+      { size: '1x2', thumb: 'Day of Year' },
+      { size: '1x2', thumb: 'Days Left' },
+      { size: '1x2', thumb: 'Year Progress' },
+      { size: '2x2', thumb: 'Year Progress' },
+    ],
+  },
+  { label: 'Days Left', value: 46, sizes: ['1x2'], themeHidden: true },
+  // Year Progress and Week Progress borrow the Day of Year and Week Number colour sets (see
+  // theme_alias in C) so they hide under the Year Count and Week Count swatches. Hour Progress
+  // borrows Day Progress's, so the two share a Time Progress swatch. each panel still gets its own
+  // rows because the header and border toggles act on the module a row names, not the one it
+  // borrows from
+  { label: 'Year Progress', value: 57, sizes: ['1x2', '2x2'], themeHidden: true },
+  { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
+  { label: 'Weather', value: 3, sizes: ['1x2', '2x2'] },
+  { label: 'Conditions', value: 15, sizes: ['2x2'] },
+  {
+    label: 'Temperature',
+    value: 4,
+    sizes: ['1x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Temperature' },
+      { size: '1x2', thumb: 'Feels Like' },
+    ],
+  },
+  { label: 'Feels Like', value: 35, sizes: ['1x2'], themeHidden: true },
+  { label: 'Hi/Low', value: 22, sizes: ['1x2'], themeLabel: 'Temperature Hi/Lo' },
+  { label: 'Humidity', value: 10, sizes: ['1x2'] },
+  {
+    label: 'Precipitation',
+    value: 23,
+    sizes: ['1x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Precipitation' },
+      { size: '1x2', thumb: 'Dew Point' },
+    ],
+  },
+  { label: 'Dew Point', value: 37, sizes: ['1x2'], themeHidden: true },
+  { label: 'Wind Speed', value: 11, sizes: ['1x2'] },
+  { label: 'Pressure', value: 36, sizes: ['1x2'] },
+  { label: 'UV', value: 21, sizes: ['1x2', '2x2'], themeLabel: 'UV Index' },
+  {
+    label: 'Sun',
+    value: 28,
+    sizes: ['1x2', '2x2'],
+    themeLabel: 'Day/Night Tracker',
+    themeRows: [
+      { size: '1x2', thumb: 'Sun' },
+      { size: '2x2', thumb: 'Sun' },
+      { size: '2x2', thumb: 'Daylight' },
+    ],
+  },
+  { label: 'Sunrise', value: 12, sizes: ['1x2'] },
+  { label: 'Sunset', value: 13, sizes: ['1x2'] },
+  { label: 'Daylight', value: 14, sizes: ['2x2'], themeHidden: true },
+  { label: 'Moon', value: 33, sizes: ['1x2', '2x2'] },
+  // Next Moon borrows the Moon panel's colour set (see theme_alias in C) so it hides
+  // behind the Moon swatch in the appearance editor
+  { label: 'Next Moon', value: 48, sizes: ['1x2'], themeHidden: true },
+  {
+    label: 'Steps',
+    value: 6,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Steps' },
+      { size: '2x2', thumb: 'Steps' },
+      { size: '2x2', thumb: 'Steps Graph' },
+      { size: '1x2', thumb: 'Step Goal' },
+    ],
+  },
+  // the goal bar panels borrow their health panel's colour set (see theme_alias in C), so each hides
+  // under that panel's swatch. each still gets its own row there, because the header and border
+  // toggles act on the module a row names
+  { label: 'Step Goal', value: 61, sizes: ['1x2'], themeHidden: true },
+  { label: 'Steps Graph', value: 39, sizes: ['2x2'], themeHidden: true },
+  {
+    label: 'Distance',
+    value: 24,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Distance' },
+      { size: '2x2', thumb: 'Distance' },
+      { size: '1x2', thumb: 'Distance Goal' },
+    ],
+  },
+  { label: 'Distance Goal', value: 62, sizes: ['1x2'], themeHidden: true },
+  {
+    label: 'Calories',
+    value: 7,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Calories' },
+      { size: '2x2', thumb: 'Calories' },
+      { size: '1x2', thumb: 'Calorie Goal' },
+    ],
+  },
+  { label: 'Calorie Goal', value: 63, sizes: ['1x2'], themeHidden: true },
+  {
+    label: 'Activity',
+    value: 9,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Activity' },
+      { size: '2x2', thumb: 'Activity' },
+      { size: '1x2', thumb: 'Activity Goal' },
+    ],
+  },
+  { label: 'Activity Goal', value: 65, sizes: ['1x2'], themeHidden: true },
+  {
+    label: 'Sleep',
+    value: 8,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Sleep' },
+      { size: '2x2', thumb: 'Sleep' },
+      { size: '1x2', thumb: 'Sleep Goal' },
+    ],
+  },
+  { label: 'Sleep Goal', value: 64, sizes: ['1x2'], themeHidden: true },
+  {
+    label: 'Heart Rate',
+    value: 5,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Heart Rate' },
+      { size: '2x2', thumb: 'Heart Rate' },
+      { size: '2x2', thumb: 'HR Graph' },
+    ],
+  },
+  { label: 'HR Graph', value: 32, sizes: ['2x2'], themeHidden: true },
+  // gridlock groups Status under Battery's swatch. this face has no Status panel, so Battery is
+  // left with its own two rows
+  {
+    label: 'Battery',
+    value: 2,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Battery' },
+      { size: '2x2', thumb: 'Battery' },
+    ],
+  },
 ];
 
 const MODULE_OPTIONS = MODULE_BASE.map(function (option) {

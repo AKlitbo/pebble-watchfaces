@@ -26,20 +26,115 @@ const MODULE_BASE = [
       { size: '2x4', thumb: 'Big Time' },
     ],
   },
-  // Status (the combined battery/bluetooth/quiet panel) borrows Battery's colour set (see
-  // theme_alias in C) so it groups under the Battery swatch in the appearance editor
+  // the big-digit night panels all ride under the Digital Clock's colour (see theme_alias in
+  // C) so they hide their own swatch and group under Time in the appearance editor
+  { label: 'Big Hour', value: 53, sizes: ['2x2'], themeHidden: true },
+  { label: 'Big Minutes', value: 54, sizes: ['2x2'], themeHidden: true },
+  { label: 'Big Time', value: 55, sizes: ['2x4'], themeHidden: true },
+  { label: 'Time (1x2)', value: 18, sizes: ['1x2'], themeLabel: 'Time' },
+  { label: 'Analog Clock', value: 20, sizes: ['2x2'] },
+  { label: 'Time Zone 1', value: 19, sizes: ['1x2'], themeLabel: 'Alternate Time' },
+  { label: 'Beats', value: 16, sizes: ['1x2', '2x2'] },
   {
-    label: 'Battery',
-    value: 2,
-    sizes: ['1x2', '2x2'],
-    themeLabel: 'Battery',
+    label: 'Epoch Clock',
+    value: 45,
+    sizes: ['1x2'],
+    themeLabel: 'Time Codes',
     themeRows: [
-      { size: '1x2', thumb: 'Battery' },
-      { size: '2x2', thumb: 'Battery' },
-      { size: '1x2', thumb: 'Status' },
+      { size: '1x2', thumb: 'Epoch Clock' },
+      { size: '1x2', thumb: 'Julian Date' },
     ],
   },
+  { label: 'Julian Date', value: 50, sizes: ['1x2'], themeHidden: true },
+  {
+    label: 'Day Progress',
+    value: 58,
+    sizes: ['1x2', '2x2', '1x4'],
+    themeLabel: 'Time Progress',
+    themeRows: [
+      { size: '1x2', thumb: 'Day Progress' },
+      { size: '2x2', thumb: 'Day Progress' },
+      { size: '1x4', thumb: 'Day Progress' },
+      { size: '1x2', thumb: 'Hour Progress' },
+      { size: '2x2', thumb: 'Hour Progress' },
+      { size: '1x4', thumb: 'Hour Progress' },
+    ],
+  },
+  { label: 'Hour Progress', value: 59, sizes: ['1x2', '2x2', '1x4'], themeHidden: true },
+  { label: 'Date', value: 17, sizes: ['1x2'] },
+  { label: 'Weekday Dots', value: 47, sizes: ['1x2'] },
+  {
+    label: 'Week Number',
+    value: 43,
+    sizes: ['1x2'],
+    themeLabel: 'Week Count',
+    themeRows: [
+      { size: '1x2', thumb: 'Week Number' },
+      { size: '1x2', thumb: 'Weeks Left' },
+      { size: '1x2', thumb: 'Week Progress' },
+      { size: '2x2', thumb: 'Week Progress' },
+      { size: '1x4', thumb: 'Week Progress' },
+    ],
+  },
+  // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
+  { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
+  { label: 'Week Progress', value: 60, sizes: ['1x2', '2x2', '1x4'], themeHidden: true },
+  {
+    label: 'Day of Year',
+    value: 44,
+    sizes: ['1x2'],
+    themeLabel: 'Year Count',
+    themeRows: [
+      { size: '1x2', thumb: 'Day of Year' },
+      { size: '1x2', thumb: 'Days Left' },
+      { size: '1x2', thumb: 'Year Progress' },
+      { size: '2x2', thumb: 'Year Progress' },
+      { size: '1x4', thumb: 'Year Progress' },
+    ],
+  },
+  { label: 'Days Left', value: 46, sizes: ['1x2'], themeHidden: true },
+  // Year Progress and Week Progress borrow the Day of Year and Week Number colour sets (see
+  // theme_alias in C) so they hide under the Year Count and Week Count swatches. Hour Progress
+  // borrows Day Progress's, so the two share a Time Progress swatch. each panel still gets its own
+  // rows because the header and border toggles act on the module a row names, not the one it
+  // borrows from
+  { label: 'Year Progress', value: 57, sizes: ['1x2', '2x2', '1x4'], themeHidden: true },
+  { label: 'Month Grid', value: 49, sizes: ['2x4'] },
+  { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
+  // the four calendar panels share one colour set (see theme_alias in C): Next Event owns it and
+  // the others borrow it so they group under one "Calendar" swatch in the appearance editor
+  // themeRows grows to list all four as each panel lands
+  {
+    label: 'Next Event',
+    value: 40,
+    sizes: ['2x2', '1x4'],
+    themeLabel: 'Calendar',
+    themeRows: [
+      { size: '2x2', thumb: 'Next Event' },
+      { size: '1x4', thumb: 'Next Event' },
+      { size: '2x4', thumb: 'Agenda' },
+      { size: '2x2', thumb: 'Timeline' },
+      { size: '1x4', thumb: 'Timeline' },
+      { size: '2x4', thumb: 'Timeline' },
+    ],
+  },
+  { label: 'Timeline', value: 42, sizes: ['1x4', '2x4', '2x2'], themeHidden: true },
+  { label: 'Agenda', value: 41, sizes: ['2x4'], themeHidden: true },
+  // stock (2x2) and the watchlist (2x4) share one colour set but each keeps its own header/border.
+  // themeRows lists the appearance editor's per-size rows and which module's screenshot each shows
+  {
+    label: 'Stock',
+    value: 29,
+    sizes: ['2x2'],
+    themeLabel: 'Stock and Watchlist',
+    themeRows: [
+      { size: '2x2', thumb: 'Stock' },
+      { size: '2x4', thumb: 'Watchlist' },
+    ],
+  },
+  { label: 'Watchlist', value: 30, sizes: ['2x4'], themeHidden: true },
   { label: 'Weather', value: 3, sizes: ['1x2', '2x2'] },
+  { label: 'Conditions', value: 15, sizes: ['2x2'] },
   {
     label: 'Temperature',
     value: 4,
@@ -49,93 +144,9 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Feels Like' },
     ],
   },
-  {
-    label: 'Heart Rate',
-    value: 5,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Heart Rate' },
-      { size: '2x2', thumb: 'Heart Rate' },
-      { size: '2x2', thumb: 'HR Graph' },
-    ],
-  },
-  {
-    label: 'Steps',
-    value: 6,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Steps' },
-      { size: '2x2', thumb: 'Steps' },
-      { size: '2x2', thumb: 'Steps Graph' },
-      { size: '1x2', thumb: 'Step Goal' },
-      { size: '1x4', thumb: 'Step Goal' },
-    ],
-  },
-  {
-    label: 'Distance',
-    value: 24,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Distance' },
-      { size: '2x2', thumb: 'Distance' },
-      { size: '1x2', thumb: 'Distance Goal' },
-      { size: '1x4', thumb: 'Distance Goal' },
-    ],
-  },
-  {
-    label: 'Calories',
-    value: 7,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Calories' },
-      { size: '2x2', thumb: 'Calories' },
-      { size: '1x2', thumb: 'Calorie Goal' },
-      { size: '1x4', thumb: 'Calorie Goal' },
-    ],
-  },
-  {
-    label: 'Sleep',
-    value: 8,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Sleep' },
-      { size: '2x2', thumb: 'Sleep' },
-      { size: '1x2', thumb: 'Sleep Goal' },
-      { size: '1x4', thumb: 'Sleep Goal' },
-    ],
-  },
-  {
-    label: 'Activity',
-    value: 9,
-    sizes: ['1x2', '2x2'],
-    themeRows: [
-      { size: '1x2', thumb: 'Activity' },
-      { size: '2x2', thumb: 'Activity' },
-      { size: '1x2', thumb: 'Activity Goal' },
-      { size: '1x4', thumb: 'Activity Goal' },
-    ],
-  },
-  // the goal bar panels borrow their health panel's colour set (see theme_alias in C), so each hides
-  // under that panel's swatch. each still gets its own row there, because the header and border
-  // toggles act on the module a row names
-  { label: 'Step Goal', value: 61, sizes: ['1x2', '1x4'], themeHidden: true },
-  { label: 'Distance Goal', value: 62, sizes: ['1x2', '1x4'], themeHidden: true },
-  { label: 'Calorie Goal', value: 63, sizes: ['1x2', '1x4'], themeHidden: true },
-  { label: 'Sleep Goal', value: 64, sizes: ['1x2', '1x4'], themeHidden: true },
-  { label: 'Activity Goal', value: 65, sizes: ['1x2', '1x4'], themeHidden: true },
-  { label: 'Humidity', value: 10, sizes: ['1x2'] },
-  { label: 'Wind Speed', value: 11, sizes: ['1x2'] },
-  { label: 'Sunrise', value: 12, sizes: ['1x2'] },
-  { label: 'Sunset', value: 13, sizes: ['1x2'] },
-  { label: 'Daylight', value: 14, sizes: ['2x2'], themeHidden: true },
-  { label: 'Conditions', value: 15, sizes: ['2x2'] },
-  { label: 'Beats', value: 16, sizes: ['1x2', '2x2'] },
-  { label: 'Date', value: 17, sizes: ['1x2'] },
-  { label: 'Time (1x2)', value: 18, sizes: ['1x2'], themeLabel: 'Time' },
-  { label: 'Time Zone 1', value: 19, sizes: ['1x2'], themeLabel: 'Alternate Time' },
-  { label: 'Analog Clock', value: 20, sizes: ['2x2'] },
-  { label: 'UV', value: 21, sizes: ['1x2', '2x2'], themeLabel: 'UV Index' },
+  { label: 'Feels Like', value: 35, sizes: ['1x2'], themeHidden: true },
   { label: 'Hi/Low', value: 22, sizes: ['1x2'], themeLabel: 'Temperature Hi/Lo' },
+  { label: 'Humidity', value: 10, sizes: ['1x2'] },
   {
     label: 'Precipitation',
     value: 23,
@@ -145,6 +156,10 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Dew Point' },
     ],
   },
+  { label: 'Dew Point', value: 37, sizes: ['1x2'], themeHidden: true },
+  { label: 'Wind Speed', value: 11, sizes: ['1x2'] },
+  { label: 'Pressure', value: 36, sizes: ['1x2'] },
+  { label: 'UV', value: 21, sizes: ['1x2', '2x2'], themeLabel: 'UV Index' },
   {
     label: 'Forecast (Hourly)',
     value: 25,
@@ -169,19 +184,103 @@ const MODULE_BASE = [
       { size: '2x2', thumb: 'Daylight' },
     ],
   },
-  // stock (2x2) and the watchlist (2x4) share one colour set but each keeps its own header/border.
-  // themeRows lists the appearance editor's per-size rows and which module's screenshot each shows
+  { label: 'Sunrise', value: 12, sizes: ['1x2'] },
+  { label: 'Sunset', value: 13, sizes: ['1x2'] },
+  { label: 'Daylight', value: 14, sizes: ['2x2'], themeHidden: true },
+  { label: 'Moon', value: 33, sizes: ['1x2', '2x2'] },
+  // Next Moon borrows the Moon panel's colour set (see theme_alias in C) so it hides
+  // behind the Moon swatch in the appearance editor
+  { label: 'Next Moon', value: 48, sizes: ['1x2'], themeHidden: true },
   {
-    label: 'Stock',
-    value: 29,
-    sizes: ['2x2'],
-    themeLabel: 'Stock and Watchlist',
+    label: 'Steps',
+    value: 6,
+    sizes: ['1x2', '2x2'],
     themeRows: [
-      { size: '2x2', thumb: 'Stock' },
-      { size: '2x4', thumb: 'Watchlist' },
+      { size: '1x2', thumb: 'Steps' },
+      { size: '2x2', thumb: 'Steps' },
+      { size: '2x2', thumb: 'Steps Graph' },
+      { size: '1x2', thumb: 'Step Goal' },
+      { size: '1x4', thumb: 'Step Goal' },
     ],
   },
-  { label: 'Watchlist', value: 30, sizes: ['2x4'], themeHidden: true },
+  // the goal bar panels borrow their health panel's colour set (see theme_alias in C), so each hides
+  // under that panel's swatch. each still gets its own row there, because the header and border
+  // toggles act on the module a row names
+  { label: 'Step Goal', value: 61, sizes: ['1x2', '1x4'], themeHidden: true },
+  { label: 'Steps Graph', value: 39, sizes: ['2x2'], themeHidden: true },
+  {
+    label: 'Distance',
+    value: 24,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Distance' },
+      { size: '2x2', thumb: 'Distance' },
+      { size: '1x2', thumb: 'Distance Goal' },
+      { size: '1x4', thumb: 'Distance Goal' },
+    ],
+  },
+  { label: 'Distance Goal', value: 62, sizes: ['1x2', '1x4'], themeHidden: true },
+  {
+    label: 'Calories',
+    value: 7,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Calories' },
+      { size: '2x2', thumb: 'Calories' },
+      { size: '1x2', thumb: 'Calorie Goal' },
+      { size: '1x4', thumb: 'Calorie Goal' },
+    ],
+  },
+  { label: 'Calorie Goal', value: 63, sizes: ['1x2', '1x4'], themeHidden: true },
+  {
+    label: 'Activity',
+    value: 9,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Activity' },
+      { size: '2x2', thumb: 'Activity' },
+      { size: '1x2', thumb: 'Activity Goal' },
+      { size: '1x4', thumb: 'Activity Goal' },
+    ],
+  },
+  { label: 'Activity Goal', value: 65, sizes: ['1x2', '1x4'], themeHidden: true },
+  {
+    label: 'Sleep',
+    value: 8,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Sleep' },
+      { size: '2x2', thumb: 'Sleep' },
+      { size: '1x2', thumb: 'Sleep Goal' },
+      { size: '1x4', thumb: 'Sleep Goal' },
+    ],
+  },
+  { label: 'Sleep Goal', value: 64, sizes: ['1x2', '1x4'], themeHidden: true },
+  {
+    label: 'Heart Rate',
+    value: 5,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Heart Rate' },
+      { size: '2x2', thumb: 'Heart Rate' },
+      { size: '2x2', thumb: 'HR Graph' },
+    ],
+  },
+  { label: 'HR Graph', value: 32, sizes: ['2x2'], themeHidden: true },
+  // Status (the combined battery/bluetooth/quiet panel) borrows Battery's colour set (see
+  // theme_alias in C) so it groups under the Battery swatch in the appearance editor
+  {
+    label: 'Battery',
+    value: 2,
+    sizes: ['1x2', '2x2'],
+    themeLabel: 'Battery',
+    themeRows: [
+      { size: '1x2', thumb: 'Battery' },
+      { size: '2x2', thumb: 'Battery' },
+      { size: '1x2', thumb: 'Status' },
+    ],
+  },
+  { label: 'Status', value: 52, sizes: ['1x2'], themeHidden: true },
   {
     label: 'Connection',
     value: 31,
@@ -191,106 +290,7 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Quiet Time' },
     ],
   },
-  { label: 'HR Graph', value: 32, sizes: ['2x2'], themeHidden: true },
-  { label: 'Moon', value: 33, sizes: ['1x2', '2x2'] },
   { label: 'Quiet Time', value: 34, sizes: ['1x2'], themeHidden: true },
-  { label: 'Feels Like', value: 35, sizes: ['1x2'], themeHidden: true },
-  { label: 'Pressure', value: 36, sizes: ['1x2'] },
-  { label: 'Dew Point', value: 37, sizes: ['1x2'], themeHidden: true },
-  { label: 'Steps Graph', value: 39, sizes: ['2x2'], themeHidden: true },
-  // the four calendar panels share one colour set (see theme_alias in C): Next Event owns it and
-  // the others borrow it so they group under one "Calendar" swatch in the appearance editor
-  // themeRows grows to list all four as each panel lands
-  {
-    label: 'Next Event',
-    value: 40,
-    sizes: ['2x2', '1x4'],
-    themeLabel: 'Calendar',
-    themeRows: [
-      { size: '2x2', thumb: 'Next Event' },
-      { size: '1x4', thumb: 'Next Event' },
-      { size: '2x4', thumb: 'Agenda' },
-      { size: '2x2', thumb: 'Timeline' },
-      { size: '1x4', thumb: 'Timeline' },
-      { size: '2x4', thumb: 'Timeline' },
-    ],
-  },
-  { label: 'Agenda', value: 41, sizes: ['2x4'], themeHidden: true },
-  { label: 'Timeline', value: 42, sizes: ['1x4', '2x4', '2x2'], themeHidden: true },
-  {
-    label: 'Week Number',
-    value: 43,
-    sizes: ['1x2'],
-    themeLabel: 'Week Count',
-    themeRows: [
-      { size: '1x2', thumb: 'Week Number' },
-      { size: '1x2', thumb: 'Weeks Left' },
-      { size: '1x2', thumb: 'Week Progress' },
-      { size: '2x2', thumb: 'Week Progress' },
-      { size: '1x4', thumb: 'Week Progress' },
-    ],
-  },
-  {
-    label: 'Day of Year',
-    value: 44,
-    sizes: ['1x2'],
-    themeLabel: 'Year Count',
-    themeRows: [
-      { size: '1x2', thumb: 'Day of Year' },
-      { size: '1x2', thumb: 'Days Left' },
-      { size: '1x2', thumb: 'Year Progress' },
-      { size: '2x2', thumb: 'Year Progress' },
-      { size: '1x4', thumb: 'Year Progress' },
-    ],
-  },
-  {
-    label: 'Epoch Clock',
-    value: 45,
-    sizes: ['1x2'],
-    themeLabel: 'Time Codes',
-    themeRows: [
-      { size: '1x2', thumb: 'Epoch Clock' },
-      { size: '1x2', thumb: 'Julian Date' },
-    ],
-  },
-  { label: 'Days Left', value: 46, sizes: ['1x2'], themeHidden: true },
-  { label: 'Weekday Dots', value: 47, sizes: ['1x2'] },
-  // Next Moon borrows the Moon panel's colour set (see theme_alias in C) so it hides
-  // behind the Moon swatch in the appearance editor
-  { label: 'Next Moon', value: 48, sizes: ['1x2'], themeHidden: true },
-  { label: 'Month Grid', value: 49, sizes: ['2x4'] },
-  { label: 'Julian Date', value: 50, sizes: ['1x2'], themeHidden: true },
-  // Weeks Left shares the Week Number swatch (see theme_alias in C) so it hides under it
-  { label: 'Weeks Left', value: 51, sizes: ['1x2'], themeHidden: true },
-  { label: 'Status', value: 52, sizes: ['1x2'], themeHidden: true },
-  // the big-digit night panels all ride under the Digital Clock's colour (see theme_alias in
-  // C) so they hide their own swatch and group under Time in the appearance editor
-  { label: 'Big Hour', value: 53, sizes: ['2x2'], themeHidden: true },
-  { label: 'Big Minutes', value: 54, sizes: ['2x2'], themeHidden: true },
-  { label: 'Big Time', value: 55, sizes: ['2x4'], themeHidden: true },
-  { label: 'Next Alarm', value: 56, sizes: ['1x2', '2x2'] },
-  // Year Progress and Week Progress borrow the Day of Year and Week Number colour sets (see
-  // theme_alias in C) so they hide under the Year Count and Week Count swatches. Hour Progress
-  // borrows Day Progress's, so the two share a Time Progress swatch. each panel still gets its own
-  // rows because the header and border toggles act on the module a row names, not the one it
-  // borrows from
-  { label: 'Year Progress', value: 57, sizes: ['1x2', '2x2', '1x4'], themeHidden: true },
-  {
-    label: 'Day Progress',
-    value: 58,
-    sizes: ['1x2', '2x2', '1x4'],
-    themeLabel: 'Time Progress',
-    themeRows: [
-      { size: '1x2', thumb: 'Day Progress' },
-      { size: '2x2', thumb: 'Day Progress' },
-      { size: '1x4', thumb: 'Day Progress' },
-      { size: '1x2', thumb: 'Hour Progress' },
-      { size: '2x2', thumb: 'Hour Progress' },
-      { size: '1x4', thumb: 'Hour Progress' },
-    ],
-  },
-  { label: 'Hour Progress', value: 59, sizes: ['1x2', '2x2', '1x4'], themeHidden: true },
-  { label: 'Week Progress', value: 60, sizes: ['1x2', '2x2', '1x4'], themeHidden: true },
   // "Weather Now" (module 27) is built in C but intentionally left out of the builder until it
   // is ready to ship so it is not selectable in the layout builder yet
 ];
