@@ -56,8 +56,10 @@ static void system_status_body(GridCtx *gctx)
     GRect body = gctx->body;
     int colw = body.size.w / 3;
 
-    // left third: the battery gauge, centred in its column with a touch of room for the nub
-    int bw = 22, bh = 11;
+    // left third: the battery gauge, centred in its column with a touch of room for the nub. 23
+    // wide leaves 19 inside, which five 3px cells and their four gaps fill exactly, so a full
+    // battery reads full rather than leaving a strip of empty casing at the end
+    int bw = 23, bh = 11;
     GRect batt = GRect(body.origin.x + (colw - bw) / 2 + 2,
                        body.origin.y + (body.size.h - bh) / 2, bw, bh);
     battery_glyph(gctx, batt, system_store_battery());

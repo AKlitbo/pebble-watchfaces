@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Changed the settings page to hide options that do nothing with your current choices, such as the stock API key when Yahoo is picked, or the custom goal vibration unless Goal Met Vibration is Custom.
 
+### Fixed
+
+- Fixed a full battery on the Status panel leaving a strip of empty casing at the end.
+
 ## [1.5.1] - 2026-10-12
 
 ### Fixed
