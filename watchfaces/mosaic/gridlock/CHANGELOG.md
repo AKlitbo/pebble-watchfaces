@@ -166,7 +166,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- Fixed the watchface making the watch feel slow and unresponsive. The health panels were rebuilding the entire day's step history from storage every minute, delaying the watch's background work.
+- Fixed the watchface making the watch feel slow and unresponsive. The health panels were rebuilding the entire day's step history from storage every minute, delaying the watch's background work. Thanks to @staindk for reporting it.
 - Fixed activity readings being re-read every few seconds while walking instead of once per minute. Each read was also written back to storage, creating unnecessary work while the watch was in active use.
 - Fixed the heart rate graph being written to storage on every sensor reading. It is now written once per minute, matching how often the graph gains a new point.
 - Fixed the watchface taking a long time to appear, both on first load and when returning from an app or the menu. It was rebuilding the entire day's step history before drawing anything, leaving the previous screen frozen until it finished.
