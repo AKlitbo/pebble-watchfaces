@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Changed the settings page to hide options that do nothing with your current choices, such as the stock API key when Yahoo is picked, or the custom goal vibration unless Goal Met Vibration is Custom.
 - Changed the order of the panels in the layout editor and the appearance editor so related ones sit together, such as each goal panel beside its health panel.
+- Changed the Creator layout preset to show the Status panel in place of Battery.
 
 ### Fixed
 
