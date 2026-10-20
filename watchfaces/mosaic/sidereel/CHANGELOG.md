@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed the settings page to hide options that do nothing with your current choices, such as the custom goal vibration unless Goal Met Vibration is Custom, or the night start and end times while the layouts never swap.
 - Changed the order of the panels in the layout editor and the appearance editor so related ones sit together, such as each goal panel beside its health panel.
 
+### Fixed
+
+- Fixed the Next Moon panel missing from the appearance editor, so its header and border could not be turned off.
+
 ## [1.2.4] - 2026-10-12
 
 ### Fixed

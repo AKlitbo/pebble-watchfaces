@@ -121,9 +121,19 @@ const MODULE_BASE = [
   { label: 'Sunrise', value: 12, sizes: ['1x2'] },
   { label: 'Sunset', value: 13, sizes: ['1x2'] },
   { label: 'Daylight', value: 14, sizes: ['2x2'], themeHidden: true },
-  { label: 'Moon', value: 33, sizes: ['1x2', '2x2'] },
-  // Next Moon borrows the Moon panel's colour set (see theme_alias in C) so it hides
-  // behind the Moon swatch in the appearance editor
+  // Next Moon borrows the Moon panel's colour set (see theme_alias in C) so it hides behind the
+  // Moon swatch in the appearance editor. it still gets its own row there, because the header and
+  // border toggles act on the module a row names
+  {
+    label: 'Moon',
+    value: 33,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Moon' },
+      { size: '2x2', thumb: 'Moon' },
+      { size: '1x2', thumb: 'Next Moon' },
+    ],
+  },
   { label: 'Next Moon', value: 48, sizes: ['1x2'], themeHidden: true },
   {
     label: 'Steps',

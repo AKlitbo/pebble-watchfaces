@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - Fixed a full battery on the Status panel leaving a strip of empty casing at the end.
+- Fixed the Next Moon panel missing from the appearance editor, so its header and border could not be turned off.
 
 ## [1.5.1] - 2026-10-12
 
