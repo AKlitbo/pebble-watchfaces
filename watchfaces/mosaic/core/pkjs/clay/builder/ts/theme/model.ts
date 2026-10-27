@@ -108,6 +108,19 @@ export function buildThemeModules(rawModules: RawModule[]): ThemeModule[] {
 }
 
 /**
+ * A module's signature colour as its argb byte.
+ *
+ * @param module The module, or anything carrying its vibrant colour name.
+ * @param argbByName Palette name to argb byte.
+ * @return The byte, or null when the module has no signature colour or names one the palette lacks.
+ */
+export function vibrantByteFor(module: Pick<ThemeModule, 'vibrant'>, argbByName: Record<string, number>): number | null {
+  const byte = module.vibrant != null ? argbByName[module.vibrant] : undefined;
+
+  return byte != null ? byte : null;
+}
+
+/**
  * True when every size the module supports has this flag set. The colour
  * preview uses it to decide whether the header or border is dropped across
  * the board.

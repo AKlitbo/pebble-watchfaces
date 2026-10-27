@@ -179,6 +179,49 @@ describe('bulk bar', () => {
     expect(afterOff).not.toBe('0');
     expect(afterOn).toBe('0');
   });
+
+  /** The every panel picker is the one tap way to a single colour, so a panel it skips stays the old colour. */
+  test('Colour All Panels writes the picked accent into every row and repaints the swatches', () => {
+    const { ctx } = openEditor();
+
+    barButton('Colour All Panels').click();
+    document.querySelector<HTMLElement>('.tb-cell[title="Red"]').click();
+    document.querySelector<HTMLElement>('.tb-pick .tb-io-btn.primary').click();
+    const result = ctx.get();
+
+    const firstSwatch = document.querySelector<HTMLElement>('.tb-row .tb-swatch');
+
+    expect(result).toBe('~3Bw...Cw...Dw...Gw...Zw...xw...|');
+    expect(firstSwatch.style.background).toBe('rgb(255, 0, 0)');
+  });
+
+  /** Apply writing the untouched channels as mono would wipe every colour already chosen per panel. */
+  test('Colour All Panels keeps a colour already set on a channel it did not touch', () => {
+    const { ctx, rows } = openEditor();
+
+    rows[1].querySelectorAll<HTMLElement>('.tb-swatch')[2].click();
+    document.querySelector<HTMLElement>('.tb-cell[title="Red"]').click();
+    document.querySelector<HTMLElement>('.tb-pick .tb-io-btn.primary').click();
+    barButton('Colour All Panels').click();
+    document.querySelectorAll<HTMLElement>('.tb-nav-btn')[1].click();
+    document.querySelector<HTMLElement>('.tb-cell[title="White"]').click();
+    document.querySelector<HTMLElement>('.tb-pick .tb-io-btn.primary').click();
+    const result = ctx.get();
+
+    expect(result).toBe('~3B._..C._w.D._..G._..Z._..x._..|');
+  });
+
+  /** Vibrant across the board means each panel's own colour, and plain for a panel that has none. */
+  test('Colour All Panels Vibrant gives each row its own signature colour', () => {
+    const { ctx } = openEditor();
+
+    barButton('Colour All Panels').click();
+    document.querySelectorAll<HTMLElement>('.tb-mv-opt')[1].click();
+    document.querySelector<HTMLElement>('.tb-pick .tb-io-btn.primary').click();
+    const result = ctx.get();
+
+    expect(result).toBe('~3CM...|');
+  });
 });
 
 describe('colour picker', () => {

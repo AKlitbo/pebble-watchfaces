@@ -1,5 +1,5 @@
 /**
- * The full screen editor sheet: the legend, the bulk sweep bar, the module
+ * The full screen editor sheet: the legend, the bulk sweep bars, the module
  * list, the bottom Reset / Import-Export / Done bar, and the import/export
  * popup.
  *
@@ -22,6 +22,7 @@ export interface SheetEnv {
   applyImport(text: string): void;
   resetAll(): void;
   persist(): void;
+  openColourAll(onApplied: () => void): void;
   picker: { close(): void };
   onDone(): void;
 }
@@ -33,8 +34,9 @@ export interface SheetEnv {
  * maps (the map objects get swapped on reset and import, so they are always
  * fetched fresh), the wire string in and out (serialize and applyImport),
  * resetAll to blank the whole table, persist() to write the string after a
- * sweep, the picker so closing the sheet also drops an open picker, and
- * onDone for the close handshake back to Clay.
+ * sweep, openColourAll to open the every panel picker, the picker so closing
+ * the sheet also drops an open picker, and onDone for the close handshake
+ * back to Clay.
  */
 export function createSheet(env: SheetEnv): { open(): void } {
   const sheetHost = createOverlayHost('tb-overlay', 'tb-sheet', false);
@@ -170,6 +172,26 @@ export function createSheet(env: SheetEnv): { open(): void } {
     return bar;
   }
 
+  // the colour sweep above the border and header sweeps: one picker that sets a channel on
+  // every panel at once. it gets a bar of its own so the three labels never squeeze on a phone
+  function buildColourBar(): HTMLElement {
+    const bar = document.createElement('div');
+
+    bar.className = 'tb-bar';
+
+    const button = document.createElement('button');
+
+    button.type = 'button';
+    button.className = 'tb-bar-btn ghost';
+    button.textContent = 'Colour All Panels';
+    button.addEventListener('click', function () {
+      env.openColourAll(renderList);
+    });
+    bar.appendChild(button);
+
+    return bar;
+  }
+
   // the Reset / Import-Export / Done bar pinned at the bottom of the sheet
   function buildBar(isBottom: boolean): HTMLElement {
     const bar = document.createElement('div');
@@ -235,12 +257,13 @@ export function createSheet(env: SheetEnv): { open(): void } {
     editorList.className = 'tb-list';
     renderList();
 
-    // the legend and the bulk sweep bar and the list all scroll together so the visible
+    // the legend and the bulk sweep bars and the list all scroll together so the visible
     // list area stays as tall as possible on a small screen. only the footer stays pinned
     const scroller = document.createElement('div');
 
     scroller.className = 'tb-scroll';
     scroller.appendChild(legend);
+    scroller.appendChild(buildColourBar());
     scroller.appendChild(buildBulkBar());
     scroller.appendChild(editorList);
     panel.appendChild(scroller);

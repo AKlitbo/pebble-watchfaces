@@ -51,6 +51,15 @@ export interface ColorRecord {
 /** Module id keyed colour records. */
 export type ColorMap = Record<number, ColorRecord>;
 
+/**
+ * What the every panel picker sets one channel to: an argb byte, null for mono, or 'vibrant' for
+ * each panel's own signature colour.
+ */
+export type ChannelPick = number | null | 'vibrant';
+
+/** The channels the every panel picker touched. A channel left out keeps each panel's own colour. */
+export type ChannelPicks = Partial<Record<ChannelKey, ChannelPick>>;
+
 /** Module id keyed { size key: true } flag map, one for headerless and one for borderless. */
 export type FlagMap = Record<number, Record<string, boolean>>;
 

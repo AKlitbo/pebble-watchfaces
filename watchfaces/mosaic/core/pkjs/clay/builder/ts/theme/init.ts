@@ -11,6 +11,7 @@
 import { PEBBLE_COLORS_CSV, buildPalette, buildArgbByName } from './palette';
 import { serializeAppearance, parseAppearance } from './codec';
 import { buildThemeModules } from './model';
+import { colourAll } from './bulk';
 import { createPicker } from './picker';
 import { createRowBuilder } from './rows';
 import { createSheet } from './sheet';
@@ -112,6 +113,18 @@ export function init(this: ClayComponentInstance): void {
       borderless = {};
     },
     persist: persist,
+    openColourAll: function (onApplied) {
+      picker.openAll(modules, function (picks) {
+        // Apply with nothing picked leaves every panel as it was
+        if (Object.keys(picks).length === 0) {
+          return;
+        }
+
+        colourAll(colors, modules, picks, argbByName);
+        persist();
+        onApplied();
+      });
+    },
     picker: picker,
     onDone: function () {
       persist();

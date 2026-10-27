@@ -8,7 +8,8 @@
  * editor that lists every module with four colour swatches (accent, value,
  * icon, sub) and per size Header/Border toggles. Tapping a swatch opens the
  * 64 colour Pebble palette. A channel left alone stays mono (a striped
- * swatch).
+ * swatch). Colour All Panels opens the same palette for every panel at
+ * once, and only the channels touched there change.
  *
  * The value it round trips is the APPEARANCE_CUSTOM_COLORS wire string the
  * watch parses. The sparse "~3" format is a colour section then "|" then a
@@ -440,7 +441,8 @@ module.exports = {
         allSizesHidden: () => allSizesHidden,
         buildOptionByLabel: () => buildOptionByLabel,
         buildThemeModules: () => buildThemeModules,
-        sizeRowsFor: () => sizeRowsFor
+        sizeRowsFor: () => sizeRowsFor,
+        vibrantByteFor: () => vibrantByteFor
       });
       function buildOptionByLabel(rawModules) {
         const optionByLabel = {};
@@ -499,6 +501,10 @@ module.exports = {
         }
         return modules;
       }
+      function vibrantByteFor(module, argbByName) {
+        const byte = module.vibrant != null ? argbByName[module.vibrant] : void 0;
+        return byte != null ? byte : null;
+      }
       function allSizesHidden(module, map) {
         if (!module.sizeRows || module.sizeRows.length === 0) {
           return false;
@@ -514,6 +520,30 @@ module.exports = {
       var init_model = __esm({
         "core/pkjs/clay/builder/ts/theme/model.ts"() {
           init_codec();
+        }
+      });
+
+      // core/pkjs/clay/builder/ts/theme/bulk.ts
+      var bulk_exports = {};
+      __export(bulk_exports, {
+        colourAll: () => colourAll
+      });
+      function colourAll(colors, modules, picks, argbByName) {
+        const keys = Object.keys(picks);
+        for (let index = 0; index < modules.length; index++) {
+          const module = modules[index];
+          if (!colors[module.value]) {
+            colors[module.value] = { accent: null, value: null, icon: null, subtitle: null };
+          }
+          for (let k = 0; k < keys.length; k++) {
+            const pick = picks[keys[k]];
+            colors[module.value][keys[k]] = pick === "vibrant" ? vibrantByteFor(module, argbByName) : pick != null ? pick : null;
+          }
+        }
+      }
+      var init_bulk = __esm({
+        "core/pkjs/clay/builder/ts/theme/bulk.ts"() {
+          init_model();
         }
       });
 
@@ -603,17 +633,11 @@ module.exports = {
       });
       function createPicker(env) {
         const host = createOverlayHost("tb-pick-overlay", "tb-pick", true);
-        function open(module, channelKey, swatchEls) {
+        function openSession(session) {
           const panel = host.open();
-          const moduleValue = module.value;
-          const committed = env.getColors()[moduleValue] || {};
-          const stagedColors = {
-            accent: committed.accent != null ? committed.accent : null,
-            value: committed.value != null ? committed.value : null,
-            icon: committed.icon != null ? committed.icon : null,
-            subtitle: committed.subtitle != null ? committed.subtitle : null
-          };
-          let active = channelKey;
+          const stagedColors = session.staged;
+          const picks = {};
+          let active = session.startOn;
           function labelFor(key) {
             for (let i = 0; i < env.channels.length; i++) {
               if (env.channels[i].key === key) {
@@ -641,26 +665,32 @@ module.exports = {
           const cells = [];
           let monoOption = null;
           let vibrantOption = null;
-          const vibrantByte = module.vibrant != null ? env.argbByName[module.vibrant] : null;
-          const hideHeader = module.alwaysHeaderless || allSizesHidden(module, env.getHeaderless());
-          const hideBorder = allSizesHidden(module, env.getBorderless());
-          const example = buildExampleBox(module, stagedColors, hideHeader, hideBorder);
+          const vibrantByte = session.vibrantByte;
+          const example = buildExampleBox(
+            { label: session.previewLabel },
+            stagedColors,
+            session.hideHeader,
+            session.hideBorder
+          );
           panel.appendChild(example.box);
           function refreshHighlight() {
-            const byte = stagedColors[active];
+            const current = session.everyPanel ? picks[active] : stagedColors[active];
             if (monoOption) {
-              monoOption.classList.toggle("sel", byte == null);
+              monoOption.classList.toggle("sel", current === null);
             }
             if (vibrantOption) {
-              vibrantOption.classList.toggle("sel", vibrantByte != null && byte === vibrantByte);
+              vibrantOption.classList.toggle(
+                "sel",
+                session.everyPanel ? current === "vibrant" : vibrantByte != null && current === vibrantByte
+              );
             }
             for (let k = 0; k < cells.length; k++) {
-              cells[k].el.classList.toggle("sel", byte != null && cells[k].argb === byte);
+              cells[k].el.classList.toggle("sel", typeof current === "number" && cells[k].argb === current);
             }
           }
           function setActive(key) {
             active = key;
-            titleLabel.textContent = "Editing: " + labelFor(key);
+            titleLabel.textContent = session.titlePrefix + ": " + labelFor(key);
             refreshHighlight();
           }
           function step(delta) {
@@ -676,8 +706,9 @@ module.exports = {
           nextButton.addEventListener("click", function() {
             step(1);
           });
-          function stage(byte) {
+          function stage(byte, pick) {
             stagedColors[active] = byte;
+            picks[active] = pick;
             example.paint(active, byte);
             refreshHighlight();
           }
@@ -687,7 +718,7 @@ module.exports = {
           monoOption.className = "tb-mv-opt";
           monoOption.innerHTML = '<span class="tb-mv-ind tb-cell-mono"></span>Mono';
           monoOption.addEventListener("click", function() {
-            stage(null);
+            stage(null, null);
           });
           mvRow.appendChild(monoOption);
           if (vibrantByte != null) {
@@ -695,11 +726,11 @@ module.exports = {
             vibrantOption.className = "tb-mv-opt";
             const vibrantDot = document.createElement("span");
             vibrantDot.className = "tb-mv-ind";
-            vibrantDot.style.background = argbToCss(vibrantByte);
+            vibrantDot.style.background = session.vibrantDot;
             vibrantOption.appendChild(vibrantDot);
             vibrantOption.appendChild(document.createTextNode("Vibrant"));
             vibrantOption.addEventListener("click", function() {
-              stage(vibrantByte);
+              stage(vibrantByte, session.everyPanel ? "vibrant" : vibrantByte);
             });
             mvRow.appendChild(vibrantOption);
           }
@@ -713,7 +744,7 @@ module.exports = {
               cell.style.background = entry.css;
               cell.title = entry.name;
               cell.addEventListener("click", function() {
-                stage(entry.argb);
+                stage(entry.argb, entry.argb);
               });
               grid.appendChild(cell);
               cells.push({ el: cell, argb: entry.argb });
@@ -733,17 +764,77 @@ module.exports = {
           applyButton.className = "tb-io-btn primary";
           applyButton.textContent = "Apply";
           applyButton.addEventListener("click", function() {
-            env.channels.forEach(function(channel) {
-              env.setChannel(moduleValue, channel.key, stagedColors[channel.key]);
-              paintSwatch(swatchEls[channel.key], stagedColors[channel.key]);
-            });
+            session.commit(stagedColors, picks);
             host.close();
           });
           bar.appendChild(applyButton);
           panel.appendChild(bar);
           setActive(active);
         }
-        return { open, close: host.close };
+        function open(module, channelKey, swatchEls) {
+          const committed = env.getColors()[module.value] || {};
+          const vibrantByte = vibrantByteFor(module, env.argbByName);
+          openSession({
+            // a staged copy of all four channels. the arrows move between them and Apply writes them
+            // all at once and Cancel throws them away so the whole panel edits as one with no
+            // early commit
+            staged: {
+              accent: committed.accent != null ? committed.accent : null,
+              value: committed.value != null ? committed.value : null,
+              icon: committed.icon != null ? committed.icon : null,
+              subtitle: committed.subtitle != null ? committed.subtitle : null
+            },
+            startOn: channelKey,
+            titlePrefix: "Editing",
+            previewLabel: module.label,
+            // this preview is about colours so keep the header and border on as long as any size
+            // still shows them (only hide when the module drops them everywhere) so the accent
+            // stays visible
+            hideHeader: module.alwaysHeaderless || allSizesHidden(module, env.getHeaderless()),
+            hideBorder: allSizesHidden(module, env.getBorderless()),
+            vibrantByte,
+            vibrantDot: vibrantByte != null ? argbToCss(vibrantByte) : "",
+            everyPanel: false,
+            commit: function(staged) {
+              env.channels.forEach(function(channel) {
+                env.setChannel(module.value, channel.key, staged[channel.key]);
+                paintSwatch(swatchEls[channel.key], staged[channel.key]);
+              });
+            }
+          });
+        }
+        function openAll(modules, onApply) {
+          const vibrantCss = [];
+          let firstVibrant = null;
+          for (let index = 0; index < modules.length && vibrantCss.length < 4; index++) {
+            const byte = vibrantByteFor(modules[index], env.argbByName);
+            if (byte == null) {
+              continue;
+            }
+            if (firstVibrant == null) {
+              firstVibrant = byte;
+            }
+            if (vibrantCss.indexOf(argbToCss(byte)) < 0) {
+              vibrantCss.push(argbToCss(byte));
+            }
+          }
+          openSession({
+            // the example starts plain and a channel shows its colour once it has been picked
+            staged: { accent: null, value: null, icon: null, subtitle: null },
+            startOn: "accent",
+            titlePrefix: "All Panels",
+            previewLabel: "All Panels",
+            hideHeader: false,
+            hideBorder: false,
+            vibrantByte: firstVibrant,
+            vibrantDot: vibrantCss.length > 1 ? "linear-gradient(90deg, " + vibrantCss.join(", ") + ")" : vibrantCss[0] || "",
+            everyPanel: true,
+            commit: function(_staged, picks) {
+              onApply(picks);
+            }
+          });
+        }
+        return { open, openAll, close: host.close };
       }
       var init_picker = __esm({
         "core/pkjs/clay/builder/ts/theme/picker.ts"() {
@@ -963,6 +1054,19 @@ module.exports = {
           bar.appendChild(makeBulkButton("headers", "header"));
           return bar;
         }
+        function buildColourBar() {
+          const bar = document.createElement("div");
+          bar.className = "tb-bar";
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "tb-bar-btn ghost";
+          button.textContent = "Colour All Panels";
+          button.addEventListener("click", function() {
+            env.openColourAll(renderList);
+          });
+          bar.appendChild(button);
+          return bar;
+        }
         function buildBar(isBottom) {
           const bar = document.createElement("div");
           bar.className = "tb-bar" + (isBottom ? " tb-bar-bottom" : "");
@@ -1001,6 +1105,7 @@ module.exports = {
           const scroller = document.createElement("div");
           scroller.className = "tb-scroll";
           scroller.appendChild(legend);
+          scroller.appendChild(buildColourBar());
           scroller.appendChild(buildBulkBar());
           scroller.appendChild(editorList);
           panel.appendChild(scroller);
@@ -1107,6 +1212,16 @@ module.exports = {
             borderless = {};
           },
           persist,
+          openColourAll: function(onApplied) {
+            picker.openAll(modules, function(picks) {
+              if (Object.keys(picks).length === 0) {
+                return;
+              }
+              colourAll(colors, modules, picks, argbByName);
+              persist();
+              onApplied();
+            });
+          },
           picker,
           onDone: function() {
             persist();
@@ -1131,6 +1246,7 @@ module.exports = {
           init_palette();
           init_codec();
           init_model();
+          init_bulk();
           init_picker();
           init_rows();
           init_sheet();
@@ -1146,6 +1262,7 @@ module.exports = {
           init_palette();
           init_codec();
           init_model();
+          init_bulk();
           init_preview();
           init_picker();
           init_rows();
