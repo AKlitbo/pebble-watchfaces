@@ -16,7 +16,7 @@
     "test:coverage": "vitest run --config config/vitest.config.ts --coverage --passWithNoTests"
   },
   "devDependencies": {
-    "@types/node": "^24.19.0",
+    "@types/node": "^24.19.2",
     "@vitest/coverage-v8": "^4.1.11",
     "jsdom": "^29.1.1",
     "typescript": "^5.9.3",
