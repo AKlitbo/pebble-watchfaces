@@ -11,8 +11,8 @@ import { thumbByLabel } from '../../../../../../paf/ts/clay/builder/ts/shared/th
 import type { ModuleInfo, RawModule, Thumbs } from '../types';
 
 /**
- * The placeable modules with their icon and colour riding along. config.ts
- * merges those in from module-meta keyed by label, so the mapping survives an
+ * The placeable modules with their icon, colour, and palette group riding
+ * along. config.ts merges those in keyed by label, so the mapping survives an
  * id drift. Module 0 (Empty) is dropped since it is not placeable.
  */
 export function buildModuleList(rawModules: RawModule[]): ModuleInfo[] {
@@ -30,6 +30,7 @@ export function buildModuleList(rawModules: RawModule[]): ModuleInfo[] {
         // themeRows maps a size to the module whose screenshot it shows (the 2x2 digital
         // clock's shot lives under "Time + Date"). thumbFor needs it to find that thumbnail
         themeRows: m.themeRows,
+        group: m.group,
       };
     });
 }

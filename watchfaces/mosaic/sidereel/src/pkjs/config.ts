@@ -1,6 +1,7 @@
 import configBuilder from '../../../paf/ts/pkjs/config-builder';
 import moduleThumbnails from './clay/module-thumbnails.g';
 import moduleMeta from './clay/module-meta';
+import moduleGroups from '../../../core/pkjs/module-groups';
 import vibrantByType from './clay/vibrant.g';
 import layoutPresets from '../data/layout-presets.json';
 import type { ClayConfigItem } from '../../../paf/ts/clay/types';
@@ -230,6 +231,13 @@ const MODULE_OPTIONS = MODULE_BASE.map(function (option) {
 
   if (vibrant) {
     merged.vibrant = vibrant;
+  }
+
+  // the palette group is the family's, shared by every face, so it comes from its own table
+  const group = moduleGroups[option.label];
+
+  if (group) {
+    merged.group = group;
   }
 
   return merged;

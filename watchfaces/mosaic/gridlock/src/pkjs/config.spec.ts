@@ -1,17 +1,22 @@
 /**
- * Specs for the config page's message keys.
+ * Specs for the config page's message keys and layout panels.
  *
  * A key the page sends but the appinfo never declared is the quietest failure in the whole
  * settings path: Clay maps an unknown key to the literal dict key "undefined0", the watch ignores
  * it, and the setting simply never works. Nothing warns, nothing throws, and it looks like a bug
  * in whatever feature the key belonged to. Comparing the two lists catches it here instead.
+ *
+ * The layout palette sorts panels by group, and a panel nobody grouped falls to Other at the end
+ * where nobody looks for it. Checking every placeable panel against the group list catches a new
+ * panel added without one.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, test, expect } from 'vitest';
 import config from './config';
-import { pageKeys } from '../../../core/pkjs/testing/page-keys';
+import { pageKeys, layoutModules } from '../../../core/pkjs/testing/page-keys';
+import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
 
 const appinfo = JSON.parse(
   fs.readFileSync(path.resolve(import.meta.dirname, '../../pebble.appinfo.json'), 'utf8')
@@ -86,6 +91,26 @@ describe('config page message keys', () => {
       expect(onPage.has(key), `${key} missing from the config page`).toBe(true);
       expect(appinfo.messageKeys, `${key} missing from the appinfo`).toContain(key);
     }
+  });
+});
+
+describe('layout palette groups', () => {
+  /** A panel with no group drops into Other at the end of the palette, where nobody looks for it. */
+  test('every placeable panel sits in one of the palette groups', () => {
+    const known = new Set<string>(PALETTE_GROUPS.map((group) => group.name));
+
+    const result = layoutModules(config)
+      .filter((module) => module.value !== 0 && (module.sizes || []).length > 0 && !known.has(module.group || ''))
+      .map((module) => module.label);
+
+    expect(result).toEqual([]);
+  });
+
+  /** The filter above passes just as happily on an empty list, which would prove nothing. */
+  test('the layout builder carries its panels', () => {
+    const result = layoutModules(config);
+
+    expect(result.length).toBeGreaterThan(20);
   });
 });
 

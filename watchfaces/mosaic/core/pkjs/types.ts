@@ -19,6 +19,18 @@ export interface Block {
 /** The four placeable block sizes, keyed the way the wire string names them. */
 export type SizeKey = '1x2' | '2x2' | '1x4' | '2x4';
 
+/** The groups the layout editor's palette sorts panels into. */
+export type ModuleGroup =
+  | 'Clock'
+  | 'Date'
+  | 'Progress'
+  | 'Weather'
+  | 'Sky'
+  | 'Health'
+  | 'Goals'
+  | 'Calendar & Stocks'
+  | 'Status';
+
 /**
  * Per-module presentation metadata, keyed by module label. Carries no grid vocabulary, so it is
  * the framework's and re-exported here for the two module-meta.ts files that read it by this path.

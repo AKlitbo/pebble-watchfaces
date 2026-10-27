@@ -51,6 +51,11 @@ function pointer(type: string, clientX: number, clientY: number): MouseEvent {
   return new MouseEvent(type, { clientX: clientX, clientY: clientY, bubbles: true });
 }
 
+/** Clicks the palette's group tab with this name. */
+function pickGroup(root: HTMLElement, name: string): void {
+  root.querySelector<HTMLElement>('.lb-group[title="' + name + '"]').click();
+}
+
 beforeEach(() => {
   document.body.innerHTML = '';
 });
@@ -182,6 +187,29 @@ describe('drag and drop', () => {
     expect(result).toBe('2,0,0,2,1');
     expect(batteryItem.classList.contains('placed')).toBe(true);
     expect(document.querySelector<HTMLElement>('.lb-ghost')).toBeNull();
+  });
+
+  /**
+   * The real page opens each size on one group, so a drop has to work from a filtered list. The
+   * dimming has to come back after a group switch too, or the same panel could be placed twice.
+   */
+  test('a panel dragged from a picked group places it and stays dimmed after switching back', () => {
+    const groups: Record<string, string> = { Battery: 'Status', Weather: 'Weather', Steps: 'Health' };
+    const grouped = moduleOptionsFixture.map((option) => ({ ...option, group: groups[option.label] }));
+    const mounted = mount(component, { moduleOptions: grouped, moduleThumbnails: {} });
+
+    mounted.ctx.initialize();
+    pickGroup(mounted.root, 'Status');
+
+    mounted.root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]').dispatchEvent(pointer('pointerdown', 5, 5));
+    document.dispatchEvent(pointer('pointermove', 6, 6));
+    document.dispatchEvent(pointer('pointerup', 5, 5));
+    pickGroup(mounted.root, 'Weather');
+    pickGroup(mounted.root, 'Status');
+    const result = mounted.ctx.get();
+
+    expect(result).toBe('2,0,0,2,1');
+    expect(mounted.root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]').classList.contains('placed')).toBe(true);
   });
 
   /** If dragging off grid stops removing, the only way to clear one block is Clear all. */

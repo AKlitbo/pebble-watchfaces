@@ -4,8 +4,8 @@
    Layouts) share their markup with the theme editor's via ts/shared, so .lb-panel and
    .lb-io-* deliberately mirror .tb-pick and .tb-io-* in theme.css.
    standing constraint: colour, border, border-radius and font only. the drag and drop
-   measures real boxes, so never touch padding/flex/gap/width on the bezel, grid, cells,
-   palette items, blocks or the ghost */
+   measures the grid's real box, so never touch padding/flex/gap/width on the bezel, grid,
+   cells, blocks or the ghost. the palette tiles live in palette.css and are never measured */
 .lb {
   padding: 12px 0;
   user-select: none;
@@ -55,21 +55,26 @@
   padding-left: 8px;
 }
 
-.lb-actions-bar {
+/* Import / Export and Clear sit at the foot of the preset column, so nothing stands between
+   the panel list and the watch to drag across */
+.lb-actions-tools {
   display: flex;
-  gap: 8px;
-  justify-content: center;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 8px;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid #2c3038;
 }
 
-.lb-actions-bar .lb-btn {
-  flex: 1;
-  max-width: 130px;
-  padding: 9px !important;
-  font-size: 11px;
+/* Clay gives buttons a 22px line height, which runs the column taller than the watch and
+   stretches the black screen to match. a tight line keeps every button beside the watch */
+.lb-actions-side .lb-btn {
+  line-height: 1.3;
+}
+
+/* the column is too narrow for Import / Export on one line */
+.lb-actions-tools .lb-btn-io {
+  white-space: normal;
 }
 
 /* box-sizing is border-box, so the 1px border costs the button no width */
@@ -124,10 +129,13 @@
   border-color: #a82f24;
 }
 
-/* the grid is the watch screen, so it stays black no matter what the page does */
+/* the grid is the watch screen, so it stays black no matter what the page does. it keeps its
+   own height when the preset column beside it runs taller, since a stretched grid grows a
+   black strip that a drop reads as the last row rather than off the grid */
 .lb-grid {
   position: relative;
   display: grid;
+  align-self: flex-start;
   grid-template-columns: repeat(4, 52px);
   grid-template-rows: repeat(5, 45px);
   gap: 3px;
@@ -172,106 +180,6 @@
 .lb-cell.selecting {
   background: #ff6a1f30;
   border: 1px solid #ff6a1f;
-}
-
-.lb-drawer-wrap {
-  padding: 0 12px;
-  margin-top: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.lb-tabs {
-  display: flex;
-  gap: 4px;
-  position: relative;
-  z-index: 1;
-}
-
-.lb-tab {
-  flex: 1;
-  min-width: 0;
-  padding: 9px 4px;
-  border: none;
-  border-radius: 0;
-  background: #14161a;
-  color: #a3a9b3;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
-  cursor: pointer;
-  margin-bottom: -1px;
-}
-
-.lb-tab.active {
-  background: #ff6a1f;
-  color: #1a0c03;
-}
-
-/* 1px border, not the 2px elsewhere: this box is content-box, so a wider border would
-   grow the drawer under the tabs */
-.lb-drawer-panes {
-  background: #1d2128;
-  border-radius: 0;
-  padding: 10px 8px;
-  border: 1px solid #3d434d;
-}
-
-.lb-drawer-pane {
-  display: none;
-}
-
-.lb-drawer-pane.active {
-  display: block;
-}
-
-.lb-drawer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-
-.lb-pal-item {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  padding: 3px;
-  border-radius: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  touch-action: none;
-  position: relative;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  transition: opacity 0.2s;
-}
-
-.lb-pal-item:active {
-  opacity: 0.7;
-}
-
-.lb-pal-item.placed {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.lb-pal-icon {
-  font-size: 20px;
-  line-height: 1;
-  color: #fff;
-}
-
-.lb-pal-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
 }
 
 .lb-block-img {

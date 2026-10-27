@@ -1,0 +1,189 @@
+/* ---- layout builder palette: size tabs, group tabs, the status line, and the panel tiles ---- */
+.lb-drawer-wrap {
+  padding: 0 12px;
+  margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lb-tabs {
+  display: flex;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.lb-tab {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 4px;
+  border: none;
+  border-radius: 0;
+  background: #14161a;
+  color: #a3a9b3;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.lb-tab.active {
+  background: #ff6a1f;
+  color: #1a0c03;
+}
+
+/* the group tabs sit at the top of the size tab's box, so they read as that size's groups.
+   each tab is as wide as its name and grows to fill its row, so no name is cut short and no
+   row ends in a gap */
+.lb-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+
+/* the display above would beat the browser's own [hidden] rule, so a size with one group
+   would keep an empty strip */
+.lb-groups[hidden] {
+  display: none;
+}
+
+.lb-group {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 5px 6px 3px !important;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: #14161a;
+  color: #a3a9b3;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  cursor: pointer;
+}
+
+/* a tint of the size tab's orange, so the picked group stands out from the box it sits in
+   without matching the solid size tab above it */
+.lb-group[aria-pressed='true'] {
+  background: rgba(255, 106, 31, 0.2);
+  color: #ff8a4c;
+  border-bottom-color: #ff6a1f;
+}
+
+.lb-group-ic {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.lb-group-nm {
+  white-space: nowrap;
+}
+
+/* 1px border, not the 2px elsewhere: this box is content-box, so a wider border would
+   grow the drawer under the tabs */
+.lb-drawer-panes {
+  background: #1d2128;
+  border-radius: 0;
+  padding: 10px 8px;
+  border: 1px solid #3d434d;
+}
+
+/* which group is showing and how much it leaves out, so a short list never reads as everything */
+.lb-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #3d434d;
+  color: #ff6a1f;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+}
+
+.lb-filter-all {
+  flex-shrink: 0;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  border: 1px solid #3d434d;
+  border-radius: 0;
+  background: transparent;
+  color: #eceef2;
+  font: inherit;
+  cursor: pointer;
+}
+
+.lb-drawer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* a tile takes its shot's own shape. half width tiles split a row four ways and full width
+   ones two ways, so a phone fits four or two across. each stops growing at its shot's real
+   size, 94 wide or 192, since a stretched shot only gets blurry */
+.lb-pal-item {
+  min-height: 42px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 2px;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: opacity 0.2s;
+}
+
+/* the widths take the 8px gaps between tiles off the row first */
+.lb-pal-item.narrow {
+  width: calc((100% - 24px) / 4);
+  max-width: 94px;
+}
+
+.lb-pal-item.wide {
+  width: calc((100% - 8px) / 2);
+  max-width: 192px;
+}
+
+.lb-pal-item:active {
+  opacity: 0.7;
+}
+
+.lb-pal-item.placed {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.lb-pal-icon {
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+}
+
+.lb-pal-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

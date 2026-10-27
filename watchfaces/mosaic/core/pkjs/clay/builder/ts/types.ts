@@ -3,7 +3,9 @@
  * strips every import of them and nothing here reaches the bundled component.
  */
 
-export type { Block, SizeKey } from '../../../types';
+import type { ModuleGroup } from '../../../types';
+
+export type { Block, ModuleGroup, SizeKey } from '../../../types';
 
 // the builder shapes that carry no grid vocabulary belong to the framework. re-exported so the mosaic
 // pieces keep naming one types module rather than two
@@ -25,6 +27,7 @@ export interface RawModule extends RawOption {
   themeHidden?: boolean;
   alwaysHeaderless?: boolean;
   vibrant?: string;
+  group?: ModuleGroup;
 }
 
 /** The cleaned module the layout builder draws from. */
@@ -35,6 +38,7 @@ export interface ModuleInfo {
   color: string;
   sizes: string[];
   themeRows?: ThemeRow[];
+  group?: ModuleGroup;
 }
 
 /** One of a panel's four colour channels. */

@@ -8,7 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Colour All Panels button that sets the Accent, Value, Icon, or Sub colour on every panel at once. A colour you leave alone keeps each panel's own, and Vibrant gives each panel its signature colour.
+- Added a Colour All Panels button to the appearance editor that sets a colour on every panel at once.
+
+### Changed
+
+- Changed the layout editor to list its panels one group at a time, such as Weather or Health, with bigger pictures.
+- Changed the layout editor's Import / Export and Clear buttons to sit beside the watch, out of the way of a drag.
 
 ## [1.6.0] - 2026-10-19
 

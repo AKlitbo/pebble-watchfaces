@@ -11,10 +11,11 @@ import type { Block, SizeKey } from '../../../../../../../core/pkjs/clay/builder
 export const GRID_ROWS = 5;
 export const GRID_COLS = 4;
 
+// the order is the order the palette's size tabs show
 export const BLOCK_SIZES: Array<{ w: number; h: number; label: string; key: SizeKey }> = [
   { w: 2, h: 1, label: 'Small', key: '1x2' },
-  { w: 2, h: 2, label: 'Big', key: '2x2' },
   { w: 4, h: 1, label: 'Wide Small', key: '1x4' },
+  { w: 2, h: 2, label: 'Big', key: '2x2' },
   { w: 4, h: 2, label: 'Wide Big', key: '2x4' },
 ];
 

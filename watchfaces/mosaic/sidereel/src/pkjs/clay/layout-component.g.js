@@ -3,9 +3,9 @@
 /**
  * Clay custom component for the drag and drop layout builder.
  *
- * Shows the watch grid, a tabbed palette of modules, preset buttons and an
- * import/export panel. The value it round trips is the LAYOUT wire string
- * the watch reads, one "module,row,col,w,h" entry per placed block.
+ * Shows the watch grid, a palette of modules in size and group tabs, preset
+ * buttons and an import/export panel. The value it round trips is the LAYOUT
+ * wire string the watch reads, one "module,row,col,w,h" entry per placed block.
  *
  * IMPORTANT: initialize and the manipulator run inside the Clay config
  * webview, a separate JS context. They must be self contained, which is why
@@ -14,9 +14,9 @@
 module.exports = {
   name: "layoutBuilder",
 
-  template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Pick a layout, then drag panels in to place them.<br>The gap in the middle is the hour pointer, so a tall panel sits above it or below it, never across.</p>  </div>  <div class=\"lb-modes\"></div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Health</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Solar</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Activity</button>      </div>    </div>  </div>  <div class=\"lb-actions-bar\">    <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>    <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
+  template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Pick a layout, then drag panels in to place them.<br>The gap in the middle is the hour pointer, so a tall panel sits above it or below it, never across.</p>  </div>  <div class=\"lb-modes\"></div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Health</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Solar</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Activity</button>        <div class=\"lb-actions-tools\">          <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>          <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>        </div>      </div>    </div>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
 
-  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;color:#6a707a;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid #3d434d;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-bar{display:flex;gap:8px;justify-content:center;width:100%;box-sizing:border-box;padding:0 8px;margin-bottom:12px}.lb-actions-bar .lb-btn{flex:1;max-width:130px;padding:9px !important;font-size:11px}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;font-weight:700;border:1px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-btn:active{background:#2c3038}.lb-preset{background:#14161a;color:#a3a9b3}.lb-preset:hover{border-color:#ff6a1f;color:#ff6a1f}.lb-btn-io:hover,.lb-btn-slots:hover{border-color:#ff6a1f}.lb-btn-clear{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-btn-clear:active{background:#a82f24;border-color:#a82f24}.lb-grid{position:relative;display:grid;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:#14161a;border:1px dashed #3d434d;border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.blocked{border-style:solid;cursor:not-allowed}.lb-cell.reel{background:#d8d8d8;border-color:#bbb}.lb-cell.pointer{background:#7a1f1f;border-color:#a33}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-drawer-wrap{padding:0 12px;margin-top:8px;width:100%;box-sizing:border-box}.lb-tabs{display:flex;gap:4px;position:relative;z-index:1}.lb-tab{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;background:#14161a;color:#a3a9b3;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;cursor:pointer;margin-bottom:-1px}.lb-tab.active{background:#ff6a1f;color:#1a0c03}.lb-drawer-panes{background:#1d2128;border-radius:0;padding:10px 8px;border:1px solid #3d434d}.lb-drawer-pane{display:none}.lb-drawer-pane.active{display:block}.lb-drawer{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.lb-pal-item{width:42px;height:42px;flex-shrink:0;box-sizing:border-box;padding:3px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.lb-pal-item:active{opacity:0.7}.lb-pal-item.placed{opacity:0.3;pointer-events:none}.lb-pal-icon{font-size:20px;line-height:1;color:#fff}.lb-pal-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:#171a1f;border:2px solid #3d434d;border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid #3d434d;border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:#14161a;color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:2px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-io-btn:active{background:#2c3038}.lb-io-btn.primary{background:#ff6a1f;border-color:#ff6a1f;color:#1a0c03}.lb-io-btn.primary:active{background:#e85e15;border-color:#e85e15}.lb-io-btn.armed{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-io-btn:disabled{background:#1d2128;border-color:#2c3038;color:#6a707a;cursor:default}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid #3d434d;border-radius:0;background:#14161a;color:#6a707a;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:11px;font-weight:700;letter-spacing:0.5px;cursor:pointer}.lb-ltab.active{background:#ff6a1f;border-color:#ff6a1f;color:#171a1f}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}.lb-assign-lbl{flex-shrink:0;color:#6a707a;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{width:100%;box-sizing:border-box;min-width:0;padding:6px 4px;border:2px solid #3d434d;border-radius:0;background:#14161a;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:11px}",
+  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;color:#6a707a;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid #3d434d;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-tools{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:6px;border-top:1px solid #2c3038}.lb-actions-side .lb-btn{line-height:1.3}.lb-actions-tools .lb-btn-io{white-space:normal}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;font-weight:700;border:1px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-btn:active{background:#2c3038}.lb-preset{background:#14161a;color:#a3a9b3}.lb-preset:hover{border-color:#ff6a1f;color:#ff6a1f}.lb-btn-io:hover,.lb-btn-slots:hover{border-color:#ff6a1f}.lb-btn-clear{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-btn-clear:active{background:#a82f24;border-color:#a82f24}.lb-grid{position:relative;display:grid;align-self:flex-start;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:#14161a;border:1px dashed #3d434d;border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.blocked{border-style:solid;cursor:not-allowed}.lb-cell.reel{background:#d8d8d8;border-color:#bbb}.lb-cell.pointer{background:#7a1f1f;border-color:#a33}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:#171a1f;border:2px solid #3d434d;border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid #3d434d;border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:#14161a;color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:2px solid #3d434d;cursor:pointer;background:#23262c;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-io-btn:active{background:#2c3038}.lb-io-btn.primary{background:#ff6a1f;border-color:#ff6a1f;color:#1a0c03}.lb-io-btn.primary:active{background:#e85e15;border-color:#e85e15}.lb-io-btn.armed{background:#c53a2c;border-color:#c53a2c;color:#fff}.lb-io-btn:disabled{background:#1d2128;border-color:#2c3038;color:#6a707a;cursor:default}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid #3d434d;border-radius:0;background:#14161a;color:#6a707a;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:11px;font-weight:700;letter-spacing:0.5px;cursor:pointer}.lb-ltab.active{background:#ff6a1f;border-color:#ff6a1f;color:#171a1f}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}.lb-assign-lbl{flex-shrink:0;color:#6a707a;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{width:100%;box-sizing:border-box;min-width:0;padding:6px 4px;border:2px solid #3d434d;border-radius:0;background:#14161a;color:#eceef2;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:11px}.lb-drawer-wrap{padding:0 12px;margin-top:8px;width:100%;box-sizing:border-box}.lb-tabs{display:flex;gap:4px;position:relative;z-index:1}.lb-tab{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;background:#14161a;color:#a3a9b3;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;cursor:pointer;margin-bottom:-1px}.lb-tab.active{background:#ff6a1f;color:#1a0c03}.lb-groups{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}.lb-groups[hidden]{display:none}.lb-group{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0 !important;margin:0 !important;padding:5px 6px 3px !important;border:none;border-bottom:2px solid transparent;border-radius:0;background:#14161a;color:#a3a9b3;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;cursor:pointer}.lb-group[aria-pressed='true']{background:rgba(255,106,31,0.2);color:#ff8a4c;border-bottom-color:#ff6a1f}.lb-group-ic{font-size:12px;line-height:1}.lb-group-nm{white-space:nowrap}.lb-drawer-panes{background:#1d2128;border-radius:0;padding:10px 8px;border:1px solid #3d434d}.lb-filter{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid #3d434d;color:#ff6a1f;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-filter-all{flex-shrink:0;min-width:0 !important;margin:0 !important;padding:4px 8px !important;border:1px solid #3d434d;border-radius:0;background:transparent;color:#eceef2;font:inherit;cursor:pointer}.lb-drawer{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.lb-pal-item{min-height:42px;flex-shrink:0;box-sizing:border-box;padding:2px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.lb-pal-item.narrow{width:calc((100% - 24px) / 4);max-width:94px}.lb-pal-item.wide{width:calc((100% - 8px) / 2);max-width:192px}.lb-pal-item:active{opacity:0.7}.lb-pal-item.placed{opacity:0.3;pointer-events:none}.lb-pal-icon{font-size:20px;line-height:1;color:#fff}.lb-pal-img{width:100%;height:auto;display:block}",
 
   manipulator: {
     set: function (value) {
@@ -381,7 +381,8 @@ module.exports = {
             sizes: m.sizes || [],
             // themeRows maps a size to the module whose screenshot it shows (the 2x2 digital
             // clock's shot lives under "Time + Date"). thumbFor needs it to find that thumbnail
-            themeRows: m.themeRows
+            themeRows: m.themeRows,
+            group: m.group
           };
         });
       }
@@ -682,6 +683,228 @@ module.exports = {
         }
       });
 
+      // core/pkjs/clay/builder/ts/layout/palette.ts
+      var palette_exports = {};
+      __export(palette_exports, {
+        PALETTE_GROUPS: () => PALETTE_GROUPS,
+        createPalette: () => createPalette,
+        groupsForSize: () => groupsForSize
+      });
+      function groupsForSize(modules, size) {
+        const known = {};
+        const sections = [];
+        const atSize = modules.filter(function(module) {
+          return module.sizes.indexOf(size) !== -1;
+        });
+        for (let index = 0; index < PALETTE_GROUPS.length; index++) {
+          const group = PALETTE_GROUPS[index];
+          const members = atSize.filter(function(module) {
+            return module.group === group.name;
+          });
+          known[group.name] = true;
+          if (members.length > 0) {
+            sections.push({ group, modules: members });
+          }
+        }
+        const others = atSize.filter(function(module) {
+          return !module.group || !known[module.group];
+        });
+        if (others.length > 0) {
+          sections.push({ group: OTHER_GROUP, modules: others });
+        }
+        return sections;
+      }
+      function createPalette(env) {
+        const chosen = {};
+        let placed = [];
+        let activeSize = "";
+        let activeWide = false;
+        const wrap = document.createElement("div");
+        wrap.className = "lb-drawer-wrap";
+        const tabBar = document.createElement("div");
+        tabBar.className = "lb-tabs";
+        const groupBar = document.createElement("div");
+        groupBar.className = "lb-groups";
+        const panes = document.createElement("div");
+        panes.className = "lb-drawer-panes";
+        const pane = document.createElement("div");
+        pane.className = "lb-drawer-pane";
+        panes.appendChild(groupBar);
+        panes.appendChild(pane);
+        function buildTile(module, size) {
+          const tile = document.createElement("div");
+          const shot = env.thumbFor(module.value, size);
+          tile.className = "lb-pal-item " + (activeWide ? "wide" : "narrow");
+          tile.dataset.value = String(module.value);
+          tile.title = module.label;
+          if (shot) {
+            const img = document.createElement("img");
+            tile.style.background = "#000";
+            img.className = "lb-pal-img";
+            img.src = shot;
+            img.alt = module.label;
+            tile.appendChild(img);
+          } else {
+            const icon = document.createElement("div");
+            tile.style.background = module.color;
+            icon.className = "lb-pal-icon";
+            icon.textContent = module.icon;
+            tile.appendChild(icon);
+          }
+          tile.addEventListener("pointerdown", function(event) {
+            env.onPick(module, size, event);
+          });
+          return tile;
+        }
+        function buildGroupTab(group, pressed) {
+          const tab = document.createElement("button");
+          const icon = document.createElement("span");
+          const name = document.createElement("span");
+          tab.type = "button";
+          tab.className = "lb-group";
+          tab.title = group ? group.name : "Every panel";
+          tab.setAttribute("aria-pressed", String(pressed));
+          icon.className = "lb-group-ic";
+          icon.textContent = group ? group.icon : "\u25A6";
+          name.className = "lb-group-nm";
+          name.textContent = group ? group.name : ALL;
+          tab.appendChild(icon);
+          tab.appendChild(name);
+          tab.addEventListener("click", function() {
+            chosen[activeSize] = group ? group.name : ALL;
+            draw();
+          });
+          return tab;
+        }
+        function applyPlaced() {
+          const tiles = pane.querySelectorAll(".lb-pal-item");
+          for (let index = 0; index < tiles.length; index++) {
+            const value = parseInt(tiles[index].dataset.value || "", 10);
+            tiles[index].classList.toggle("placed", placed.indexOf(value) !== -1);
+          }
+        }
+        function draw() {
+          const sections = groupsForSize(env.modules, activeSize);
+          const single = sections.length < 2;
+          let pick = chosen[activeSize];
+          let total = 0;
+          for (let index = 0; index < sections.length; index++) {
+            total += sections[index].modules.length;
+          }
+          if (single) {
+            pick = ALL;
+          } else if (pick !== ALL && !sections.some(function(section) {
+            return section.group.name === pick;
+          })) {
+            pick = sections[0].group.name;
+          }
+          while (groupBar.firstChild) {
+            groupBar.removeChild(groupBar.firstChild);
+          }
+          groupBar.hidden = single;
+          for (let index = 0; index < sections.length && !single; index++) {
+            groupBar.appendChild(buildGroupTab(sections[index].group, sections[index].group.name === pick));
+          }
+          if (!single) {
+            groupBar.appendChild(buildGroupTab(null, pick === ALL));
+          }
+          while (pane.firstChild) {
+            pane.removeChild(pane.firstChild);
+          }
+          const showing = pick === ALL ? null : sections.filter(function(section) {
+            return section.group.name === pick;
+          })[0];
+          const drawer = document.createElement("div");
+          drawer.className = "lb-drawer";
+          const listed = showing ? [showing] : sections;
+          for (let index = 0; index < listed.length; index++) {
+            for (let moduleIndex = 0; moduleIndex < listed[index].modules.length; moduleIndex++) {
+              drawer.appendChild(buildTile(listed[index].modules[moduleIndex], activeSize));
+            }
+          }
+          pane.appendChild(drawer);
+          if (showing) {
+            const status = document.createElement("div");
+            const what = document.createElement("span");
+            const all = document.createElement("button");
+            status.className = "lb-filter";
+            what.textContent = showing.group.name + " \xB7 " + showing.modules.length + " of " + total;
+            all.type = "button";
+            all.className = "lb-filter-all";
+            all.textContent = "Show all";
+            all.addEventListener("click", function() {
+              chosen[activeSize] = ALL;
+              draw();
+            });
+            status.appendChild(what);
+            status.appendChild(all);
+            pane.appendChild(status);
+          }
+          applyPlaced();
+        }
+        function selectSize(size) {
+          const tabs = tabBar.querySelectorAll(".lb-tab");
+          activeSize = size.key;
+          activeWide = size.wide;
+          for (let index = 0; index < tabs.length; index++) {
+            tabs[index].classList.toggle("active", tabs[index].dataset.size === size.key);
+          }
+          draw();
+        }
+        let first = null;
+        for (let index = 0; index < env.sizes.length; index++) {
+          const size = env.sizes[index];
+          if (groupsForSize(env.modules, size.key).length === 0) {
+            continue;
+          }
+          const tab = document.createElement("button");
+          tab.type = "button";
+          tab.className = "lb-tab";
+          tab.dataset.size = size.key;
+          tab.textContent = size.key;
+          tab.addEventListener("click", function() {
+            selectSize(size);
+          });
+          tabBar.appendChild(tab);
+          if (!first) {
+            first = size;
+          }
+        }
+        wrap.appendChild(tabBar);
+        wrap.appendChild(panes);
+        env.container.appendChild(wrap);
+        if (first) {
+          selectSize(first);
+        }
+        return {
+          markPlaced: function(values) {
+            placed = values.slice();
+            applyPlaced();
+          }
+        };
+      }
+      var GROUP_ICONS, PALETTE_GROUPS, OTHER_GROUP, ALL;
+      var init_palette = __esm({
+        "core/pkjs/clay/builder/ts/layout/palette.ts"() {
+          GROUP_ICONS = {
+            "Clock": "\u23F0",
+            "Date": "\u{1F4C5}",
+            "Progress": "\u{1F4CA}",
+            "Weather": "\u{1F324}",
+            "Sky": "\u{1F317}",
+            "Health": "\u2764\uFE0F",
+            "Goals": "\u{1F3AF}",
+            "Calendar & Stocks": "\u{1F4C8}",
+            "Status": "\u{1F50B}"
+          };
+          PALETTE_GROUPS = Object.keys(GROUP_ICONS).map(function(name) {
+            return { name, icon: GROUP_ICONS[name] };
+          });
+          OTHER_GROUP = { name: "Other", icon: "\xB7" };
+          ALL = "All";
+        }
+      });
+
       // core/pkjs/clay/builder/ts/layout/modes.ts
       var modes_exports = {};
       __export(modes_exports, {
@@ -932,18 +1155,9 @@ module.exports = {
             })(i);
           }
           publish();
-          const placedModules = blocks.map(function(b) {
+          palette.markPlaced(blocks.map(function(b) {
             return b.module;
-          });
-          const palItems = root.querySelectorAll(".lb-pal-item");
-          for (let k = 0; k < palItems.length; k++) {
-            const modVal = parseInt(palItems[k].dataset.value || "", 10);
-            if (placedModules.indexOf(modVal) !== -1) {
-              palItems[k].classList.add("placed");
-            } else {
-              palItems[k].classList.remove("placed");
-            }
-          }
+          }));
         }
         const engine = createDragEngine({
           gridEl,
@@ -966,78 +1180,19 @@ module.exports = {
             return thumbFor(THUMBS, MODULES, value, key);
           }
         });
-        const sizeGroups = [
-          { key: "1x2", title: "1x2" },
-          { key: "1x4", title: "1x4" },
-          { key: "2x2", title: "2x2" },
-          { key: "2x4", title: "2x4" }
-        ];
-        const drawerWrap = document.createElement("div");
-        drawerWrap.className = "lb-drawer-wrap";
-        const tabBar = document.createElement("div");
-        tabBar.className = "lb-tabs";
-        const panes = document.createElement("div");
-        panes.className = "lb-drawer-panes";
-        function activateGroup(tab, pane) {
-          const allTabs = tabBar.querySelectorAll(".lb-tab");
-          for (let i = 0; i < allTabs.length; i++) {
-            allTabs[i].classList.remove("active");
+        const palette = createPalette({
+          container: paletteContainer,
+          modules: MODULES,
+          sizes: BLOCK_SIZES.map(function(size) {
+            return { key: size.key, wide: size.w === GRID_COLS };
+          }),
+          thumbFor: function(value, key) {
+            return thumbFor(THUMBS, MODULES, value, key);
+          },
+          onPick: function(module, key, event) {
+            engine.startDragFromPalette(module, key, event);
           }
-          const allPanes = panes.querySelectorAll(".lb-drawer-pane");
-          for (let j = 0; j < allPanes.length; j++) {
-            allPanes[j].classList.remove("active");
-          }
-          tab.classList.add("active");
-          pane.classList.add("active");
-        }
-        let firstGroup = true;
-        sizeGroups.forEach(function(sg) {
-          const groupMods = MODULES.filter(function(m) {
-            return m.sizes.indexOf(sg.key) !== -1;
-          });
-          if (groupMods.length === 0) {
-            return;
-          }
-          const tab = document.createElement("button");
-          tab.type = "button";
-          tab.className = "lb-tab";
-          tab.textContent = sg.title;
-          const pane = document.createElement("div");
-          pane.className = "lb-drawer-pane";
-          const drawer = document.createElement("div");
-          drawer.className = "lb-drawer";
-          groupMods.forEach(function(m) {
-            const el = document.createElement("div");
-            el.className = "lb-pal-item";
-            el.dataset.value = String(m.value);
-            const palThumb = thumbFor(THUMBS, MODULES, m.value, sg.key);
-            if (palThumb) {
-              el.style.background = "#000";
-              el.innerHTML = '<img class="lb-pal-img" src="' + palThumb + '">';
-            } else {
-              el.style.background = m.color;
-              el.innerHTML = '<div class="lb-pal-icon">' + m.icon + "</div>";
-            }
-            el.addEventListener("pointerdown", function(e) {
-              engine.startDragFromPalette(m, sg.key, e);
-            });
-            drawer.appendChild(el);
-          });
-          pane.appendChild(drawer);
-          tab.addEventListener("click", function() {
-            activateGroup(tab, pane);
-          });
-          if (firstGroup) {
-            tab.classList.add("active");
-            pane.classList.add("active");
-            firstGroup = false;
-          }
-          tabBar.appendChild(tab);
-          panes.appendChild(pane);
         });
-        drawerWrap.appendChild(tabBar);
-        drawerWrap.appendChild(panes);
-        paletteContainer.appendChild(drawerWrap);
         root.querySelector(".lb-btn-clear").addEventListener("click", function() {
           blocks = [];
           render();
@@ -1129,6 +1284,7 @@ module.exports = {
           init_presets();
           init_visuals();
           init_drag2();
+          init_palette();
           init_overlay();
           init_io_panel();
           init_modes();
@@ -1147,6 +1303,7 @@ module.exports = {
           init_presets();
           init_visuals();
           init_drag2();
+          init_palette();
           init_modes();
           init_init();
           module.exports = (init_init(), __toCommonJS(init_exports));
