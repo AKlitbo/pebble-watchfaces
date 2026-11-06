@@ -23,7 +23,7 @@ jobs:
       # paf fills every unit's paf/ from the framework tag in its paf.config.json and installs its
       # node_modules from the committed lock. the face is only known once the tag is read, so every unit
       # is filled
-      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.1.0
 
       # every check that can stop a release runs here, before the SDK install and the build, so a
       # mistyped tag or an undated changelog costs seconds

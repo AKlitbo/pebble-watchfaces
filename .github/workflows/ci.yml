@@ -29,7 +29,7 @@ jobs:
 
       # paf fills the unit's paf/ from the framework tag in its paf.config.json and installs its
       # node_modules from the committed lock
-      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.1.0
         with:
           face: ${{ matrix.face }}
 
@@ -74,14 +74,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.1.0
       - run: paf test
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.1.0
       - run: paf lint
       # passes with one line for each unit until it turns Prettier on in its paf.config.json
       - run: paf format --check
@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.1.0
       - run: paf typecheck
 
   # the generated files each face commits, such as its Clay components and thumbnails, still match
@@ -99,5 +99,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.0.0
+      - uses: AKlitbo/pebble-app-framework-cli/.github/actions/sync@v2.1.0
       - run: paf check
