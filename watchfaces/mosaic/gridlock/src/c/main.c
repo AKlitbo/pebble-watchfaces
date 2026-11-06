@@ -43,6 +43,53 @@ static const char GRIDLOCK_NOTICE[] =
 // the two never drift
 #define WEATHER_POLL_MIN 30
 
+// how often the watch takes a burst of beat gaps for the HRV panel. each burst also reads the heart
+// rate, so this is a battery cost on top of the watch's own heart rate sampling
+// TODO: tune on a Pebble Time 2, the only watch that reports beat gaps
+#define HRV_PERIOD_SEC 300
+
+/**
+ * @brief How often to sample for HRV, which is not at all unless an HRV panel is on a layout.
+ *
+ * @return The period in seconds, or 0 for no sampling.
+ */
+static uint16_t hrv_period(void)
+{
+    // listed by name, so a panel added later has to be put here to make the watch sample for it
+    static const uint8_t panels[] = {
+        MOD_HEALTH_HRV, MOD_HEALTH_HRV_TREND, MOD_HEALTH_HEART, MOD_HEALTH_HRV_NIGHT,
+        MOD_HEALTH_HRV_HISTORY, MOD_HEALTH_HRV_STATES, MOD_HEALTH_HRV_DAY, MOD_HEALTH_HRV_TUNING,
+    };
+
+    for (size_t panel = 0; panel < ARRAY_LENGTH(panels); panel++)
+    {
+        if (gridlock_has_module_either(panels[panel]))
+        {
+            return HRV_PERIOD_SEC;
+        }
+    }
+    return 0;
+}
+
+/**
+ * @brief Whether a burst that cannot count is measured rather than dropped, which only the panels
+ * that show walking readings need. Measuring one holds the sensor on for up to 90 seconds more.
+ *
+ * @return True when the history, the still against walking, or the tuning panel is on a layout.
+ */
+static bool hrv_keep_all(void)
+{
+    return gridlock_has_module_either(MOD_HEALTH_HRV_HISTORY) || gridlock_has_module_either(MOD_HEALTH_HRV_STATES) ||
+           gridlock_has_module_either(MOD_HEALTH_HRV_TUNING);
+}
+
+/** @brief Hands the health store the wearer's HRV settings and what the placed panels need. */
+static void apply_hrv_rules(void)
+{
+    health_store_set_hrv_rules((uint16_t)gridlock_hrv_still_mg(), (uint16_t)gridlock_hrv_walk_steps(),
+                               (HrvCount)gridlock_hrv_count(), hrv_keep_all(), gridlock_has_module_either(MOD_HEALTH_HRV_TUNING));
+}
+
 // the header font is the one font that changes at runtime (the user's Header Font pick). we own
 // its handle so we can unload the previous one on a swap, since fonts_register does not free it.
 // 0xFF forces the first apply to load rather than short-circuit on an unchanged choice
@@ -115,6 +162,9 @@ static void on_settings_changed(bool time_or_date_changed)
     {
         stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
         calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
+        // an HRV panel may have been placed or taken off, which turns the sampling on or off
+        apply_hrv_rules();
+        health_store_set_hrv_period(hrv_period());
     }
 }
 
@@ -234,10 +284,20 @@ static void init(void)
     {
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
         // the only face with the two health graphs and with panels for sleep, active time and
-        // calories, so the only one that keeps their history or pays to read them
-        health_store_init((HealthConfig){.live = true, .hr_history = HEALTH_HR_HISTORY,
+        // calories, so the only one that keeps their history or pays to read them. the heart rate
+        // day is named whatever is placed, so its log read runs at every launch, after the paint.
+        // naming it only with BPM Today placed would leave a BPM Today added later empty until the
+        // face next launched, since a settings save does not start the store again
+        // the HRV rules go in with the start, since a relaunch puts the last reading back up by them
+        health_store_init((HealthConfig){.live = true, .hr_history = HEALTH_HR_HISTORY, .hr_day = HEALTH_HR_DAY,
                                          .step_history = HEALTH_STEP_HISTORY, .sleep = true, .active = true,
-                                         .calories = true, .distance = true, .persist_key = HEALTH_STORE_KEY}, NULL);
+                                         .calories = true, .distance = true, .hrv_period_sec = hrv_period(),
+                                         .hrv_still_mg = (uint16_t)gridlock_hrv_still_mg(),
+                                         .hrv_walk_steps = (uint16_t)gridlock_hrv_walk_steps(),
+                                         .hrv_count = (HrvCount)gridlock_hrv_count(), .hrv_keep_all = hrv_keep_all(),
+                                         .hrv_live_redraw = gridlock_has_module_either(MOD_HEALTH_HRV_TUNING),
+                                         .hrv_persist_key = HRV_STORE_KEY,
+                                         .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick
         time_store_init((TimeConfig){.live = true, .minute_tick = true, .beats = false}, NULL);
         weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN, .persist_key = WEATHER_STORE_KEY}, NULL);
@@ -287,6 +347,8 @@ static void init(void)
 static void deinit(void)
 {
     dev_taps_deinit();
+    // the watch keeps the HRV request going for an hour after the face closes, so stop it here
+    health_store_deinit();
     system_store_deinit();
     engine_deinit();
     gridlock_engine_cleanup();

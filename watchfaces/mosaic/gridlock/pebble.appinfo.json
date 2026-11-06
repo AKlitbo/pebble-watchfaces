@@ -7,6 +7,9 @@
   "targetPlatforms": [
     "emery"
   ],
+  "defines": {
+    "HEALTH_HRV": 1
+  },
   "capabilities": [
     "location",
     "configurable",
@@ -76,6 +79,9 @@
     "HEALTH_GOAL_DISTANCE",
     "HEALTH_GOAL_VIBE",
     "HEALTH_GOAL_VIBE_CUSTOM",
+    "HEALTH_HRV_COUNT",
+    "HEALTH_HRV_STILL",
+    "HEALTH_HRV_WALK",
     "CLOCK_TIMEZONE_1",
     "STOCK_PROVIDER",
     "STOCK_API_KEY",

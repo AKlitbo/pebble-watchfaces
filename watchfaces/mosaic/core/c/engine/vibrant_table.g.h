@@ -69,4 +69,13 @@ static const ModuleColors MODULE_VIBRANT[MOD_TYPE_COUNT] = {
     [MOD_HEALTH_CALORIES_GOAL] = { .accent = GColorWindsorTan, .value = GColorWindsorTan, .icon = GColorWindsorTan },
     [MOD_HEALTH_SLEEP_GOAL] = { .accent = GColorLavenderIndigo, .value = GColorLavenderIndigo, .icon = GColorLavenderIndigo },
     [MOD_HEALTH_ACTIVITY_GOAL] = { .accent = GColorSpringBud, .value = GColorSpringBud, .icon = GColorSpringBud },
+    [MOD_HEALTH_HRV] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HRV_TREND] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HEART] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HRV_NIGHT] = { .accent = GColorLavenderIndigo, .value = GColorLavenderIndigo, .icon = GColorLavenderIndigo },
+    [MOD_HEALTH_HRV_HISTORY] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HRV_STATES] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HRV_DAY] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HRV_TUNING] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_HEALTH_HR_DAY] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
 };

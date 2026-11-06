@@ -7,7 +7,9 @@
 #include "mosaic/draw/common.h"
 #include "mosaic/draw/metrics.h"
 #include "io/stores/health_store.h"
+#include "health/hr_day.h"
 #include <stdio.h>
+#include <time.h>
 
 #define HR_SLOTS 60
 
@@ -151,4 +153,102 @@ const ModuleDef mod_health_hr_graph_def = {
     .features = FEATURE_HEALTH,
     .theme_alias = MOD_HEALTH_HEARTRATE,
     .body = health_hr_graph_body
+};
+
+// --- BPM today (1x4, 2x4) ---
+
+/**
+ * Draws today's hours as bars, midnight on the left. The bars stand on the same fixed floor as the
+ * HR graph, so a bar's height reads as the beats themselves and two days compare by eye. The
+ * ceiling rises past HR_CEIL only when an hour's average does. The hour now is drawn in the icon
+ * colour so it stands out while it fills.
+ *
+ * @param gctx The grid context.
+ * @param area Where the bars go.
+ * @param day Today's heart rate by the hour.
+ */
+static void hr_draw_day(GridCtx *gctx, GRect area, const HrDay *day)
+{
+    time_t now = time(NULL);
+    int hour_now = localtime(&now)->tm_hour;
+    int ceiling = HR_CEIL;
+
+    for (int hour = 0; hour < HR_DAY_HOURS; hour++)
+    {
+        int avg = hr_day_hour_avg(day, hour);
+        if (avg > ceiling)
+        {
+            ceiling = avg;
+        }
+    }
+
+    int col_w = area.size.w / HR_DAY_HOURS;
+    int base_y = area.origin.y + area.size.h;
+
+    graphics_context_set_stroke_color(gctx->ctx, gctx->color_subtitle);
+    graphics_draw_line(gctx->ctx, GPoint(area.origin.x, base_y), GPoint(area.origin.x + area.size.w - 1, base_y));
+
+    for (int hour = 0; hour < HR_DAY_HOURS; hour++)
+    {
+        int avg = hr_day_hour_avg(day, hour);
+        if (avg < 0)
+        {
+            continue;
+        }
+
+        // an hour with a reading always shows at least a sliver, even one at or under the floor
+        int top = plot_y(area.origin.y, area.size.h, HR_FLOOR, ceiling, clamp_int(avg, HR_FLOOR, ceiling));
+        int h = base_y - top;
+        if (h < 2)
+        {
+            h = 2;
+        }
+        GRect bar = GRect(area.origin.x + hour * col_w, base_y - h, col_w > 1 ? col_w - 1 : 1, h);
+        graphics_context_set_fill_color(gctx->ctx, hour == hour_now ? gctx->color_icon : gctx->color_value);
+        graphics_fill_rect(gctx->ctx, bar, 0, GCornerNone);
+    }
+}
+
+/**
+ * Today's heart rate. The 1x4 is the bars alone. The 2x4 puts the day's low, average, and high and
+ * the live reading across the top, laid out the same as HRV Today so the two read as a pair.
+ */
+static void health_hr_day_body(GridCtx *gctx)
+{
+    const HrDay *day = health_store_hr_day();
+    GRect area = gctx->body;
+    area.origin.x += PANEL_PAD;
+    area.size.w -= PANEL_PAD * 2;
+
+    if (gctx->size == MSIZE_1x4)
+    {
+        area.origin.y += 3;
+        area.size.h -= 6;
+        hr_draw_day(gctx, area, day);
+        return;
+    }
+
+    if (gctx->size != MSIZE_2x4)
+    {
+        return;
+    }
+
+    int low = -1;
+    int avg = -1;
+    int high = -1;
+    hr_day_stats(day, &low, &avg, &high);
+    static const char *const labels[4] = { "LOW", "AVG", "HIGH", "NOW" };
+    const int values[4] = { low, avg, high, health_store_hr() };
+    int stats_h = gh_stat_row4(gctx, area, labels, values);
+    area.origin.y += stats_h;
+    area.size.h -= stats_h + 3;
+    hr_draw_day(gctx, area, day);
+}
+
+const ModuleDef mod_health_hr_day_def = {
+    .label = "BPM TODAY",
+    .sizes = SZ_1x4 | SZ_2x4,
+    .features = FEATURE_HEALTH,
+    .theme_alias = MOD_HEALTH_HEARTRATE,
+    .body = health_hr_day_body
 };

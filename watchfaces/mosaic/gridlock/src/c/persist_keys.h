@@ -34,10 +34,11 @@
 
 // --- store snapshots (high band, handed to each store's init) ---
 // 253 is the location store's slot, left reserved: this face doesn't wire location
+#define HRV_STORE_KEY      250
 #define CALENDAR_STORE_KEY 251
 #define HEALTH_STORE_KEY   252
 #define STOCK_STORE_KEY    254
 #define WEATHER_STORE_KEY  255
 
 // a stray edit that lets the two bands meet breaks the build instead of a watch in the field
-_Static_assert(GRIDLOCK_QUIET_KEY < CALENDAR_STORE_KEY, "settings keys must stay below the store keys");
+_Static_assert(GRIDLOCK_QUIET_KEY < HRV_STORE_KEY, "settings keys must stay below the store keys");

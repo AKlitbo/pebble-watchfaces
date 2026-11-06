@@ -5,6 +5,7 @@
  * @ingroup mosaic_draw
  */
 #include "mosaic/draw/grid_helpers.h"
+#include "text/number_format.h"
 
 #include "math/pct.h"
 #include "math/scale.h"
@@ -575,4 +576,29 @@ void gh_mini_row(GridCtx *gctx, const char *label, const char *value, const char
     {
         gh_icon_bottom_of(gctx, icon, val_r, FONT_TEKO_26);
     }
+}
+
+int gh_stat_row4(GridCtx *gctx, GRect area, const char *const labels[4], const int values[4])
+{
+    int col_w = area.size.w / 4;
+    int caption_h = metric_for(FONT_STM_12)->line_h;
+    int value_h = metric_for(FONT_TEKO_26)->line_h;
+
+    for (int stat = 0; stat < 4; stat++)
+    {
+        char val[8];
+        fmt_int_or_dash(val, sizeof(val), values[stat], "%d");
+        GRect cap = GRect(area.origin.x + stat * col_w, area.origin.y, col_w, caption_h);
+        // Teko's digits sit low in their line, so the value starts 4px into the caption's line
+        GRect num = GRect(area.origin.x + stat * col_w, area.origin.y + caption_h - 4, col_w, value_h);
+
+        graphics_context_set_text_color(gctx->ctx, gctx->color_subtitle);
+        graphics_draw_text(gctx->ctx, labels[stat], fonts_get(FONT_STM_12), cap, GTextOverflowModeFill,
+                           GTextAlignmentCenter, NULL);
+        graphics_context_set_text_color(gctx->ctx, gctx->color_value);
+        graphics_draw_text(gctx->ctx, val, fonts_get(FONT_TEKO_26), num, GTextOverflowModeFill,
+                           GTextAlignmentCenter, NULL);
+    }
+
+    return caption_h + value_h - 2;
 }

@@ -147,6 +147,8 @@ int gridlock_goal_distance_m(void);
 int gridlock_goal_sleep_min(void);
 int gridlock_goal_active_min(void);
 int gridlock_hr_limit(void);
+/** @brief Which HRV bursts count. Sidereel has no HRV, so this is always the default, not while walking. */
+uint8_t gridlock_hrv_count(void);
 uint8_t gridlock_wind_unit(void);
 uint8_t gridlock_week_start(void);
 bool gridlock_distance_in_miles(void);

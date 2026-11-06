@@ -4,7 +4,7 @@
  *
  * A mosaic face holds three layouts and this decides which one is showing. Two things can ask for
  * one: the night schedule, and Quiet Time. The picking itself is plain logic and lives in the framework
- * (role/role.h and clock/nightsched.h); what is here is the wiring: reading the clock,
+ * (role/role.h and clock/nightsched.h). What is here is the wiring: reading the clock,
  * the sun and the watch's own Quiet Time setting, and telling the engine to rebuild on the few
  * minutes a day the answer actually changes.
  *

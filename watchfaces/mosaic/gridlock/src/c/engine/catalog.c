@@ -21,6 +21,7 @@
 #include "mosaic/modules/weather/weather_sun.h"
 #include "mosaic/modules/weather/weather_temperature.h"
 #include "mosaic/modules/health/health_heartrate.h"
+#include "mosaic/modules/health/health_hrv.h"
 #include "mosaic/modules/health/health_steps.h"
 #include "mosaic/modules/health/health_distance.h"
 #include "mosaic/modules/health/health_calories.h"
@@ -145,6 +146,15 @@ const ModuleDef *module_def(ModuleType type)
         case MOD_HEALTH_CALORIES_GOAL: return &mod_health_calories_goal_def;
         case MOD_HEALTH_SLEEP_GOAL: return &mod_health_sleep_goal_def;
         case MOD_HEALTH_ACTIVITY_GOAL: return &mod_health_activity_goal_def;
+        case MOD_HEALTH_HRV: return &mod_health_hrv_def;
+        case MOD_HEALTH_HRV_TREND: return &mod_health_hrv_trend_def;
+        case MOD_HEALTH_HEART: return &mod_health_heart_def;
+        case MOD_HEALTH_HRV_NIGHT: return &mod_health_hrv_night_def;
+        case MOD_HEALTH_HRV_HISTORY: return &mod_health_hrv_history_def;
+        case MOD_HEALTH_HRV_STATES: return &mod_health_hrv_states_def;
+        case MOD_HEALTH_HRV_DAY: return &mod_health_hrv_day_def;
+        case MOD_HEALTH_HRV_TUNING: return &mod_health_hrv_tuning_def;
+        case MOD_HEALTH_HR_DAY: return &mod_health_hr_day_def;
         case MOD_SYSTEM_STATUS: return &mod_system_status_def;
         case MOD_TIME_HOUR_BIG: return &mod_time_hour_big_def;
         case MOD_TIME_MIN_BIG: return &mod_time_min_big_def;

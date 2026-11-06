@@ -69,8 +69,11 @@
 #define GRIDLOCK_WEATHER_VERSION 1
 #define GRIDLOCK_WEATHER_SIZE    3
 
-#define GRIDLOCK_HEALTH_VERSION 1
-#define GRIDLOCK_HEALTH_SIZE    9
+#define GRIDLOCK_HEALTH_VERSION 2
+#define GRIDLOCK_HEALTH_SIZE    12
+// frozen size of the v1 health blob, before the three HRV settings were appended. min_versioned_size
+// stays pinned here so an older short blob still short-reads and the new fields keep their defaults
+#define GRIDLOCK_HEALTH_V1_SIZE 9
 
 // the Goal Met Vibe rides its own key, not the health blob: the pick and the custom pattern are
 // short strings (the dropdown value is either a sentinel or a comma list of milliseconds), too big
@@ -200,6 +203,9 @@ typedef struct GridlockHealth
     uint8_t goal_active;
     uint8_t goal_hr;
     uint8_t goal_distance;
+    uint8_t hrv_count; ///< Which HRV bursts count, an HrvCount
+    uint8_t hrv_still; ///< The still limit, as the menu choice
+    uint8_t hrv_walk;  ///< The steps that make a walk, as the menu choice
 } GridlockHealth;
 _Static_assert(sizeof(GridlockHealth) == GRIDLOCK_HEALTH_SIZE, "health blob size is frozen; fields append only");
 
@@ -282,6 +288,10 @@ static const int16_t s_active_goals[]  = {15, 30, 45, 60, 90};
 static const int16_t s_hr_limits[]     = {150, 160, 170, 180, 190, 200};
 // distance goals in meters. the readout converts to the user's miles/km at draw time
 static const int16_t s_dist_goals_m[]  = {2000, 3000, 5000, 8000, 10000, 15000, 20000};
+// the top of still for an HRV burst, in milli-g a sample at 10 Hz
+static const int16_t s_hrv_still_limits[] = {30, 40, 50, 60, 80, 100, 150, 200};
+// the steps through an HRV burst that make it a walk
+static const int16_t s_hrv_walk_steps[] = {5, 10, 15, 20, 30};
 // how often the watch asks the phone for fresh quotes, in minutes
 static const int16_t s_stock_poll_min[] = {1, 5, 10, 15, 20, 30};
 // how often the watch asks the phone for a fresh agenda, in minutes
@@ -343,6 +353,9 @@ static const SettingField s_health_fields[] = {
     FACE_ENUM(GridlockHealth, goal_active, HEALTH_GOAL_ACTIVE, ARRAY_LENGTH(s_active_goals), 1),
     FACE_ENUM(GridlockHealth, goal_hr, HEALTH_GOAL_HR, ARRAY_LENGTH(s_hr_limits), 3),
     FACE_ENUM(GridlockHealth, goal_distance, HEALTH_GOAL_DISTANCE, ARRAY_LENGTH(s_dist_goals_m), 2),
+    FACE_ENUM(GridlockHealth, hrv_count, HEALTH_HRV_COUNT, 3, 0),
+    FACE_ENUM(GridlockHealth, hrv_still, HEALTH_HRV_STILL, ARRAY_LENGTH(s_hrv_still_limits), 3),
+    FACE_ENUM(GridlockHealth, hrv_walk, HEALTH_HRV_WALK, ARRAY_LENGTH(s_hrv_walk_steps), 1),
 };
 
 // --- goal vibe (key 11) ---
@@ -492,7 +505,7 @@ static const SettingsSchema s_clock_schema = {
 static const SettingsSchema s_health_schema = {
     .key = GRIDLOCK_HEALTH_KEY,
     .version = GRIDLOCK_HEALTH_VERSION,
-    .min_versioned_size = GRIDLOCK_HEALTH_SIZE,
+    .min_versioned_size = GRIDLOCK_HEALTH_V1_SIZE,
     .blob = &s_health,
     .blob_size = SETTINGS_BLOB_SIZE(s_health),
     .fields = s_health_fields,
@@ -1132,6 +1145,21 @@ int gridlock_goal_active_min(void)
 int gridlock_hr_limit(void)
 {
     return goal_value(s_hr_limits, ARRAY_LENGTH(s_hr_limits), s_health.goal_hr);
+}
+
+uint8_t gridlock_hrv_count(void)
+{
+    return s_health.hrv_count;
+}
+
+int gridlock_hrv_still_mg(void)
+{
+    return goal_value(s_hrv_still_limits, ARRAY_LENGTH(s_hrv_still_limits), s_health.hrv_still);
+}
+
+int gridlock_hrv_walk_steps(void)
+{
+    return goal_value(s_hrv_walk_steps, ARRAY_LENGTH(s_hrv_walk_steps), s_health.hrv_walk);
 }
 
 const char *gridlock_goal_vibe_pick(void)

@@ -66,4 +66,13 @@ module.exports = {
   63: "Windsor Tan",
   64: "Lavender Indigo",
   65: "Spring Bud",
+  66: "Red",
+  67: "Red",
+  68: "Red",
+  69: "Lavender Indigo",
+  70: "Red",
+  71: "Red",
+  72: "Red",
+  73: "Red",
+  74: "Red",
 };

@@ -242,4 +242,17 @@ void gh_stat_1x2(GridCtx *gctx, const char *val, const char *trailing, FontId fo
 void gh_mini_row(GridCtx *gctx, const char *label, const char *value, const char *trailing,
                  const IconSpec *icon, int top);
 
+/**
+ * @brief A row of four figures across the top of a wide panel, each a small grey caption over a
+ * value, such as LOW, AVG, HIGH, and NOW over a day chart. HRV Today and BPM Today both draw it, so
+ * the pair line up.
+ *
+ * @param gctx The grid context.
+ * @param area Where the row and whatever sits under it go. The row takes the top of it.
+ * @param labels The four captions.
+ * @param values The four figures, with -1 drawn as a dash.
+ * @return How tall the row is, so the caller can start what sits under it there.
+ */
+int gh_stat_row4(GridCtx *gctx, GRect area, const char *const labels[4], const int values[4]);
+
 /** @} */

@@ -471,6 +471,11 @@ int gridlock_hr_limit(void)
     return goal_value(s_hr_limits, ARRAY_LENGTH(s_hr_limits), s_settings.goal_hr);
 }
 
+uint8_t gridlock_hrv_count(void)
+{
+    return 0;
+}
+
 uint8_t gridlock_wind_unit(void)
 {
     return s_settings.wind_unit;

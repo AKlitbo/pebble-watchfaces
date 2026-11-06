@@ -181,6 +181,15 @@ int gridlock_goal_distance_m(void); ///< Today's distance goal in meters
 int gridlock_goal_sleep_min(void);
 int gridlock_goal_active_min(void);
 int gridlock_hr_limit(void);
+
+/** @brief Which HRV bursts count for the main reading, as an HrvCount: not walking, only still, or any. */
+uint8_t gridlock_hrv_count(void);
+
+/** @brief The most the wrist may move for an HRV burst to be still, in milli-g a sample. */
+int gridlock_hrv_still_mg(void);
+
+/** @brief The steps through an HRV burst that make it a walk. */
+int gridlock_hrv_walk_steps(void);
 /** @brief The Goal Met Vibe pick string: empty (off), a sentinel (S/L/D/C), or a comma list of milliseconds. */
 const char *gridlock_goal_vibe_pick(void);
 /** @brief The user's own Goal Met Vibe pattern, a comma list of milliseconds, used when the pick is Custom. */

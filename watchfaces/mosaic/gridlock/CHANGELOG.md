@@ -4,6 +4,26 @@ All notable changes to the Gridlock watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added 1x2 HRV, HRV Trend, and Night HRV panels, which show heart rate variability in ms: how much the gap between your heartbeats changes, a number that tends to rise when you are rested. The watch only measures it every few minutes while an HRV panel is on a layout, and a nap stays out of Night HRV.
+- Added 2x2 HRV History and Still vs Walking panels, showing the last two hours of HRV readings and the latest one taken still, busy, and walking.
+- Added 1x4 and 2x4 HRV Today panels charting today's HRV by the hour. The 2x4 adds the day's low, average, and high and the latest reading.
+- Added a 2x2 Heart panel with your heart rate, its range over the last hour, a line of that hour, and your HRV.
+- Added a 2x4 HRV Tuning panel that lists each reading with how much you moved, your steps, and whether it counted, so you can set the HRV settings from your own numbers.
+- Added HRV Readings, Still Up To, and Walking From settings, which decide whether a reading taken while busy or walking counts toward HRV.
+- Added 1x4 and 2x4 BPM Today panels charting your heart rate through the day by the hour. The 2x4 adds the day's low, average, and high and your heart rate now.
+
+### Changed
+
+- Changed the Health settings to sit under Activity, Sleep, Heart, and Goal Alerts headings.
+
+### Notes
+
+- This release needs watch firmware 4.44.3 or later. On older firmware the watch lists Gridlock as incompatible until it updates.
+
 ## [1.7.0] - 2026-10-26
 
 ### Added
