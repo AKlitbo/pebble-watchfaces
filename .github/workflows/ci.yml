@@ -47,7 +47,7 @@ jobs:
       # runs after a failed build too, so a face that broke still shows up as missing its rows
       - name: Report Memory
         if: always()
-        uses: AKlitbo/pebble-app-framework/.github/actions/report-memory@v4.0.0
+        uses: AKlitbo/pebble-app-framework/.github/actions/report-memory@v5.0.0
         with:
           face: ${{ matrix.face }}
           log: build-${{ matrix.face }}.log
@@ -67,7 +67,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Render Memory
-        uses: AKlitbo/pebble-app-framework/.github/actions/render-memory@v4.0.0
+        uses: AKlitbo/pebble-app-framework/.github/actions/render-memory@v5.0.0
 
   # the checks run in every unit, each against its own framework
   vitest:
