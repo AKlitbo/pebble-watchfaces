@@ -21,7 +21,7 @@
 #include "mosaic/draw/panel_styles.h"
 #include "units/wind.h"
 #include "clock/nightsched.h"
-#include "layout/layout_role.h"
+#include "role/role.h"
 #include "layout/layout_string.h"
 
 #include <stddef.h>
@@ -319,12 +319,12 @@ const char *sidereel_layout(void)
     // an alternate layout only wins while it actually holds blocks, so a cleared or corrupt grid
     // quietly falls back to the day one rather than showing an empty screen. layout_string.c
     // re-reads this and notices the string changed, so nothing else has to be told about a swap
-    if (s_active_role == LAYOUT_ROLE_QUIET && layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT))
+    if (s_active_role == ROLE_QUIET && layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT))
     {
         return s_quiet.layout;
     }
 
-    if (s_active_role == LAYOUT_ROLE_NIGHT && layout_has_any_block(s_night.layout, MOD_TYPE_COUNT))
+    if (s_active_role == ROLE_NIGHT && layout_has_any_block(s_night.layout, MOD_TYPE_COUNT))
     {
         return s_night.layout;
     }
@@ -364,7 +364,7 @@ uint8_t sidereel_active_layout_role(void)
 
 void sidereel_set_active_layout_role(uint8_t role)
 {
-    if (role < LAYOUT_ROLE_COUNT)
+    if (role < ROLE_COUNT)
     {
         s_active_role = role;
     }

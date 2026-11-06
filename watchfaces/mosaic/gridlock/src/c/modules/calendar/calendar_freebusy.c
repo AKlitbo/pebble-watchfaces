@@ -56,9 +56,9 @@ static void draw_timeline(GridCtx *gctx, GRect area, int hours)
 
     // each timed event clipped onto the window once, in minutes past its start. a pinned moment
     // with no length still comes back a minute wide so it draws
-    TimeBandSpan spans[CALENDAR_MAX_SLOTS];
+    TimeBandSpan spans[CALENDAR_SLOTS_MAX];
     int span_count = 0;
-    for (uint8_t i = 0; i < strip->count && span_count < CALENDAR_MAX_SLOTS; i++)
+    for (uint8_t i = 0; i < strip->count && span_count < CALENDAR_SLOTS_MAX; i++)
     {
         const CalendarEvent *event = &strip->event[i];
         if (!event->all_day && timeband_clip(band, window_start, event->start, event->end, &spans[span_count]))

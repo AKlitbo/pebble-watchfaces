@@ -128,7 +128,7 @@ static void init(void)
         // minute, so they are only on because a cell can actually show them
         health_store_init((HealthConfig){.live = true, .calories = true,
                                          .sleep = true, .active = true,
-                                         .hr_history = true, .step_history = true, .distance = true,
+                                         .hr_history = HEALTH_HR_HISTORY, .step_history = HEALTH_STEP_HISTORY, .distance = true,
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
         weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN,

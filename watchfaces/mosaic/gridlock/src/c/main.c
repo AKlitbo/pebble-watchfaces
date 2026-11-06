@@ -235,8 +235,8 @@ static void init(void)
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
         // the only face with the two health graphs and with panels for sleep, active time and
         // calories, so the only one that keeps their history or pays to read them
-        health_store_init((HealthConfig){.live = true, .hr_history = true,
-                                         .step_history = true, .sleep = true, .active = true,
+        health_store_init((HealthConfig){.live = true, .hr_history = HEALTH_HR_HISTORY,
+                                         .step_history = HEALTH_STEP_HISTORY, .sleep = true, .active = true,
                                          .calories = true, .distance = true, .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick
         time_store_init((TimeConfig){.live = true, .minute_tick = true, .beats = false}, NULL);

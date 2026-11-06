@@ -9,7 +9,7 @@
 #include "settings_schema.h"
 #include "ui/engine/engine.h"
 #include "clock/nightsched.h"
-#include "layout/layout_role.h"
+#include "role/role.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 
@@ -56,7 +56,7 @@ static bool layout_sync(void)
 {
     bool quiet = quiet_time_is_active();
 
-    LayoutRole want = layout_role_pick(quiet, gridlock_quiet_layout_set(),
+    Role want = role_pick(quiet, gridlock_quiet_layout_set(),
                                        night_is_on(), gridlock_night_layout_set());
 
     if (want == gridlock_active_layout_role())

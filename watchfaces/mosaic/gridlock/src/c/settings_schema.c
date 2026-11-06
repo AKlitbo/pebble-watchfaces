@@ -18,7 +18,7 @@
 #include "units/wind.h"
 #include "clock/nightsched.h"
 #include "clock/zone_setting.h"
-#include "layout/layout_role.h"
+#include "role/role.h"
 #include "layout/layout_string.h"
 #include "ui/engine/engine.h"
 #include "engine/layouts.h"
@@ -616,12 +616,12 @@ static uint8_t s_active_role;                    // a LayoutRole: which layout t
  */
 static const char *active_layout(void)
 {
-    if (s_active_role == LAYOUT_ROLE_QUIET && layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT))
+    if (s_active_role == ROLE_QUIET && layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT))
     {
         return s_quiet.layout;
     }
 
-    if (s_active_role == LAYOUT_ROLE_NIGHT && layout_has_any_block(s_night.layout, MOD_TYPE_COUNT))
+    if (s_active_role == ROLE_NIGHT && layout_has_any_block(s_night.layout, MOD_TYPE_COUNT))
     {
         return s_night.layout;
     }
@@ -791,7 +791,7 @@ uint8_t gridlock_active_layout_role(void)
 
 void gridlock_set_active_layout_role(uint8_t role)
 {
-    if (role < LAYOUT_ROLE_COUNT)
+    if (role < ROLE_COUNT)
     {
         s_active_role = role;
     }
