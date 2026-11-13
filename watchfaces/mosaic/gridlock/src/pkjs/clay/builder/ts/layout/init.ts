@@ -14,16 +14,22 @@ import { LAYOUT_PRESETS } from './presets';
 import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from '../../../../../../../core/pkjs/clay/builder/ts/layout/visuals';
 import { createDragEngine } from '../../../../../../../core/pkjs/clay/builder/ts/layout/drag';
 import { createPalette } from '../../../../../../../core/pkjs/clay/builder/ts/layout/palette';
+import { createPluginWarnings } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
+import type { PickedKinds } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
 import { createOverlayHost } from '../../../../../../../paf/ts/clay/builder/ts/shared/overlay';
 import { buildIoPanel } from '../../../../../../../paf/ts/clay/builder/ts/shared/io-panel';
 import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, ROLE_NONE } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { ModesBar } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../../../../../../../core/pkjs/clay/builder/ts/types';
 
-/** The set/get handles init hangs on the root element for the manipulator. */
+/**
+ * The set/get handles init hangs on the root element for the manipulator, and the one the face's
+ * page code calls with the sources the wearer picked.
+ */
 interface LbHooks {
   _lbSet(value: string): void;
   _lbGet(): string;
+  _lbPluginSources(picked: PickedKinds): void;
 }
 
 /**
@@ -43,6 +49,9 @@ export function init(this: ClayComponentInstance): void {
   const gridEl = root.querySelector('.lb-grid') as HTMLElement;
   const paletteContainer = root.querySelector('.lb-palette-container') as HTMLElement;
   const modesHost = root.querySelector('.lb-modes') as HTMLElement;
+
+  // the warning for a placed panel the phone has no plugin for sits under the watch, above the palette
+  const warnings = createPluginWarnings(root.querySelector('.lb-middle-wrap') as HTMLElement);
 
   let blocks: Block[] = [];
 
@@ -86,6 +95,32 @@ export function init(this: ClayComponentInstance): void {
 
     pushAssigned('.gl-night', library.night);
     pushAssigned('.gl-quiet', library.quiet);
+
+    warnings.update(assignedLabels());
+  }
+
+  /**
+   * The names of the panels on every layout the watch shows, day, night, and Quiet Time, each once.
+   * The watch starts the phone and music readings for a panel on any of them, so a panel placed only
+   * on the night layout still needs its plugin.
+   */
+  function assignedLabels(): string[] {
+    const labels: string[] = [];
+
+    [library.day, library.night, library.quiet].forEach(function (index) {
+      if (index === ROLE_NONE) {
+        return;
+      }
+
+      parseLayoutString(library.layouts[index] || EMPTY_LAYOUT).forEach(function (block) {
+        const label = modInfo(MODULES, block.module).label;
+
+        if (labels.indexOf(label) < 0) {
+          labels.push(label);
+        }
+      });
+    });
+    return labels;
   }
 
   /**
@@ -274,6 +309,10 @@ export function init(this: ClayComponentInstance): void {
 
   root._lbGet = function () {
     return library.layouts[library.day] || EMPTY_LAYOUT;
+  };
+
+  root._lbPluginSources = function (picked) {
+    warnings.setPicked(picked);
   };
 
   blocks = parseLayoutString(library.layouts[library.day]);

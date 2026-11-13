@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added 1x2 and 2x2 Phone Battery panels showing your phone's battery beside a gauge, the way the Battery panel shows the watch's. They need plugins turned on in the Pebble app, say PLUGINS OFF while they are off, and show two dashes while your phone is away.
 - Added a 1x2 Battery Battery panel showing your watch's battery and your phone's side by side. The phone's half needs plugins turned on in the Pebble app, says OFF while they are off, and shows two dashes while your phone is away.
 - Added 1x4 and 2x4 Now Playing panels showing the song playing on your phone with its album art. The 2x4 adds whether it is playing or paused. They need plugins turned on in the Pebble app and say PLUGINS OFF while they are off. On an iPhone they wait for a music plugin, since the Pebble app has none built in there.
+- Added a warning under the watch in Layout when a panel you placed needs a Pebble app plugin that your phone has turned off or does not have. It says what to turn on or get in the Pebble app.
 
 ### Changed
 
