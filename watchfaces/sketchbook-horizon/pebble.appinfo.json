@@ -1,7 +1,7 @@
 {
   "name": "sketchbook-horizon",
   "displayName": "Sketchbook Horizon",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "watchface": true,
   "uuid": "1e5c651c-afd0-472e-8f87-f0ff31656657",
   "targetPlatforms": [
