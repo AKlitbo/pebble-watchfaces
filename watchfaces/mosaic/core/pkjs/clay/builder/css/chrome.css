@@ -7,7 +7,7 @@
    reliably keeps a gap under the full-width submit at the end of the page. Clay gives the body no
    top padding at all, so padding-top here is what puts the same gap above the first section */
 body {
-  background-color: #101216 !important;
+  background-color: var(--mo-page) !important;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
@@ -17,8 +17,8 @@ body {
 }
 
 .section {
-  background: #171a1f !important;
-  border: 2px solid #3d434d !important;
+  background: var(--mo-card) !important;
+  border: 2px solid var(--mo-line) !important;
   border-radius: 0 !important;
   box-shadow: none !important;
 }
@@ -33,7 +33,7 @@ body {
 }
 
 .component-heading:first-child {
-  background: #1d2128 !important;
+  background: var(--mo-panel) !important;
   border-radius: 0 !important;
 }
 
@@ -41,12 +41,14 @@ body {
   margin-top: 0 !important;
 }
 
+/* a field is something to tap, so it takes the brighter control edge from controls.css rather than
+   the dim edge the cards wear */
 select {
-  background: #14161a !important;
-  color: #eceef2 !important;
-  border: 1px solid #3d434d !important;
+  background: var(--mo-inset) !important;
+  color: var(--mo-ink) !important;
+  border: 1px solid var(--mo-line-control) !important;
   border-radius: 0 !important;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace !important;
+  font-family: var(--mo-mono) !important;
 }
 
 input[type='text'],
@@ -55,15 +57,16 @@ input[type='url'],
 input[type='search'],
 input[type='number'],
 input[type='password'] {
-  background: #14161a !important;
-  color: #eceef2 !important;
-  border: 1px solid #3d434d !important;
+  background: var(--mo-inset) !important;
+  color: var(--mo-ink) !important;
+  border: 1px solid var(--mo-line-control) !important;
   border-radius: 0 !important;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace !important;
+  font-family: var(--mo-mono) !important;
 }
 
 /* submit is a bare <button type=submit> in .component-submit, small + centred (min-width 12rem).
-   target it by type (the builder only makes type=button) so it goes full-width without touching .lb-* */
+   target it by type (the builder only makes type=button) so it goes full-width without touching .lb-*.
+   controls.css paints it as the page's primary */
 .component-submit button,
 button[type='submit'] {
   display: block !important;
@@ -72,14 +75,9 @@ button[type='submit'] {
   box-sizing: border-box !important;
   margin: 0 !important;
   padding: 13px !important;
-  background: #ff6a1f !important;
-  color: #1a0c03 !important;
-  border: 2px solid #ff6a1f !important;
+  border-width: 2px !important;
+  border-style: solid !important;
   border-radius: 0 !important;
-  font-weight: 800 !important;
-  letter-spacing: 2px !important;
-  cursor: pointer !important;
-  transition: background 0.12s !important;
 }
 
 /* padding on the submit's own wrapper is the only gap that survives (margin collapses, and
@@ -88,22 +86,10 @@ button[type='submit'] {
   padding-bottom: 0.7rem !important;
 }
 
-.component-submit button:hover,
-button[type='submit']:hover {
-  background: #ff7d38 !important;
-  border-color: #ff7d38 !important;
-}
-
-.component-submit button:active,
-button[type='submit']:active {
-  background: #e85e15 !important;
-  border-color: #e85e15 !important;
-}
-
 /* Clay's own button component, which a face uses for a page-level action like a reset. safe to
    target through .component-button because the builders only ever make bare buttons of their own.
-   it takes the ghost treatment the appearance sheet's Reset already wears, so a secondary action
-   reads the same wherever it turns up, and goes full-width like every other row's control */
+   controls.css paints it as a secondary action, the same as the appearance sheet's Reset, and it
+   goes full-width like every other row's control */
 .component-button button {
   display: block !important;
   width: 100% !important;
@@ -111,34 +97,20 @@ button[type='submit']:active {
   box-sizing: border-box !important;
   margin: 0 !important;
   padding: 10px 14px !important;
-  background: transparent !important;
-  color: #eceef2 !important;
-  border: 2px solid #3d434d !important;
+  border-width: 2px !important;
+  border-style: solid !important;
   border-radius: 0 !important;
   font-size: 12px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.5px !important;
   text-transform: uppercase !important;
-  cursor: pointer !important;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace !important;
-  transition: background 0.12s !important;
-}
-
-.component-button button:hover {
-  background: #1d2128 !important;
-}
-
-.component-button button:active {
-  background: #23262c !important;
 }
 
 /* the location search's suggestion dropdown. it ships light because it lives in the framework, which
    stays skin-agnostic, so the gridlock palette is painted on from here instead. this sheet is
    injected after the component's own style, so plain declarations are enough */
 .loc-search .loc-list {
-  background: #171a1f;
+  background: var(--mo-card);
   color: #eceef2;
-  border: 2px solid #3d434d;
+  border: 2px solid var(--mo-line);
   border-radius: 0;
 }
 

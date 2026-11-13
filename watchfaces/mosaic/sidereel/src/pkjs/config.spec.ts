@@ -13,14 +13,19 @@
  * The layout palette sorts panels by group, and a panel nobody grouped falls to Other at the end
  * where nobody looks for it. Checking every placeable panel against the group list catches a new
  * panel added without one.
+ *
+ * The family core builds the Weather Location section and the time zone row, but the face places
+ * them. Weather Location belongs after Weather, and the time zone in Clock, since the clock reads it
+ * whatever the weather source.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, test, expect } from 'vitest';
 import config from './config';
-import { pageKeys, layoutModules } from '../../../core/pkjs/testing/page-keys';
+import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/testing/page-keys';
 import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
+import type { ClayConfigItem } from '../../../paf/ts/clay/types';
 
 const appinfo = JSON.parse(
   fs.readFileSync(path.resolve(import.meta.dirname, '../../pebble.appinfo.json'), 'utf8')
@@ -131,5 +136,31 @@ describe('config page message keys', () => {
       expect(onPage.has(key), `${key} missing from the config page`).toBe(true);
       expect(appinfo.messageKeys, `${key} missing from the appinfo`).toContain(key);
     }
+  });
+});
+
+describe('config page order', () => {
+  /** Every location row only feeds the weather, so a wearer picks the source before the place. */
+  test('the Weather card comes before the Weather Location card', () => {
+    const page = config as ClayConfigItem[];
+    const weather = sectionHolding(page, 'WEATHER_PROVIDER');
+    const location = sectionHolding(page, 'LOCATION_USE_GPS');
+
+    const result = page.indexOf(weather as ClayConfigItem);
+
+    expect(weather).toBeDefined();
+    expect(location).toBeDefined();
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThan(page.indexOf(location as ClayConfigItem));
+  });
+
+  /** The clock reads the time zone whatever the weather source, so the row belongs with the other clock settings. */
+  test('the Clock card holds the Alternate Time Zone', () => {
+    const page = config as ClayConfigItem[];
+
+    const result = sectionHolding(page, 'CLOCK_TIMEZONE_1');
+
+    expect(result).toBeDefined();
+    expect(result).toBe(sectionHolding(page, 'CLOCK_TIME_FORMAT'));
   });
 });

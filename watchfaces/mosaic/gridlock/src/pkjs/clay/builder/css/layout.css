@@ -1,11 +1,13 @@
-/* the layout builder, painted in the same gridlock palette as the appearance editor:
-   #171a1f panels behind 2px #3d434d borders, #14161a insets, #ff6a1f for the one signal
-   colour and a mono voice throughout. the popups here (Import/Export Layout and Saved
+/* the layout builder, painted in the same gridlock palette as the appearance editor from the
+   --mo-* colours in controls.css: card panels behind 2px line borders, inset wells, the accent
+   for the one signal colour, and a mono voice throughout. the popups here (Import/Export Layout and Saved
    Layouts) share their markup with the theme editor's via ts/shared, so .lb-panel and
    .lb-io-* deliberately mirror .tb-pick and .tb-io-* in theme.css.
    standing constraint: colour, border, border-radius and font only. the drag and drop
    measures the grid's real box, so never touch padding/flex/gap/width on the bezel, grid,
-   cells, blocks or the ghost. the palette tiles live in palette.css and are never measured */
+   cells, blocks or the ghost. the palette tiles live in palette.css and are never measured.
+   the core controls.css paints the buttons, tabs, and hint text, so the rules here only set
+   their size and place */
 .lb {
   padding: 12px 0;
   user-select: none;
@@ -19,7 +21,6 @@
 
 .lb-desc {
   font-size: 11px;
-  color: #6a707a;
   line-height: 1.4;
   margin: 0;
 }
@@ -37,7 +38,7 @@
   background: #191c22;
   border-radius: 0;
   padding: 8px;
-  border: 2px solid #3d434d;
+  border: 2px solid var(--mo-line);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: stretch;
@@ -86,47 +87,11 @@
   width: 100%;
   border-radius: 0;
   font-size: 9px;
-  font-weight: 700;
-  border: 1px solid #3d434d;
-  cursor: pointer;
-  background: #23262c;
-  color: #eceef2;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  border: 1px solid;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.lb-btn:active {
-  background: #2c3038;
-}
-
-/* presets read as recessed graphite chips so the eye lands on the grid first */
-.lb-preset {
-  background: #14161a;
-  color: #a3a9b3;
-}
-
-.lb-preset:hover {
-  border-color: #ff6a1f;
-  color: #ff6a1f;
-}
-
-.lb-btn-io:hover,
-.lb-btn-slots:hover {
-  border-color: #ff6a1f;
-}
-
-.lb-btn-clear {
-  background: #c53a2c;
-  border-color: #c53a2c;
-  color: #fff;
-}
-
-.lb-btn-clear:active {
-  background: #a82f24;
-  border-color: #a82f24;
 }
 
 /* the grid is the watch screen, so it stays black no matter what the page does. it keeps its
@@ -146,8 +111,8 @@
 }
 
 .lb-cell {
-  background: #14161a;
-  border: 1px dashed #3d434d;
+  background: var(--mo-inset);
+  border: 1px dashed var(--mo-line);
   border-radius: 0;
   transition: background 0.12s;
   display: flex;
@@ -242,8 +207,8 @@
 .lb-panel {
   position: fixed;
   z-index: 50001;
-  background: #171a1f;
-  border: 2px solid #3d434d;
+  background: var(--mo-card);
+  border: 2px solid var(--mo-line);
   border-radius: 0;
   padding: 14px;
   box-sizing: border-box;
@@ -274,12 +239,12 @@
   padding: 8px;
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 11px;
-  border: 2px solid #3d434d;
+  border: 2px solid var(--mo-line);
   border-radius: 0;
   margin-bottom: 12px;
   resize: none;
   box-sizing: border-box;
-  background: #14161a;
+  background: var(--mo-inset);
   color: #eceef2;
 }
 
@@ -297,45 +262,8 @@
   box-sizing: border-box;
   border-radius: 0;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
   text-transform: uppercase;
-  border: 2px solid #3d434d;
-  cursor: pointer;
-  background: #23262c;
-  color: #eceef2;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
-}
-
-.lb-io-btn:active {
-  background: #2c3038;
-}
-
-.lb-io-btn.primary {
-  background: #ff6a1f;
-  border-color: #ff6a1f;
-  color: #1a0c03;
-}
-
-.lb-io-btn.primary:active {
-  background: #e85e15;
-  border-color: #e85e15;
-}
-
-/* a slot button primed for its confirming second tap (overwrite or load). red, not the
-   signal orange, so an armed button never reads as the ordinary primary one */
-.lb-io-btn.armed {
-  background: #c53a2c;
-  border-color: #c53a2c;
-  color: #fff;
-}
-
-/* after .primary so a disabled Load drops out of orange instead of being a dimmed one */
-.lb-io-btn:disabled {
-  background: #1d2128;
-  border-color: #2c3038;
-  color: #6a707a;
-  cursor: default;
+  border: 2px solid;
 }
 
 .platform-ios .button,
@@ -357,21 +285,9 @@
   flex: 1;
   min-width: 0;
   padding: 8px 4px;
-  border: 2px solid #3d434d;
+  border: 2px solid;
   border-radius: 0;
-  background: #14161a;
-  color: #6a707a;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-}
-
-.lb-ltab.active {
-  background: #ff6a1f;
-  border-color: #ff6a1f;
-  color: #171a1f;
 }
 
 /* which layout the watch shows by day, and which after dark */
@@ -394,7 +310,6 @@
 
 .lb-assign-lbl {
   flex-shrink: 0;
-  color: #6a707a;
   font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
   font-size: 10px;
   font-weight: 700;
@@ -407,10 +322,10 @@
   box-sizing: border-box;
   min-width: 0;
   padding: 6px 4px;
-  border: 2px solid #3d434d;
+  border: 2px solid var(--mo-line-control);
   border-radius: 0;
-  background: #14161a;
-  color: #eceef2;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  background: var(--mo-inset);
+  color: var(--mo-ink);
+  font-family: var(--mo-mono);
   font-size: 11px;
 }

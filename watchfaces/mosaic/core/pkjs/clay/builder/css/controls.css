@@ -1,0 +1,302 @@
+/* how every control on a mosaic settings page looks: the colours as custom properties, then one
+   rule per role. a role is what the wearer does with it, so a button that opens something and a
+   button that saves look the same wherever they turn up.
+   the controls component carries this sheet, so it lands on the page once and reaches both builders
+   and the page chrome, which all read the colours below.
+   this sheet paints colours, edges, and fonts only. each control's size, padding, and border width
+   stay in the sheet that lays it out, so nothing here moves or resizes a control.
+   the :root in front of each rule lifts it past Clay's own button rules. .platform-android button
+   swaps in Clay's font and button.primary its orange, and both would otherwise win over a plain class */
+:root {
+  --mo-page: #101216; /* the page behind the cards */
+  --mo-card: #171a1f; /* a section card, a sheet row, and a popup */
+  --mo-panel: #1d2128; /* a panel set into a card: a section's title bar, the drawer, the legend */
+  --mo-inset: #14161a; /* wells, inputs, and a tab that is not picked */
+  --mo-raise: #23262c; /* the fill of a secondary button */
+  --mo-raise-press: #2c3038;
+  --mo-line: #3d434d; /* the edge of a card or a panel, which is not tappable */
+  /* the edge of anything tappable. its lowest is 3.01:1, on a tab while it is pressed, and 3.45:1 on
+     a secondary button. every card, panel, and well is 3.68:1 or better */
+  --mo-line-control: #717986;
+  --mo-ink: #eceef2;
+  --mo-ink-2: #a3a9b3; /* a tab that is not picked, and status text. 5.6:1 or better, pressed included */
+  --mo-ink-muted: #8b929c; /* hints and captions. 5.56:1 or better on the cards and wells they sit on */
+  --mo-accent: #ff6a1f; /* tap here, or this one is picked. never plain status text */
+  --mo-accent-press: #e85e15;
+  --mo-accent-tint: rgba(255, 106, 31, 0.2);
+  --mo-on-accent: #1a0c03;
+  --mo-danger: #c53a2c;
+  --mo-danger-press: #a82f24;
+  --mo-edge: 2px; /* the drawn edge of a tab that has no border of its own */
+  --mo-mono: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+}
+
+/* ---- the font every button shares ----
+   Clay's .platform-android button sets its own font, a bold weight, and wider letters, so an Android
+   phone would show these in Clay's font while the rest of the page stays mono. the weight and
+   letter spacing are each control's own, held here so Android draws them the same as an iPhone.
+   the colour picker's two arrows keep Clay's font on both, since a mono arrow is wider and would
+   make the buttons around it grow */
+:root .lb-btn,
+:root .lb-io-btn,
+:root .tb-io-btn,
+:root .lb-filter-all,
+:root .lb-ltab,
+:root .lb-tab,
+:root .lb-group {
+  font-family: var(--mo-mono);
+  font-weight: 700;
+}
+
+:root .tb-edit-btn,
+:root .tb-bar-btn,
+:root .component-button button,
+:root .component-submit button {
+  font-family: var(--mo-mono);
+  font-weight: 800;
+}
+
+/* Show All takes its font from the status line around it, but the browser gives every button
+   normal letter spacing, so it keeps that like the builder's other buttons */
+:root .lb-btn,
+:root .lb-filter-all {
+  letter-spacing: normal;
+}
+
+:root .lb-ltab,
+:root .lb-tab,
+:root .lb-group {
+  letter-spacing: 0.5px;
+}
+
+:root .lb-io-btn,
+:root .tb-io-btn,
+:root .tb-bar-btn {
+  letter-spacing: 1px;
+}
+
+:root .tb-edit-btn,
+:root .component-button button {
+  letter-spacing: 1.5px;
+}
+
+:root .component-submit button {
+  letter-spacing: 2px;
+}
+
+/* ---- what every button shares ---- */
+:root .lb-btn,
+:root .lb-io-btn,
+:root .tb-io-btn,
+:root .tb-bar-btn,
+:root .tb-nav-btn,
+:root .tb-edit-btn,
+:root .lb-filter-all,
+:root .component-button button,
+:root .component-submit button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s;
+}
+
+/* ---- secondary: filled graphite with a bright edge. most buttons on the page ---- */
+:root .lb-btn,
+:root .lb-io-btn,
+:root .tb-io-btn,
+:root .tb-bar-btn.ghost,
+:root .tb-bar-btn.io,
+:root .tb-nav-btn,
+:root .lb-filter-all,
+:root .component-button button {
+  background: var(--mo-raise);
+  border-color: var(--mo-line-control);
+  color: var(--mo-ink);
+}
+
+:root .lb-btn:active,
+:root .lb-io-btn:active,
+:root .tb-io-btn:active,
+:root .tb-bar-btn.ghost:active,
+:root .tb-bar-btn.io:active,
+:root .tb-nav-btn:active,
+:root .lb-filter-all:active,
+:root .component-button button:active {
+  background: var(--mo-raise-press);
+  border-color: var(--mo-ink-2);
+}
+
+/* ---- primary: solid signal orange. one per view, for the step that finishes or opens the job.
+   the bare .tb-bar-btn is the sheet's Done, and its .ghost and .io neighbours outweigh it above ---- */
+:root .tb-edit-btn,
+:root .tb-bar-btn,
+:root .lb-io-btn.primary,
+:root .tb-io-btn.primary,
+:root .component-submit button {
+  background: var(--mo-accent);
+  border-color: var(--mo-accent);
+  color: var(--mo-on-accent);
+}
+
+:root .tb-edit-btn:active,
+:root .tb-bar-btn:active,
+:root .lb-io-btn.primary:active,
+:root .tb-io-btn.primary:active,
+:root .component-submit button:active {
+  background: var(--mo-accent-press);
+  border-color: var(--mo-accent-press);
+}
+
+/* ---- danger: wipes something, which on this page is the builder's Clear. red, so it never reads
+   as the primary ---- */
+:root .lb-btn-clear {
+  background: var(--mo-danger);
+  border-color: var(--mo-danger);
+  color: #fff;
+}
+
+:root .lb-btn-clear:active {
+  background: var(--mo-danger-press);
+  border-color: var(--mo-danger-press);
+}
+
+/* ---- tabs: the layout tabs, the size tabs, and Mono | Vibrant. a row of edged cells with the
+   picked one solid, so a tab that is not picked still reads as something to tap ---- */
+:root .lb-ltab,
+:root .lb-tab,
+:root .tb-mv-opt {
+  background: var(--mo-inset);
+  color: var(--mo-ink-2);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root .lb-ltab {
+  border-color: var(--mo-line-control);
+}
+
+/* the size tabs have no border, since one would make them taller. the edge is drawn inside instead */
+:root .lb-tab {
+  box-shadow: inset 0 0 0 var(--mo-edge) var(--mo-line-control);
+}
+
+:root .lb-ltab:active,
+:root .lb-tab:active,
+:root .tb-mv-opt:active {
+  background: var(--mo-raise-press);
+}
+
+:root .lb-ltab.active,
+:root .lb-tab.active,
+:root .tb-mv-opt.sel {
+  background: var(--mo-accent);
+  border-color: var(--mo-accent);
+  box-shadow: none;
+  color: var(--mo-on-accent);
+}
+
+/* Mono | Vibrant sits in a bordered strip with a divider between its two halves */
+:root .tb-mv,
+:root .tb-mv-opt + .tb-mv-opt {
+  border-color: var(--mo-line-control);
+}
+
+/* the group tabs are the second row down, so the picked one is a tint and an underline, not a
+   second solid orange that competes with the size tab above it. the sides and top are drawn inside
+   the box, and the bottom is the 2px border the underline already uses */
+:root .lb-group {
+  background: var(--mo-inset);
+  border-bottom-color: var(--mo-line-control);
+  box-shadow:
+    inset 0 1px 0 var(--mo-line-control),
+    inset 1px 0 0 var(--mo-line-control),
+    inset -1px 0 0 var(--mo-line-control);
+  color: var(--mo-ink-2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root .lb-group:active {
+  background: var(--mo-raise-press);
+}
+
+:root .lb-group[aria-pressed='true'] {
+  background: var(--mo-accent-tint);
+  border-bottom-color: var(--mo-accent);
+  box-shadow:
+    inset 0 1px 0 var(--mo-accent),
+    inset 1px 0 0 var(--mo-accent),
+    inset -1px 0 0 var(--mo-accent);
+  color: #ff8a4c;
+}
+
+/* the count beside Show All is status, so it takes the quieter ink and leaves orange to the controls */
+:root .lb-filter {
+  color: var(--mo-ink-2);
+}
+
+/* ---- the appearance sheet's small controls ---- */
+:root .tb-swatch,
+:root .tb-toggle {
+  border-color: var(--mo-line-control);
+}
+
+/* ---- text that is read, not tapped ---- */
+:root .lb-desc,
+:root .tb-hint,
+:root .lb-assign-lbl,
+:root .tb-chip-lbl,
+:root .row-note,
+:root .sz-noshot {
+  color: var(--mo-ink-muted);
+}
+
+/* ---- hover only on a device with a mouse or a trackpad. a phone keeps the hover after a tap, so
+   a hover colour there would leave the last preset tapped looking picked ---- */
+@media (hover: hover) and (pointer: fine) {
+  :root .lb-btn:not(.lb-btn-clear):hover,
+  :root .lb-io-btn:not(.primary):hover,
+  :root .tb-io-btn:not(.primary):hover,
+  :root .tb-bar-btn.ghost:hover,
+  :root .tb-bar-btn.io:hover,
+  :root .tb-nav-btn:hover,
+  :root .lb-filter-all:hover,
+  :root .lb-ltab:hover,
+  :root .component-button button:hover {
+    border-color: var(--mo-accent);
+  }
+
+  :root .lb-tab:not(.active):hover {
+    box-shadow: inset 0 0 0 var(--mo-edge) var(--mo-accent);
+  }
+
+  :root .lb-group:hover {
+    border-bottom-color: var(--mo-accent);
+    box-shadow:
+      inset 0 1px 0 var(--mo-accent),
+      inset 1px 0 0 var(--mo-accent),
+      inset -1px 0 0 var(--mo-accent);
+  }
+}
+
+/* ---- focus: Clay turns the outline off on every button and input, so put a ring back for a
+   keyboard or switch user. :focus-visible keeps it off a plain tap on a button ---- */
+:root button:focus-visible,
+:root summary:focus-visible,
+:root select:focus-visible,
+:root input:focus-visible,
+:root textarea:focus-visible,
+:root a:focus-visible {
+  outline: 2px solid var(--mo-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Clay's plain text input carries no type, so the page's input rule in chrome.css misses it.
+   it has no border either, and adding one would make it taller, so its edge is drawn inside ---- */
+:root .component-input input:not([type]) {
+  background: var(--mo-inset);
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px var(--mo-line-control);
+  color: var(--mo-ink);
+  font-family: var(--mo-mono);
+}

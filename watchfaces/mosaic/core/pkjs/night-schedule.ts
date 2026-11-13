@@ -20,7 +20,7 @@ const MODE_OPTIONS = [
 ];
 
 // half-hour steps, matching the slot the watch stores. a free-text time would need its own
-// validation and would hit the empty-string problem the layout sentinel exists for
+// validation and would hit the empty-string problem the layout marker exists for
 const HALF_HOURS = Array.from({ length: 48 }, (_, slot) => {
   const hour = Math.floor(slot / 2);
   const minute = slot % 2 ? '30' : '00';
@@ -41,7 +41,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       label: 'Swap Day & Night Layouts',
       defaultValue: 0,
       options: MODE_OPTIONS,
-      description: 'When the watch swaps between your day and night layouts. At Sunset & Sunrise follows the times your weather provider reports, and falls back to the times below whenever it has none yet.',
+      description: 'When the watch swaps to your night layout and back. At Sunset & Sunrise uses the times from your weather source, and the times below until it has them.',
     },
     {
       type: 'select',
@@ -49,7 +49,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       label: 'Night Starts',
       defaultValue: 42, // 21:00
       options: HALF_HOURS,
-      description: 'When the night layout takes over. Used for custom times, and as the fallback whenever the watch has no sunset reading.',
+      description: 'When the night layout takes over. At Sunset & Sunrise also uses it until the watch has a sunset time.',
       visibleWhen: { key: 'LAYOUT_NIGHT_MODE', in: [1, 2] },
     },
     {
@@ -58,7 +58,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       label: 'Night Ends',
       defaultValue: 14, // 07:00
       options: HALF_HOURS,
-      description: 'And when the day layout comes back.',
+      description: 'When the day layout comes back. At Sunset & Sunrise also uses it until the watch has a sunrise time.',
       visibleWhen: { key: 'LAYOUT_NIGHT_MODE', in: [1, 2] },
     },
   ];

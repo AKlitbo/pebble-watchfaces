@@ -1,4 +1,5 @@
 import app from '../../../paf/ts/pkjs/app';
+import controlsComponent from './clay/controls-component.g';
 import layoutComponent from './clay/layout-component.g';
 import themeComponent from './clay/theme-component.g';
 import hiddenStoreComponent from '../../../paf/ts/clay/hidden-store-component';
@@ -9,6 +10,6 @@ import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
-  components: [layoutComponent, themeComponent, hiddenStoreComponent],
+  components: [controlsComponent, layoutComponent, themeComponent, hiddenStoreComponent],
   features: [weather, stocks, calendar],
 });

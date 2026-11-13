@@ -4,6 +4,16 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Changed the settings page to shorter headings and plainer wording, with Weather Location now below Weather.
+- Changed Alternate Time Zone to sit under Clock rather than with the weather location.
+- Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
+- Changed Fall Back to Manual Location to show only while Use Phone GPS is on.
+- Changed the settings page buttons and tabs to be easier to tell apart from the rest of the page. Everything you can tap has a brighter edge, and the hints under each part are easier to read.
+
 ## [1.5.0] - 2026-11-05
 
 ### Changed

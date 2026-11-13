@@ -1,9 +1,9 @@
 /**
  * Spec helper for reading a built Clay config page.
  *
- * Every face in the family checks its page against its own appinfo and its panels against the
- * palette groups, so the walks that find the keys and the panels live here rather than being
- * written out once per face and drifting.
+ * Every face in the family checks its page against its own appinfo, its panels against the
+ * palette groups, and its section order, so the walks that find the keys, the panels, and the
+ * sections live here rather than being written out once per face and drifting.
  *
  * Only specs import this, so it never reaches the watch.
  */
@@ -84,4 +84,34 @@ export function layoutModules(items: unknown): PageModule[] {
   return found;
 }
 
-export default { pageKeys, layoutModules };
+/** The bits of a page item the section walk reads. */
+interface PageNode {
+  type?: string;
+  messageKey?: string;
+  items?: PageNode[];
+}
+
+/**
+ * The section holding the row with the given message key, however deeply it is nested.
+ *
+ * @param items The config array, or any part of it.
+ * @param key The message key of a row inside the section.
+ * @return The section, or undefined when no section holds that row.
+ */
+export function sectionHolding<T extends PageNode>(items: T[], key: string): T | undefined {
+  for (const item of items) {
+    if (item.type === 'section' && (item.items || []).some((row) => row.messageKey === key)) {
+      return item;
+    }
+
+    const found = sectionHolding((item.items || []) as T[], key);
+
+    if (found) {
+      return found;
+    }
+  }
+
+  return undefined;
+}
+
+export default { pageKeys, layoutModules, sectionHolding };

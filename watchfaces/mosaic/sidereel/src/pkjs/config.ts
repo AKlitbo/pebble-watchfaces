@@ -8,8 +8,10 @@ import type { ClayConfigItem } from '../../../paf/ts/clay/types';
 import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
 import { select, heading, toggle, VIBE_OPTIONS } from '../../../paf/ts/pkjs/config-rows';
 import { healthSection } from '../../../core/pkjs/health-section';
-import { locationSection } from '../../../core/pkjs/location-section';
+import { locationSection, timeZoneItem } from '../../../core/pkjs/location-section';
 import { weatherSection } from '../../../core/pkjs/weather-section';
+import { hourlyVibeItem } from '../../../core/pkjs/clock-rows';
+import { headerFontItem, panelStyleItem } from '../../../core/pkjs/appearance-rows';
 
 // base list. icon/colour get merged in from module-meta below so the builders read one source.
 //
@@ -261,10 +263,10 @@ const config = [
   {
     type: 'section',
     items: [
-      heading('Sidereel Configuration'),
+      heading('Sidereel Settings'),
       {
         type: 'text',
-        defaultValue: 'A reel of minutes read by an hour pointer. Drag panels onto the left of the face, pick a theme, and dial in your weather and goals.',
+        defaultValue: 'A reel of minutes read by an hour pointer. Pick a theme and build your layouts first. The sections below set up what your panels show.',
       },
     ],
   },
@@ -277,7 +279,7 @@ const config = [
         type: 'select',
         messageKey: 'APPEARANCE_THEME',
         label: 'Theme',
-        description: 'Mono (White on Black) is the classic look and Mono (Black on White) flips it. Vibrant colours each panel by what it shows and gives the pointer its red. Custom lets you pick the colours yourself below.',
+        description: 'Vibrant colours each panel by what it shows and gives the pointer its red. Custom uses the panel colours you set in the editor below.',
         defaultValue: 0,
         options: [
           { label: 'Mono (White on Black)', value: 0 },
@@ -312,34 +314,8 @@ const config = [
         moduleOptions: MODULE_OPTIONS,
         moduleThumbnails: moduleThumbnails,
       },
-      {
-        type: 'select',
-        messageKey: 'APPEARANCE_HEADER_FONT',
-        label: 'Header Font',
-        description: "The font used for every panel's header label. Share Tech Mono is the default.",
-        defaultValue: 0,
-        options: [
-          { label: 'Share Tech Mono (Default)', value: 0 },
-          { label: 'LECO', value: 1 },
-          { label: 'Press Start 2P', value: 2 },
-          { label: 'Pixelify Sans', value: 3 },
-          { label: 'Aldrich', value: 4 },
-          { label: 'Kode Mono', value: 5 },
-          { label: 'Electrolize', value: 6 },
-          { label: 'Quantico', value: 7 },
-        ],
-      },
-      {
-        type: 'select',
-        messageKey: 'APPEARANCE_PANEL_STYLE',
-        label: 'Panel Style',
-        description: 'How every panel is framed. Classic is the original square panel and Rounded softens the four corners.',
-        defaultValue: 0,
-        options: [
-          { label: 'Classic (Default)', value: 0 },
-          { label: 'Rounded', value: 1 },
-        ],
-      },
+      headerFontItem(),
+      panelStyleItem(),
       // this face draws its own status glyphs in the hour pointer rather than carrying gridlock's
       // Quiet Time panel, so the toggle for one lives here beside the rest of the look
       toggle('APPEARANCE_QUIET_TIME_ICON', 'Show Quiet Time Icon',
@@ -394,7 +370,7 @@ const config = [
   {
     type: 'section',
     items: [
-      heading('Bluetooth Settings'),
+      heading('Bluetooth'),
       // the other half of the pointer's status pair, kept with the connection settings it reports on
       toggle('CONNECTION_BLUETOOTH_ICON', 'Show Connection Icon',
         'Show a bluetooth glyph in the hour pointer, lit while the phone is connected and slashed when it drops.', true),
@@ -406,7 +382,7 @@ const config = [
   {
     type: 'section',
     items: [
-      heading('Clock Configuration'),
+      heading('Clock'),
       // .beats is left out of the list gridlock offers: the reel reads minutes, so a beat count
       // has nowhere to land on this face
       select('CLOCK_TIME_FORMAT', 'Time Format', [
@@ -416,16 +392,18 @@ const config = [
         { label: '24-hour (20:30)', value: 2 },
       ], 0),
       select('CLOCK_DATE_FORMAT', 'Date Format', configBuilder.defaultDateOptions, '%b %d'),
-      select('CLOCK_HOURLY_VIBE', 'Hourly Vibration', VIBE_OPTIONS, 0, 'Buzz at the top of every hour. Silenced automatically during Quiet Time.'),
+      hourlyVibeItem(),
       select('CLOCK_WEEK_START', 'Week Starts On', [
         { label: 'Sunday', value: 0 },
         { label: 'Monday', value: 1 },
       ], 0, 'The first day of the week for the Weekday Dots panel.'),
+      timeZoneItem(),
     ],
   },
   healthSection(),
-  locationSection(),
   weatherSection(),
+  // straight under Weather, since every row in it only feeds the weather
+  locationSection(),
 
   {
     type: 'submit',

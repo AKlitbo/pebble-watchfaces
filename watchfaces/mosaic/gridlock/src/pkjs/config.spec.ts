@@ -9,14 +9,24 @@
  * The layout palette sorts panels by group, and a panel nobody grouped falls to Other at the end
  * where nobody looks for it. Checking every placeable panel against the group list catches a new
  * panel added without one.
+ *
+ * Picking the Pebble app as the weather or calendar source has to take every row that only feeds the
+ * phone's own fetch off the page, and fold the Weather Location card away whole. The marks that do
+ * it sit in the face and the family core, and one unmarked row added to the card leaves it on screen
+ * doing nothing. Running the framework's page hook over the real page catches that here.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, test, expect } from 'vitest';
 import config from './config';
-import { pageKeys, layoutModules } from '../../../core/pkjs/testing/page-keys';
+import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/testing/page-keys';
 import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
+import { pluginSourcePage } from '../../../paf/ts/plugin-sources/page';
+import { CALENDAR_SOURCE_SELECT } from '../../../paf/ts/plugin-sources/calendar';
+import { CALENDAR_STANDARD, WEATHER_STANDARD } from '../../../paf/ts/plugin-sources/standard';
+import { allItems, conditionsOf } from '../../../paf/ts/clay/rows';
+import type { ClayConfigItem } from '../../../paf/ts/clay/types';
 
 const appinfo = JSON.parse(
   fs.readFileSync(path.resolve(import.meta.dirname, '../../pebble.appinfo.json'), 'utf8')
@@ -127,5 +137,149 @@ describe('config page date formats', () => {
     const result = dateFormatValues(config);
 
     expect(result.length).toBeGreaterThan(10);
+  });
+});
+
+/** A phone with the Pebble app's built-in weather and calendar plugins. */
+const BUILT_IN_PLUGINS = [
+  { uuid: '00000000-0000-0000-0001-000000000002', name: 'Weather', sources: [{ category: 'weather', items: ['location'], properties: {} }] },
+  { uuid: '00000000-0000-0000-0001-000000000004', name: 'Calendar', sources: [{ category: 'calendar', items: ['event'], properties: {} }] },
+];
+
+/** The page as the phone opens it on a plugin build, with both page hooks run over a copy. */
+function pluginPage(): ClayConfigItem[] {
+  const page = JSON.parse(JSON.stringify(config)) as ClayConfigItem[];
+  const messageKeys = Object.fromEntries(appinfo.messageKeys.map((key, index) => [key, index]));
+  const state = { pluginUuid: null, lastError: null, lastEmpty: false };
+
+  pluginSourcePage(page, {
+    selectKey: 'WEATHER_PROVIDER',
+    category: 'weather',
+    item: 'location',
+    plugins: BUILT_IN_PLUGINS,
+    messageKeys,
+    state,
+    standard: WEATHER_STANDARD,
+    texts: {},
+    movesBelow: 'LOCATION_USE_GPS',
+  });
+  pluginSourcePage(page, {
+    selectKey: 'CALENDAR_SOURCE',
+    category: 'calendar',
+    item: 'event',
+    plugins: BUILT_IN_PLUGINS,
+    messageKeys,
+    state,
+    standard: CALENDAR_STANDARD,
+    texts: {},
+    insert: { select: CALENDAR_SOURCE_SELECT, anchorKey: 'CALENDAR_ICS_URL' },
+  });
+  return page;
+}
+
+/**
+ * The message keys of the rows hidden under the given picks, read the way the page's
+ * dependentVisibility reads them. A control not picked holds its default.
+ */
+function hiddenKeys(page: ClayConfigItem[], picks: Record<string, unknown>): string[] {
+  const rows = allItems(page);
+  const values: Record<string, unknown> = {};
+
+  rows.forEach((row) => {
+    if (row.messageKey) {
+      values[row.messageKey] = row.defaultValue;
+    }
+  });
+  Object.assign(values, picks);
+
+  return rows
+    .filter((row) => row.messageKey && !conditionsOf(row).every((condition) => condition.in.some((wanted) => String(wanted) === String(values[condition.key]))))
+    .map((row) => row.messageKey as string);
+}
+
+describe('config page with the Pebble app plugins', () => {
+  /** A row left showing under the plugin does nothing, and reads as a setting the watch still uses. */
+  test('picking Preferred Source hides the key, the location rows, and the iCal rows', () => {
+    const page = pluginPage();
+
+    const result = hiddenKeys(page, { WEATHER_PROVIDER: 'plugin', CALENDAR_SOURCE: 'plugin' });
+
+    expect(result).toEqual(expect.arrayContaining(['WEATHER_API_KEY', 'LOCATION_USE_GPS', 'LOCATION_GPS_FALLBACK', 'LOCATION_NAME', 'CALENDAR_ICS_URL', 'CALENDAR_POLL']));
+  });
+
+  /** The clock reads the time zone whatever the weather source, so the plugin must never take it off the page. */
+  test('picking Preferred Source keeps the alternate time zone', () => {
+    const page = pluginPage();
+
+    const result = hiddenKeys(page, { WEATHER_PROVIDER: 'plugin', CALENDAR_SOURCE: 'plugin' });
+
+    expect(result).not.toContain('CLOCK_TIMEZONE_1');
+  });
+
+  /** Switching back has to bring every row the plugin hid, or an Open-Meteo wearer loses their city. */
+  test('switching back to Open-Meteo and the iCal link shows the rows again', () => {
+    const page = pluginPage();
+
+    const result = hiddenKeys(page, { WEATHER_PROVIDER: 'openmeteo', CALENDAR_SOURCE: 'ical' });
+
+    expect(result).not.toContain('LOCATION_USE_GPS');
+    expect(result).not.toContain('LOCATION_NAME');
+    expect(result).not.toContain('CALENDAR_ICS_URL');
+    expect(result).not.toContain('CALENDAR_POLL');
+  });
+
+  /**
+   * Clay draws a section as a card and only the hook's hideWhenEmpty folds one away. A heading or a
+   * row in the card without the mark leaves an empty card behind once the plugin is picked.
+   */
+  test('the Weather Location card folds away whole', () => {
+    const page = pluginPage();
+
+    const result = sectionHolding(page, 'LOCATION_USE_GPS');
+
+    expect(result?.hideWhenEmpty).toBe(true);
+    expect((result?.items || []).every((row) => conditionsOf(row).some((condition) => condition.key === 'WEATHER_PROVIDER'))).toBe(true);
+  });
+});
+
+describe('config page order', () => {
+  /**
+   * Every location row only feeds the weather, so a wearer picks the source before the place. On a
+   * build without the plugin nothing moves the card, so the face's own order is the one they see.
+   */
+  test('the Weather card comes before the Weather Location card', () => {
+    const page = config as ClayConfigItem[];
+    const weather = sectionHolding(page, 'WEATHER_PROVIDER');
+    const location = sectionHolding(page, 'LOCATION_USE_GPS');
+
+    const result = page.indexOf(weather as ClayConfigItem);
+
+    expect(weather).toBeDefined();
+    expect(location).toBeDefined();
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThan(page.indexOf(location as ClayConfigItem));
+  });
+
+  /** The clock reads the time zone whatever the weather source, so the row belongs with the other clock settings. */
+  test('the Clock card holds the Alternate Time Zone', () => {
+    const page = config as ClayConfigItem[];
+
+    const result = sectionHolding(page, 'CLOCK_TIMEZONE_1');
+
+    expect(result).toBeDefined();
+    expect(result).toBe(sectionHolding(page, 'CLOCK_TIME_FORMAT'));
+  });
+});
+
+describe('config page weather key', () => {
+  /** Open-Meteo needs no key, so a key row showing for it asks the wearer for something that does nothing. */
+  test.each([
+    ['openmeteo', true],
+    ['owm', false],
+    ['weatherapi', false],
+  ])('the API Key row for %s is hidden: %s', (provider, hidden) => {
+    const result = hiddenKeys(config as ClayConfigItem[], { WEATHER_PROVIDER: provider }).includes('WEATHER_API_KEY');
+
+    expect(result).toBe(hidden);
   });
 });

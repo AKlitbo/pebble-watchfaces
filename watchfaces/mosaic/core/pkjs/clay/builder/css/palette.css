@@ -1,4 +1,5 @@
-/* ---- layout builder palette: size tabs, group tabs, the status line, and the panel tiles ---- */
+/* ---- layout builder palette: size tabs, group tabs, the status line, and the panel tiles ----
+   controls.css paints the tabs and Show All, so the rules here only set their size and place */
 .lb-drawer-wrap {
   padding: 0 12px;
   margin-top: 8px;
@@ -19,20 +20,9 @@
   padding: 9px 4px;
   border: none;
   border-radius: 0;
-  background: #14161a;
-  color: #a3a9b3;
   font-size: 10px;
-  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
-  cursor: pointer;
   margin-bottom: -1px;
-}
-
-.lb-tab.active {
-  background: #ff6a1f;
-  color: #1a0c03;
 }
 
 /* the group tabs sit at the top of the size tab's box, so they read as that size's groups.
@@ -61,24 +51,10 @@
   margin: 0 !important;
   padding: 5px 6px 3px !important;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2px solid;
   border-radius: 0;
-  background: #14161a;
-  color: #a3a9b3;
   font-size: 9px;
-  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
-  cursor: pointer;
-}
-
-/* a tint of the size tab's orange, so the picked group stands out from the box it sits in
-   without matching the solid size tab above it */
-.lb-group[aria-pressed='true'] {
-  background: rgba(255, 106, 31, 0.2);
-  color: #ff8a4c;
-  border-bottom-color: #ff6a1f;
 }
 
 .lb-group-ic {
@@ -93,10 +69,10 @@
 /* 1px border, not the 2px elsewhere: this box is content-box, so a wider border would
    grow the drawer under the tabs */
 .lb-drawer-panes {
-  background: #1d2128;
+  background: var(--mo-panel);
   border-radius: 0;
   padding: 10px 8px;
-  border: 1px solid #3d434d;
+  border: 1px solid var(--mo-line);
 }
 
 /* which group is showing and how much it leaves out, so a short list never reads as everything */
@@ -107,8 +83,7 @@
   gap: 8px;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid #3d434d;
-  color: #ff6a1f;
+  border-top: 1px solid var(--mo-line);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -121,12 +96,9 @@
   min-width: 0 !important;
   margin: 0 !important;
   padding: 4px 8px !important;
-  border: 1px solid #3d434d;
+  border: 1px solid;
   border-radius: 0;
-  background: transparent;
-  color: #eceef2;
   font: inherit;
-  cursor: pointer;
 }
 
 .lb-drawer {

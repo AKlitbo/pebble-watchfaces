@@ -3,6 +3,9 @@
  * reads this to stitch the pieces below into the self contained
  * theme-component.g.js Clay ships into its config webview.
  *
+ * The face also has to register the mosaicControls component, which holds the colour tokens these
+ * stylesheets read, since without it every var(--mo-*) goes unresolved and no check notices.
+ *
  * Piece order only groups the banners for reading. Function declarations
  * hoist across the assembled initialize, so order never changes behaviour.
  */
@@ -33,7 +36,7 @@ export default {
     'Clay custom component for per-module appearance: colours plus header and',
     'border on/off toggles.',
     '',
-    'Shows an "Edit Module Appearance" button. Tapping it opens a full screen',
+    'Shows an "Edit Panel Colours and Headers" button. Tapping it opens a full screen',
     'editor that lists every module with four colour swatches (accent, value,',
     'icon, sub) and per size Header/Border toggles. Tapping a swatch opens the',
     '64 colour Pebble palette. A channel left alone stays mono (a striped',

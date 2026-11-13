@@ -3,6 +3,9 @@
  * reads this to stitch the pieces below into the self contained
  * layout-component.g.js Clay ships into its config webview.
  *
+ * The face also has to register the mosaicControls component, which holds the colour tokens these
+ * stylesheets read, since without it every var(--mo-*) goes unresolved and no check notices.
+ *
  * Every mosaic face builds the same component from this one recipe. The pieces
  * below resolve per face, so a name found in the face's own builder wins over
  * the family's copy and both win over the framework's. That is how the same list picks

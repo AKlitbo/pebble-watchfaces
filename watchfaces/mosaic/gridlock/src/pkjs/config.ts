@@ -7,8 +7,10 @@ import type { ClayOption } from '../../../paf/ts/clay/types';
 import { nightScheduleItems } from '../../../core/pkjs/night-schedule';
 import { select, heading, VIBE_OPTIONS } from '../../../paf/ts/pkjs/config-rows';
 import { healthSection } from '../../../core/pkjs/health-section';
-import { locationSection } from '../../../core/pkjs/location-section';
+import { locationSection, timeZoneItem } from '../../../core/pkjs/location-section';
 import { weatherSection } from '../../../core/pkjs/weather-section';
+import { hourlyVibeItem } from '../../../core/pkjs/clock-rows';
+import { headerFontItem, panelStyleItem } from '../../../core/pkjs/appearance-rows';
 
 // base list. icon/colour get merged in from module-meta below so the builders read one source
 const MODULE_BASE = [
@@ -359,74 +361,23 @@ const VIBE_TYPE_OPTIONS: ClayOption[] = [
 const CALENDAR_VIBE_MODE_OPTIONS: ClayOption[] = [
   { label: 'None', value: 0 },
   { label: '15 min, 5 min, and Start', value: 1 },
-  { label: '5 min, and Start', value: 2 },
+  { label: '5 min and Start', value: 2 },
   { label: 'Start Only', value: 3 },
 ];
 
+// the sections follow how a wearer sets the face up. build the layout, give it a look, set the
+// clock, then make each kind of panel work. the sources that need a key, a link, or symbols come
+// ahead of Health, whose defaults work untouched
 const config = [
   // intro lives in its own section like every other heading so it picks up the same
   // .section > .component padding. at the top level it misses that and the title bar sits cramped
   {
     type: 'section',
     items: [
-      heading('Gridlock Configuration'),
+      heading('Gridlock Settings'),
       {
         type: 'text',
-        defaultValue: 'Compose your layout, pick a theme, and dial in your weather and goals.',
-      },
-    ],
-  },
-  // --- Appearance ---
-  {
-    type: 'section',
-    items: [
-      heading('Appearance'),
-      {
-        type: 'select',
-        messageKey: 'APPEARANCE_THEME',
-        label: 'Theme',
-        description: 'Mono (White on Black) is the classic look and Mono (Black on White) flips it. Vibrant colours each panel by what it shows. Custom lets you pick the colours yourself below.',
-        defaultValue: 0,
-        options: [
-          { label: 'Mono (White on Black)', value: 0 },
-          { label: 'Mono (Black on White)', value: 3 },
-          { label: 'Vibrant', value: 1 },
-          { label: 'Custom', value: 2 },
-        ],
-      },
-      {
-        type: 'themeBuilder',
-        messageKey: 'APPEARANCE_CUSTOM_COLORS',
-        moduleOptions: MODULE_OPTIONS,
-        moduleThumbnails: moduleThumbnails,
-      },
-      {
-        type: 'select',
-        messageKey: 'APPEARANCE_HEADER_FONT',
-        label: 'Header Font',
-        description: "The font used for every panel's header label. Share Tech Mono is the default.",
-        defaultValue: 0,
-        options: [
-          { label: 'Share Tech Mono (Default)', value: 0 },
-          { label: 'LECO', value: 1 },
-          { label: 'Press Start 2P', value: 2 },
-          { label: 'Pixelify Sans', value: 3 },
-          { label: 'Aldrich', value: 4 },
-          { label: 'Kode Mono', value: 5 },
-          { label: 'Electrolize', value: 6 },
-          { label: 'Quantico', value: 7 },
-        ],
-      },
-      {
-        type: 'select',
-        messageKey: 'APPEARANCE_PANEL_STYLE',
-        label: 'Panel Style',
-        description: 'How every panel is framed. Classic is the original square panel and Rounded softens the four corners.',
-        defaultValue: 0,
-        options: [
-          { label: 'Classic (Default)', value: 0 },
-          { label: 'Rounded', value: 1 },
-        ],
+        defaultValue: 'Build your layouts and pick a theme first. The sections below set up what your panels show.',
       },
     ],
   },
@@ -437,13 +388,13 @@ const config = [
       heading('Layout'),
       {
         type: 'text',
-        defaultValue: 'Build up to five layouts. Day is the one you normally see. Night takes over on the schedule below, and Quiet Time takes over whenever the watch is on Quiet Time.',
+        defaultValue: 'Build up to five layouts, then pick which one the watch shows by day, at night, and during Quiet Time. Night follows the schedule below.',
       },
-      // the two invisible stores come first on purpose. Clay builds each item in order and only
+      // the three invisible stores come first on purpose. Clay builds each item in order and only
       // attaches it after setting its value, so a store declared after the builder does not exist
       // yet when the builder initialises and goes looking for it.
       //
-      // invisible store for the layout library: the four grids and which two are in use. lives
+      // invisible store for the layout library: the five layouts and which one has each job. lives
       // here so its value saves and restores with the rest of the settings, since the config
       // webview will not let it keep its own localStorage. the watch never reads this key
       {
@@ -478,32 +429,34 @@ const config = [
       ...nightScheduleItems(),
     ],
   },
-  // --- Bluetooth ---
+  // --- Appearance ---
+  // it sits below Layout, which is safe under Clay's build order since the theme editor reads none
+  // of the layout stores
   {
     type: 'section',
     items: [
-      heading('Bluetooth Settings'),
-      select('CONNECTION_VIBE_CONNECT', 'Vibrate on Connect', VIBE_OPTIONS, 0),
-      select('CONNECTION_VIBE_DISCONNECT', 'Vibrate on Disconnect', VIBE_OPTIONS, 0),
-    ],
-  },
-  // --- Clock ---
-  {
-    type: 'section',
-    items: [
-      heading('Clock Configuration'),
-      select('CLOCK_TIME_FORMAT', 'Time Format', [
-        { label: 'System Default', value: 0 },
-        { label: '12-hour (08:30)', value: 1 },
-        { label: '12-hour (8:30)', value: 4 },
-        { label: '24-hour (20:30)', value: 2 },
-      ], 0),
-      select('CLOCK_DATE_FORMAT', 'Date Format', configBuilder.defaultDateOptions, '%a %b %d'),
-      select('CLOCK_HOURLY_VIBE', 'Hourly Vibration', VIBE_OPTIONS, 0, 'Buzz at the top of every hour. Silenced automatically during Quiet Time.'),
-      select('CLOCK_WEEK_START', 'Week Starts On', [
-        { label: 'Sunday', value: 0 },
-        { label: 'Monday', value: 1 },
-      ], 0, 'The first day of the week for the Month Grid and Weekday Dots panels.'),
+      heading('Appearance'),
+      {
+        type: 'select',
+        messageKey: 'APPEARANCE_THEME',
+        label: 'Theme',
+        description: 'Vibrant colours each panel by what it shows. Custom uses the colours you set in the editor below.',
+        defaultValue: 0,
+        options: [
+          { label: 'Mono (White on Black)', value: 0 },
+          { label: 'Mono (Black on White)', value: 3 },
+          { label: 'Vibrant', value: 1 },
+          { label: 'Custom', value: 2 },
+        ],
+      },
+      {
+        type: 'themeBuilder',
+        messageKey: 'APPEARANCE_CUSTOM_COLORS',
+        moduleOptions: MODULE_OPTIONS,
+        moduleThumbnails: moduleThumbnails,
+      },
+      headerFontItem(),
+      panelStyleItem(),
       select('APPEARANCE_ANALOG_STYLE', 'Analog Clock Style', [
         { label: 'Classic (Round)', value: 0 },
         { label: 'Square Frame', value: 1 },
@@ -514,23 +467,43 @@ const config = [
         { label: 'Dots', value: 6 },
         { label: 'Roman', value: 7 },
         { label: 'Grid', value: 8 },
-      ], 0, 'The dial an Analog Clock panel draws. Add an Analog Clock to your layout to see it.'),
+      ], 0, 'The dial on the Analog Clock panel.'),
     ],
   },
-  healthSection({ hrv: true }),
-  locationSection(),
+  // --- Clock ---
+  {
+    type: 'section',
+    items: [
+      heading('Clock'),
+      select('CLOCK_TIME_FORMAT', 'Time Format', [
+        { label: 'System Default', value: 0 },
+        { label: '12-hour (08:30)', value: 1 },
+        { label: '12-hour (8:30)', value: 4 },
+        { label: '24-hour (20:30)', value: 2 },
+      ], 0),
+      select('CLOCK_DATE_FORMAT', 'Date Format', configBuilder.defaultDateOptions, '%a %b %d'),
+      select('CLOCK_WEEK_START', 'Week Starts On', [
+        { label: 'Sunday', value: 0 },
+        { label: 'Monday', value: 1 },
+      ], 0, 'The first day of the week on the Month Grid, Weekday Dots, and Week Progress panels.'),
+      timeZoneItem(),
+      hourlyVibeItem(),
+    ],
+  },
   weatherSection(),
+  // straight under Weather, so the plugin choice folds this card away right below the select that hides it
+  locationSection(),
   // --- Calendar ---
   {
     type: 'section',
     items: [
-      heading('Calendar Preferences'),
+      heading('Calendar'),
       // the lead line holds for either source, so the Calendar Source select the plugin define adds
       // goes straight under it. the iCal line, the link, and the refresh interval only mean
       // something for an iCal link, so they hide while the events come from a Pebble app plugin
       {
         type: 'text',
-        defaultValue: 'Add a Calendar panel (Next Event, Agenda, or Timeline) to your layout.',
+        defaultValue: 'Add a Next Event, Agenda, or Timeline panel to your layout to see your events.',
       },
       {
         type: 'text',
@@ -540,9 +513,9 @@ const config = [
       {
         type: 'input',
         messageKey: 'CALENDAR_ICS_URL',
-        label: 'iCal URL',
+        label: 'iCal Link',
         pluginSourceHides: 'CALENDAR_SOURCE',
-        description: 'Paste any calendar\'s private iCal (.ics) address. Google Calendar: Settings and sharing, Integrate calendar, "Secret address in iCal format". Apple iCloud: share a calendar as Public. Outlook: publish the calendar. Treat the link like a password: anyone with it can read your calendar.',
+        description: "Your calendar's private iCal (.ics) address. Google Calendar has it under Settings and sharing, Integrate calendar, Secret address in iCal format. In iCloud, share the calendar as Public, and in Outlook, publish it. Anyone with the link can read your calendar.",
         attributes: {
           placeholder: 'https://.../calendar.ics',
           maxlength: 512,
@@ -556,36 +529,36 @@ const config = [
           { label: '20 min', value: 3 },
           { label: '30 min', value: 4 },
           { label: '1 hour', value: 5 },
-        ], 4, 'How often the watch pulls a fresh copy of your calendar feed. A tighter interval uses more battery.'),
+        ], 4, 'How often the phone downloads your calendar. More often uses more battery.'),
         pluginSourceHides: 'CALENDAR_SOURCE',
       },
-      select('CALENDAR_VIBE_MODE', 'Event Reminders', CALENDAR_VIBE_MODE_OPTIONS, 0, 'Buzz before a timed event starts. Silenced during Quiet Time, and only when a Calendar panel is on your layout. Pick the pattern for each reminder below.'),
+      select('CALENDAR_VIBE_MODE', 'Event Reminders', CALENDAR_VIBE_MODE_OPTIONS, 0, 'The watch buzzes before a timed event while a calendar panel is on your layout, and stays quiet during Quiet Time.'),
       // each pattern shows only under the reminder modes that fire it
-      { ...select('CALENDAR_VIBE_15MIN', 'Reminder: 15m Vibration', VIBE_TYPE_OPTIONS, 1), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1] } },
-      { ...select('CALENDAR_VIBE_5MIN', 'Reminder: 5m Vibration', VIBE_TYPE_OPTIONS, 3), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1, 2] } },
-      { ...select('CALENDAR_VIBE_START', 'Reminder: Start Vibration', VIBE_TYPE_OPTIONS, 2), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1, 2, 3] } },
+      { ...select('CALENDAR_VIBE_15MIN', '15-Minute Reminder', VIBE_TYPE_OPTIONS, 1), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1] } },
+      { ...select('CALENDAR_VIBE_5MIN', '5-Minute Reminder', VIBE_TYPE_OPTIONS, 3), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1, 2] } },
+      { ...select('CALENDAR_VIBE_START', 'Start Reminder', VIBE_TYPE_OPTIONS, 2), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1, 2, 3] } },
     ],
   },
   // --- Stocks ---
   {
     type: 'section',
     items: [
-      heading('Stock Preferences'),
+      heading('Stocks'),
       {
         type: 'text',
-        defaultValue: 'Add a Stock or Watchlist panel to your layout, then set your ticker(s) below. Most sources need a free API key (Yahoo does not).',
+        defaultValue: 'Add a Stock or Watchlist panel to your layout, then enter your symbols below.',
       },
       select('STOCK_PROVIDER', 'Data Source', [
         { label: 'Finnhub (Real-Time, Free Key)', value: 'finnhub' },
         { label: 'Yahoo (Real-Time, No Key)', value: 'yahoo' },
         { label: 'Twelve Data (Global, Free Key)', value: 'twelvedata' },
         { label: 'Alpha Vantage (End-of-Day, Free Key)', value: 'alphavantage' },
-      ], 'finnhub', 'Finnhub gives real-time US quotes and is the one to use for a live watchlist. Yahoo is real-time too and needs no key, with the widest market coverage, but it is an unofficial feed that can change without notice. Twelve Data adds global markets on a free key and refreshes on your interval while the market is open. Alpha Vantage is end-of-day only, so it grabs the day\'s close once after the closing bell.'),
+      ], 'finnhub', "Finnhub is real-time for US stocks. Yahoo needs no key, but it is an unofficial feed that can break without warning. Twelve Data adds markets outside the US. Alpha Vantage only fetches the day's close."),
       {
         type: 'input',
         messageKey: 'STOCK_API_KEY',
         label: 'API Key',
-        description: 'Grab a free key from your chosen provider and paste it here.',
+        description: 'Paste the free key from the source you picked.',
         attributes: {
           placeholder: 'Paste your private API key here...',
           maxlength: 64,
@@ -595,8 +568,8 @@ const config = [
       {
         type: 'input',
         messageKey: 'STOCK_SYMBOLS',
-        label: 'Tickers',
-        description: 'One symbol for the 2x2 Stock panel, or up to four comma-separated for the Watchlist (e.g. AAPL, MSFT, TSLA, NVDA).',
+        label: 'Symbols',
+        description: 'One symbol for the Stock panel, or up to four separated by commas for the Watchlist.',
         attributes: {
           placeholder: 'AAPL, MSFT, TSLA, NVDA',
           maxlength: 64,
@@ -609,7 +582,17 @@ const config = [
         { label: '15 min', value: 3 },
         { label: '20 min', value: 4 },
         { label: '30 min', value: 5 },
-      ], 5, 'How often Finnhub and Yahoo pull fresh quotes. A tighter interval drains your battery faster. Twelve Data follows this too while the market is open (down to every 15 minutes to protect its daily cap), then eases off after hours. Alpha Vantage ignores it and just grabs the close once a day after the market shuts.'),
+      ], 5, 'How often the phone fetches new quotes. More often uses more battery. Twelve Data waits at least 15 minutes and slows down after hours, and Alpha Vantage fetches the close once a day.'),
+    ],
+  },
+  healthSection({ hrv: true }),
+  // --- Bluetooth ---
+  {
+    type: 'section',
+    items: [
+      heading('Bluetooth'),
+      select('CONNECTION_VIBE_CONNECT', 'Vibrate on Connect', VIBE_OPTIONS, 0),
+      select('CONNECTION_VIBE_DISCONNECT', 'Vibrate on Disconnect', VIBE_OPTIONS, 0),
     ],
   },
 

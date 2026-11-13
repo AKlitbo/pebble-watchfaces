@@ -1,53 +1,68 @@
 /**
- * The Location section of the settings page.
+ * The Weather Location section of the settings page, and the alternate time zone row.
  *
- * Both faces in the family ask the same three questions and store them under the same keys, so
- * the rows are built once here rather than written out twice and drifting.
+ * Both faces in the family ask the same questions and store them under the same keys, so the rows
+ * are built once here rather than written out twice and drifting.
  *
- * The alternate time zone lives here rather than with the clock settings because it is answered
- * the same way as the manual location, by searching for a place.
+ * Every row in the section only feeds a weather fetch. The time zone row is searched the same way
+ * as the manual location, so it is built here too, but each face puts it in its Clock section,
+ * since the clock reads it whatever the weather source.
  */
 
 import type { ClayConfigItem } from '../../paf/ts/clay/types';
 import { heading, toggle } from '../../paf/ts/pkjs/config-rows';
 
+// the heading and every row only mean something for a weather fetch, so they all hide while the
+// weather comes from a Pebble app plugin, and the card folds away with them. a face built without
+// a plugin define ignores the mark
+const HIDES = { pluginSourceHides: 'WEATHER_PROVIDER' };
+
 /**
  * The whole section, ready to drop into the page.
  *
- * @return The Location section with the GPS toggles and the two place searches.
+ * @return The Weather Location section with the GPS toggles and the manual city.
  */
 export function locationSection(): ClayConfigItem {
   return {
     type: 'section',
     items: [
-      heading('Location Settings'),
-      // the GPS toggles and the manual city only feed a weather fetch, so they hide while the
-      // weather comes from a Pebble app plugin. a face built without a plugin define ignores the mark.
-      // the heading stays unmarked since the time zone below still sits under it
-      { ...toggle('LOCATION_USE_GPS', 'Enable Phone GPS', 'Automatically fetch weather for your current location.', true), pluginSourceHides: 'WEATHER_PROVIDER' },
-      { ...toggle('LOCATION_GPS_FALLBACK', 'Fallback to Manual Location', 'If GPS is on but cannot find you, use the city picked below.', true), pluginSourceHides: 'WEATHER_PROVIDER' },
+      { ...heading('Weather Location'), ...HIDES },
+      { ...toggle('LOCATION_USE_GPS', 'Use Phone GPS', 'The phone looks up where you are for the weather.', true), ...HIDES },
+      {
+        ...toggle('LOCATION_GPS_FALLBACK', 'Fall Back to Manual Location', 'When GPS cannot find you, the phone uses the city below.', true),
+        ...HIDES,
+        visibleWhen: { key: 'LOCATION_USE_GPS', in: [true] },
+      },
       {
         type: 'locationsearch',
         messageKey: 'LOCATION_NAME',
         label: 'Manual Location',
-        pluginSourceHides: 'WEATHER_PROVIDER',
+        description: 'The city for the weather when GPS is off or cannot find you.',
+        ...HIDES,
         attributes: {
           placeholder: 'Search a city, e.g. Phoenix',
-        },
-      },
-      // the time zone stays whatever the weather source, since the clock reads it
-      {
-        type: 'locationsearch',
-        messageKey: 'CLOCK_TIMEZONE_1',
-        timeZone: true,
-        label: 'Alternate Time Zone',
-        description: "Sets the local time displayed by the 'Time Zone 1' module in your layout. Search a city, a zone name such as Europe/London, or type UTC or an offset like UTC+05:30.",
-        attributes: {
-          placeholder: 'e.g. Phoenix, UTC, or Europe/London',
         },
       },
     ],
   };
 }
 
-export default { locationSection };
+/**
+ * The alternate time zone row, for a face's Clock section.
+ *
+ * @return The time zone search that sets the Time Zone 1 panel.
+ */
+export function timeZoneItem(): ClayConfigItem {
+  return {
+    type: 'locationsearch',
+    messageKey: 'CLOCK_TIMEZONE_1',
+    timeZone: true,
+    label: 'Alternate Time Zone',
+    description: 'The time on the Time Zone 1 panel. Search a city or a zone such as Europe/London, or type UTC or an offset like UTC+05:30.',
+    attributes: {
+      placeholder: 'e.g. Phoenix, UTC, or Europe/London',
+    },
+  };
+}
+
+export default { locationSection, timeZoneItem };
