@@ -104,6 +104,9 @@ export default {
     '  letter-spacing: 0.5px !important;',
     '  cursor: pointer !important;',
     '  transition: background 0.12s !important;',
+    // Clay gives a pressed submit a bright tap highlight of its own, which the Android webview lays
+    // over the whole button, so it goes clear and the pressed ink below shows instead
+    '  -webkit-tap-highlight-color: transparent !important;',
     '}',
     '.component-submit { padding-bottom: 0.8rem !important; }',
     ".component-submit button:hover, button[type='submit']:hover { background: #46413a !important; }",

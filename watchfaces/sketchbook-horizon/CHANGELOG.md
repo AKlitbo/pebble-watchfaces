@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed the weather fetching twice each time the watchface starts.
 - Fixed the settings page opening on a numbered Date Format while the watch wrote the date in words, until you saved one. Saving without touching it switched the date to numbers.
 - Fixed the settings page showing extra space under and beside its controls in the Pebble app on Android while plugins are on.
+- Fixed the Save button on the settings page turning bright orange while you hold it.
 
 ### Notes
 
