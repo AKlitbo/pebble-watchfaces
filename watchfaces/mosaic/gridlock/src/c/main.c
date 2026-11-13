@@ -26,6 +26,7 @@
 #include "settings_schema.h"
 #include "mosaic/goal_vibe.h"
 #include "mosaic/layout_switch.h"
+#include "mosaic/phone_gate.h"
 #include "persist_keys.h"
 #include "theme/theme.h"
 #include "system/vibe/vibe.h"
@@ -54,7 +55,7 @@ static uint16_t hrv_period(void)
 
     for (size_t panel = 0; panel < ARRAY_LENGTH(panels); panel++)
     {
-        if (gridlock_has_module_either(panels[panel]))
+        if (mosaic_places_module(panels[panel]))
         {
             return HRV_PERIOD_SEC;
         }
@@ -70,49 +71,31 @@ static uint16_t hrv_period(void)
  */
 static bool hrv_keep_all(void)
 {
-    return gridlock_has_module_either(MOD_HEALTH_HRV_HISTORY) || gridlock_has_module_either(MOD_HEALTH_HRV_STATES) ||
-           gridlock_has_module_either(MOD_HEALTH_HRV_TUNING);
+    return mosaic_places_module(MOD_HEALTH_HRV_HISTORY) || mosaic_places_module(MOD_HEALTH_HRV_STATES) ||
+           mosaic_places_module(MOD_HEALTH_HRV_TUNING);
 }
 
-static bool s_phone_live;    ///< whether the phone store was last started live
 static bool s_music_live;    ///< whether the music store was last started live
 static bool s_stores_seeded; ///< whether dev mode seeded every store, which a save leaves alone
 
 /**
- * @brief Whether a panel showing the phone's battery is on any layout.
+ * @brief Starts the music store live only while a Now Playing panel is on any layout, and again when
+ * a save adds the first one or takes the last one off.
  *
- * @return True when Phone Battery or Battery Battery is placed in the day, night, or Quiet Time layout.
+ * The phone sends every change of track, so a live store with nothing showing it would wake the
+ * watch for each one. A store started not live tells the phone so, and the phone stops sending. The
+ * phone store follows its own panels the same way, in mosaic/phone_gate.h.
+ *
+ * @param first True at launch, when the store starts whatever it was before.
  */
-static bool phone_shown(void)
-{
-    return gridlock_has_module_either(MOD_SYSTEM_PHONE_BATTERY) || gridlock_has_module_either(MOD_SYSTEM_BATTERY_PAIR);
-}
-
-/**
- * @brief Starts the phone and music stores live only while a panel shows their readings, and again
- * when a save adds the first such panel or takes the last one off.
- *
- * The phone sends every change in its battery and every change of track, so a live store with nothing
- * showing it would wake the watch for each one. A store started not live tells the phone so, and the
- * phone stops sending.
- *
- * @param first True at launch, when each store starts whatever it was before.
- */
-static void apply_plugin_store_rules(bool first)
+static void apply_music_rules(bool first)
 {
     if (s_stores_seeded)
     {
         return;
     }
 
-    bool phone_live = phone_shown();
-    if (first || phone_live != s_phone_live)
-    {
-        s_phone_live = phone_live;
-        phone_store_init((PhoneConfig){.live = phone_live}, NULL);
-    }
-
-    bool music_live = gridlock_has_module_either(MOD_MUSIC_NOW_PLAYING);
+    bool music_live = mosaic_places_module(MOD_MUSIC_NOW_PLAYING);
     if (first || music_live != s_music_live)
     {
         s_music_live = music_live;
@@ -125,7 +108,7 @@ static void apply_hrv_rules(void)
 {
     health_store_set_hrv_rules((uint16_t)gridlock_hrv_still_mg(), (uint16_t)gridlock_hrv_walk_steps(),
                                (uint16_t)gridlock_hrv_settle_gaps(), (HrvCount)gridlock_hrv_count(), hrv_keep_all(),
-                               gridlock_has_module_either(MOD_HEALTH_HRV_TUNING));
+                               mosaic_places_module(MOD_HEALTH_HRV_TUNING));
 }
 
 // the header font is the one font that changes at runtime (the user's Header Font pick). we own
@@ -208,7 +191,8 @@ static void on_settings_changed(bool time_or_date_changed)
     calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
     // a phone battery or Now Playing panel may have been placed or taken off, which starts or stops
     // the phone's updates for it
-    apply_plugin_store_rules(false);
+    phone_gate_settings_changed();
+    apply_music_rules(false);
     // an HRV panel may have been placed or taken off, which turns the sampling on or off
     apply_hrv_rules();
     health_store_set_hrv_period(hrv_period());
@@ -220,9 +204,9 @@ static void on_settings_changed(bool time_or_date_changed)
 // never buzzes for an event already past the mark. vibe_choice stays silent during quiet time
 static void calendar_vibe(void)
 {
-    if (!gridlock_has_module_either(MOD_CALENDAR_COUNTDOWN) &&
-        !gridlock_has_module_either(MOD_CALENDAR_AGENDA) &&
-        !gridlock_has_module_either(MOD_CALENDAR_FREEBUSY))
+    if (!mosaic_places_module(MOD_CALENDAR_COUNTDOWN) &&
+        !mosaic_places_module(MOD_CALENDAR_AGENDA) &&
+        !mosaic_places_module(MOD_CALENDAR_FREEBUSY))
     {
         return;
     }
@@ -307,7 +291,8 @@ static void init(void)
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
         // the phone's battery and its music, from the Pebble app's plugins. each hears the phone come
         // and go through the live system store above, and clears its reading while the phone is away
-        apply_plugin_store_rules(true);
+        phone_gate_start();
+        apply_music_rules(true);
         // the only face with the two health graphs and with panels for sleep, active time and
         // calories, so the only one that keeps their history or pays to read them. the heart rate
         // day is named whatever is placed, so its log read runs at every launch, after the paint.
@@ -321,7 +306,7 @@ static void init(void)
                                          .hrv_walk_steps = (uint16_t)gridlock_hrv_walk_steps(),
                                          .hrv_settle_gaps = (uint16_t)gridlock_hrv_settle_gaps(),
                                          .hrv_count = (HrvCount)gridlock_hrv_count(), .hrv_keep_all = hrv_keep_all(),
-                                         .hrv_live_redraw = gridlock_has_module_either(MOD_HEALTH_HRV_TUNING),
+                                         .hrv_live_redraw = mosaic_places_module(MOD_HEALTH_HRV_TUNING),
                                          .hrv_persist_key = HRV_STORE_KEY,
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick

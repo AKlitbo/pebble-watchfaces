@@ -8,10 +8,10 @@
  * reading. The phone's comes from the Pebble app's Phone plugin, so only its half drops, to OFF while
  * plugins are off and to -- while the phone is away.
  *
- * It sits in this face rather than the family core because the phone's colours come from the grid
- * engine's grid_ctx_use_colors_of, which Sidereel's engine does not have.
+ * The phone's colours come from grid_ctx_use_colors_of, which each face's engine gives in its
+ * grid_engine.h.
  *
- * @ingroup gridlock_mod_system
+ * @ingroup mosaic_mod_system
  */
 #include "engine/grid_engine.h"
 #include "system_battery_pair.h"

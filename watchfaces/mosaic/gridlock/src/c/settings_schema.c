@@ -26,6 +26,7 @@
 #include "mosaic/engine/catalog.h"
 #include "mosaic/draw/header_fonts.h" // HEADER_FONT_COUNT for the header font enum bound
 #include "mosaic/draw/panel_styles.h" // PANEL_STYLE_COUNT for the panel style enum bound
+#include "mosaic/layout_places.h"
 
 #include <pebble.h>
 #include <stddef.h>
@@ -692,35 +693,13 @@ bool gridlock_has_module(uint8_t type)
     return false;
 }
 
-/** @brief Whether a layout string places a module, without disturbing the block cache. */
-static bool layout_string_has_module(const char *layout, uint8_t type)
+bool mosaic_places_module(uint8_t type)
 {
-    for (const char *p = layout; p && *p; )
-    {
-        if (layout_parse_int(&p) == type)
-        {
-            return true;
-        }
-
-        while (*p && *p != ';')
-        {
-            p++;
-        }
-        if (*p == ';')
-        {
-            p++;
-        }
-    }
-
-    return false;
-}
-
-bool gridlock_has_module_either(uint8_t type)
-{
+    // the three strings are read as they stand, so the block cache of the layout on screen stays put
     return gridlock_has_module(type)
-        || layout_string_has_module(s_core.layout, type)
-        || layout_string_has_module(s_night.layout, type)
-        || layout_string_has_module(s_quiet.layout, type);
+        || layout_places_module(s_core.layout, type)
+        || layout_places_module(s_night.layout, type)
+        || layout_places_module(s_quiet.layout, type);
 }
 
 uint8_t gridlock_night_mode(void)

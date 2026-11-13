@@ -11,7 +11,7 @@
 #include "mosaic/modules/system/system_alarm.h"
 #include "mosaic/modules/system/system_battery.h"
 #include "mosaic/modules/system/system_phone_battery.h"
-#include "modules/system/system_battery_pair.h"
+#include "mosaic/modules/system/system_battery_pair.h"
 #include "modules/system/system_connection.h"
 #include "modules/music/music_now_playing.h"
 #include "mosaic/modules/health/health_hr_graph.h"

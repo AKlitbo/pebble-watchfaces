@@ -2,7 +2,8 @@
  * @file dev.h
  * @brief Sidereel's dev overrides. The dev plugin's `dev/dev_hooks.h` holds the harness hooks, and
  * the build sets their switches from `paf build sidereel --dev` and the family's paf.dev.config.json.
- * This only adds the look a shot pins and the forced Quiet Time glyph.
+ * This only adds the look a shot pins and the forced Quiet Time glyph. dev.c beside it shows one panel
+ * on its own for the panel walk the config lists.
  *
  * @ingroup watchface-sidereel
  */

@@ -265,6 +265,7 @@ static uint32_t tags_for(ModuleFeature features)
     tags |= (features & FEATURE_WEATHER) ? TAG_WEATHER : 0;
     tags |= (features & FEATURE_HEALTH) ? TAG_HEALTH : 0;
     tags |= (features & FEATURE_SYSTEM) ? TAG_SYSTEM : 0;
+    tags |= (features & FEATURE_PHONE) ? TAG_PHONE : 0;
 
     return tags ? tags : TAG_CHROME;
 }

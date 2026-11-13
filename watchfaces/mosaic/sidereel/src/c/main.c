@@ -13,11 +13,13 @@
 #include "dev/dev.h"
 #include "io/appmessage/appmessage.h"
 #include "io/stores/health_store.h"
+#include "io/stores/phone_store.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 #include "layout.h"
 #include "mosaic/layout_switch.h"
+#include "mosaic/phone_gate.h"
 #include "persist_keys.h"
 #include "reel/reel.h"
 #include "settings_schema.h"
@@ -63,6 +65,9 @@ static void on_settings_changed(bool time_or_date_changed)
     engine_rebuild();
 
     time_store_reconfigure(time_cfg());
+    // a phone battery panel may have been placed or taken off, which starts or stops the phone's
+    // updates for it
+    phone_gate_settings_changed();
 }
 
 static void on_time_tick(void)
@@ -97,6 +102,11 @@ static void on_system_changed(void)
     engine_mark_dirty_tags(TAG_SYSTEM | TAG_CHROME);
 }
 
+static void on_phone_changed(void)
+{
+    engine_mark_dirty_tags(TAG_PHONE);
+}
+
 static void init(void)
 {
     settings_init(sidereel_settings_schema());
@@ -107,6 +117,9 @@ static void init(void)
     if (!dev_seed_stores())
     {
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
+        // the phone's battery, from the Pebble app's Phone plugin. it hears the phone come and go
+        // through the live system store above, and clears its reading while the phone is away
+        phone_gate_start();
         // the history flags are what the two graph panels read. they cost a storage write per
         // minute, so they are only on because a cell can actually show them
         health_store_init((HealthConfig){.live = true, .calories = true,
@@ -140,6 +153,7 @@ static void init(void)
     health_store_subscribe(on_health_changed);
     weather_store_subscribe(on_weather_changed);
     system_store_subscribe(on_system_changed);
+    phone_store_subscribe(on_phone_changed);
 
     // weather_store owns its channel. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

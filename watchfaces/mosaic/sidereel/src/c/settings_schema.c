@@ -19,6 +19,7 @@
 #include "theme/theme.h"
 #include "mosaic/draw/header_fonts.h"
 #include "mosaic/draw/panel_styles.h"
+#include "mosaic/layout_places.h"
 #include "units/wind.h"
 #include "clock/nightsched.h"
 #include "role/role.h"
@@ -351,6 +352,12 @@ bool sidereel_night_layout_set(void)
 bool sidereel_quiet_layout_set(void)
 {
     return layout_has_any_block(s_quiet.layout, MOD_TYPE_COUNT);
+}
+
+bool mosaic_places_module(uint8_t type)
+{
+    return layout_places_module(s_settings.layout, type) || layout_places_module(s_night.layout, type) ||
+           layout_places_module(s_quiet.layout, type);
 }
 
 uint8_t sidereel_active_layout_role(void)

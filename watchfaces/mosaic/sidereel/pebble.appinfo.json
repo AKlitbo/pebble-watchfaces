@@ -8,7 +8,8 @@
     "emery"
   ],
   "defines": {
-    "PLUGIN_WEATHER": 1
+    "PLUGIN_WEATHER": 1,
+    "PLUGIN_PHONE": 1
   },
   "providers": {
     "weather": ["plugin", "openmeteo", "owm", "weatherapi"]
@@ -192,6 +193,8 @@
       { "type": "bitmap", "name": "ICON_TIME_MOON_LG_27", "file": "icons/time-moon-lg-27.png" },
       { "type": "bitmap", "name": "ICON_SYSTEM_VOLUME_MUTED", "file": "icons/system-volume-muted.png" },
       { "type": "bitmap", "name": "ICON_SYSTEM_VOLUME_FULL", "file": "icons/system-volume-full.png" },
+      { "type": "bitmap", "name": "ICON_SYSTEM_WATCH_CHARGE", "file": "icons/system-watch-charge.png" },
+      { "type": "bitmap", "name": "ICON_SYSTEM_PHONE_CHARGE", "file": "icons/system-phone-charge.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_FC_CLEAR", "file": "icons/weather-fc-clear.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_FC_PARTLY_CLOUDY", "file": "icons/weather-fc-partly-cloudy.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_FC_CLOUDY", "file": "icons/weather-fc-cloudy.png" },

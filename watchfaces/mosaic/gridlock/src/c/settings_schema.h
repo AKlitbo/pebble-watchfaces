@@ -55,7 +55,7 @@ bool gridlock_has_module(uint8_t type);
  * @param type A ModuleType.
  * @return True when any layout places it.
  */
-bool gridlock_has_module_either(uint8_t type);
+bool mosaic_places_module(uint8_t type);
 
 /**
  * @brief When the night layout takes over.

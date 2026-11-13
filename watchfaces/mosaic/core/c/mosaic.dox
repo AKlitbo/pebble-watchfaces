@@ -9,10 +9,12 @@
  *
  * What it may reach back into is fixed and short:
  *
- * - `engine/grid_engine.h`, the face's `GridCtx`, which is what a panel body is handed
+ * - `engine/grid_engine.h`, the face's `GridCtx`, which is what a panel body is handed, and
+ *   `grid_ctx_use_colors_of`, which paints a context in another panel's colours
  * - `draw/fonts.h`, the face's font slot names, so a body can ask for a size by name
  * - `theme/theme.h`, the face's `Palette`, whose panel channels this tier draws with
- * - `settings_schema.h`, the goals, units and week start a body reads, under the names it calls
+ * - `settings_schema.h`, the goals, units and week start a body reads, and which panels the layouts
+ *   place, under the names it calls
  * - `dev/dev.h`, the face's dev hooks
  * - anything from the framework, the same as any face
  *
@@ -75,7 +77,8 @@
  * @defgroup mosaic_mod_system System
  * @ingroup mosaic_modules
  *
- * The watch's own bits: battery, the phone connection, and the quiet time marker.
+ * The watch's own bits: battery, the phone connection, and the quiet time marker, plus the phone's
+ * battery from the Pebble app.
  */
 
 /**

@@ -172,22 +172,19 @@ static GColor label_color_for(GColor accent)
     return lum >= 150 ? GColorBlack : GColorWhite;
 }
 
-void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
+/**
+ * @brief Works out the colours a panel paints with under the current theme.
+ *
+ * VIBRANT paints each panel's own colours over the theme's base, and GColorClear in its table means
+ * keep the base. CUSTOM takes only the channels the settings page set.
+ *
+ * @param colour_id The panel whose colours to use, already resolved through its theme_alias.
+ * @return The four colours.
+ */
+static Palette module_palette(uint8_t colour_id)
 {
-    const ModuleDef *def = module_def(type);
-
-    // a module that cannot sit in this cell draws nothing rather than drawing wrong. that is the
-    // same gate gridlock's layout applies, kept so a stale id degrades to blank
-    if (!def->body || !module_allows_size(type, size))
-    {
-        return;
-    }
-
     uint8_t theme = settings_u8(SETTING_THEME);
     Palette base = palette_for_theme(theme);
-
-    // a grouped panel borrows another's colours, so the two read as one family
-    uint8_t colour_id = def->theme_alias ? def->theme_alias : (uint8_t)type;
 
     if (theme == THEME_VIBRANT)
     {
@@ -208,7 +205,36 @@ void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
                                           : (pick.accent_set ? pick.accent : base.subtitle);
     }
 
-    const Palette *pal = &base;
+    return base;
+}
+
+void grid_ctx_use_colors_of(GridCtx *gctx, ModuleType module)
+{
+    // an id past the catalogue paints in the plain base colours, the way an empty cell does, so it
+    // never reads past the end of the vibrant table
+    uint8_t own = module < MOD_TYPE_COUNT ? (uint8_t)module : (uint8_t)MOD_EMPTY;
+
+    // a grouped panel borrows another's colours, so the two read as one family
+    const ModuleDef *def = module_def(own);
+    Palette pal = module_palette(def->theme_alias ? def->theme_alias : own);
+
+    gctx->color_value = pal.value;
+    gctx->color_subtitle = pal.subtitle;
+    gctx->color_accent = pal.accent;
+    gctx->color_icon = pal.icon;
+    gctx->color_label = label_color_for(pal.accent);
+}
+
+void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
+{
+    const ModuleDef *def = module_def(type);
+
+    // a module that cannot sit in this cell draws nothing rather than drawing wrong. that is the
+    // same gate gridlock's layout applies, kept so a stale id degrades to blank
+    if (!def->body || !module_allows_size(type, size))
+    {
+        return;
+    }
 
     // a module can ask for the whole tile at a given size, and the user can ask for it too
     bool headerless = (def->headerless_sizes & (1 << size)) != 0
@@ -221,14 +247,10 @@ void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
         .body = GRect(bounds.origin.x, bounds.origin.y + HEADER_H,
                       bounds.size.w, bounds.size.h - HEADER_H),
         .size = size,
-        .color_value = pal->value,
-        .color_subtitle = pal->subtitle,
-        .color_accent = pal->accent,
-        .color_icon = pal->icon,
-        .color_label = label_color_for(pal->accent),
         .borderless = borderless,
         .headerless = headerless,
     };
+    grid_ctx_use_colors_of(&gctx, type);
 
     // the Panel Style pick is a corner radius, and 0 is the square classic frame. the header
     // block below rounds its own top corner to match, or it would square the border back off

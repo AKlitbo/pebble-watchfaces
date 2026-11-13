@@ -159,6 +159,7 @@
 #define TAG_SYSTEM  (1u << 3)
 #define TAG_REEL    (1u << 4)  // the scroll frames, and nothing else
 #define TAG_CHROME  (1u << 5)  // static, so only a rebuild repaints it
+#define TAG_PHONE   (1u << 6)  // the phone's battery, from the Pebble app's Phone plugin
 
 /**
  * @brief Register fonts and pull in the palette.

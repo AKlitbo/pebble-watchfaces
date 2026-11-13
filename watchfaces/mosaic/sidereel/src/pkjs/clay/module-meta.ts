@@ -65,6 +65,8 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Day Progress':  { icon: '🌗', blockColor: '#ec407a', slug: 'day-progress' },
   'Hour Progress': { icon: '⌛', blockColor: '#ec407a', slug: 'hour-progress' },
   'Week Progress': { icon: '🗓', blockColor: '#0288d1', slug: 'week-progress' },
+  'Battery Battery': { icon: '🔋', blockColor: '#f0a500', slug: 'battery-battery' },
+  'Phone Battery': { icon: '📱', blockColor: '#26c6da', slug: 'phone-battery' },
 };
 
 // the block sizes this face's thumbnails come in. embed-thumbnails.ts refuses a png in any other size

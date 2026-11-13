@@ -634,6 +634,26 @@
           "year-progress": "MOD_TIME_YEAR_PROGRESS"
         }
       }
+    },
+    "sidereel": {
+      "walk": "phone",
+      "stores": {
+        "phone": { "battery": 84 }
+      },
+      "walks": {
+        "phone": { "panels": { "1x2": ["phone-battery", "battery-battery"], "2x2": ["phone-battery"] } }
+      },
+      "panels": {
+        "include": "mosaic/engine/catalog.h",
+        "sizes": {
+          "1x2": { "id": "MSIZE_1x2", "crop": { "left": 7, "top": 7, "width": 94, "height": 40 } },
+          "2x2": { "id": "MSIZE_2x2", "crop": { "left": 7, "top": 7, "width": 94, "height": 83 } }
+        },
+        "ids": {
+          "battery-battery": "MOD_SYSTEM_BATTERY_PAIR",
+          "phone-battery": "MOD_SYSTEM_PHONE_BATTERY"
+        }
+      }
     }
   }
 }

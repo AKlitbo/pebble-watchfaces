@@ -114,6 +114,8 @@
 
   "system-volume-muted":              { "svg": "uxwing/volume-muted-icon",           "size": [14, 14] },
   "system-volume-full":               { "svg": "uxwing/volume-full-icon",            "size": [14, 14] },
+  "system-watch-charge":              { "svg": "uxwing/smartwatch-charging-icon",    "size": [8, 14] },
+  "system-phone-charge":              { "svg": "uxwing/mobile-charge-icon",          "size": [8, 14] },
   "weather-fc-clear":                 { "svg": "weather-icons/svg/wi-day-sunny",                "size": [16, 16] },
   "weather-fc-partly-cloudy":         { "svg": "weather-icons/svg/wi-day-cloudy",               "size": [16, 16] },
   "weather-fc-cloudy":                { "svg": "weather-icons/svg/wi-cloudy",                   "size": [16, 16] },

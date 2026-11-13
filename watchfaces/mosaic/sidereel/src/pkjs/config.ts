@@ -209,8 +209,10 @@ const MODULE_BASE = [
     ],
   },
   { label: 'HR Graph', value: 32, sizes: ['2x2'], themeHidden: true },
-  // gridlock groups Status under Battery's swatch. this face has no Status panel, so Battery is
-  // left with its own two rows
+  // Battery Battery (the watch and phone batteries side by side) borrows Battery's colour set (see
+  // theme_alias in C) so it groups under the Battery swatch in the appearance editor, and shows only
+  // there, though its phone half takes Phone Battery's colours, since a second row under Phone Battery
+  // could not be styled. this face has no Status panel, which gridlock also groups under Battery
   {
     label: 'Battery',
     value: 2,
@@ -218,6 +220,19 @@ const MODULE_BASE = [
     themeRows: [
       { size: '1x2', thumb: 'Battery' },
       { size: '2x2', thumb: 'Battery' },
+      { size: '1x2', thumb: 'Battery Battery' },
+    ],
+  },
+  { label: 'Battery Battery', value: 76, sizes: ['1x2'], themeHidden: true },
+  // the phone's battery comes from the Pebble app's Phone plugin, so it reads PLUGINS OFF with plugins
+  // off. its own rows come first, since the layout builder takes a size's picture from the first match
+  {
+    label: 'Phone Battery',
+    value: 75,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Phone Battery' },
+      { size: '2x2', thumb: 'Phone Battery' },
     ],
   },
 ];

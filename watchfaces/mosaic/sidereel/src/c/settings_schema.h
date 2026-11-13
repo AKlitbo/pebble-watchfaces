@@ -181,6 +181,15 @@ const char *gridlock_time_zone_name(uint8_t index);
 bool gridlock_clock_is_24h(void);
 bool gridlock_format_clock(char *out, size_t n, int hour24, int minute);
 
+/**
+ * @brief Whether a panel is placed in any layout, day, night, or Quiet Time, for the shared phone
+ * gate, which keeps the phone's battery readings coming while any of them shows it.
+ *
+ * @param type A ModuleType.
+ * @return True when any layout places it.
+ */
+bool mosaic_places_module(uint8_t type);
+
 // the Goal Met Vibe, read by the shared goal_vibe.c. the pick is a sentinel or a comma list of
 // milliseconds, and the custom box holds the user's own list for when the pick is Custom
 const char *gridlock_goal_vibe_pick(void);
