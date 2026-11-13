@@ -770,7 +770,12 @@ static void health_hrv_tuning_body(GridCtx *gctx)
         tuning_line(gctx, row, line, burst.counted ? bright : gctx->color_subtitle);
     }
 
-    snprintf(line, sizeof(line), "STILL<=%d  WALK>=%d STEPS", health_store_hrv_still_mg(), health_store_hrv_walk_steps());
+    // the still and walk limits take the MOV and STP column names above, so each one sits over the
+    // numbers it is checked against. the still limit is in milli-g, the walk in steps, and the settle in
+    // gaps between beats. at its longest it reads MOV<=200MG STP>=30 SKIP 20GAP, the 29 characters of
+    // the header row
+    snprintf(line, sizeof(line), "MOV<=%dMG STP>=%d SKIP %dGAP", health_store_hrv_still_mg(), health_store_hrv_walk_steps(),
+             health_store_hrv_settle_gaps());
     tuning_line(gctx, bottom, line, gctx->color_subtitle);
 }
 

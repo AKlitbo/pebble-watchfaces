@@ -81,9 +81,9 @@ static bool hrv_keep_all(void)
 /** @brief Hands the health store the wearer's HRV settings and what the placed panels need. */
 static void apply_hrv_rules(void)
 {
-    // a settle count of 0 leaves the sensor's settling to the framework's own count
-    health_store_set_hrv_rules((uint16_t)gridlock_hrv_still_mg(), (uint16_t)gridlock_hrv_walk_steps(), 0,
-                               (HrvCount)gridlock_hrv_count(), hrv_keep_all(), gridlock_has_module_either(MOD_HEALTH_HRV_TUNING));
+    health_store_set_hrv_rules((uint16_t)gridlock_hrv_still_mg(), (uint16_t)gridlock_hrv_walk_steps(),
+                               (uint16_t)gridlock_hrv_settle_gaps(), (HrvCount)gridlock_hrv_count(), hrv_keep_all(),
+                               gridlock_has_module_either(MOD_HEALTH_HRV_TUNING));
 }
 
 // the header font is the one font that changes at runtime (the user's Header Font pick). we own
@@ -264,6 +264,7 @@ static void init(void)
                                          .calories = true, .distance = true, .hrv_period_sec = hrv_period(),
                                          .hrv_still_mg = (uint16_t)gridlock_hrv_still_mg(),
                                          .hrv_walk_steps = (uint16_t)gridlock_hrv_walk_steps(),
+                                         .hrv_settle_gaps = (uint16_t)gridlock_hrv_settle_gaps(),
                                          .hrv_count = (HrvCount)gridlock_hrv_count(), .hrv_keep_all = hrv_keep_all(),
                                          .hrv_live_redraw = gridlock_has_module_either(MOD_HEALTH_HRV_TUNING),
                                          .hrv_persist_key = HRV_STORE_KEY,

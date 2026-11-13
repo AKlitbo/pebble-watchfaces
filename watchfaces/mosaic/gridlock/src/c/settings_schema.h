@@ -190,6 +190,14 @@ int gridlock_hrv_still_mg(void);
 
 /** @brief The steps through an HRV burst that make it a walk. */
 int gridlock_hrv_walk_steps(void);
+
+/**
+ * @brief The beat gaps an HRV burst leaves out at its start while the sensor settles.
+ *
+ * @return The gap count, from 1 to 20.
+ */
+int gridlock_hrv_settle_gaps(void);
+
 /** @brief The Goal Met Vibe pick string: empty (off), a sentinel (S/L/D/C), or a comma list of milliseconds. */
 const char *gridlock_goal_vibe_pick(void);
 /** @brief The user's own Goal Met Vibe pattern, a comma list of milliseconds, used when the pick is Custom. */

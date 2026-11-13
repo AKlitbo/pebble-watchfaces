@@ -72,9 +72,9 @@
 // stays pinned here so an older short blob still short-reads and the new field keeps its default
 #define GRIDLOCK_WEATHER_V1_SIZE 3
 
-#define GRIDLOCK_HEALTH_VERSION 2
-#define GRIDLOCK_HEALTH_SIZE    12
-// frozen size of the v1 health blob, before the three HRV settings were appended. min_versioned_size
+#define GRIDLOCK_HEALTH_VERSION 3
+#define GRIDLOCK_HEALTH_SIZE    13
+// frozen size of the v1 health blob, before the four HRV settings were appended. min_versioned_size
 // stays pinned here so an older short blob still short-reads and the new fields keep their defaults
 #define GRIDLOCK_HEALTH_V1_SIZE 9
 
@@ -204,9 +204,10 @@ typedef struct GridlockHealth
     uint8_t goal_active;
     uint8_t goal_hr;
     uint8_t goal_distance;
-    uint8_t hrv_count; ///< Which HRV bursts count, an HrvCount
-    uint8_t hrv_still; ///< The still limit, as the menu choice
-    uint8_t hrv_walk;  ///< The steps that make a walk, as the menu choice
+    uint8_t hrv_count;  ///< Which HRV bursts count, an HrvCount
+    uint8_t hrv_still;  ///< The still limit, as the menu choice
+    uint8_t hrv_walk;   ///< The steps that make a walk, as the menu choice
+    uint8_t hrv_settle; ///< The beat gaps each burst leaves out while the sensor settles, as the menu choice
 } GridlockHealth;
 _Static_assert(sizeof(GridlockHealth) == GRIDLOCK_HEALTH_SIZE, "health blob size is frozen; fields append only");
 
@@ -294,6 +295,10 @@ static const int16_t s_dist_goals_m[]  = {2000, 3000, 5000, 8000, 10000, 15000, 
 static const int16_t s_hrv_still_limits[] = {30, 40, 50, 60, 80, 100, 150, 200};
 // the steps through an HRV burst that make it a walk
 static const int16_t s_hrv_walk_steps[] = {5, 10, 15, 20, 30};
+// the beat gaps an HRV burst leaves out at its start while the sensor settles. the store holds a
+// count from 1 to 20, and 10 is its own default. the page's HRV_SETTLE_GAPS has to match this table,
+// and config.spec.ts checks the two
+static const int16_t s_hrv_settle_gaps[] = {3, 5, 8, 10, 12, 15, 20};
 // how often the watch asks the phone for fresh quotes, in minutes
 static const int16_t s_stock_poll_min[] = {1, 5, 10, 15, 20, 30};
 // how often the watch asks the phone for a fresh agenda, in minutes
@@ -361,6 +366,7 @@ static const SettingField s_health_fields[] = {
     FACE_ENUM(GridlockHealth, hrv_count, HEALTH_HRV_COUNT, 3, 0),
     FACE_ENUM(GridlockHealth, hrv_still, HEALTH_HRV_STILL, ARRAY_LENGTH(s_hrv_still_limits), 3),
     FACE_ENUM(GridlockHealth, hrv_walk, HEALTH_HRV_WALK, ARRAY_LENGTH(s_hrv_walk_steps), 1),
+    FACE_ENUM(GridlockHealth, hrv_settle, HEALTH_HRV_SETTLE, ARRAY_LENGTH(s_hrv_settle_gaps), 3),
 };
 
 // --- goal vibe (key 11) ---
@@ -1142,6 +1148,11 @@ int gridlock_hrv_still_mg(void)
 int gridlock_hrv_walk_steps(void)
 {
     return goal_value(s_hrv_walk_steps, ARRAY_LENGTH(s_hrv_walk_steps), s_health.hrv_walk);
+}
+
+int gridlock_hrv_settle_gaps(void)
+{
+    return goal_value(s_hrv_settle_gaps, ARRAY_LENGTH(s_hrv_settle_gaps), s_health.hrv_settle);
 }
 
 const char *gridlock_goal_vibe_pick(void)

@@ -14,6 +14,11 @@
  * phone's own fetch off the page, and fold the Weather Location card away whole. The marks that do
  * it sit in the face and the family core, and one unmarked row added to the card leaves it on screen
  * doing nothing. Running the framework's page hook over the real page catches that here.
+ *
+ * The HRV Skip at Start row sends an index, and the watch looks the gap count up in its own table in
+ * settings_schema.c. Both compile on their own, so a count added to one list and not the other would
+ * have the watch skip a different number of gaps from the one the wearer picked. Reading the C table
+ * beside the page row catches that.
  */
 
 import fs from 'node:fs';
@@ -281,5 +286,55 @@ describe('config page weather key', () => {
     const result = hiddenKeys(config as ClayConfigItem[], { WEATHER_PROVIDER: provider }).includes('WEATHER_API_KEY');
 
     expect(result).toBe(hidden);
+  });
+});
+
+describe('config page HRV settle choice', () => {
+  const schema = fs.readFileSync(path.resolve(import.meta.dirname, '../c/settings_schema.c'), 'utf8');
+
+  /** The gap counts the watch looks the saved index up in, read out of the C table. */
+  function watchSettleGaps(): number[] {
+    const table = /s_hrv_settle_gaps\[\]\s*=\s*\{([^}]*)\}/.exec(schema);
+
+    expect(table).not.toBeNull();
+
+    return (table as RegExpExecArray)[1].split(',').map((entry) => Number(entry.trim()));
+  }
+
+  /** The index the watch starts on before any save, read out of the field's FACE_ENUM. */
+  function watchSettleDefault(): number {
+    const field = /FACE_ENUM\(GridlockHealth,\s*hrv_settle,\s*HEALTH_HRV_SETTLE,[^,]*,\s*(\d+)\)/.exec(schema);
+
+    expect(field).not.toBeNull();
+
+    return Number((field as RegExpExecArray)[1]);
+  }
+
+  /** The settle row on the page. */
+  function settleRow(): ClayConfigItem {
+    const row = allItems(config as ClayConfigItem[]).find((item) => item.messageKey === 'HEALTH_HRV_SETTLE');
+
+    expect(row).toBeDefined();
+
+    return row as ClayConfigItem;
+  }
+
+  /** A page offering a count the watch table does not hold, or in another order, skips the wrong number of gaps. */
+  test('each choice on the page names the count the watch keeps at its index', () => {
+    const expected = watchSettleGaps().map((gaps, index) => [index, gaps]);
+
+    const result = (settleRow().options || []).map((option) => [option.value, parseInt(option.label, 10)]);
+
+    expect(result).toEqual(expected);
+  });
+
+  /** A page and a watch starting on different counts would send back a choice the wearer never made after a reset. */
+  test('the page and the watch both start on 10 gaps', () => {
+    const watchDefault = watchSettleDefault();
+
+    const result = settleRow().defaultValue;
+
+    expect(result).toBe(watchDefault);
+    expect(watchSettleGaps()[watchDefault]).toBe(10);
   });
 });

@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings.
 - Added a Pebble App: Preferred Source choice for the calendar, under a new Calendar Source setting, which shows the events from the calendars switched on in the Pebble app's calendar settings in place of an iCal link.
 - Added a list on the settings page of the Pebble app plugins this watchface works with.
+- Added a Skip at Start setting under HRV, which sets how many gaps between heartbeats each reading leaves out at the start while the sensor settles. The HRV Tuning panel shows the count in use along its bottom line.
 
 ### Changed
 

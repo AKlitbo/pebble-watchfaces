@@ -47,6 +47,16 @@ const GOAL_DISTANCE = [
 
 const HRV_STILL = [30, 40, 50, 60, 80, 100, 150, 200].map((n, i) => ({ label: String(n), value: i }));
 const HRV_WALK = [5, 10, 15, 20, 30].map((n, i) => ({ label: n + ' steps', value: i }));
+/**
+ * The gaps between heartbeats each HRV reading leaves out at its start, in the order the page sends
+ * them. The page sends the index and the watch keeps the counts, so its table has to match this one.
+ */
+const HRV_SETTLE_GAPS = [3, 5, 8, 10, 12, 15, 20];
+
+/** The index the settle choice starts on, which is 10 gaps, the framework's own default. */
+const HRV_SETTLE_DEFAULT = 3;
+
+const HRV_SETTLE = HRV_SETTLE_GAPS.map((n, i) => ({ label: n + ' gaps', value: i }));
 
 /** The HRV settings under their own subheading, for a face that has HRV panels. */
 function hrvItems(): ClayConfigItem[] {
@@ -59,6 +69,7 @@ function hrvItems(): ClayConfigItem[] {
     ], 0, 'Which readings the HRV panels count. Readings taken while walking run high, so Not While Walking keeps to resting ones.'),
     select('HEALTH_HRV_STILL', 'Still Up To', HRV_STILL, 3, "The most your wrist can move during a reading for it to count as still. The HRV Tuning panel shows each reading's movement, so you can set this from your own numbers."),
     select('HEALTH_HRV_WALK', 'Walking From', HRV_WALK, 1, "How many steps during a reading make it a walk, since wrist movement alone looks the same for typing and walking. The HRV Tuning panel shows each reading's steps."),
+    select('HEALTH_HRV_SETTLE', 'Skip at Start', HRV_SETTLE, HRV_SETTLE_DEFAULT, "How many gaps between heartbeats each reading leaves out at the start while the sensor settles. The HRV Tuning panel's KEPT column shows the share of gaps each reading kept."),
   ];
 }
 
