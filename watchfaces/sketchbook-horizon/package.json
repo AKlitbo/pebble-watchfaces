@@ -12,6 +12,7 @@
   },
   "scripts": {
     "gen:scene-previews": "node tools/embed-scene-previews.mjs",
+    "gen:page-font": "python tools/page-font.py",
     "test": "vitest run --config config/vitest.config.ts --passWithNoTests",
     "test:watch": "vitest --config config/vitest.config.ts",
     "test:coverage": "vitest run --config config/vitest.config.ts --coverage --passWithNoTests"

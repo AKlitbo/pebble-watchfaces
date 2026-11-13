@@ -9,13 +9,15 @@
  *
  * It paints Clay's own chrome classes with !important: the paper background, the section cards, the
  * headings, the form controls, and the submit. The hand lettering is Patrick Hand, the same face the
- * watch draws its clock with, pulled from Google Fonts. Offline the page falls back to a plain sans,
- * which costs the lettering but nothing else.
+ * watch draws its clock with. The page carries a Latin subset of it as Sketchbook Hand, from
+ * page-font.g.js, so it draws offline and asks the wearer to allow no font site.
  *
  * It also repaints two things the framework ships neutral on purpose: the theme preview's frame and
  * the location search dropdown. Those stay skin-agnostic in the framework, so a face paints them
  * from here. This sheet loads after their own styles, so plain declarations win where they need to.
  */
+
+import pageFont from './page-font.g';
 
 export default {
   name: 'sketchbookChrome',
@@ -27,7 +29,7 @@ export default {
   manipulator: 'val',
 
   style: [
-    "@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');",
+    pageFont.rule,
 
     // warm paper with a faint dot grid, the way a sketchbook or bullet journal is ruled, and the
     // hand font across the whole page
@@ -41,7 +43,7 @@ export default {
     '  padding-bottom: 40px !important;',
     '}',
     'body, .component, .component .label, .component .description, .component .value, .component-heading, .component input, .component select, .component button {',
-    "  font-family: 'Patrick Hand', 'Segoe UI', system-ui, sans-serif !important;",
+    "  font-family: '" + pageFont.family + "', 'Segoe UI', system-ui, sans-serif !important;",
     '}',
 
     // each section is a paper card with an ink edge and a soft drop

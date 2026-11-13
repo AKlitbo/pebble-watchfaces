@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed a weather source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. A source you already picked stays as it is.
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.
+- Changed the settings page to carry its own hand lettering, so it draws in Patrick Hand without a connection and needs no font site allowed in the Pebble app.
 
 ### Fixed
 
