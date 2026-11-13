@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. A weather plugin that serves the pressure, dew point, and UV fills those panels too.
+- Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
 - Added a Reduce Motion setting, which shows each new minute straight away rather than scrolling the reel to it.
 
 ### Changed
@@ -16,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed Alternate Time Zone to sit under Clock rather than with the weather location.
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed Fall Back to Manual Location to show only while Use Phone GPS is on.
+- Changed a weather source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. A source you already picked stays as it is.
 - Changed the settings page buttons and tabs to be easier to tell apart from the rest of the page. Everything you can tap has a brighter edge, and the hints under each part are easier to read.
 - Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.
 - Changed the weather to catch up as soon as your phone comes back after being away, rather than at the next refresh.
@@ -27,7 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Notes
 
-- Pebble app plugins work the same way as the weather sources on this settings page. If the Pebble app makes plugins the default, these sources may be phased out in a later release.
+- The Pebble App: Preferred Source choice needs plugins turned on in the Pebble app under Settings, Plugins.
+- Pebble app plugins, including my Weather Enhanced, work the same way as the weather sources on this settings page. If the Pebble app makes plugins the default, these sources may be phased out in a later release.
 
 ## [1.5.0] - 2026-11-05
 
