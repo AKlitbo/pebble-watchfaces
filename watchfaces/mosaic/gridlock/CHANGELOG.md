@@ -8,9 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings.
+- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. A weather plugin that serves the pressure, dew point, and UV fills those panels too.
 - Added a Pebble App: Preferred Source choice for the calendar, under a new Calendar Source setting, which shows the events from the calendars switched on in the Pebble app's calendar settings in place of an iCal link.
-- Added a list on the settings page of the Pebble app plugins this watchface works with.
+- Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
+- Added a Pebble App: Preferred Source choice to the stock Data Source, which shows the quotes from a stock plugin you install from the Pebble app store. The plugin keeps its own tickers, and the Stock and Watchlist panels show its first four. While no stock plugin is installed, the choice says so and where to get one.
+- Added a Paid Plan switch under the stock API Key. Turn it on if your key is on a paid plan, so Gridlock fetches on your watch's interval rather than holding to the free plan's limits.
 - Added a Skip at Start setting under HRV, which sets how many gaps between heartbeats each reading leaves out at the start while the sensor settles. The HRV Tuning panel shows the count in use along its bottom line.
 
 ### Changed
@@ -19,11 +21,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed Alternate Time Zone to sit under Clock rather than with the weather location.
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed Fall Back to Manual Location to show only while Use Phone GPS is on.
+- Changed a weather, stock, or calendar source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. Without a stock plugin, stocks start on Yahoo, which needs no API key. A source you already picked, or a saved iCal link, stays as it is.
 - Changed the settings page buttons and tabs to be easier to tell apart from the rest of the page. Everything you can tap has a brighter edge, and the hints under each part are easier to read.
+- Changed the weather and stock API Key to keep a key for each source. Switching source shows that source's own key, and switching back no longer needs the key pasted again.
+- Changed the weather, stocks, and calendar to catch up as soon as your phone comes back after being away, rather than at the next refresh.
+- Changed a stock quote that timed out to show TIMEOUT rather than NET ERROR.
+
+### Fixed
+
+- Fixed a RATE LIMIT replacing the last good quotes. A refused ticker now keeps its last price until the source answers again.
+- Fixed Alpha Vantage showing RATE LIMIT in most slots until the next evening. Its free key refuses calls less than a second apart, so Gridlock now asks for one ticker at a time.
+- Fixed Twelve Data and Alpha Vantage running past their free plans' daily limits after quick saves or a restart partway through a fetch.
+- Fixed Finnhub showing INVALID KEY for a ticker its free plan does not cover, such as ^GSPC, while the same key priced the others. It now shows NO ACCESS.
+- Fixed Finnhub and Yahoo fetching twice on some launches.
+- Fixed the stock panels keeping another source's quotes until the next day after restoring settings that changed the stock source.
+- Fixed the stock Data Source describing Twelve Data as global. Its free key covers US markets, and a paid plan adds more than 20 others.
+- Fixed the weather and calendar fetching twice each time the watchface starts.
+- Fixed a stock quote whose answer was lost on the way back not counting against a free Twelve Data or Alpha Vantage key's daily limit. While your phone is offline, Gridlock now tries one ticker at a time and waits longer between tries.
 
 ### Notes
 
 - The Pebble App: Preferred Source choices need plugins turned on in the Pebble app under Settings, Plugins.
+- Pebble app plugins, including my Stocks + Crypto, Calendar + iCal, and Weather Enhanced, work the same way as the weather, stock, and calendar sources on this settings page. If the Pebble app makes plugins the default, these sources may be phased out in a later release.
 
 ## [1.8.0] - 2026-11-05
 

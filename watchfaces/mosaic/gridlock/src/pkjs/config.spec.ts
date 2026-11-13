@@ -29,7 +29,7 @@ import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/test
 import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
 import { pluginSourcePage } from '../../../paf/ts/plugin-sources/page';
 import { CALENDAR_SOURCE_SELECT } from '../../../paf/ts/plugin-sources/calendar';
-import { CALENDAR_STANDARD, WEATHER_STANDARD } from '../../../paf/ts/plugin-sources/standard';
+import { CALENDAR_STANDARD, STOCK_STANDARD, WEATHER_STANDARD } from '../../../paf/ts/plugin-sources/standard';
 import { allItems, conditionsOf } from '../../../paf/ts/clay/rows';
 import { messageKeysFrom } from '../../../paf/tools/pkjs/settings-page.ts';
 import type { ClayConfigItem, VisibilityCondition } from '../../../paf/ts/clay/types';
@@ -150,13 +150,14 @@ describe('config page date formats', () => {
   });
 });
 
-/** A phone with the Pebble app's built-in weather and calendar plugins. */
+/** A phone with the Pebble app's built-in weather and calendar plugins, and a stock plugin from the app store. */
 const BUILT_IN_PLUGINS = [
   { uuid: '00000000-0000-0000-0001-000000000002', name: 'Weather', sources: [{ category: 'weather', items: ['location'], properties: {} }] },
   { uuid: '00000000-0000-0000-0001-000000000004', name: 'Calendar', sources: [{ category: 'calendar', items: ['event'], properties: {} }] },
+  { uuid: '77e6eeb3-340a-46f8-ba39-5e2000b6fce3', name: 'Stocks + Crypto', sources: [{ category: 'finance', items: ['stock'], properties: {} }] },
 ];
 
-/** The page as the phone opens it on a plugin build, with both page hooks run over a copy. */
+/** The page as the phone opens it on a plugin build, with every page hook run over a copy. */
 function pluginPage(): ClayConfigItem[] {
   const page = JSON.parse(JSON.stringify(config)) as ClayConfigItem[];
   const state = { pluginUuid: null, lastError: null, lastEmpty: false };
@@ -182,6 +183,17 @@ function pluginPage(): ClayConfigItem[] {
     standard: CALENDAR_STANDARD,
     texts: {},
     insert: { select: CALENDAR_SOURCE_SELECT, anchorKey: 'CALENDAR_ICS_URL' },
+  });
+  pluginSourcePage(page, {
+    selectKey: 'STOCK_PROVIDER',
+    category: 'finance',
+    item: 'stock',
+    plugins: BUILT_IN_PLUGINS,
+    messageKeys,
+    state,
+    standard: STOCK_STANDARD,
+    texts: {},
+    panel: true,
   });
   return page;
 }
@@ -242,6 +254,36 @@ describe('config page with the Pebble app plugins', () => {
     expect(result).not.toContain('LOCATION_NAME');
     expect(result).not.toContain('CALENDAR_ICS_URL');
     expect(result).not.toContain('CALENDAR_POLL');
+  });
+
+  /** The plugin keeps its own tickers and timing and spends no key, so any of these rows left showing does nothing. */
+  test('picking Preferred Source for stocks hides the key, Paid Plan, the symbols, and the refresh interval', () => {
+    const page = pluginPage();
+
+    const result = hiddenKeys(page, { STOCK_PROVIDER: 'plugin' });
+
+    expect(result).toEqual(expect.arrayContaining(['STOCK_API_KEY', 'STOCK_PAID_PLAN', 'STOCK_SYMBOLS', 'STOCK_POLL']));
+  });
+
+  /** A Finnhub wearer has to see the key and Paid Plan, or they cannot set the key the quotes need. */
+  test('switching stocks back to Finnhub shows the key, Paid Plan, and the symbols again', () => {
+    const page = pluginPage();
+
+    const result = hiddenKeys(page, { STOCK_PROVIDER: 'finnhub' });
+
+    expect(result).not.toContain('STOCK_API_KEY');
+    expect(result).not.toContain('STOCK_PAID_PLAN');
+    expect(result).not.toContain('STOCK_SYMBOLS');
+  });
+
+  /** Yahoo takes no key, so a Paid Plan switch beside it would read as a setting that changes something. */
+  test('Yahoo hides the key and Paid Plan but keeps the symbols', () => {
+    const page = pluginPage();
+
+    const result = hiddenKeys(page, { STOCK_PROVIDER: 'yahoo' });
+
+    expect(result).toEqual(expect.arrayContaining(['STOCK_API_KEY', 'STOCK_PAID_PLAN']));
+    expect(result).not.toContain('STOCK_SYMBOLS');
   });
 
   /**

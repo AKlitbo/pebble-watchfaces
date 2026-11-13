@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed Fall Back to Manual Location to show only while Use Phone GPS is on.
 - Changed the settings page buttons and tabs to be easier to tell apart from the rest of the page. Everything you can tap has a brighter edge, and the hints under each part are easier to read.
+- Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.
+- Changed the weather to catch up as soon as your phone comes back after being away, rather than at the next refresh.
+
+### Notes
+
+- Pebble app plugins work the same way as the weather sources on this settings page. If the Pebble app makes plugins the default, these sources may be phased out in a later release.
 
 ## [1.5.0] - 2026-11-05
 

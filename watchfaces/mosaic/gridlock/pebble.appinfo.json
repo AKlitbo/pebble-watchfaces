@@ -8,11 +8,12 @@
   "defines": {
     "HEALTH_HRV": 1,
     "PLUGIN_WEATHER": 1,
+    "PLUGIN_STOCKS": 1,
     "PLUGIN_CALENDAR": 1
   },
   "providers": {
     "weather": ["plugin", "openmeteo", "owm", "weatherapi"],
-    "stocks": ["finnhub", "yahoo", "twelvedata", "alphavantage"],
+    "stocks": ["yahoo", "plugin", "finnhub", "twelvedata", "alphavantage"],
     "calendar": ["plugin", "ical"]
   },
   "capabilities": [
@@ -98,7 +99,8 @@
     "LAYOUT_NIGHT_MODE",
     "LAYOUT_NIGHT_START",
     "LAYOUT_NIGHT_END",
-    "LAYOUT_QUIET"
+    "LAYOUT_QUIET",
+    "STOCK_PAID_PLAN"
   ],
   "resources": {
     "media": [
