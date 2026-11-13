@@ -13,21 +13,16 @@
 #include "ui/engine/engine.h"
 #include "ui/readouts.h"
 #include "io/stores/health_store.h"
-#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
-#include "dev/dev.h"
+#include "dev/dev_hooks.h"
 #include "scene/scene.h"
 #include "persist_keys.h"
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
 #include "settings_schema.h"
 #include "system/vibe/vibe.h"
-
-// weather polls the phone this often. the reconnect catch-up reuses it as the staleness gate so
-// the two cadences can never drift apart
-#define WEATHER_POLL_MIN 30
 
 static Window *s_window;
 
@@ -45,7 +40,7 @@ static TimeConfig time_cfg(void)
     bool hourly = settings_u8(SETTING_HOURLY_VIBE) != VIBE_NONE;
 
     return (TimeConfig){
-        .live = !DEV_MODE,            // a dev build keeps the clock its fixture pinned
+        .live = true,
         .minute_tick = !clock_beats,  // .beats replaces the clock, and only the clock
         .beats = clock_beats || readout_date_shows_beats(),
         .hourly = hourly,             // a .beats clock still wakes on the hour for the buzz
@@ -99,21 +94,6 @@ static void on_time_tick(void)
     vibe_hourly(time_store_tm(), settings_u8(SETTING_HOURLY_VIBE));
 }
 
-/**
- * @brief The phone app just reconnected, so catch up a reading that went stale while it was away.
- *
- * The phone's pkjs may have been closed for the whole gap, and the store's own poll is 30 min, so
- * without this the face sits on an old reading. Gating on age means bluetooth flapping cannot
- * re-fetch faster than the normal cadence.
- */
-static void on_phone_reconnected(void)
-{
-    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
-    {
-        appmessage_request_weather();
-    }
-}
-
 static void init(void)
 {
     // one schema for the whole face, with the scene choice alongside the palette and layout
@@ -126,7 +106,7 @@ static void init(void)
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
         health_store_init((HealthConfig){.live = true, .distance = true, .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
-        weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN,
+        weather_store_init((WeatherConfig){.live = true, .poll_min = 30,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
     }
 
@@ -141,7 +121,6 @@ static void init(void)
     health_store_subscribe(engine_mark_dirty);
     weather_store_subscribe(engine_mark_dirty);
     system_store_subscribe(engine_mark_dirty);
-    system_store_on_reconnect(on_phone_reconnected);
 
     // weather_store owns its channels. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

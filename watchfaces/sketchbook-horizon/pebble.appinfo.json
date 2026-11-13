@@ -4,24 +4,16 @@
   "version": "1.0.0",
   "watchface": true,
   "uuid": "1e5c651c-afd0-472e-8f87-f0ff31656657",
-  "sdkVersion": "3",
-  "enableMultiJS": true,
   "targetPlatforms": [
     "emery",
     "gabbro"
   ],
   "capabilities": [
-    "location",
-    "configurable",
     "health"
   ],
   "messageKeys": [
-    "WEATHER_TEMPERATURE",
-    "WEATHER_CONDITIONS",
-    "WEATHER_REQUEST",
     "SETTINGS_REQUEST",
     "SETTINGS_FRESH",
-    "WEATHER_OK",
     "LOCATION_LATITUDE",
     "LOCATION_LONGITUDE",
     "LOCATION_NAME",

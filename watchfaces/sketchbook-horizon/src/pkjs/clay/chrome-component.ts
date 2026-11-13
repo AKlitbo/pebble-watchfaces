@@ -108,14 +108,14 @@ export default {
     ".component-submit button:active, button[type='submit']:active { background: #22201b !important; }",
 
     // the theme preview frames take the ink edge rather than the framework's neutral grey
-    '.theme-preview .tp-img { border-color: #35322b !important; }',
+    '.pf-theme .pf-theme-img { border-color: #35322b !important; }',
 
     // the location search dropdown, painted onto the paper
-    '.loc-search .loc-list { background: #fcf7ea; color: #2c2a24; border: 2px solid #35322b; border-radius: 6px; }',
-    '.loc-search .loc-item { border-bottom: 1px solid #e6dcc1; }',
-    '.loc-search .loc-item:hover, .loc-search .loc-item:active { background: #e8b84b; color: #2c2a24; }',
-    '.loc-search .loc-note { background: rgba(232, 184, 75, 0.18) !important; border-left-color: #e8b84b !important; }',
-    '.loc-search .loc-note:before { border-color: #b98a22 !important; color: #8a6714 !important; }',
+    '.pf-loc-search .pf-loc-list { background: #fcf7ea; color: #2c2a24; border: 2px solid #35322b; border-radius: 6px; }',
+    '.pf-loc-search .pf-loc-item { border-bottom: 1px solid #e6dcc1; }',
+    '.pf-loc-search .pf-loc-item:hover, .pf-loc-search .pf-loc-item:active { background: #e8b84b; color: #2c2a24; }',
+    '.pf-loc-search .pf-loc-note { background: rgba(232, 184, 75, 0.18) !important; border-left-color: #e8b84b !important; }',
+    '.pf-loc-search .pf-loc-note:before { border-color: #b98a22 !important; color: #8a6714 !important; }',
 
     // the page has a day and a night the way the faces do. when the phone is set to dark, the warm
     // paper turns to a deep night blue, the ink turns to a cool off-white, and the accent cools from
@@ -156,12 +156,12 @@ export default {
     '  }',
     "  .component-submit button:hover, button[type='submit']:hover { background: #eef3fb !important; }",
     "  .component-submit button:active, button[type='submit']:active { background: #c3cfe2 !important; }",
-    '  .theme-preview .tp-img { border-color: #30405c !important; }',
-    '  .loc-search .loc-list { background: #182234; color: #dde5f2; border-color: #30405c; }',
-    '  .loc-search .loc-item { border-bottom-color: #273449; }',
-    '  .loc-search .loc-item:hover, .loc-search .loc-item:active { background: #5c8fd4; color: #0f1521; }',
-    '  .loc-search .loc-note { background: rgba(92, 143, 212, 0.15) !important; border-left-color: #5c8fd4 !important; }',
-    '  .loc-search .loc-note:before { border-color: #5c8fd4 !important; color: #8fb3e4 !important; }',
+    '  .pf-theme .pf-theme-img { border-color: #30405c !important; }',
+    '  .pf-loc-search .pf-loc-list { background: #182234; color: #dde5f2; border-color: #30405c; }',
+    '  .pf-loc-search .pf-loc-item { border-bottom-color: #273449; }',
+    '  .pf-loc-search .pf-loc-item:hover, .pf-loc-search .pf-loc-item:active { background: #5c8fd4; color: #0f1521; }',
+    '  .pf-loc-search .pf-loc-note { background: rgba(92, 143, 212, 0.15) !important; border-left-color: #5c8fd4 !important; }',
+    '  .pf-loc-search .pf-loc-note:before { border-color: #5c8fd4 !important; color: #8fb3e4 !important; }',
     '}',
   ].join('\n'),
 };

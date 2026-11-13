@@ -28,7 +28,8 @@
  * @brief The face's persisted settings.
  *
  * Fields are only ever appended, never reordered or removed, so a later version can read an
- * earlier blob short and leave the new fields on their defaults.
+ * earlier blob short and leave the new fields on their defaults. The schema's first size stays at
+ * the 35 bytes the first release saved, so a save from before an append still loads.
  */
 typedef struct SketchbookSettings
 {
@@ -69,18 +70,18 @@ static SketchbookSettings s_settings;
 #define SETTING_QUIET_PALETTE_ON ((SettingId)(SETTING_COUNT + 7))
 #define SETTING_QUIET_PALETTE    ((SettingId)(SETTING_COUNT + 8))
 
-// the date shows as a readout-style "SAT 19 JUN" rather than the library's numeric default, which
-// suits the hand-drawn lettering
+// every KNOWN_ entry takes its default from the settings page, so a fresh watch shows what the
+// page opens on
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(SketchbookSettings, temperature_unit)),
-    KNOWN_DATE_FORMAT(offsetof(SketchbookSettings, date_format), "%a %d %b"),
+    KNOWN_DATE_FORMAT(offsetof(SketchbookSettings, date_format)),
     KNOWN_THEME(offsetof(SketchbookSettings, theme), THEME_COUNT),
-    KNOWN_STEPS_MODE(offsetof(SketchbookSettings, steps_mode), STEPS_MODE_COUNT),
-    KNOWN_TIME_FORMAT(offsetof(SketchbookSettings, time_format), TIME_FORMAT_COUNT),
+    KNOWN_STEPS_MODE(offsetof(SketchbookSettings, steps_mode)),
+    KNOWN_TIME_FORMAT(offsetof(SketchbookSettings, time_format)),
     KNOWN_BLUETOOTH_ICON(offsetof(SketchbookSettings, bluetooth_icon)),
-    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(SketchbookSettings, vibe_connect), VIBE_COUNT),
-    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(SketchbookSettings, vibe_disconnect), VIBE_COUNT),
-    KNOWN_HOURLY_VIBE(offsetof(SketchbookSettings, hourly_vibe), VIBE_COUNT),
+    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(SketchbookSettings, vibe_connect)),
+    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(SketchbookSettings, vibe_disconnect)),
+    KNOWN_HOURLY_VIBE(offsetof(SketchbookSettings, hourly_vibe)),
     KNOWN_QUIET_TIME_ICON(offsetof(SketchbookSettings, quiet_time_icon)),
 
     // --- the face's own ---
@@ -116,9 +117,7 @@ static const SettingField s_fields[] = {
 static const SettingsSchema s_schema = {
     .key = SKETCHBOOK_SETTINGS_KEY,
     .version = SKETCHBOOK_SETTINGS_VERSION,
-    .min_versioned_size = SETTINGS_BLOB_SIZE(SketchbookSettings),
-    .blob = &s_settings,
-    .blob_size = SETTINGS_BLOB_SIZE(SketchbookSettings),
+    SETTINGS_BLOB(s_settings, 35),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,
