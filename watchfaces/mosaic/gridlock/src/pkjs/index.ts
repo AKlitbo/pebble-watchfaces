@@ -5,10 +5,11 @@ import themeComponent from './clay/theme-component.g';
 import weather from '../../../paf/ts/weather/feature';
 import stocks from '../../../paf/ts/stock/feature';
 import calendar from '../../../paf/ts/calendar/feature';
+import phone from '../../../paf/ts/phone/feature';
 import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
   components: [controlsComponent, layoutComponent, themeComponent],
-  features: [weather, stocks, calendar],
+  features: [weather, stocks, calendar, phone],
 });

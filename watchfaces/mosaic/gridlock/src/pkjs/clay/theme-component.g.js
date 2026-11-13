@@ -462,7 +462,8 @@ module.exports = {
               size: row.size,
               thumbLabel: row.thumb || option.label,
               value: src.value,
-              alwaysHeaderless: Boolean(panelHeaderless)
+              alwaysHeaderless: Boolean(panelHeaderless),
+              shotOnly: Boolean(row.shotOnly)
             };
           });
         }
@@ -471,7 +472,8 @@ module.exports = {
             size,
             thumbLabel: option.label,
             value: option.value,
-            alwaysHeaderless: Boolean(option.alwaysHeaderless)
+            alwaysHeaderless: Boolean(option.alwaysHeaderless),
+            shotOnly: false
           };
         });
       }
@@ -506,11 +508,14 @@ module.exports = {
         return byte != null ? byte : null;
       }
       function allSizesHidden(module, map) {
-        if (!module.sizeRows || module.sizeRows.length === 0) {
+        const rows = (module.sizeRows || []).filter(function(row) {
+          return !row.shotOnly;
+        });
+        if (rows.length === 0) {
           return false;
         }
-        for (let s = 0; s < module.sizeRows.length; s++) {
-          const row = module.sizeRows[s];
+        for (let s = 0; s < rows.length; s++) {
+          const row = rows[s];
           if (!flagOn(map, row.value, row.size)) {
             return false;
           }
@@ -894,10 +899,12 @@ module.exports = {
           sizeRow.appendChild(label);
           const toggles = document.createElement("div");
           toggles.className = "sz-tog";
-          if (!row.alwaysHeaderless) {
-            toggles.appendChild(buildFlagToggle(env.getHeaderless, row.value, size, "H"));
+          if (!row.shotOnly) {
+            if (!row.alwaysHeaderless) {
+              toggles.appendChild(buildFlagToggle(env.getHeaderless, row.value, size, "H"));
+            }
+            toggles.appendChild(buildFlagToggle(env.getBorderless, row.value, size, "B"));
           }
-          toggles.appendChild(buildFlagToggle(env.getBorderless, row.value, size, "B"));
           sizeRow.appendChild(toggles);
           return sizeRow;
         }

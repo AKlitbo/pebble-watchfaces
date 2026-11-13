@@ -19,6 +19,11 @@
  * settings_schema.c. Both compile on their own, so a count added to one list and not the other would
  * have the watch skip a different number of gaps from the one the wearer picked. Reading the C table
  * beside the page row catches that.
+ *
+ * The page saves each panel by its id and offers it at the sizes it lists, and the watch draws that
+ * id from its own catalogue at the sizes its C allows. Both compile on their own, so a panel added to
+ * one and not the other, or at different sizes, leaves a blank tile where the wearer placed it.
+ * Reading the C catalogue beside the page's panel list catches that.
  */
 
 import fs from 'node:fs';
@@ -26,6 +31,7 @@ import path from 'node:path';
 import { describe, test, expect } from 'vitest';
 import config from './config';
 import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/testing/page-keys';
+import type { PageModule } from '../../../core/pkjs/testing/page-keys';
 import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
 import { pluginSourcePage } from '../../../paf/ts/plugin-sources/page';
 import { CALENDAR_SOURCE_SELECT } from '../../../paf/ts/plugin-sources/calendar';
@@ -389,5 +395,188 @@ describe('config page HRV settle choice', () => {
 
     expect(result).toBe(watchDefault);
     expect(watchSettleGaps()[watchDefault]).toBe(10);
+  });
+});
+
+/** One panel as the watch's C defines it. */
+interface WatchPanel {
+  sizes: string[];
+  alias: boolean;
+}
+
+/** The ModuleType names in declared order, so a name's index is the id the page saves. */
+function watchModuleIds(): string[] {
+  const header = fs.readFileSync(path.resolve(import.meta.dirname, '../../../core/c/engine/catalog.h'), 'utf8');
+  const block = /typedef enum\s*\{([\s\S]*?)\}\s*ModuleType\s*;/.exec(header);
+
+  expect(block).not.toBeNull();
+
+  return (block as RegExpExecArray)[1]
+    .split('\n')
+    .map((line) => /\bMOD_[A-Z0-9_]+\b/.exec(line.replace(/\/\/.*$/, '')))
+    .filter((match): match is RegExpExecArray => match !== null && match[0] !== 'MOD_TYPE_COUNT')
+    .map((match) => match[0]);
+}
+
+/** Which def each ModuleType resolves to in Gridlock's catalog switch. */
+function catalogDefs(): Map<string, string> {
+  const source = fs.readFileSync(path.resolve(import.meta.dirname, '../c/engine/catalog.c'), 'utf8');
+  const defs = new Map<string, string>();
+
+  for (const match of source.matchAll(/case\s+(MOD_[A-Z0-9_]+):\s*return\s*&(\w+);/g)) {
+    defs.set(match[1], match[2]);
+  }
+
+  return defs;
+}
+
+/** Every .c file under a folder. */
+function cFiles(dir: string): string[] {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      return cFiles(full);
+    }
+
+    return entry.name.endsWith('.c') && !entry.name.endsWith('.spec.c') ? [full] : [];
+  });
+}
+
+/** An SZ_ mask as the page's size names, such as SZ_1x2 | SZ_2x2 as 1x2 and 2x2. */
+function sizesOf(mask: string): string[] {
+  return [...mask.matchAll(/SZ_(\dx\d)/g)].map((match) => match[1]).sort();
+}
+
+/** Whether a theme_alias value names another panel rather than 0 for its own colours. */
+function borrows(alias: string | undefined): boolean {
+  return alias !== undefined && alias.trim() !== '0';
+}
+
+/** A field of a ModuleDef initializer, such as `.sizes = SZ_1x2 | SZ_2x2`, as its raw expression. */
+function fieldOf(body: string, field: string): string | undefined {
+  const match = new RegExp(`\\.${field}\\s*=\\s*([^,\\n}]+)`).exec(body);
+
+  return match ? match[1].trim() : undefined;
+}
+
+/** One of the stat panel macros: its parameter names and the def it writes. */
+interface DefMacro {
+  params: string[];
+  body: string;
+}
+
+/** The STAT_PANEL_ macros as stat_panel.h defines them, so the spec reads their sizes and aliases from there. */
+function defMacros(): Map<string, DefMacro> {
+  const header = fs.readFileSync(path.resolve(import.meta.dirname, '../../../core/c/draw/stat_panel.h'), 'utf8');
+  const macros = new Map<string, DefMacro>();
+
+  // a macro runs on across lines that end in a backslash
+  for (const match of header.matchAll(/#define (STAT_PANEL_\w+)\(([^)]*)\)((?:[^\n]*\\\n)*[^\n]*)/g)) {
+    macros.set(match[1], { params: match[2].split(',').map((param) => param.trim()), body: match[3] });
+  }
+
+  return macros;
+}
+
+/**
+ * A macro field resolved against one use of the macro. A field written as a parameter, such as
+ * `(SIZES)`, takes that argument, and one written out in the macro, such as the goal bar's sizes,
+ * is taken as it stands.
+ */
+function macroField(macro: DefMacro, args: string[], field: string): string | undefined {
+  const raw = fieldOf(macro.body, field);
+  const param = raw ? /^\(?(\w+)\)?$/.exec(raw) : null;
+  const index = param ? macro.params.indexOf(param[1]) : -1;
+
+  return index >= 0 ? args[index] : raw;
+}
+
+/**
+ * The sizes and whether it borrows colours, for each panel def the face builds, read out of the C.
+ * A def written out in full and one built by the stat panel macros both count.
+ */
+function watchPanels(): Map<string, WatchPanel> {
+  const roots = [path.resolve(import.meta.dirname, '../c'), path.resolve(import.meta.dirname, '../../../core/c')];
+  const macros = defMacros();
+  const panels = new Map<string, WatchPanel>();
+
+  expect(macros.size).toBeGreaterThan(0);
+
+  for (const file of roots.flatMap(cFiles)) {
+    const source = fs.readFileSync(file, 'utf8');
+
+    for (const match of source.matchAll(/const ModuleDef (\w+) = \{([\s\S]*?)\n\};/g)) {
+      const sizes = fieldOf(match[2], 'sizes');
+
+      if (sizes) {
+        panels.set(match[1], { sizes: sizesOf(sizes), alias: borrows(fieldOf(match[2], 'theme_alias')) });
+      }
+    }
+
+    for (const match of source.matchAll(/^(STAT_PANEL_\w+)\(([^;]*)\);/gm)) {
+      const macro = macros.get(match[1]);
+
+      if (macro) {
+        const args = match[2].split(',').map((arg) => arg.trim());
+        const sizes = macroField(macro, args, 'sizes') || '';
+
+        panels.set(`mod_${args[0]}_def`, { sizes: sizesOf(sizes), alias: borrows(macroField(macro, args, 'theme_alias')) });
+      }
+    }
+  }
+
+  return panels;
+}
+
+describe('layout panels against the watch catalogue', () => {
+  const ids = watchModuleIds();
+  const defs = catalogDefs();
+  const panels = watchPanels();
+  const modules = layoutModules(config) as Array<PageModule & { themeHidden?: boolean }>;
+  const placeable = modules.filter((module) => module.value !== 0 && (module.sizes || []).length > 0);
+
+  /** The page saves a panel's id, so an id the watch draws nothing for leaves a blank tile where the wearer placed it. */
+  test('every panel on the page is one the watch draws', () => {
+    const result = placeable.filter((module) => !defs.has(ids[module.value])).map((module) => `${module.label} (${module.value})`);
+
+    expect(result).toEqual([]);
+  });
+
+  /**
+   * The watch drops a cell whose panel does not allow its size, so a size the page offers and the C
+   * leaves out lets the wearer place a panel that never shows.
+   */
+  test('every panel offers the sizes the watch draws it at', () => {
+    const result = placeable
+      .filter((module) => panels.has(defs.get(ids[module.value]) || ''))
+      .filter((module) => {
+        const watch = panels.get(defs.get(ids[module.value]) as string) as WatchPanel;
+
+        return [...(module.sizes || [])].sort().join(',') !== watch.sizes.join(',');
+      })
+      .map((module) => module.label);
+
+    expect(result).toEqual([]);
+  });
+
+  /**
+   * A panel the appearance editor hides gets no colours of its own from the page, so on the watch it
+   * has to borrow another panel's. One that did not would stay plain whatever colour its group took.
+   */
+  test('every panel hidden in the appearance editor borrows colours on the watch', () => {
+    const result = placeable
+      .filter((module) => module.themeHidden && panels.has(defs.get(ids[module.value]) || ''))
+      .filter((module) => !(panels.get(defs.get(ids[module.value]) as string) as WatchPanel).alias)
+      .map((module) => module.label);
+
+    expect(result).toEqual([]);
+  });
+
+  /** The size and colour checks pass just as happily on panels they could not read, which would prove nothing. */
+  test('the C reading finds every panel on the page', () => {
+    const result = placeable.filter((module) => !panels.has(defs.get(ids[module.value]) || '')).map((module) => module.label);
+
+    expect(result).toEqual([]);
   });
 });

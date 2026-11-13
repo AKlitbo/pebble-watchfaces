@@ -78,4 +78,6 @@ static const ModuleColors MODULE_VIBRANT[MOD_TYPE_COUNT] = {
     [MOD_HEALTH_HRV_DAY] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
     [MOD_HEALTH_HRV_TUNING] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
     [MOD_HEALTH_HR_DAY] = { .accent = GColorRed, .value = GColorRed, .icon = GColorRed },
+    [MOD_SYSTEM_PHONE_BATTERY] = { .accent = GColorElectricBlue, .value = GColorElectricBlue, .icon = GColorElectricBlue },
+    [MOD_SYSTEM_BATTERY_PAIR] = { .accent = GColorGreen, .value = GColorGreen, .icon = GColorGreen },
 };

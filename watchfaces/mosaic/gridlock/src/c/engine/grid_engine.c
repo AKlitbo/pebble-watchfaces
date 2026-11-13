@@ -321,6 +321,63 @@ static GColor label_color_for(GColor accent)
 }
 
 /**
+ * @brief Works out the colours a panel paints with under the current theme.
+ *
+ * VIBRANT paints each module's own colours on top of the mono base, and GColorClear in its table
+ * means keep the base. CUSTOM starts from the plain mono look and takes only the channels the
+ * config page set. MONO and MONO_INVERSE stay on the plain base palette.
+ *
+ * @param theme_module The module whose colours to use, already resolved through its theme_alias.
+ * @return The four colours.
+ */
+static Palette module_palette(uint8_t theme_module)
+{
+    Palette pal = s_base_pal;
+
+    if (s_theme == THEME_VIBRANT)
+    {
+        const ModuleColors *v = &MODULE_VIBRANT[theme_module];
+        if (!gcolor_equal(v->accent, GColorClear))   pal.accent = v->accent;
+        if (!gcolor_equal(v->value, GColorClear))    pal.value = v->value;
+        if (!gcolor_equal(v->icon, GColorClear))     pal.icon = v->icon;
+        if (!gcolor_equal(v->subtitle, GColorClear)) pal.subtitle = v->subtitle;
+    }
+
+    if (s_theme == THEME_CUSTOM)
+    {
+        GridlockCustomColor custom = gridlock_custom_color(theme_module);
+        if (custom.accent_set)
+        {
+            pal.accent = custom.accent;
+            pal.subtitle = custom.accent; // the caption follows the accent by default
+        }
+        if (custom.value_set)    pal.value = custom.value;
+        if (custom.icon_set)     pal.icon = custom.icon;
+        if (custom.subtitle_set) pal.subtitle = custom.subtitle; // its own colour wins when set
+    }
+
+    return pal;
+}
+
+void grid_ctx_use_colors_of(GridCtx *gctx, ModuleType module)
+{
+    // an id past the catalogue paints in the plain base colours, the way an empty cell does, so it
+    // never reads past the end of the vibrant table
+    uint8_t own = module < MOD_TYPE_COUNT ? (uint8_t)module : (uint8_t)MOD_EMPTY;
+
+    // grouped panels borrow their primary's colours via theme_alias (the daily forecast reads
+    // as the hourly panel, the watchlist as the stock panel)
+    const ModuleDef *def = module_def(own);
+    Palette pal = module_palette(def->theme_alias ? def->theme_alias : own);
+
+    gctx->color_value = pal.value;
+    gctx->color_subtitle = pal.subtitle;
+    gctx->color_accent = pal.accent;
+    gctx->color_icon = pal.icon;
+    gctx->color_label = label_color_for(pal.accent);
+}
+
+/**
  * @brief Draw-slot callback: paints one cell's module. `data` points at the cell's
  * ResolvedSlot and `bounds` is the cell's own (layer-local) rect.
  *
@@ -333,56 +390,15 @@ static void cell_draw(GContext *ctx, GRect bounds, const void *data)
     const ResolvedSlot *slot = data;
     const ModuleDef *def = module_def(slot->module);
 
-    // grouped panels borrow their primary's colours via theme_alias (the daily forecast reads
-    // as the hourly panel, the watchlist as the stock panel). the header/border flags stay per
-    // size and per module id, so the two panels still toggle independently
-    uint8_t theme_module = def->theme_alias ? def->theme_alias : slot->module;
-
-    uint8_t theme = s_theme;
-    Palette pal = s_base_pal;
-
-    GColor c_accent = pal.accent;
-    GColor c_value = pal.value;
-    GColor c_subtitle = pal.subtitle;
-    GColor c_icon = pal.icon;
-
-    // VIBRANT paints each module's own colours on top of the mono base (GColorClear means
-    // keep the base). MONO MONO_INVERSE and CUSTOM stay on the plain base palette.
-    if (theme == THEME_VIBRANT)
-    {
-        const ModuleColors *v = &MODULE_VIBRANT[theme_module];
-        if (!gcolor_equal(v->accent, GColorClear))   c_accent = v->accent;
-        if (!gcolor_equal(v->value, GColorClear))    c_value = v->value;
-        if (!gcolor_equal(v->icon, GColorClear))     c_icon = v->icon;
-        if (!gcolor_equal(v->subtitle, GColorClear)) c_subtitle = v->subtitle;
-    }
-
-    // CUSTOM starts from the plain mono look. the config page sets only the channels it
-    // wants and anything left alone stays mono.
-    if (theme == THEME_CUSTOM)
-    {
-        GridlockCustomColor custom = gridlock_custom_color(theme_module);
-        if (custom.accent_set)
-        {
-            c_accent = custom.accent;
-            c_subtitle = custom.accent; // the caption follows the accent by default
-        }
-        if (custom.value_set)    c_value = custom.value;
-        if (custom.icon_set)     c_icon = custom.icon;
-        if (custom.subtitle_set) c_subtitle = custom.subtitle; // its own colour wins when set
-    }
-
     GridCtx gctx = {
         .ctx = ctx,
         .bounds = bounds,
         .body = GRect(bounds.origin.x, bounds.origin.y + HEADER_H, bounds.size.w, bounds.size.h - HEADER_H),
         .size = slot->msize,
-        .color_value = c_value,
-        .color_subtitle = c_subtitle,
-        .color_accent = c_accent,
-        .color_icon = c_icon,
-        .color_label = label_color_for(c_accent)
     };
+    // the colours follow theme_alias, but the header/border flags below stay per size and per
+    // module id, so two grouped panels still toggle independently
+    grid_ctx_use_colors_of(&gctx, (ModuleType)slot->module);
 
     // every module goes through draw_panel. the header is dropped for always-headerless
     // modules (the clock bar) or when this size's toggle hides it. the flags are per size AND

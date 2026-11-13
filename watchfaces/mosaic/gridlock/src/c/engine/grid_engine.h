@@ -62,6 +62,20 @@ typedef struct GridCtx {
 GRect grid_anchor(GridCtx *gctx, GSize size, GAlign anchor, int dx, int dy);
 
 /**
+ * @brief Sets a context's value, caption, accent, icon, and label colours to a panel's, as the
+ * current theme paints that panel.
+ *
+ * The engine paints every cell's colours through it. A panel that shows two readings in one tile
+ * calls it again on a copy to draw one half in the other reading's own colours, such as the phone's
+ * half of the paired battery panel. The header and border are already painted by then, so they
+ * keep the tile's own colours.
+ *
+ * @param gctx The context to set. A copy works, so the caller keeps the original for its own half.
+ * @param module The panel whose colours to take. A grouped panel resolves to its group's colours.
+ */
+void grid_ctx_use_colors_of(GridCtx *gctx, ModuleType module);
+
+/**
  * @brief Builds the Gridlock grid as draw-slots on the shared engine: one slot per layout
  * cell, each painting its module's panel. Handed to engine_init as the EngineBuild callback,
  * so engine_init/deinit/rebuild/mark_dirty all come from the shared engine (ui/engine/engine.h).

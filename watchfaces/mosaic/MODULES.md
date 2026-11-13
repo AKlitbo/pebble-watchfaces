@@ -2,9 +2,11 @@
 
 These are all the panels I've made for the Mosaic faces, shown at every size each one comes in.
 
-Sizes are rows by columns. `1×2` and `2×2` are half the screen wide, and `1×4` and `2×4` span it. Many panels come in more than one size, and a panel shows the same thing on either face. Sidereel reads the time off its own reel, so it leaves out the clock panels and has no full-width sizes. The calendar, stock, connection, Quiet Time, and status panels are on Gridlock only.
+Sizes are rows by columns. `1×2` and `2×2` are half the screen wide, and `1×4` and `2×4` span it. Many panels come in more than one size, and a panel shows the same thing on either face. Sidereel reads the time off its own reel, so it leaves out the clock panels and has no full-width sizes. The calendar, stock, connection, Quiet Time, status, and phone battery panels are on Gridlock only.
 
 Next Event, Agenda, and Timeline need a calendar feed, and Stock and Watchlist need a ticker. You set both in Gridlock's settings page.
+
+Phone Battery and Battery Battery read your phone's battery through the Pebble app, so they need plugins turned on there. Until then the phone's number shows two dashes.
 
 Each face's settings page has a row of starter layouts, so there's something on screen before you've placed anything. They're shown here in the Vibrant theme. None of them is a mode. Drag panels in or take them out and the layout is yours from there.
 
@@ -29,6 +31,7 @@ Gridlock's are Default, Activity, Weather, Data, Sleep, and Creator.
 | **Distance**<br>![](gridlock/resources/thumbnails/distance-1x2.png) | **Calories**<br>![](gridlock/resources/thumbnails/calories-1x2.png) | **Sleep**<br>![](gridlock/resources/thumbnails/sleep-1x2.png) | **Activity**<br>![](gridlock/resources/thumbnails/activity-1x2.png) | **Battery**<br>![](gridlock/resources/thumbnails/battery-1x2.png) | **Connection**<br>![](gridlock/resources/thumbnails/connection-1x2.png) | **Quiet Time**<br>![](gridlock/resources/thumbnails/quiet-1x2.png) |
 | **Status**<br>![](gridlock/resources/thumbnails/status-1x2.png) | **Next Alarm**<br>![](gridlock/resources/thumbnails/alarm-1x2.png) | **Year Progress**<br>![](gridlock/resources/thumbnails/year-progress-1x2.png) | **Day Progress**<br>![](gridlock/resources/thumbnails/day-progress-1x2.png) | **Hour Progress**<br>![](gridlock/resources/thumbnails/hour-progress-1x2.png) | **Week Progress**<br>![](gridlock/resources/thumbnails/week-progress-1x2.png) | **Step Goal**<br>![](gridlock/resources/thumbnails/step-goal-1x2.png) |
 | **Distance Goal**<br>![](gridlock/resources/thumbnails/distance-goal-1x2.png) | **Calorie Goal**<br>![](gridlock/resources/thumbnails/calorie-goal-1x2.png) | **Sleep Goal**<br>![](gridlock/resources/thumbnails/sleep-goal-1x2.png) | **Activity Goal**<br>![](gridlock/resources/thumbnails/activity-goal-1x2.png) | **HRV**<br>![](gridlock/resources/thumbnails/hrv-1x2.png) | **HRV Trend**<br>![](gridlock/resources/thumbnails/hrv-trend-1x2.png) | **Night HRV**<br>![](gridlock/resources/thumbnails/hrv-night-1x2.png) |
+| **Phone Battery**<br>![](gridlock/resources/thumbnails/phone-battery-1x2.png) | **Battery Battery**<br>![](gridlock/resources/thumbnails/battery-battery-1x2.png) | | | | | |
 
 ### 2×2
 
@@ -38,7 +41,7 @@ Gridlock's are Default, Activity, Weather, Data, Sleep, and Creator.
 | **UV**<br>![](gridlock/resources/thumbnails/uv-2x2.png) | **Daylight**<br>![](gridlock/resources/thumbnails/daylight-2x2.png) | **Sun**<br>![](gridlock/resources/thumbnails/sun-2x2.png) | **Moon**<br>![](gridlock/resources/thumbnails/moon-2x2.png) | **Heart Rate**<br>![](gridlock/resources/thumbnails/heartrate-2x2.png) | **HR Graph**<br>![](gridlock/resources/thumbnails/hrgraph-2x2.png) | **Steps**<br>![](gridlock/resources/thumbnails/steps-2x2.png) |
 | **Steps Graph**<br>![](gridlock/resources/thumbnails/stepsgraph-2x2.png) | **Distance**<br>![](gridlock/resources/thumbnails/distance-2x2.png) | **Calories**<br>![](gridlock/resources/thumbnails/calories-2x2.png) | **Sleep**<br>![](gridlock/resources/thumbnails/sleep-2x2.png) | **Activity**<br>![](gridlock/resources/thumbnails/activity-2x2.png) | **Next Event**<br>![](gridlock/resources/thumbnails/next-event-2x2.png) | **Timeline**<br>![](gridlock/resources/thumbnails/timeline-2x2.png) |
 | **Stock**<br>![](gridlock/resources/thumbnails/stock-2x2.png) | **Battery**<br>![](gridlock/resources/thumbnails/battery-2x2.png) | **Next Alarm**<br>![](gridlock/resources/thumbnails/alarm-2x2.png) | **Year Progress**<br>![](gridlock/resources/thumbnails/year-progress-2x2.png) | **Day Progress**<br>![](gridlock/resources/thumbnails/day-progress-2x2.png) | **Hour Progress**<br>![](gridlock/resources/thumbnails/hour-progress-2x2.png) | **Week Progress**<br>![](gridlock/resources/thumbnails/week-progress-2x2.png) |
-| **Heart**<br>![](gridlock/resources/thumbnails/heart-2x2.png) | **HRV History**<br>![](gridlock/resources/thumbnails/hrv-history-2x2.png) | **Still vs Walking**<br>![](gridlock/resources/thumbnails/hrv-states-2x2.png) | | | | |
+| **Heart**<br>![](gridlock/resources/thumbnails/heart-2x2.png) | **HRV History**<br>![](gridlock/resources/thumbnails/hrv-history-2x2.png) | **Still vs Walking**<br>![](gridlock/resources/thumbnails/hrv-states-2x2.png) | **Phone Battery**<br>![](gridlock/resources/thumbnails/phone-battery-2x2.png) | | | |
 
 ### 1×4
 

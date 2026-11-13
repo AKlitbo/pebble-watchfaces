@@ -100,12 +100,16 @@ export function createRowBuilder(env: RowEnv): { buildRow(module: ThemeModule): 
 
     toggles.className = 'sz-tog';
 
-    // flags target the panel this sub row represents (row.value)
-    if (!row.alwaysHeaderless) {
-      toggles.appendChild(buildFlagToggle(env.getHeaderless, row.value, size, 'H'));
+    // flags target the panel this sub row represents (row.value). a shot only row is a panel shown
+    // under a second swatch too, and its toggles stay under the first so each flag shows once
+    if (!row.shotOnly) {
+      if (!row.alwaysHeaderless) {
+        toggles.appendChild(buildFlagToggle(env.getHeaderless, row.value, size, 'H'));
+      }
+
+      toggles.appendChild(buildFlagToggle(env.getBorderless, row.value, size, 'B'));
     }
 
-    toggles.appendChild(buildFlagToggle(env.getBorderless, row.value, size, 'B'));
     sizeRow.appendChild(toggles);
 
     return sizeRow;

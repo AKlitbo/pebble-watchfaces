@@ -132,5 +132,7 @@
   "time-moon-lg-26":                  { "svg": "weather-icons/svg/wi-moon-waning-crescent-5",   "size": [42, 42] },
   "time-moon-lg-27":                  { "svg": "weather-icons/svg/wi-moon-waning-crescent-6",   "size": [42, 42] },
   "system-volume-muted":              { "svg": "uxwing/volume-muted-icon",           "size": [18, 14] },
-  "system-volume-full":               { "svg": "uxwing/volume-full-icon",            "size": [18, 14] }
+  "system-volume-full":               { "svg": "uxwing/volume-full-icon",            "size": [18, 14] },
+  "system-watch-charge":              { "svg": "uxwing/smartwatch-charging-icon",    "size": [8, 14] },
+  "system-phone-charge":              { "svg": "uxwing/mobile-charge-icon",          "size": [8, 14] }
 }

@@ -13,6 +13,7 @@
 #include "io/stores/calendar_store.h"
 #include "io/stores/health_store.h"
 #include "io/stores/system_store.h"
+#include "io/stores/phone_store.h"
 #include "ui/fonts.h"
 #include "draw/fonts.h"
 #include "ui/engine/engine.h"
@@ -70,6 +71,41 @@ static bool hrv_keep_all(void)
 {
     return gridlock_has_module_either(MOD_HEALTH_HRV_HISTORY) || gridlock_has_module_either(MOD_HEALTH_HRV_STATES) ||
            gridlock_has_module_either(MOD_HEALTH_HRV_TUNING);
+}
+
+static bool s_phone_live;    ///< whether the phone store was last started live
+static bool s_stores_seeded; ///< whether dev mode seeded every store, which a save leaves alone
+
+/**
+ * @brief Whether a panel showing the phone's battery is on any layout.
+ *
+ * @return True when Phone Battery or Battery Battery is placed in the day, night, or Quiet Time layout.
+ */
+static bool phone_shown(void)
+{
+    return gridlock_has_module_either(MOD_SYSTEM_PHONE_BATTERY) || gridlock_has_module_either(MOD_SYSTEM_BATTERY_PAIR);
+}
+
+/**
+ * @brief Starts the phone store live only while a panel shows the phone's battery, and again when a
+ * save adds the first one or takes the last one off.
+ *
+ * The phone sends every change in its battery, so a live store with nothing showing it would wake the
+ * watch for each one. A store started not live tells the phone so, and the phone stops sending.
+ *
+ * @param first True at launch, when the store starts whatever it was before.
+ */
+static void apply_phone_rules(bool first)
+{
+    bool live = phone_shown();
+
+    if (s_stores_seeded || (!first && live == s_phone_live))
+    {
+        return;
+    }
+
+    s_phone_live = live;
+    phone_store_init((PhoneConfig){.live = live}, NULL);
 }
 
 /** @brief Hands the health store the wearer's HRV settings and what the placed panels need. */
@@ -148,6 +184,8 @@ static void on_settings_changed(bool time_or_date_changed)
     // the stock and calendar poll intervals may have changed, so move each next poll onto the new one
     stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
     calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
+    // a phone battery panel may have been placed or taken off, which starts or stops the phone's updates
+    apply_phone_rules(false);
     // an HRV panel may have been placed or taken off, which turns the sampling on or off
     apply_hrv_rules();
     health_store_set_hrv_period(hrv_period());
@@ -227,6 +265,7 @@ static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }
 static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR); }
 static void on_health_changed(void)  { goal_vibe_update(); engine_mark_dirty_tags(FEATURE_HEALTH); }
 static void on_system_changed(void)  { engine_mark_dirty_tags(FEATURE_SYSTEM); }
+static void on_phone_changed(void)   { engine_mark_dirty_tags(FEATURE_PHONE); }
 
 static void init(void)
 {
@@ -240,9 +279,13 @@ static void init(void)
 
     // each store owns its own source. init starts it (live) or seeds it. dev mode seeds every
     // store from a fixed fixture (live=false) for deterministic screenshots
-    if (!dev_seed_stores())
+    s_stores_seeded = dev_seed_stores();
+    if (!s_stores_seeded)
     {
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
+        // the phone's battery, from the Pebble app's Phone plugin. it hears the phone come and go
+        // through the live system store above, and clears its level while the phone is away
+        apply_phone_rules(true);
         // the only face with the two health graphs and with panels for sleep, active time and
         // calories, so the only one that keeps their history or pays to read them. the heart rate
         // day is named whatever is placed, so its log read runs at every launch, after the paint.
@@ -287,6 +330,7 @@ static void init(void)
     calendar_store_subscribe(on_calendar_changed);
     health_store_subscribe(on_health_changed);
     system_store_subscribe(on_system_changed);
+    phone_store_subscribe(on_phone_changed);
 
     // the stores own their channels + poll. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

@@ -10,6 +10,8 @@
 #include "mosaic/draw/icons.h"
 #include "mosaic/modules/system/system_alarm.h"
 #include "mosaic/modules/system/system_battery.h"
+#include "mosaic/modules/system/system_phone_battery.h"
+#include "modules/system/system_battery_pair.h"
 #include "modules/system/system_connection.h"
 #include "mosaic/modules/health/health_hr_graph.h"
 #include "mosaic/modules/time/time_moon.h"
@@ -156,6 +158,8 @@ const ModuleDef *module_def(ModuleType type)
         case MOD_HEALTH_HRV_TUNING: return &mod_health_hrv_tuning_def;
         case MOD_HEALTH_HR_DAY: return &mod_health_hr_day_def;
         case MOD_SYSTEM_STATUS: return &mod_system_status_def;
+        case MOD_SYSTEM_PHONE_BATTERY: return &mod_system_phone_battery_def;
+        case MOD_SYSTEM_BATTERY_PAIR: return &mod_system_battery_pair_def;
         case MOD_TIME_HOUR_BIG: return &mod_time_hour_big_def;
         case MOD_TIME_MIN_BIG: return &mod_time_min_big_def;
         case MOD_TIME_BIGCLOCK: return &mod_time_bigclock_def;

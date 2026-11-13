@@ -79,6 +79,8 @@ const moduleGroups: Record<string, ModuleGroup> = {
   'Watchlist':         'Calendar & Stocks',
   'Battery':           'Status',
   'Status':            'Status',
+  'Battery Battery':   'Status',
+  'Phone Battery':     'Status',
   'Connection':        'Status',
   'Quiet Time':        'Status',
   'Next Alarm':        'Status',

@@ -94,6 +94,8 @@ typedef enum
     MOD_HEALTH_HRV_DAY,
     MOD_HEALTH_HRV_TUNING,
     MOD_HEALTH_HR_DAY,
+    MOD_SYSTEM_PHONE_BATTERY,
+    MOD_SYSTEM_BATTERY_PAIR,
     MOD_TYPE_COUNT
 } ModuleType;
 
@@ -136,6 +138,7 @@ typedef enum
     FEATURE_SYSTEM  = 1 << 3,
     FEATURE_STOCK   = 1 << 4,
     FEATURE_CALENDAR = 1 << 5,
+    FEATURE_PHONE   = 1 << 6,
 } ModuleFeature;
 
 /**

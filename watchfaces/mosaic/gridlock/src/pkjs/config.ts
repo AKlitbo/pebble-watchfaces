@@ -298,8 +298,10 @@ const MODULE_BASE = [
   { label: 'Still vs Walking', value: 71, sizes: ['2x2'], themeHidden: true },
   { label: 'HRV Today', value: 72, sizes: ['1x4', '2x4'], themeHidden: true },
   { label: 'HRV Tuning', value: 73, sizes: ['2x4'], themeHidden: true },
-  // Status (the combined battery/bluetooth/quiet panel) borrows Battery's colour set (see
-  // theme_alias in C) so it groups under the Battery swatch in the appearance editor
+  // Status (the combined battery/bluetooth/quiet panel) and Battery Battery (the watch and phone
+  // batteries side by side) borrow Battery's colour set (see theme_alias in C) so they group under
+  // the Battery swatch in the appearance editor. Battery Battery shows only there, though its phone
+  // half takes Phone Battery's colours, since a second row under Phone Battery could not be styled
   {
     label: 'Battery',
     value: 2,
@@ -309,9 +311,22 @@ const MODULE_BASE = [
       { size: '1x2', thumb: 'Battery' },
       { size: '2x2', thumb: 'Battery' },
       { size: '1x2', thumb: 'Status' },
+      { size: '1x2', thumb: 'Battery Battery' },
     ],
   },
   { label: 'Status', value: 52, sizes: ['1x2'], themeHidden: true },
+  { label: 'Battery Battery', value: 76, sizes: ['1x2'], themeHidden: true },
+  // the phone's battery comes from the Pebble app's Phone plugin, so it reads -- with plugins off.
+  // its own rows come first, since the layout builder takes a size's picture from the first match
+  {
+    label: 'Phone Battery',
+    value: 75,
+    sizes: ['1x2', '2x2'],
+    themeRows: [
+      { size: '1x2', thumb: 'Phone Battery' },
+      { size: '2x2', thumb: 'Phone Battery' },
+    ],
+  },
   {
     label: 'Connection',
     value: 31,

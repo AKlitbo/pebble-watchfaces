@@ -130,6 +130,30 @@ describe('editor sheet', () => {
     expect(blockToggles.length).toBe(2);
   });
 
+  /** A panel under two swatches with toggles under both would show one flag in two places that disagree after a tap. */
+  test('a shot only size row offers no toggles', () => {
+    const options = [
+      ...moduleOptionsFixture,
+      {
+        label: 'Phone',
+        value: 75,
+        sizes: ['1x2'],
+        themeRows: [{ size: '1x2', thumb: 'Phone' }, { size: '1x2', thumb: 'Pair', shotOnly: true }],
+      },
+      { label: 'Pair', value: 76, sizes: ['1x2'], themeHidden: true },
+    ];
+    const mounted = mount(component, { moduleOptions: options, moduleThumbnails: {} });
+
+    mounted.ctx.initialize();
+    mounted.root.querySelector<HTMLElement>('.tb-edit-btn').click();
+    const rows = document.querySelectorAll<HTMLElement>('.tb-row');
+    const phoneSizeRows = rows[rows.length - 1].querySelectorAll<HTMLElement>('.sz');
+
+    const result = Array.from(phoneSizeRows).map((row) => row.querySelectorAll('.tb-toggle').length);
+
+    expect(result).toEqual([2, 0]);
+  });
+
   /** A header toggle writing the wrong bit would hide the wrong panel's header on the watch. */
   test('toggling one header flag serializes that module and size alone', () => {
     const { ctx } = openEditor();

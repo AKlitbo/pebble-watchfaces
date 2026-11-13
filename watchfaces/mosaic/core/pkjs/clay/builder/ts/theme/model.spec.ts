@@ -47,8 +47,8 @@ describe('sizeRowsFor', () => {
     const result = sizeRowsFor(forecast, optionByLabel);
 
     expect(result).toEqual([
-      { size: '1x4', thumbLabel: 'Forecast (Hourly)', value: 25, alwaysHeaderless: false },
-      { size: '2x4', thumbLabel: 'Forecast (4-Day)', value: 26, alwaysHeaderless: false },
+      { size: '1x4', thumbLabel: 'Forecast (Hourly)', value: 25, alwaysHeaderless: false, shotOnly: false },
+      { size: '2x4', thumbLabel: 'Forecast (4-Day)', value: 26, alwaysHeaderless: false, shotOnly: false },
     ]);
   });
 
@@ -59,8 +59,28 @@ describe('sizeRowsFor', () => {
     const result = sizeRowsFor(battery, {});
 
     expect(result).toEqual([
-      { size: '1x2', thumbLabel: 'Battery', value: 2, alwaysHeaderless: false },
-      { size: '2x2', thumbLabel: 'Battery', value: 2, alwaysHeaderless: false },
+      { size: '1x2', thumbLabel: 'Battery', value: 2, alwaysHeaderless: false, shotOnly: false },
+      { size: '2x2', thumbLabel: 'Battery', value: 2, alwaysHeaderless: false, shotOnly: false },
+    ]);
+  });
+  /**
+   * A panel drawn in two swatches' colours shows under both. The second copy has to keep pointing at
+   * its own panel and come marked shot only, or the editor shows its header and border flags twice.
+   */
+  test('a shot only row keeps its panel and carries the mark', () => {
+    const optionByLabel = buildOptionByLabel([...moduleOptionsFixture, { label: 'Pair', value: 76, sizes: ['1x2'] }]);
+    const phone = {
+      label: 'Phone',
+      value: 75,
+      sizes: ['1x2'],
+      themeRows: [{ size: '1x2', thumb: 'Phone' }, { size: '1x2', thumb: 'Pair', shotOnly: true }],
+    };
+
+    const result = sizeRowsFor(phone, optionByLabel);
+
+    expect(result).toEqual([
+      { size: '1x2', thumbLabel: 'Phone', value: 75, alwaysHeaderless: false, shotOnly: false },
+      { size: '1x2', thumbLabel: 'Pair', value: 76, alwaysHeaderless: false, shotOnly: true },
     ]);
   });
 });
@@ -79,5 +99,23 @@ describe('allSizesHidden', () => {
 
     expect(partial).toBe(false);
     expect(full).toBe(true);
+  });
+  /** Another swatch's panel shown for its picture must not hold this swatch's preview header up or down. */
+  test('leaves shot only rows out', () => {
+    const phone = buildThemeModules([
+      {
+        label: 'Phone',
+        value: 75,
+        sizes: ['1x2'],
+        themeRows: [{ size: '1x2', thumb: 'Phone' }, { size: '1x2', thumb: 'Pair', shotOnly: true }],
+      },
+      { label: 'Pair', value: 76, sizes: ['1x2'], themeHidden: true },
+    ])[0];
+    const map = {};
+
+    setFlag(map, 75, '1x2', true);
+    const result = allSizesHidden(phone, map);
+
+    expect(result).toBe(true);
   });
 });

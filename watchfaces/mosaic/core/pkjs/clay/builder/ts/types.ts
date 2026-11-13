@@ -17,6 +17,12 @@ export interface ThemeRow {
   size: string;
   thumb?: string;
   alwaysHeaderless?: boolean;
+  /**
+   * Shows the shot with no header or border toggles. A panel drawn in two swatches' colours sits
+   * under both, and its toggles stay under the swatch that owns its flags, so the two rows never
+   * show the same flag twice.
+   */
+  shotOnly?: boolean;
 }
 
 /** A module option as Clay hands it in, matching config.ts MODULE_OPTIONS. */
@@ -86,6 +92,7 @@ export interface SizeRow {
   thumbLabel: string;
   value: number;
   alwaysHeaderless: boolean;
+  shotOnly: boolean;
 }
 
 /** One module the appearance editor lists, with its size rows. */

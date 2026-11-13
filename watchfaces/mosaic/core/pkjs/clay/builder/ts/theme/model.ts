@@ -29,7 +29,7 @@ export function buildOptionByLabel(rawModules: RawModule[]): Record<string, RawM
 
 /**
  * The per size rows the appearance editor shows for a module, each
- * { size, thumbLabel, value, alwaysHeaderless }. themeRows lets a shared
+ * { size, thumbLabel, value, alwaysHeaderless, shotOnly }. themeRows lets a shared
  * theme family name each row's size and which module's screenshot it uses
  * (stock 2x2 plus watchlist 2x4). Otherwise every placeable size becomes a
  * row showing this module's own screenshot. value and alwaysHeaderless come
@@ -52,6 +52,7 @@ export function sizeRowsFor(option: RawModule, optionByLabel: Record<string, Raw
         thumbLabel: row.thumb || option.label,
         value: src.value,
         alwaysHeaderless: Boolean(panelHeaderless),
+        shotOnly: Boolean(row.shotOnly),
       };
     });
   }
@@ -62,6 +63,7 @@ export function sizeRowsFor(option: RawModule, optionByLabel: Record<string, Raw
       thumbLabel: option.label,
       value: option.value,
       alwaysHeaderless: Boolean(option.alwaysHeaderless),
+      shotOnly: false,
     };
   });
 }
@@ -123,15 +125,20 @@ export function vibrantByteFor(module: Pick<ThemeModule, 'vibrant'>, argbByName:
 /**
  * True when every size the module supports has this flag set. The colour
  * preview uses it to decide whether the header or border is dropped across
- * the board.
+ * the board. A shot only row is another swatch's panel, so its flag says
+ * nothing about this one and is left out.
  */
 export function allSizesHidden(module: ThemeModule, map: FlagMap): boolean {
-  if (!module.sizeRows || module.sizeRows.length === 0) {
+  const rows = (module.sizeRows || []).filter(function (row) {
+    return !row.shotOnly;
+  });
+
+  if (rows.length === 0) {
     return false;
   }
 
-  for (let s = 0; s < module.sizeRows.length; s++) {
-    const row = module.sizeRows[s];
+  for (let s = 0; s < rows.length; s++) {
+    const row = rows[s];
 
     if (!flagOn(map, row.value, row.size)) {
       return false;

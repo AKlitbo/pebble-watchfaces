@@ -84,6 +84,8 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Julian Date':   { icon: '🔭', blockColor: '#3d5afe', slug: 'julian' },
   'Weeks Left':    { icon: '🔢', blockColor: '#0288d1', slug: 'weeksleft' },
   'Status':        { icon: '📶', blockColor: '#f0a500', slug: 'status' },
+  'Battery Battery': { icon: '🔋', blockColor: '#f0a500', slug: 'battery-battery' },
+  'Phone Battery': { icon: '📱', blockColor: '#26c6da', slug: 'phone-battery' },
   'Big Hour':      { icon: '🕛', blockColor: '#b0bec5', slug: 'big-hour' },
   'Big Minutes':   { icon: '🕧', blockColor: '#b0bec5', slug: 'big-min' },
   'Big Time':      { icon: '🌙', blockColor: '#b0bec5', slug: 'big-time' },
