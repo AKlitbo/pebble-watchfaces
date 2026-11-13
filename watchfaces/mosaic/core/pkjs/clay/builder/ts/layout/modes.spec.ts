@@ -17,7 +17,7 @@ function mountStore(value = ''): HTMLInputElement {
   const input = document.createElement('input');
 
   input.type = 'hidden';
-  input.className = 'gl-store gl-library';
+  input.className = 'pf-hidden-store gl-library';
   input.value = value;
   document.body.appendChild(input);
   return input;
@@ -28,7 +28,7 @@ function mountQuietStore(): HTMLInputElement {
   const input = document.createElement('input');
 
   input.type = 'hidden';
-  input.className = 'gl-store gl-quiet';
+  input.className = 'pf-hidden-store gl-quiet';
   document.body.appendChild(input);
   return input;
 }

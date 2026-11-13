@@ -29,7 +29,7 @@ static void weather_current_inner_2x2(GridCtx *gctx)
     char word[16];
     wx_label_short(word, sizeof(word), raw);
     const char *label = weather_store_cond_label();
-    const char *cond = (!raw[0] || !strcmp(raw, "--")) ? "--" : (label[0] ? label : word);
+    const char *cond = !raw[0] ? "--" : (label[0] ? label : word);
 
     IconMargins margin;
     GBitmap *bmp = wx_icon_get(&margin);
@@ -64,7 +64,7 @@ static void weather_current_inner_1x2(GridCtx *gctx)
     const char *raw = weather_store_cond();
     char word[16];
     wx_label_short(word, sizeof(word), raw);
-    const char *cond = (!raw[0] || !strcmp(raw, "--")) ? "--" : word;
+    const char *cond = !raw[0] ? "--" : word;
 
     IconMargins margin;
     GBitmap *bmp = wx_icon_get(&margin);

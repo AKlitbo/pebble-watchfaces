@@ -1,34 +1,18 @@
 /**
  * @file dev.h
- * @brief Per-face dev-walk switches. Keep DEV_MODE 0 for any build you ship. Flip it (plus the
- * walk toggle) to boot the face into a fixed fixture and tap-walk themes for screenshots.
- * The logic lives in the dev plugin's `dev/dev_walk`, which builds only with `dev` listed under plugins
- * in paf.config.json. This only holds the switches.
+ * @brief Sidereel's dev overrides. The dev plugin's `dev/dev_hooks.h` holds the harness hooks, and
+ * the build sets their switches from `paf build sidereel --dev` and the family's paf.dev.config.json.
+ * This only adds the look a shot pins and the forced Quiet Time glyph.
  *
  * @ingroup watchface-sidereel
  */
 #pragma once
 #include <pebble.h>
 
+#include "dev/dev_hooks.h"
 #include "system/settings/setting_values.h"
 #include "system/settings/settings.h"
 #include "theme/theme.h"
-
-// ===== master switch (0 for any shipped build) =====
-#define DEV_MODE 0
-
-// the tap-walk screenshot harness lives in the dev plugin's dev/dev_walk. nothing outside
-// DEV_MODE touches it, so a shipping build (0) needs neither the include nor the walk macro
-#if DEV_MODE
-#include "dev/dev_walk.h"
-#endif
-
-// ===== walk toggle =====
-#define DEV_TAP_WALK_THEMES 0  // tap steps through every theme on fixed data + a fixed clock
-
-// ===== theme walk: the fixed clock every shot shows =====
-#define DEV_TIME_HOUR 8   // 08:00 is a wide clock string
-#define DEV_TIME_MIN  0
 
 // ===== fixture overrides =====
 // quiet time is a real watch state the emulator never enters, so the pennant glyph would never
@@ -40,30 +24,8 @@
 #define DEV_FORCE_THEME    THEME_VIBRANT
 #define DEV_FORCE_TIME_FMT TIME_FORMAT_24H
 
-// which walk a tap advances (from the toggle above)
-#if DEV_TAP_WALK_THEMES
-  #define DEV_WALK_MODE DEV_WALK_THEMES
-#else
-  #define DEV_WALK_MODE DEV_WALK_NONE
-#endif
-
 // the hooks are static inline so a release build (DEV_MODE 0) inlines them to nothing and
 // leaves no dev symbol at all. main.c stays #if-free while shipping zero dev code
-
-/**
- * @brief Seed the stores from the dev fixture (live=false) when DEV_MODE is on.
- *
- * @return True if it seeded, so main skips the live inits. False in a release build.
- */
-static inline bool dev_seed_stores(void)
-{
-#if DEV_MODE
-    dev_walk_seed_stores(DEV_TIME_HOUR, DEV_TIME_MIN);
-    return true;
-#else
-    return false;
-#endif
-}
 
 /**
  * @brief Pins the theme and clock format a shot should show, when DEV_MODE is on.
@@ -77,49 +39,6 @@ static inline void dev_force_settings(void)
 #if DEV_MODE
     settings_set_u8(SETTING_THEME, DEV_FORCE_THEME);
     settings_set_u8(SETTING_TIME_FORMAT, DEV_FORCE_TIME_FMT);
-#endif
-}
-
-/**
- * @brief Overrides a struct tm with the dev fixture's fixed clock when DEV_MODE is on.
- *
- * A panel that builds its own tm (a second time zone, say) calls this so a screenshot walk shows
- * the same time everywhere. A no-op in a release build.
- *
- * @param t The time to override.
- */
-static inline void dev_force_time(struct tm *t)
-{
-#if DEV_MODE
-    // the same fixed clock dev_walk_seed_stores pins, so a panel that builds its own tm reads
-    // the hour and minute every other panel is showing
-    t->tm_hour = DEV_TIME_HOUR;
-    t->tm_min = DEV_TIME_MIN;
-#else
-    (void)t;
-#endif
-}
-
-/**
- * @brief Start the walk (force theme, first paint, tap subscription) when DEV_MODE is on. A
- * no-op otherwise. Call after engine_init.
- *
- * @param apply_theme The face's theme-apply hook.
- */
-static inline void dev_start(void (*apply_theme)(void))
-{
-#if DEV_MODE
-    dev_walk_init(DEV_WALK_MODE, apply_theme);
-#else
-    (void)apply_theme;
-#endif
-}
-
-/** @brief Stop the walk (drop the tap) when DEV_MODE is on. A no-op otherwise. */
-static inline void dev_stop(void)
-{
-#if DEV_MODE
-    dev_walk_deinit();
 #endif
 }
 

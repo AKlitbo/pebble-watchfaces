@@ -100,16 +100,8 @@ static int draw_hilo(GridCtx *gctx, int rel_x, int baseline)
 // fits the remaining width
 static void draw_status(GridCtx *gctx, int rel_x, int baseline, int avail, const char *cond)
 {
-    // no reading yet draws a placeholder, like the other weather panels
     char label[16];
-    if (!cond || !cond[0] || !strcmp(cond, "--"))
-    {
-        strcpy(label, "--");
-    }
-    else
-    {
-        wx_label_short(label, sizeof(label), cond);
-    }
+    wx_label_short(label, sizeof(label), cond);
 
     if (text_width(label, STATUS_FONT) <= avail)
     {
@@ -147,7 +139,7 @@ static void weather_now_draw(GridCtx *gctx)
 
     // the condition name rides last, beside the icon
     const char *raw = weather_store_cond();
-    if (raw[0] && strcmp(raw, "--"))
+    if (raw[0])
     {
         draw_status(gctx, cursor, baseline, width - EDGE_PAD(gctx) - cursor, raw);
     }

@@ -13,7 +13,7 @@
  * - `draw/fonts.h`, the face's font slot names, so a body can ask for a size by name
  * - `theme/theme.h`, the face's `Palette`, whose panel channels this tier draws with
  * - `settings_schema.h`, the goals, units and week start a body reads, under the names it calls
- * - `dev/dev.h`, the face's dev switches
+ * - `dev/dev.h`, the face's dev hooks
  * - anything from the framework, the same as any face
  *
  * Nothing else. A face's own layout, its persisted settings, its palette tables and the cells it

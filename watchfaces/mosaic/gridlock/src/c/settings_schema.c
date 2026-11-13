@@ -22,6 +22,7 @@
 #include "layout/layout_string.h"
 #include "ui/engine/engine.h"
 #include "engine/layouts.h"
+#include "theme/theme.h"
 #include "mosaic/engine/catalog.h"
 #include "mosaic/draw/header_fonts.h" // HEADER_FONT_COUNT for the header font enum bound
 #include "mosaic/draw/panel_styles.h" // PANEL_STYLE_COUNT for the panel style enum bound
@@ -40,22 +41,21 @@
 // retype, or resize a field already in a struct. the static asserts below freeze each size so a
 // stray change breaks the build instead of watches in the field. the persist keys themselves
 // live in persist_keys.h so every key across the face sits in one place
+//
+// each schema's SETTINGS_BLOB carries the blob's size in its first release, written as a number.
+// it never moves when a field is appended, so an older short blob still short-reads instead of
+// being turned away and reset
 #define GRIDLOCK_CORE_VERSION 3
 #define GRIDLOCK_CORE_SIZE    132
-// frozen size of the very first (v1) core blob: version + theme + layout[128], before
-// header_font and panel_style were appended. min_versioned_size must stay pinned to the v1 size
-// so an older short blob still short-reads instead of being rejected and reset. bump this only if
-// v1 is ever retired, never when appending a new trailing field
-#define GRIDLOCK_CORE_V1_SIZE 130
+// the first core blob was version, theme, and layout[128], 130 bytes, before header_font and
+// panel_style were appended
 
 // the per-module custom colours keep their own key so the table never crowds the core blob.
 // read only when the theme is custom. the wire format is the sparse "~3 colours | flags"
 // string. on the watch it splits into two persist keys (colours here, flags below) so the
 // worst case never crowds one 256 byte key. this key holds only the colour section.
-// NOTE this schema is version 2 with min_versioned_size == SIZE, which is safe ONLY because
-// v1 to v2 was an in-buffer format change on a fixed 251 byte struct, not an appended field.
-// if a field is ever appended here (v3), freeze the v2 size into a *_V1_SIZE-style constant
-// for min_versioned_size like GRIDLOCK_CORE_V1_SIZE does, or every custom theme gets wiped
+// version 2 changed the format inside the same 251 byte struct rather than appending a field, so
+// its first size is still 251
 #define GRIDLOCK_CUSTOM_THEME_VERSION 2
 #define GRIDLOCK_CUSTOM_THEME_SIZE    251
 #define GRIDLOCK_CUSTOM_COLORS_LEN 250
@@ -85,10 +85,7 @@
 
 #define GRIDLOCK_CLOCK_VERSION 3
 #define GRIDLOCK_CLOCK_SIZE    52
-// frozen size of the v1 clock blob, before hourly_vibe and week_start were appended.
-// min_versioned_size stays pinned here so an older short blob still short-reads and the
-// new fields keep their defaults
-#define GRIDLOCK_CLOCK_V1_SIZE 50
+// the first clock blob was 50 bytes, before hourly_vibe and week_start were appended
 
 #define GRIDLOCK_BLUETOOTH_VERSION 1
 #define GRIDLOCK_BLUETOOTH_SIZE    4
@@ -304,7 +301,7 @@ static const int16_t s_calendar_poll_min[] = {5, 10, 15, 20, 30, 60};
 
 // --- core (key 1) ---
 static const SettingField s_core_fields[] = {
-    KNOWN_THEME(offsetof(GridlockCore, theme), GRIDLOCK_THEME_COUNT),
+    KNOWN_THEME(offsetof(GridlockCore, theme), THEME_COUNT),
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT, .type = SETTING_CSTRING,
       .offset = offsetof(GridlockCore, layout), .size = sizeof(s_core.layout),
       .default_str = GRIDLOCK_DEFAULT_LAYOUT },
@@ -345,8 +342,8 @@ static const SettingField s_weather_fields[] = {
 
 // --- health (key 4) ---
 static const SettingField s_health_fields[] = {
-    KNOWN_STEPS_MODE(offsetof(GridlockHealth, steps_mode), STEPS_MODE_COUNT),
-    KNOWN_DISTANCE_UNIT(offsetof(GridlockHealth, distance_unit), DISTANCE_UNIT_COUNT),
+    KNOWN_STEPS_MODE(offsetof(GridlockHealth, steps_mode)),
+    KNOWN_DISTANCE_UNIT(offsetof(GridlockHealth, distance_unit)),
     FACE_ENUM(GridlockHealth, goal_steps, HEALTH_GOAL_STEPS, ARRAY_LENGTH(s_steps_goals), 2),
     FACE_ENUM(GridlockHealth, goal_calories, HEALTH_GOAL_CALORIES, ARRAY_LENGTH(s_cal_goals), 3),
     FACE_ENUM(GridlockHealth, goal_sleep, HEALTH_GOAL_SLEEP, ARRAY_LENGTH(s_sleep_goals_h), 2),
@@ -370,7 +367,7 @@ static const SettingField s_goal_vibe_fields[] = {
 
 // --- clock (key 5) ---
 static const SettingField s_clock_fields[] = {
-    KNOWN_DATE_FORMAT(offsetof(GridlockClock, date_format), "%a %b %d"),
+    KNOWN_DATE_FORMAT(offsetof(GridlockClock, date_format)),
     { .id = SETTING_TIME_FORMAT, .message_key = &MESSAGE_KEY_CLOCK_TIME_FORMAT,
       .type = SETTING_ENUM_U8, .offset = offsetof(GridlockClock, time_format),
       .enum_count = TIME_FORMAT_COUNT, .affects_layout = true, .default_num = 0 },
@@ -384,8 +381,8 @@ static const SettingField s_clock_fields[] = {
 // --- bluetooth (key 6) ---
 static const SettingField s_bluetooth_fields[] = {
     KNOWN_BLUETOOTH_ICON(offsetof(GridlockBluetooth, bluetooth_icon)),
-    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(GridlockBluetooth, vibe_connect), VIBE_COUNT),
-    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(GridlockBluetooth, vibe_disconnect), VIBE_COUNT),
+    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(GridlockBluetooth, vibe_connect)),
+    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(GridlockBluetooth, vibe_disconnect)),
 };
 
 // --- stocks (key 7) ---
@@ -446,9 +443,7 @@ static GridlockCustomFlags s_custom_flags;
 static const SettingsSchema s_calendar_schema = {
     .key = GRIDLOCK_CALENDAR_KEY,
     .version = GRIDLOCK_CALENDAR_VERSION,
-    .min_versioned_size = GRIDLOCK_CALENDAR_V1_SIZE,
-    .blob = &s_calendar,
-    .blob_size = SETTINGS_BLOB_SIZE(s_calendar),
+    SETTINGS_BLOB(s_calendar, 2),
     .fields = s_calendar_fields,
     .field_count = ARRAY_LENGTH(s_calendar_fields),
     .migrate = NULL,
@@ -457,9 +452,7 @@ static const SettingsSchema s_calendar_schema = {
 static const SettingsSchema s_analog_schema = {
     .key = GRIDLOCK_ANALOG_KEY,
     .version = GRIDLOCK_ANALOG_VERSION,
-    .min_versioned_size = GRIDLOCK_ANALOG_SIZE,
-    .blob = &s_analog,
-    .blob_size = SETTINGS_BLOB_SIZE(s_analog),
+    SETTINGS_BLOB(s_analog, 2),
     .fields = s_analog_fields,
     .field_count = ARRAY_LENGTH(s_analog_fields),
     .migrate = NULL,
@@ -469,9 +462,7 @@ static const SettingsSchema s_analog_schema = {
 static const SettingsSchema s_stocks_schema = {
     .key = GRIDLOCK_STOCKS_KEY,
     .version = GRIDLOCK_STOCKS_VERSION,
-    .min_versioned_size = GRIDLOCK_STOCKS_SIZE,
-    .blob = &s_stocks,
-    .blob_size = SETTINGS_BLOB_SIZE(s_stocks),
+    SETTINGS_BLOB(s_stocks, 2),
     .fields = s_stocks_fields,
     .field_count = ARRAY_LENGTH(s_stocks_fields),
     .migrate = NULL,
@@ -481,9 +472,7 @@ static const SettingsSchema s_stocks_schema = {
 static const SettingsSchema s_bluetooth_schema = {
     .key = GRIDLOCK_BLUETOOTH_KEY,
     .version = GRIDLOCK_BLUETOOTH_VERSION,
-    .min_versioned_size = GRIDLOCK_BLUETOOTH_SIZE,
-    .blob = &s_bluetooth,
-    .blob_size = SETTINGS_BLOB_SIZE(s_bluetooth),
+    SETTINGS_BLOB(s_bluetooth, 4),
     .fields = s_bluetooth_fields,
     .field_count = ARRAY_LENGTH(s_bluetooth_fields),
     .migrate = NULL,
@@ -493,9 +482,7 @@ static const SettingsSchema s_bluetooth_schema = {
 static const SettingsSchema s_clock_schema = {
     .key = GRIDLOCK_CLOCK_KEY,
     .version = GRIDLOCK_CLOCK_VERSION,
-    .min_versioned_size = GRIDLOCK_CLOCK_V1_SIZE,
-    .blob = &s_clock,
-    .blob_size = SETTINGS_BLOB_SIZE(s_clock),
+    SETTINGS_BLOB(s_clock, 50),
     .fields = s_clock_fields,
     .field_count = ARRAY_LENGTH(s_clock_fields),
     .migrate = NULL,
@@ -505,9 +492,7 @@ static const SettingsSchema s_clock_schema = {
 static const SettingsSchema s_health_schema = {
     .key = GRIDLOCK_HEALTH_KEY,
     .version = GRIDLOCK_HEALTH_VERSION,
-    .min_versioned_size = GRIDLOCK_HEALTH_V1_SIZE,
-    .blob = &s_health,
-    .blob_size = SETTINGS_BLOB_SIZE(s_health),
+    SETTINGS_BLOB(s_health, 9),
     .fields = s_health_fields,
     .field_count = ARRAY_LENGTH(s_health_fields),
     .migrate = NULL,
@@ -517,9 +502,7 @@ static const SettingsSchema s_health_schema = {
 static const SettingsSchema s_weather_schema = {
     .key = GRIDLOCK_WEATHER_KEY,
     .version = GRIDLOCK_WEATHER_VERSION,
-    .min_versioned_size = GRIDLOCK_WEATHER_SIZE,
-    .blob = &s_weather,
-    .blob_size = SETTINGS_BLOB_SIZE(s_weather),
+    SETTINGS_BLOB(s_weather, GRIDLOCK_WEATHER_SIZE),
     .fields = s_weather_fields,
     .field_count = ARRAY_LENGTH(s_weather_fields),
     .migrate = NULL,
@@ -531,9 +514,7 @@ static const SettingsSchema s_weather_schema = {
 static const SettingsSchema s_custom_flags_schema = {
     .key = GRIDLOCK_CUSTOM_FLAGS_KEY,
     .version = GRIDLOCK_CUSTOM_FLAGS_VERSION,
-    .min_versioned_size = GRIDLOCK_CUSTOM_FLAGS_SIZE,
-    .blob = &s_custom_flags,
-    .blob_size = SETTINGS_BLOB_SIZE(s_custom_flags),
+    SETTINGS_BLOB(s_custom_flags, 251),
     .fields = NULL,
     .field_count = 0,
     .migrate = NULL,
@@ -543,9 +524,7 @@ static const SettingsSchema s_custom_flags_schema = {
 static const SettingsSchema s_custom_theme_schema = {
     .key = GRIDLOCK_CUSTOM_THEME_KEY,
     .version = GRIDLOCK_CUSTOM_THEME_VERSION,
-    .min_versioned_size = GRIDLOCK_CUSTOM_THEME_SIZE,
-    .blob = &s_custom_theme,
-    .blob_size = SETTINGS_BLOB_SIZE(s_custom_theme),
+    SETTINGS_BLOB(s_custom_theme, 251),
     .fields = NULL,
     .field_count = 0,
     .migrate = NULL,
@@ -555,9 +534,7 @@ static const SettingsSchema s_custom_theme_schema = {
 static const SettingsSchema s_goal_vibe_schema = {
     .key = GRIDLOCK_GOAL_VIBE_KEY,
     .version = GRIDLOCK_GOAL_VIBE_VERSION,
-    .min_versioned_size = GRIDLOCK_GOAL_VIBE_SIZE,
-    .blob = &s_goal_vibe,
-    .blob_size = SETTINGS_BLOB_SIZE(s_goal_vibe),
+    SETTINGS_BLOB(s_goal_vibe, 187),
     .fields = s_goal_vibe_fields,
     .field_count = ARRAY_LENGTH(s_goal_vibe_fields),
     .migrate = NULL,
@@ -568,9 +545,7 @@ static const SettingsSchema s_goal_vibe_schema = {
 static const SettingsSchema s_quiet_schema = {
     .key = GRIDLOCK_QUIET_KEY,
     .version = GRIDLOCK_QUIET_VERSION,
-    .min_versioned_size = GRIDLOCK_QUIET_V1_SIZE,
-    .blob = &s_quiet,
-    .blob_size = SETTINGS_BLOB_SIZE(s_quiet),
+    SETTINGS_BLOB(s_quiet, 129),
     .fields = s_quiet_fields,
     .field_count = ARRAY_LENGTH(s_quiet_fields),
     .migrate = NULL,
@@ -583,9 +558,7 @@ static const SettingsSchema s_quiet_schema = {
 static const SettingsSchema s_night_schema = {
     .key = GRIDLOCK_NIGHT_KEY,
     .version = GRIDLOCK_NIGHT_VERSION,
-    .min_versioned_size = GRIDLOCK_NIGHT_V1_SIZE,
-    .blob = &s_night,
-    .blob_size = SETTINGS_BLOB_SIZE(s_night),
+    SETTINGS_BLOB(s_night, 132),
     .fields = s_night_fields,
     .field_count = ARRAY_LENGTH(s_night_fields),
     .migrate = NULL,
@@ -595,9 +568,7 @@ static const SettingsSchema s_night_schema = {
 static const SettingsSchema s_core_schema = {
     .key = GRIDLOCK_CORE_KEY,
     .version = GRIDLOCK_CORE_VERSION,
-    .min_versioned_size = GRIDLOCK_CORE_V1_SIZE,
-    .blob = &s_core,
-    .blob_size = SETTINGS_BLOB_SIZE(s_core),
+    SETTINGS_BLOB(s_core, 130),
     .fields = s_core_fields,
     .field_count = ARRAY_LENGTH(s_core_fields),
     .migrate = NULL,

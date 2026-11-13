@@ -6,7 +6,7 @@
  * one is the day layout, one takes over after dark, one takes over while Quiet Time is on. Only
  * the assigned ones reach the watch.
  *
- * Everything except those two lives in the hidden gl-store input on the page, so Clay saves it to
+ * Everything except those two lives in the pf-hidden-store input on the page, so Clay saves it to
  * the phone and seeds it back next time. The config webview blocks its own localStorage, which is
  * why the store is an input rather than something sensible.
  *
@@ -72,8 +72,8 @@ function clampIndex(value: unknown, fallback: number): number {
 
 /** The library's own store input, or null when the page has none. */
 function storeInput(): HTMLInputElement | null {
-  // by its own class, not .gl-store: the night layout is a hidden store too, and a plain
-  // .gl-store lookup would keep finding whichever of the two Clay rendered first
+  // by its own class, not .pf-hidden-store: the night layout is a hidden store too, and a plain
+  // .pf-hidden-store lookup would keep finding whichever of the two Clay rendered first
   return document.querySelector('.gl-library');
 }
 

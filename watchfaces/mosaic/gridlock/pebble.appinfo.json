@@ -2,8 +2,6 @@
   "displayName": "Gridlock",
   "version": "1.8.0",
   "uuid": "85ee3144-1c42-486a-b2a4-a74a1efaeb69",
-  "sdkVersion": "3",
-  "enableMultiJS": true,
   "targetPlatforms": [
     "emery"
   ],
@@ -27,13 +25,9 @@
     }
   },
   "messageKeys": [
-    "WEATHER_TEMPERATURE",
-    "WEATHER_CONDITIONS",
     "WEATHER_CONDITION_LABEL",
-    "WEATHER_REQUEST",
     "SETTINGS_REQUEST",
     "SETTINGS_FRESH",
-    "WEATHER_OK",
     "WEATHER_HUMIDITY",
     "WEATHER_WIND_SPEED",
     "WEATHER_WIND_DIR",

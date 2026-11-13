@@ -9,7 +9,7 @@
  */
 
 import type { ClayConfigItem } from '../../paf/ts/clay/types';
-import { select, heading } from '../../paf/ts/pkjs/config-rows';
+import { select, heading, WIND_UNIT_OPTIONS } from '../../paf/ts/pkjs/config-rows';
 
 /**
  * The whole section, ready to drop into the page.
@@ -25,12 +25,7 @@ export function weatherSection(): ClayConfigItem {
         { label: 'Celsius (°C)', value: 0 },
         { label: 'Fahrenheit (°F)', value: 1 },
       ], 0),
-      select('WEATHER_WIND_UNIT', 'Wind Speed Unit', [
-        { label: 'Kilometers/hour (km/h)', value: 0 },
-        { label: 'Miles/hour (mph)', value: 1 },
-        { label: 'Knots (kts)', value: 2 },
-        { label: 'Meters/second (m/s)', value: 3 },
-      ], 0),
+      select('WEATHER_WIND_UNIT', 'Wind Speed Unit', WIND_UNIT_OPTIONS, 0),
       select('WEATHER_PROVIDER', 'Data Source', [
         { label: 'Open-Meteo (Free, No Key Required)', value: 'openmeteo' },
         { label: 'OpenWeatherMap', value: 'owm' },

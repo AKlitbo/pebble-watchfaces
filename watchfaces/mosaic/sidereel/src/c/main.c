@@ -13,7 +13,6 @@
 #include "dev/dev.h"
 #include "io/appmessage/appmessage.h"
 #include "io/stores/health_store.h"
-#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
@@ -28,10 +27,6 @@
 #include "theme/custom_colors.h"
 #include "ui/engine/engine.h"
 
-// weather polls the phone this often. the reconnect catch-up reuses it as the staleness gate so
-// the two cadences can never drift apart
-#define WEATHER_POLL_MIN 30
-
 static Window *s_window;
 
 /**
@@ -43,7 +38,7 @@ static Window *s_window;
 static TimeConfig time_cfg(void)
 {
     return (TimeConfig){
-        .live = !DEV_MODE,  // a dev build keeps the clock its fixture pinned
+        .live = true,
         .minute_tick = true,
         .beats = false,
     };
@@ -101,19 +96,6 @@ static void on_system_changed(void)
     engine_mark_dirty_tags(TAG_SYSTEM | TAG_CHROME);
 }
 
-/**
- * @brief The phone app just reconnected, so catch up a reading that went stale while it was away.
- *
- * Gating on age means bluetooth flapping cannot re-fetch faster than the normal cadence.
- */
-static void on_phone_reconnected(void)
-{
-    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
-    {
-        appmessage_request_weather();
-    }
-}
-
 static void init(void)
 {
     settings_init(sidereel_settings_schema());
@@ -131,7 +113,7 @@ static void init(void)
                                          .hr_history = HEALTH_HR_HISTORY, .step_history = HEALTH_STEP_HISTORY, .distance = true,
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
-        weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN,
+        weather_store_init((WeatherConfig){.live = true, .poll_min = 30,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
     }
 
@@ -157,7 +139,6 @@ static void init(void)
     health_store_subscribe(on_health_changed);
     weather_store_subscribe(on_weather_changed);
     system_store_subscribe(on_system_changed);
-    system_store_on_reconnect(on_phone_reconnected);
 
     // weather_store owns its channel. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

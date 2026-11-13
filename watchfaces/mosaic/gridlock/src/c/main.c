@@ -12,7 +12,6 @@
 #include "io/stores/stock_store.h"
 #include "io/stores/calendar_store.h"
 #include "io/stores/health_store.h"
-#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "ui/fonts.h"
 #include "draw/fonts.h"
@@ -38,10 +37,6 @@ static Window *s_window;
 static const char GRIDLOCK_NOTICE[] =
     "Required Notice: Copyright (c) 2026 Andrew Klitbo. "
     "PolyForm Noncommercial 1.0.0.";
-
-// weather polls the phone this often. the reconnect catch-up reuses it as the staleness gate so
-// the two never drift
-#define WEATHER_POLL_MIN 30
 
 // how often the watch takes a burst of beat gaps for the HRV panel. each burst also reads the heart
 // rate, so this is a battery cost on top of the watch's own heart rate sampling
@@ -86,7 +81,8 @@ static bool hrv_keep_all(void)
 /** @brief Hands the health store the wearer's HRV settings and what the placed panels need. */
 static void apply_hrv_rules(void)
 {
-    health_store_set_hrv_rules((uint16_t)gridlock_hrv_still_mg(), (uint16_t)gridlock_hrv_walk_steps(),
+    // a settle count of 0 leaves the sensor's settling to the framework's own count
+    health_store_set_hrv_rules((uint16_t)gridlock_hrv_still_mg(), (uint16_t)gridlock_hrv_walk_steps(), 0,
                                (HrvCount)gridlock_hrv_count(), hrv_keep_all(), gridlock_has_module_either(MOD_HEALTH_HRV_TUNING));
 }
 
@@ -156,16 +152,11 @@ static void on_settings_changed(bool time_or_date_changed)
     engine_rebuild();
 
     // the stock and calendar poll intervals may have changed, so move each next poll onto the new one
-    // a dev build leaves its seeded stores alone, since starting them live here would fetch real
-    // quotes and agendas over the fixture
-    if (!DEV_MODE)
-    {
-        stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
-        calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
-        // an HRV panel may have been placed or taken off, which turns the sampling on or off
-        apply_hrv_rules();
-        health_store_set_hrv_period(hrv_period());
-    }
+    stock_store_reconfigure((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min()});
+    calendar_store_reconfigure((CalendarConfig){.live = true, .poll_min = gridlock_calendar_poll_min()});
+    // an HRV panel may have been placed or taken off, which turns the sampling on or off
+    apply_hrv_rules();
+    health_store_set_hrv_period(hrv_period());
 }
 
 // buzz for an upcoming calendar event. only runs when a Calendar panel is on the layout so a face
@@ -243,27 +234,6 @@ static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR)
 static void on_health_changed(void)  { goal_vibe_update(); engine_mark_dirty_tags(FEATURE_HEALTH); }
 static void on_system_changed(void)  { engine_mark_dirty_tags(FEATURE_SYSTEM); }
 
-// the phone app just reconnected. its pkjs may have been closed while away, so catch up any
-// readout that went stale during the gap rather than waiting out the poll (weather is 30 min).
-// gating on age means bluetooth flapping cannot re-fetch faster than the normal cadence, so a
-// metered weather/stock api is never overshot. keys this face lacks are compile-time no-ops and
-// the outbox nack/retry wakes an asleep pkjs
-static void on_phone_reconnected(void)
-{
-    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
-    {
-        appmessage_request_weather();
-    }
-    if (store_poll_reconnect_due(stock_store_age_s(), gridlock_stock_poll_min()))
-    {
-        appmessage_request_stock();
-    }
-    if (store_poll_reconnect_due(calendar_store_age_s(), gridlock_calendar_poll_min()))
-    {
-        appmessage_request_calendar();
-    }
-}
-
 static void init(void)
 {
     settings_init(gridlock_settings_schema());
@@ -300,7 +270,7 @@ static void init(void)
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick
         time_store_init((TimeConfig){.live = true, .minute_tick = true, .beats = false}, NULL);
-        weather_store_init((WeatherConfig){.live = true, .poll_min = WEATHER_POLL_MIN, .persist_key = WEATHER_STORE_KEY}, NULL);
+        weather_store_init((WeatherConfig){.live = true, .poll_min = 30, .persist_key = WEATHER_STORE_KEY}, NULL);
         // the poll interval comes from the config (Finnhub only, see the Clay note)
         stock_store_init((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min(), .persist_key = STOCK_STORE_KEY}, NULL);
         // the calendar polls the phone for a fresh agenda on its own interval, same as stocks
@@ -326,7 +296,6 @@ static void init(void)
     calendar_store_subscribe(on_calendar_changed);
     health_store_subscribe(on_health_changed);
     system_store_subscribe(on_system_changed);
-    system_store_on_reconnect(on_phone_reconnected);
 
     // the stores own their channels + poll. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

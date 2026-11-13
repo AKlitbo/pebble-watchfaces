@@ -59,7 +59,8 @@
  * @brief sidereel's persisted settings.
  *
  * Version 1 carries every field, so there is no older layout to bring forward. Fields only ever
- * get added to the end from here.
+ * get added to the end from here. The schema's first size stays at the 146 bytes the first release
+ * saved, so a save from before an append still loads with the new field on its default.
  */
 typedef struct SidereelSettings
 {
@@ -172,14 +173,14 @@ static const int16_t s_dist_goals_m[]  = {2000, 3000, 5000, 8000, 10000, 15000, 
 static const SettingField s_fields[] = {
     KNOWN_THEME(offsetof(SidereelSettings, theme), THEME_COUNT),
     KNOWN_TEMPERATURE_UNIT(offsetof(SidereelSettings, temperature_unit)),
-    KNOWN_DATE_FORMAT(offsetof(SidereelSettings, date_format), "%b %d"),
-    KNOWN_STEPS_MODE(offsetof(SidereelSettings, steps_mode), STEPS_MODE_COUNT),
-    KNOWN_TIME_FORMAT(offsetof(SidereelSettings, time_format), TIME_FORMAT_COUNT),
-    KNOWN_HOURLY_VIBE(offsetof(SidereelSettings, hourly_vibe), VIBE_COUNT),
+    KNOWN_DATE_FORMAT(offsetof(SidereelSettings, date_format)),
+    KNOWN_STEPS_MODE(offsetof(SidereelSettings, steps_mode)),
+    KNOWN_TIME_FORMAT(offsetof(SidereelSettings, time_format)),
+    KNOWN_HOURLY_VIBE(offsetof(SidereelSettings, hourly_vibe)),
     KNOWN_BLUETOOTH_ICON(offsetof(SidereelSettings, bluetooth_icon)),
     KNOWN_QUIET_TIME_ICON(offsetof(SidereelSettings, quiet_time_icon)),
-    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(SidereelSettings, vibe_connect), VIBE_COUNT),
-    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(SidereelSettings, vibe_disconnect), VIBE_COUNT),
+    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(SidereelSettings, vibe_connect)),
+    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(SidereelSettings, vibe_disconnect)),
 
     // the whole panel layout rides one string the drag builder writes, so a placement is a
     // block with its own row and height rather than a fixed slot with a size flag beside it
@@ -194,14 +195,14 @@ static const SettingField s_fields[] = {
 
     // the goals every health panel measures against, and the units and week start the shared
     // panel bodies read. defaults match gridlock's so a panel reads the same on either face
-    KNOWN_DISTANCE_UNIT(offsetof(SidereelSettings, distance_unit), DISTANCE_UNIT_COUNT),
+    KNOWN_DISTANCE_UNIT(offsetof(SidereelSettings, distance_unit)),
     FACE_ENUM(goal_steps,    HEALTH_GOAL_STEPS,    ARRAY_LENGTH(s_steps_goals),   2),
     FACE_ENUM(goal_calories, HEALTH_GOAL_CALORIES, ARRAY_LENGTH(s_cal_goals),     3),
     FACE_ENUM(goal_sleep,    HEALTH_GOAL_SLEEP,    ARRAY_LENGTH(s_sleep_goals_h), 2),
     FACE_ENUM(goal_active,   HEALTH_GOAL_ACTIVE,   ARRAY_LENGTH(s_active_goals),  1),
     FACE_ENUM(goal_hr,       HEALTH_GOAL_HR,       ARRAY_LENGTH(s_hr_limits),     3),
     FACE_ENUM(goal_distance, HEALTH_GOAL_DISTANCE, ARRAY_LENGTH(s_dist_goals_m),  2),
-    FACE_ENUM(wind_unit,     WEATHER_WIND_UNIT,    4, 0),
+    KNOWN_WIND_UNIT(offsetof(SidereelSettings, wind_unit)),
     FACE_ENUM(week_start,    CLOCK_WEEK_START,     2, 0),
 
     // how the face is framed. the header font is the catalogue's entry, so panel.c reads it with
@@ -257,9 +258,7 @@ static const SettingField s_quiet_fields[] = {
 static const SettingsSchema s_goal_vibe_schema = {
     .key = SIDEREEL_GOAL_VIBE_KEY,
     .version = SIDEREEL_GOAL_VIBE_VERSION,
-    .min_versioned_size = SIDEREEL_GOAL_VIBE_SIZE,
-    .blob = &s_goal_vibe,
-    .blob_size = SETTINGS_BLOB_SIZE(s_goal_vibe),
+    SETTINGS_BLOB(s_goal_vibe, 187),
     .fields = s_goal_vibe_fields,
     .field_count = ARRAY_LENGTH(s_goal_vibe_fields),
     .migrate = NULL,
@@ -272,9 +271,7 @@ static const SettingsSchema s_goal_vibe_schema = {
 static const SettingsSchema s_quiet_schema = {
     .key = SIDEREEL_QUIET_KEY,
     .version = SIDEREEL_QUIET_VERSION,
-    .min_versioned_size = SIDEREEL_QUIET_SIZE,
-    .blob = &s_quiet,
-    .blob_size = SETTINGS_BLOB_SIZE(s_quiet),
+    SETTINGS_BLOB(s_quiet, 65),
     .fields = s_quiet_fields,
     .field_count = ARRAY_LENGTH(s_quiet_fields),
     .migrate = NULL,
@@ -284,9 +281,7 @@ static const SettingsSchema s_quiet_schema = {
 static const SettingsSchema s_night_schema = {
     .key = SIDEREEL_NIGHT_KEY,
     .version = SIDEREEL_NIGHT_VERSION,
-    .min_versioned_size = SIDEREEL_NIGHT_SIZE,
-    .blob = &s_night,
-    .blob_size = SETTINGS_BLOB_SIZE(s_night),
+    SETTINGS_BLOB(s_night, 68),
     .fields = s_night_fields,
     .field_count = ARRAY_LENGTH(s_night_fields),
     .migrate = NULL,
@@ -296,11 +291,7 @@ static const SettingsSchema s_night_schema = {
 static const SettingsSchema s_schema = {
     .key = SIDEREEL_SETTINGS_KEY,
     .version = SIDEREEL_SETTINGS_VERSION,
-    // sidereel is unshipped so its v1 is the current struct. once it ships freeze this to a
-    // literal byte count and bump the version on any further field append
-    .min_versioned_size = sizeof(SidereelSettings),
-    .blob = &s_settings,
-    .blob_size = SETTINGS_BLOB_SIZE(s_settings),
+    SETTINGS_BLOB(s_settings, 146),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,  // v1 is the only shape a stored blob can have, so nothing to bring forward

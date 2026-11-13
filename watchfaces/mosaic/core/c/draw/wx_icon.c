@@ -14,7 +14,7 @@ static char s_cached[32];
 GBitmap *wx_icon_get(IconMargins *margin)
 {
     const char *cond = weather_store_cond();
-    if (!cond[0] || !strcmp(cond, "--"))
+    if (!cond[0])
     {
         // no real condition (e.g. a failed fetch cleared the hub). drop any stale picture
         // so a module doesn't draw the last weather's icon next to a "--" readout

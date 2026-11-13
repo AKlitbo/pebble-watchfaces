@@ -4,21 +4,15 @@
   "version": "1.5.0",
   "watchface": true,
   "uuid": "c8d3a53e-3ca1-4fb5-8a0a-af7c5fba781c",
-  "sdkVersion": "3",
-  "enableMultiJS": true,
   "targetPlatforms": [
     "emery"
   ],
   "capabilities": [
-    "location",
-    "configurable",
     "health"
   ],
   "messageKeys": [
     "SETTINGS_REQUEST",
     "SETTINGS_FRESH",
-    "WEATHER_REQUEST",
-    "WEATHER_OK",
     "APPEARANCE_THEME",
     "APPEARANCE_QUIET_TIME_ICON",
     "APPEARANCE_CUSTOM_COLORS",
@@ -44,9 +38,7 @@
     "LOCATION_GPS_FALLBACK",
     "WEATHER_PROVIDER",
     "WEATHER_API_KEY",
-    "WEATHER_TEMPERATURE",
     "WEATHER_TEMPERATURE_UNIT",
-    "WEATHER_CONDITIONS",
     "WEATHER_CONDITION_LABEL",
     "WEATHER_HUMIDITY",
     "WEATHER_WIND_SPEED",

@@ -31,14 +31,14 @@ function mountLayout() {
  * The hidden stores the config page renders beside the builder.
  *
  * The library keeps every layout, and the night and quiet ones carry whichever is assigned to
- * them. They are separate inputs because a single .gl-store lookup would keep finding the first.
+ * them. They are separate inputs because a single .pf-hidden-store lookup would keep finding the first.
  */
 function mountStores(): { library: HTMLInputElement; night: HTMLInputElement; quiet: HTMLInputElement } {
   function input(extra: string): HTMLInputElement {
     const element = document.createElement('input');
 
     element.type = 'hidden';
-    element.className = 'gl-store ' + extra;
+    element.className = 'pf-hidden-store ' + extra;
     document.body.appendChild(element);
     return element;
   }

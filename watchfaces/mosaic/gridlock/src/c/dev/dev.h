@@ -1,8 +1,8 @@
 /**
  * @file dev.h
- * @brief The dev mode switch and its hooks. DEV_MODE is 0 for any build you ship, and the hooks
- * are static inline so a release build leaves no dev symbol at all. main.c calls them straight,
- * with no preprocessor branch anywhere in it.
+ * @brief The dev hooks. The build sets DEV_MODE, 1 with paf build gridlock --dev and 0 otherwise,
+ * and the hooks are static inline so a release build leaves no dev symbol at all. main.c calls them
+ * straight, with no preprocessor branch anywhere in it.
  *
  * The screenshot harness that fills these in is not kept in the repo. It builds its own layouts to
  * walk the modules, the store layouts and the starter presets, which is a lot of machinery for
@@ -17,10 +17,6 @@
  * @addtogroup gridlock_dev
  * @{
  */
-
-// === master switch ===
-// keep this 0 for any build you ship
-#define DEV_MODE 0
 
 /**
  * @brief Applies the theme, clock and tap-mode overrides into the settings structs.

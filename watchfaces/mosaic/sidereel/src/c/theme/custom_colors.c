@@ -67,9 +67,7 @@ static bool s_parsed;
 const SettingsSchema sidereel_custom_flags_schema = {
     .key = SIDEREEL_CUSTOM_FLAGS_KEY,
     .version = 1,
-    .min_versioned_size = sizeof(SidereelCustomFlags),
-    .blob = &s_flags_blob,
-    .blob_size = SETTINGS_BLOB_SIZE(s_flags_blob),
+    SETTINGS_BLOB(s_flags_blob, 161),
     .fields = NULL,
     .field_count = 0,
     .migrate = NULL,
@@ -79,9 +77,7 @@ const SettingsSchema sidereel_custom_flags_schema = {
 const SettingsSchema sidereel_custom_theme_schema = {
     .key = SIDEREEL_CUSTOM_THEME_KEY,
     .version = 1,
-    .min_versioned_size = sizeof(SidereelCustomTheme),
-    .blob = &s_theme,
-    .blob_size = SETTINGS_BLOB_SIZE(s_theme),
+    SETTINGS_BLOB(s_theme, 251),
     .fields = NULL,
     .field_count = 0,
     .migrate = NULL,
