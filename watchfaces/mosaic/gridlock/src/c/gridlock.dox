@@ -36,8 +36,8 @@
  * @defgroup gridlock_dev Dev Tools
  * @ingroup gridlock
  *
- * Development-only helpers, like the tap cycle that previews layouts and styles. Off in a
- * normal build.
+ * The hooks the dev plugin's walks call to show one panel or one whole layout, with the rest of a
+ * dev build laid out in the family's paf.dev.config.json. Only a dev build compiles them.
  */
 
 /**

@@ -165,12 +165,10 @@ static void load_fonts(void)
 }
 
 /**
- * @brief Redraws after the settings change.
- *
- * @param time_or_date_changed True if a time or date format changed (unused: a rebuild
- * re-pulls every readout anyway).
+ * @brief Settles what a settings change moves outside the cells: which layout wins, the window
+ * background, and the header font. The dev walks run it after each step, before they rebuild.
  */
-static void on_settings_changed(bool time_or_date_changed)
+static void apply_look(void)
 {
     // a layout or its trigger may have changed, so settle the role before the rebuild reads it
     layout_switch_settings_changed();
@@ -179,6 +177,17 @@ static void on_settings_changed(bool time_or_date_changed)
     // changed so swap it (a no-op when unchanged) before rebuilding the cells
     window_set_background_color(s_window, theme_background(settings_u8(SETTING_THEME)));
     apply_header_font();
+}
+
+/**
+ * @brief Redraws after the settings change.
+ *
+ * @param time_or_date_changed True if a time or date format changed (unused: a rebuild
+ * re-pulls every readout anyway).
+ */
+static void on_settings_changed(bool time_or_date_changed)
+{
+    apply_look();
     engine_rebuild();
 
     // the stock and calendar poll intervals may have changed, so move each next poll onto the new one
@@ -274,11 +283,9 @@ static void init(void)
     // start with a clean goal-vibe slate before the first health reading can land
     goal_vibe_init();
 
-    // settings overrides only. must run before the stores and engine come up
-    dev_apply_overrides();
-
-    // each store owns its own source. init starts it (live) or seeds it. dev mode seeds every
-    // store from a fixed fixture (live=false) for deterministic screenshots
+    // each store owns its own source. init starts it (live) or seeds it. dev mode applies the
+    // settings paf.dev.config.json gives, then seeds every store (live=false) for deterministic
+    // screenshots, so it runs before the stores and the engine come up
     s_stores_seeded = dev_seed_stores();
     if (!s_stores_seeded)
     {
@@ -345,12 +352,12 @@ static void init(void)
     appmessage_request_weather();
 #endif
 
-    dev_taps_init(s_window);
+    dev_start(apply_look);
 }
 
 static void deinit(void)
 {
-    dev_taps_deinit();
+    dev_stop();
     // the watch keeps the HRV request going for an hour after the face closes, so stop it here
     health_store_deinit();
     system_store_deinit();

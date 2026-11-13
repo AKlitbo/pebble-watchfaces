@@ -1,1 +1,636 @@
-{ "faces": { "gridlock": { "walk": "modules", "clock": "20:42" } } }
+{
+  "faces": {
+    "gridlock": {
+      "walk": "thumbnails",
+      "clock": "20:42",
+      "date": "2026-07-13",
+      "settings": {
+        "APPEARANCE_THEME": 1,
+        "CLOCK_TIME_FORMAT": 1,
+        "WEATHER_TEMPERATURE_UNIT": 1,
+        "CLOCK_TIMEZONE_1": "0,Time Zone 1",
+        "LAYOUT_NIGHT_MODE": 0
+      },
+      "stores": {
+        "weather": {
+          "temp": 105,
+          "cond": "CLDY",
+          "humidity": 31,
+          "windKmh": 12,
+          "windDir": "NW",
+          "sunrise": "05:30",
+          "sunset": "19:40",
+          "uv": 8,
+          "tempMax": 110,
+          "tempMin": 78,
+          "precipChance": 20,
+          "feelsLike": 112,
+          "pressure": 1008,
+          "dewPoint": 54,
+          "hourly": {
+            "from": 9,
+            "every": 2,
+            "columns": [
+              ["CLEAR", 90],
+              ["PCLDY", 104],
+              ["RAIN", 101],
+              ["STRM", 95],
+              ["CLDY", 98],
+              ["CLEAR", 92],
+              ["CLEAR_NIGHT", 88],
+              ["PCLDY_NIGHT", 85]
+            ]
+          },
+          "daily": {
+            "from": "sat",
+            "columns": [
+              ["CLEAR", 110, 78],
+              ["PCLDY", 108, 80],
+              ["CLDY", 99, 74],
+              ["RAIN", 92, 70],
+              ["CLEAR", 101, 72],
+              ["STRM", 97, 71],
+              ["PCLDY", 105, 79],
+              ["CLDY", 100, 73]
+            ]
+          }
+        },
+        "health": {
+          "hr": 92,
+          "steps": 8423,
+          "calories": 540,
+          "sleepMin": 437,
+          "activeMin": 52,
+          "distanceM": 6064,
+          "hrvMs": 41,
+          "hrHistory": [
+            103, 102, 100, 99, 98, 97, 96, 95, 94, 94, 93, 93, 92, 91, 90, 92, 93, 95, 94, 92, 90, 89, 88, 87, 86, 88,
+            90, 91, 93, 92, 90, 89, 91, 93, 94, 92, 91, 90, 92, 93, 94, 95, 97, 96, 95, 93, 92, 91, 90, 89, 90, 92, 93,
+            91, 90, 89, 90, 91, 93, 92
+          ],
+          "stepHourly": [
+            0, 0, 0, 0, 0, 40, 320, 850, 640, 410, 380, 520, 910, 700, 360, 300, 340, 780, 1120, 640, 480, 300, 120, 20
+          ],
+          "hrDay": [
+            [84, 86, 87, 85, 89, 85],
+            [84, 86, 87, 85, 89, 85],
+            [85, 87, 88, 86, 90, 86],
+            [85, 87, 88, 86, 90, 86],
+            [84, 86, 87, 85, 89, 85],
+            [86, 88, 89, 87, 91, 87],
+            [88, 90, 91, 89, 93, 89],
+            [90, 92, 93, 91, 95, 91],
+            [97, 99, 100, 98, 102, 98],
+            [93, 95, 96, 94, 98, 94],
+            [91, 93, 94, 92, 96, 92],
+            [92, 94, 95, 93, 97, 93],
+            [97, 99, 100, 98, 102, 98],
+            [94, 96, 97, 95, 99, 95],
+            [92, 94, 95, 93, 97, 93],
+            [91, 93, 94, 92, 96, 92],
+            [93, 95, 96, 94, 98, 94],
+            [95, 97, 98, 96, 100, 96],
+            [96, 98, 99, 97, 101, 97],
+            [102, 104, 105, 103, 107, 103],
+            [92, 94, 95, 93, 97, 93]
+          ],
+          "hrvLog": [
+            {
+              "from": "00:00",
+              "ms": [52, 54, 51, 56, 50, 53, 52, 49, 54, 51, 53, 50],
+              "state": "still",
+              "asleep": true
+            },
+            {
+              "from": "01:00",
+              "ms": [56, 58, 55, 60, 54, 57, 56, 53, 58, 55, 57, 54],
+              "state": "still",
+              "asleep": true
+            },
+            {
+              "from": "02:00",
+              "ms": [58, 60, 57, 62, 56, 59, 58, 55, 60, 57, 59, 56],
+              "state": "still",
+              "asleep": true
+            },
+            {
+              "from": "03:00",
+              "ms": [55, 57, 54, 59, 53, 56, 55, 52, 57, 54, 56, 53],
+              "state": "still",
+              "asleep": true
+            },
+            {
+              "from": "04:00",
+              "ms": [53, 55, 52, 57, 51, 54, 53, 50, 55, 52, 54, 51],
+              "state": "still",
+              "asleep": true
+            },
+            {
+              "from": "05:00",
+              "ms": [49, 51, 48, 53, 47, 50, 49, 46, 51, 48, 50, 47],
+              "state": "still",
+              "asleep": true
+            },
+            {
+              "from": "06:00",
+              "ms": [45, 47, 44, 49, 43, 46, 45, 42, 47, 44, 46, 43],
+              "state": "still",
+              "asleep": true
+            },
+            { "from": "07:00", "ms": [37, 39, 36, 41, 35, 38, 37, 34, 39, 36, 38, 35], "state": "still" },
+            {
+              "from": "08:00",
+              "ms": [31, 33, 30, 24, 26, 23, 27, 28, 33, 30, 32, 29],
+              "state": [
+                "still",
+                "still",
+                "still",
+                "walking",
+                "walking",
+                "walking",
+                "walking",
+                "still",
+                "still",
+                "still",
+                "still",
+                "still"
+              ]
+            },
+            {
+              "from": "09:00",
+              "ms": [29, 31, 28, 33, 27, 30, 29, 26, 31, 28, 30, 27],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "10:00",
+              "ms": [32, 34, 31, 36, 30, 33, 32, 29, 34, 31, 33, 30],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "11:00",
+              "ms": [34, 36, 33, 38, 32, 35, 34, 31, 36, 33, 35, 32],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "12:00",
+              "ms": [28, 30, 27, 32, 25, 23, 27, 24, 30, 27, 29, 26],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "walking",
+                "walking",
+                "walking",
+                "walking",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "13:00",
+              "ms": [25, 27, 24, 29, 23, 26, 25, 22, 27, 24, 26, 23],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "14:00",
+              "ms": [24, 26, 23, 28, 22, 25, 24, 21, 26, 23, 25, 22],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "15:00",
+              "ms": [27, 29, 26, 31, 25, 28, 27, 24, 29, 26, 28, 25],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "16:00",
+              "ms": [30, 32, 29, 34, 28, 31, 30, 27, 32, 29, 31, 28],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            {
+              "from": "17:00",
+              "ms": [32, 34, 31, 36, 30, 33, 32, 29, 34, 31, 33, 30],
+              "state": [
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "busy"
+              ]
+            },
+            { "from": "18:00", "ms": [29, 31, 28, 33, 27, 30, 29, 26, 31], "state": "still" },
+            {
+              "from": "18:45",
+              "ms": [28, 25, 31, 27, 24, 26, 28, 26, 25, 23, 24, 22, 27, 31, 29, 33, 30, 35, 36, 38, 34, 43, 29, 41],
+              "state": [
+                "busy",
+                "busy",
+                "still",
+                "busy",
+                "busy",
+                "busy",
+                "walking",
+                "walking",
+                "walking",
+                "walking",
+                "walking",
+                "walking",
+                "busy",
+                "still",
+                "busy",
+                "still",
+                "busy",
+                "still",
+                "still",
+                "still",
+                "busy",
+                "still",
+                "walking",
+                "still"
+              ]
+            }
+          ]
+        },
+        "system": { "battery": 80, "charging": false, "bluetooth": true, "alarmIn": 442 },
+        "phone": { "battery": 84 },
+        "stocks": [
+          { "symbol": "NVDA", "price": 1180.0, "change": 3.4 },
+          { "symbol": "NFLX", "price": 890.55, "change": -0.8 },
+          { "symbol": "F", "price": 11.92, "change": 2.15 },
+          { "symbol": "SOFI", "price": 8.45, "change": -1.2 }
+        ],
+        "calendar": [
+          { "title": "Quick sync", "inMinutes": 60, "minutes": 20 },
+          { "title": "Dentist", "location": "Downtown", "inMinutes": 1440, "minutes": 60 },
+          { "title": "Mom's Birthday", "allDay": true, "inDays": 3 },
+          { "title": "Conference", "location": "SF", "inMinutes": 7200, "minutes": 90 }
+        ]
+      },
+      "walks": {
+        "thumbnails": { "panels": "all" },
+        "phone": { "panels": { "1x2": ["phone-battery", "battery-battery"], "2x2": ["phone-battery"] } },
+        "presets": {
+          "steps": [
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "2,0,0,2,2;12,0,2,2,1;13,1,2,2,1;1,2,0,4,1;3,3,0,2,2;6,3,2,2,2"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "2,0,0,2,1;18,0,2,2,1;5,1,0,2,2;6,1,2,2,2;9,3,0,2,2;7,3,2,2,2"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "17,0,0,2,1;28,0,2,2,2;18,1,0,2,1;25,2,0,4,1;22,3,0,2,1;21,3,2,2,1;11,4,0,2,1;23,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "3,0,0,2,2;12,0,2,2,1;10,1,2,2,1;1,2,0,4,1;6,3,0,2,1;5,4,0,2,1;11,3,2,2,1;13,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "2,0,0,2,1;5,0,2,2,1;1,1,0,4,1;9,2,0,2,1;6,2,2,2,1;8,3,0,2,2;28,3,2,2,2"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "52,0,0,2,1;17,0,2,2,1;18,1,0,2,1;19,1,2,2,1;3,2,0,2,2;28,2,2,2,2;6,4,0,2,1;5,4,2,2,1"
+            }
+          ]
+        },
+        "store": {
+          "steps": [
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
+            },
+            { "settings": { "APPEARANCE_THEME": 0 }, "layout": "55,0,0,4,2;17,2,0,2,1;4,2,2,2,1;6,3,0,2,2;3,3,2,2,2" },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "20,0,0,2,2;17,0,2,2,1;18,1,2,2,1;3,2,0,2,2;5,2,2,2,2;6,4,0,2,1;2,4,2,2,1~4|UgARQASQADgAFgAGQACQA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "27,0,0,4,1;3,1,0,2,2;15,1,2,2,2;22,3,0,2,1;10,3,2,2,1;11,4,0,2,1;23,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "32,0,0,2,2;39,0,2,2,2;9,2,0,2,2;7,2,2,2,2;24,4,0,2,1;5,4,2,2,1~4|gCAnCAJCAHCAYBAFBA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 0 },
+              "layout": "41,0,0,4,2;40,2,0,4,1;1,3,0,4,1;17,4,0,2,1;18,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 3 },
+              "layout": "30,0,0,4,2;29,2,0,2,2;18,2,2,2,1;17,3,2,2,1;2,4,0,2,1;31,4,2,2,1"
+            },
+            { "settings": { "APPEARANCE_THEME": 0 }, "layout": "55,1,0,4,2;2,4,0,2,1;52,4,2,2,1~4|3ICCRA0RA" },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "28,0,0,2,2;33,0,2,2,2;12,2,0,2,1;13,2,2,2,1;14,3,0,2,2;21,3,2,2,1;48,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 0 },
+              "layout": "18,0,0,2,1;17,0,2,2,1;4,1,0,2,1;10,1,2,2,1;5,2,0,2,1;6,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "26,0,0,4,2;25,2,0,4,1;3,3,0,2,2;22,3,2,2,1;21,4,2,2,1~4|aACZABDgAWQAVQA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 3 },
+              "layout": "16,0,0,2,2;45,0,2,2,1;50,1,2,2,1;43,2,0,2,1;44,2,2,2,1;51,3,0,2,1;46,3,2,2,1;47,4,0,2,1;33,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "53,0,0,2,2;54,0,2,2,2;19,2,0,2,1;18,2,2,2,1;1,3,0,4,1;3,4,0,2,1;4,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "8,0,0,2,2;5,0,2,2,2;9,2,0,2,2;6,2,2,2,2;7,4,0,2,1;24,4,2,2,1~4|IiAFiAJiAGiAHRAYRA"
+            },
+            { "settings": { "APPEARANCE_THEME": 3 }, "layout": "49,0,0,4,2;1,2,0,4,1;42,3,0,4,1;17,4,0,2,1;2,4,2,2,1" },
+            {
+              "settings": { "APPEARANCE_THEME": 2 },
+              "layout": "20,0,0,2,2;3,0,2,2,2;18,2,0,2,1;17,2,2,2,1;5,3,0,2,1;6,3,2,2,1;12,4,0,2,1;13,4,2,2,1~4Uw8w.Dz8z.Sw_w.Rz8z.Fw8w.Gz_z.M484.N484.|"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 0 },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1~4|BEBDiAGiARRACRAFRAYRA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 2 },
+              "layout": "20,0,0,2,2;28,0,2,2,2;18,2,0,2,1;4,2,2,2,1;10,3,0,2,1;11,3,2,2,1;2,4,0,2,1;31,4,2,2,1~4UP_P.cDPD.SP_P.EDPD.KP_P.LDPD.CP_P.fDPD.|UgAcgASQAEQAKQALQACQAfQA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "53,0,0,2,2;33,0,2,2,2;1,2,0,4,1;25,3,0,4,1;6,4,0,2,1;5,4,2,2,1~4|1CAhCABEAZEAGBAFBA"
+            },
+            { "settings": { "APPEARANCE_THEME": 3 }, "layout": "25,0,0,4,2;26,2,0,4,2;3,4,0,2,1;22,4,2,2,1" },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "41,0,0,4,2;18,2,0,2,1;17,2,2,2,1;42,3,0,4,1;31,4,0,2,1;2,4,2,2,1~4|pICSRARRAqEBfRACRA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 2 },
+              "layout": "55,0,0,4,2;18,2,0,2,1;17,2,2,2,1;5,3,0,2,2;6,3,2,2,2~43zPz.SzPz.RzPz.FzPz.GzPz.|3ACSQARQAFgAGgA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 0 },
+              "layout": "20,1,0,2,2;14,1,2,2,2;1,3,0,4,1;12,4,0,2,1;13,4,2,2,1~4|UgAOgABABMQANQA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "32,0,0,2,2;5,0,2,2,2;39,2,0,2,2;9,2,2,2,2;7,4,0,2,1;24,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 0 },
+              "layout": "30,0,0,4,2;29,2,0,2,2;16,2,2,2,2;18,4,0,2,1;2,4,2,2,1~4|eIAdCAQCASBACBA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 2 },
+              "layout": "1,0,0,4,1;5,1,0,2,1;6,1,2,2,1;4,2,0,2,1;10,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1~4B8_8.Fw_w.GM_M.EP_P.KD_D.Lz_z.X4_4.CM_M.0P_P.|"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "14,0,0,2,2;33,0,2,2,2;12,2,0,2,1;13,2,2,2,1;28,3,0,2,2;21,3,2,2,1;48,4,2,2,1~4|OgAhgAMQANQAcgAVQAwQA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 0 },
+              "layout": "49,0,0,4,2;40,2,0,4,1;18,3,0,2,1;17,3,2,2,1;2,4,0,2,1;31,4,2,2,1~4|xICoEBSRARRACRAfRA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 2 },
+              "layout": "18,0,0,2,1;17,0,2,2,1;16,1,0,2,2;3,1,2,2,2;5,3,0,2,1;6,3,2,2,1;2,4,0,2,1;52,4,2,2,1~4SMMM.RMMM.QMMM.DMMM.FMMM.GMMM.CMMM.0MMM.|SBARBAQCADCAFBAGBACBA0BA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 1 },
+              "layout": "16,0,0,2,2;45,0,2,2,1;50,1,2,2,1;1,2,0,4,1;43,3,0,2,1;44,3,2,2,1;47,4,0,2,1;46,4,2,2,1"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 3 },
+              "layout": "42,0,0,4,2;40,2,0,4,1;25,3,0,4,1;18,4,0,2,1;2,4,2,2,1~4|qACoABZABSQACQA"
+            },
+            {
+              "settings": { "APPEARANCE_THEME": 2 },
+              "layout": "55,0,0,4,2;3,2,0,2,2;13,2,2,2,1;12,3,2,2,1;5,4,0,2,1;6,4,2,2,1~43484.D484.N484.M484.F484.G484.|3ICDiANRAMRAFRAGRA"
+            }
+          ]
+        },
+        "night": {
+          "steps": [
+            {
+              "settings": {
+                "LAYOUT_NIGHT": "55,0,0,4,2;17,2,0,2,1;12,2,2,2,1;2,4,0,2,1;52,4,2,2,1",
+                "LAYOUT_NIGHT_MODE": 2,
+                "LAYOUT_NIGHT_START": 42,
+                "LAYOUT_NIGHT_END": 14
+              },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
+            },
+            { "settings": { "LAYOUT_NIGHT_START": 41 } }
+          ]
+        },
+        "analog": {
+          "steps": [
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 0 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 1 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 2 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 3 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 4 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 5 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 6 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 7 }, "layout": "20,0,0,2,2" },
+            { "settings": { "APPEARANCE_ANALOG_STYLE": 8 }, "layout": "20,0,0,2,2" }
+          ]
+        }
+      },
+      "panels": {
+        "include": "mosaic/engine/catalog.h",
+        "sizes": {
+          "1x2": { "id": "MSIZE_1x2", "crop": { "left": 4, "top": 94, "width": 94, "height": 40 } },
+          "2x2": { "id": "MSIZE_2x2", "crop": { "left": 4, "top": 72, "width": 94, "height": 83 } },
+          "1x4": { "id": "MSIZE_1x4", "crop": { "left": 4, "top": 94, "width": 192, "height": 40 } },
+          "2x4": { "id": "MSIZE_2x4", "crop": { "left": 4, "top": 72, "width": 192, "height": 83 } }
+        },
+        "ids": {
+          "activity": "MOD_HEALTH_ACTIVITY",
+          "activity-goal": "MOD_HEALTH_ACTIVITY_GOAL",
+          "agenda": "MOD_CALENDAR_AGENDA",
+          "alarm": "MOD_SYSTEM_ALARM",
+          "analog": "MOD_TIME_ANALOG",
+          "battery": "MOD_SYSTEM_BATTERY",
+          "battery-battery": "MOD_SYSTEM_BATTERY_PAIR",
+          "beats": "MOD_TIME_BEATS",
+          "big-hour": "MOD_TIME_HOUR_BIG",
+          "big-min": "MOD_TIME_MIN_BIG",
+          "big-time": "MOD_TIME_BIGCLOCK",
+          "bpm-day": "MOD_HEALTH_HR_DAY",
+          "calorie-goal": "MOD_HEALTH_CALORIES_GOAL",
+          "calories": "MOD_HEALTH_CALORIES",
+          "clock": "MOD_COMPOSITE_DATETIME",
+          "conditions": "MOD_WEATHER_CONDITIONS",
+          "connection": "MOD_SYSTEM_CONNECTION",
+          "date": "MOD_TIME_DATE",
+          "datetime": "MOD_COMPOSITE_DATETIME",
+          "day-progress": "MOD_TIME_DAY_PROGRESS",
+          "daylight": "MOD_WEATHER_DAYLIGHT",
+          "dayofyear": "MOD_TIME_DAYOFYEAR",
+          "daysleft": "MOD_TIME_YEAREND",
+          "dew": "MOD_WEATHER_DEW_POINT",
+          "distance": "MOD_HEALTH_DISTANCE",
+          "distance-goal": "MOD_HEALTH_DISTANCE_GOAL",
+          "epoch": "MOD_TIME_EPOCH",
+          "feels": "MOD_WEATHER_FEELS_LIKE",
+          "forecast-daily": "MOD_WEATHER_FORECAST_DAILY",
+          "forecast-hourly": "MOD_WEATHER_FORECAST_HOURLY",
+          "heart": "MOD_HEALTH_HEART",
+          "heartrate": "MOD_HEALTH_HEARTRATE",
+          "hilo": "MOD_WEATHER_HILO",
+          "hour-progress": "MOD_TIME_HOUR_PROGRESS",
+          "hrgraph": "MOD_HEALTH_HR_GRAPH",
+          "hrv": "MOD_HEALTH_HRV",
+          "hrv-day": "MOD_HEALTH_HRV_DAY",
+          "hrv-history": "MOD_HEALTH_HRV_HISTORY",
+          "hrv-night": "MOD_HEALTH_HRV_NIGHT",
+          "hrv-states": "MOD_HEALTH_HRV_STATES",
+          "hrv-trend": "MOD_HEALTH_HRV_TREND",
+          "hrv-tuning": "MOD_HEALTH_HRV_TUNING",
+          "humidity": "MOD_WEATHER_HUMIDITY",
+          "julian": "MOD_TIME_JULIAN",
+          "month": "MOD_TIME_MONTH",
+          "moon": "MOD_TIME_MOON",
+          "next-event": "MOD_CALENDAR_COUNTDOWN",
+          "next-moon": "MOD_TIME_MOON_COUNTDOWN",
+          "phone-battery": "MOD_SYSTEM_PHONE_BATTERY",
+          "precip": "MOD_WEATHER_PRECIP",
+          "pressure": "MOD_WEATHER_PRESSURE",
+          "quiet": "MOD_SYSTEM_QUIET",
+          "sleep": "MOD_HEALTH_SLEEP",
+          "sleep-goal": "MOD_HEALTH_SLEEP_GOAL",
+          "status": "MOD_SYSTEM_STATUS",
+          "step-goal": "MOD_HEALTH_STEPS_GOAL",
+          "steps": "MOD_HEALTH_STEPS",
+          "stepsgraph": "MOD_HEALTH_STEPS_GRAPH",
+          "stock": "MOD_STOCK_QUOTE",
+          "sun": "MOD_WEATHER_SOLAR",
+          "sunrise": "MOD_WEATHER_SUNRISE",
+          "sunset": "MOD_WEATHER_SUNSET",
+          "temp": "MOD_WEATHER_TEMPERATURE",
+          "time": "MOD_TIME_CLOCK",
+          "timeline": "MOD_CALENDAR_FREEBUSY",
+          "tz1": "MOD_TIME_ZONE_1",
+          "uv": "MOD_WEATHER_UV",
+          "watchlist": "MOD_STOCK_WATCHLIST",
+          "weather": "MOD_WEATHER_CURRENT",
+          "week-progress": "MOD_TIME_WEEK_PROGRESS",
+          "weekday-dots": "MOD_TIME_WEEKDAY_DOTS",
+          "weeknum": "MOD_TIME_WEEKNUM",
+          "weeksleft": "MOD_TIME_WEEKSLEFT",
+          "wind": "MOD_WEATHER_WIND",
+          "year-progress": "MOD_TIME_YEAR_PROGRESS"
+        }
+      }
+    }
+  }
+}
