@@ -23,7 +23,8 @@
 
 // --- store snapshots (high band, handed to each store's init) ---
 // 251 (calendar) and 254 (stock) are left reserved: no face in this family wires either. 253
-// belongs to the location store, which owns its key itself
+// belongs to the location store, which owns its key itself. 249 holds the framework's own copy of
+// the weather source choice
 #define HEALTH_STORE_KEY  252
 #define WEATHER_STORE_KEY 255
 

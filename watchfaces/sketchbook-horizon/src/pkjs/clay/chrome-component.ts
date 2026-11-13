@@ -121,7 +121,29 @@ export default {
     // paper turns to a deep night blue, the ink turns to a cool off-white, and the accent cools from
     // the daytime sun to a moonlit blue, matching the faces' blue night sky
     ':root { color-scheme: light dark; }',
+
+    // the framework's own rows, such as the plugin notes and the supported plugins list, read their
+    // colours from these. the day takes the deep gold for links and the sun for a warning
+    ':root {',
+    '  --pf-accent: #8a6714;',
+    '  --pf-on-accent: #fcf7ea;',
+    '  --pf-note-accent: #e8b84b;',
+    '  --pf-note-info-accent: #8a8070;',
+    '  --pf-surface: #fcf7ea;',
+    '  --pf-ink: #2c2a24;',
+    '  --pf-line: #e6dcc1;',
+    '}',
+
     '@media (prefers-color-scheme: dark) {',
+    '  :root {',
+    '    --pf-accent: #8fb3e4;',
+    '    --pf-on-accent: #0f1521;',
+    '    --pf-note-accent: #5c8fd4;',
+    '    --pf-note-info-accent: #93a2bd;',
+    '    --pf-surface: #182234;',
+    '    --pf-ink: #dde5f2;',
+    '    --pf-line: #30405c;',
+    '  }',
     '  body {',
     '    background-color: #0f1521 !important;',
     '    background-image: radial-gradient(rgba(150, 170, 205, 0.14) 1.3px, transparent 1.4px) !important;',

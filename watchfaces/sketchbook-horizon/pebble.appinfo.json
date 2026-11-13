@@ -8,6 +8,12 @@
     "emery",
     "gabbro"
   ],
+  "defines": {
+    "PLUGIN_WEATHER": 1
+  },
+  "providers": {
+    "weather": ["plugin", "openmeteo", "owm", "weatherapi"]
+  },
   "capabilities": [
     "health"
   ],
