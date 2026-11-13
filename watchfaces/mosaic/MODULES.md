@@ -6,7 +6,7 @@ Sizes are rows by columns. `1×2` and `2×2` are half the screen wide, and `1×4
 
 Next Event, Agenda, and Timeline need a calendar feed, and Stock and Watchlist need a ticker. You set both in Gridlock's settings page.
 
-Phone Battery and Battery Battery read your phone's battery through the Pebble app, so they need plugins turned on there. Until then the phone's number shows two dashes.
+Phone Battery and Battery Battery read your phone's battery through the Pebble app, so they need plugins turned on there. Until then they say PLUGINS OFF, or OFF in Battery Battery's phone half.
 
 Now Playing shows what your phone is playing, with its album art, through the Pebble app's music plugin. It needs plugins turned on there too.
 

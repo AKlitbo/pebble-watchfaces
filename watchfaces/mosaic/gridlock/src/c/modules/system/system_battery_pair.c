@@ -5,7 +5,8 @@
  *
  * The panel takes the battery panel's colours, and the phone's half takes the phone battery panel's,
  * so in Vibrant each reading wears the same colour it has on its own panel. The watch always has a
- * reading. The phone's comes from the Pebble app's Phone plugin, so only its half drops to --.
+ * reading. The phone's comes from the Pebble app's Phone plugin, so only its half drops, to OFF while
+ * plugins are off and to -- while the phone is away.
  *
  * It sits in this face rather than the family core because the phone's colours come from the grid
  * engine's grid_ctx_use_colors_of, which Sidereel's engine does not have.
@@ -122,7 +123,8 @@ static void system_battery_pair_body(GridCtx *gctx)
     GridCtx phone = *gctx;
     grid_ctx_use_colors_of(&phone, MOD_SYSTEM_PHONE_BATTERY);
 
-    pair_1x2(gctx, &phone, watch_text, phone_text);
+    // PLUGINS OFF has no room in a half, so the phone's half says OFF beside its glyph
+    pair_1x2(gctx, &phone, watch_text, phone_store_no_plugin() ? "OFF" : phone_text);
 }
 
 const ModuleDef mod_system_battery_pair_def = {

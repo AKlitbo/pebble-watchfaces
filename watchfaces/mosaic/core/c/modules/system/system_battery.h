@@ -29,6 +29,15 @@ extern const ModuleDef mod_system_battery_def;
  */
 void battery_body(GridCtx *gctx, int level);
 
+/**
+ * @brief Draws a battery panel's body for a phone whose plugins are off, so it has no level to show.
+ * At 1x2 it reads PLUGINS OFF across the row, and at 2x2 it keeps the dashes and the empty gauge with
+ * PLUGINS OFF under the dashes.
+ *
+ * @param gctx The grid context.
+ */
+void battery_body_plugins_off(GridCtx *gctx);
+
 #define BATTERY_VALUE_H 30 ///< the height of the box a 1x2 battery number draws in, as the other 1x2 values use
 
 /**
