@@ -17,6 +17,9 @@
  * The family core builds the Weather Location section and the time zone row, but the face places
  * them. Weather Location belongs after Weather, and the time zone in Clock, since the clock reads it
  * whatever the weather source.
+ *
+ * The four face colours paint nothing until Set Face Colours Yourself is on, so they and their reset
+ * hide with it off.
  */
 
 import fs from 'node:fs';
@@ -25,6 +28,7 @@ import { describe, test, expect } from 'vitest';
 import config from './config';
 import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/testing/page-keys';
 import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
+import { allItems } from '../../../paf/ts/clay/rows';
 import type { ClayConfigItem } from '../../../paf/ts/clay/types';
 
 const appinfo = JSON.parse(
@@ -162,5 +166,19 @@ describe('config page order', () => {
 
     expect(result).toBeDefined();
     expect(result).toBe(sectionHolding(page, 'CLOCK_TIME_FORMAT'));
+  });
+});
+
+describe('config page face colours', () => {
+  /** A colour row left showing with the switch off reads as a setting that does something, and it does not. */
+  test('the four colours and their reset show only while the switch is on', () => {
+    const rows = allItems(config as ClayConfigItem[]);
+    const reset = rows.find((row) => row.id === 'resetFaceColors') as ClayConfigItem & { resetKeys: string[] };
+    const faceRows = [reset, ...rows.filter((row) => reset.resetKeys.includes(row.messageKey || ''))];
+
+    const result = faceRows.map((row) => row.visibleWhen);
+
+    expect(faceRows).toHaveLength(reset.resetKeys.length + 1);
+    expect(result.every((rule) => JSON.stringify(rule) === JSON.stringify({ key: 'APPEARANCE_FACE_COLORS', in: [true] }))).toBe(true);
   });
 });

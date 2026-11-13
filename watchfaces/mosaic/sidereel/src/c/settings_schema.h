@@ -81,6 +81,13 @@ uint8_t sidereel_panel_style(void);
 bool sidereel_face_colors(void);
 
 /**
+ * @brief Whether the reel jumps to each new minute rather than scrolling to it.
+ *
+ * @return True when the wearer turned Reduce Motion on.
+ */
+bool sidereel_reduce_motion(void);
+
+/**
  * @brief The hour pointer's fill.
  *
  * @return The picked colour.

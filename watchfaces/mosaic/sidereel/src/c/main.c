@@ -67,8 +67,9 @@ static void on_settings_changed(bool time_or_date_changed)
 
 static void on_time_tick(void)
 {
-    // the reel marks its own tag, and starts the scroll if this was a plain one-minute step
-    reel_set_minute(time_store_tm()->tm_min, true);
+    // the reel marks its own tag
+    // a plain one-minute step scrolls, unless the wearer turned Reduce Motion on
+    reel_set_minute(time_store_tm()->tm_min, !sidereel_reduce_motion());
 
     engine_mark_dirty_tags(TAG_TIME);
 

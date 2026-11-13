@@ -246,6 +246,9 @@ const MODULE_OPTIONS = MODULE_BASE.map(function (option) {
 });
 
 /** A Clay colour swatch row. Sunlight is off so the grid shows the colours as the watch paints them. */
+// the face colours and their reset only do anything with Set Face Colours Yourself on
+const FACE_COLORS_ON = { key: 'APPEARANCE_FACE_COLORS', in: [true] };
+
 function color(messageKey: string, label: string, description: string, def: number): ClayConfigItem {
   return {
     type: 'color',
@@ -292,21 +295,22 @@ const config = [
       // a mono face can carry a red pointer. the switch is what keeps the presets intact until
       // you ask for it, since there is no one default that suits all four themes
       toggle('APPEARANCE_FACE_COLORS', 'Set Face Colours Yourself',
-        'Paint the reel and the hour pointer with the four colours below, whichever theme is picked. Off, each theme keeps its own.', false),
-      color('APPEARANCE_POINTER_COLOR', 'Pointer Colour',
-        'The hour pointer on the left.', 0xFF0000),
-      color('APPEARANCE_POINTER_INK', 'Pointer Text Colour',
-        'The hour and the status glyphs sitting on the pointer.', 0xFFFFFF),
-      color('APPEARANCE_REEL_COLOR', 'Reel Colour',
-        'The reel of minutes on the right, and the run of sprocket holes beside it.', 0xFFFFFF),
-      color('APPEARANCE_REEL_INK', 'Reel Text Colour',
-        'The minutes on the reel.', 0x000000),
+        'Paint the reel and the hour pointer with four colours of your own, whichever theme is picked. Off, each theme keeps its own.', false),
+      { ...color('APPEARANCE_POINTER_COLOR', 'Pointer Colour',
+        'The hour pointer on the left.', 0xFF0000), visibleWhen: FACE_COLORS_ON },
+      { ...color('APPEARANCE_POINTER_INK', 'Pointer Text Colour',
+        'The hour and the status glyphs sitting on the pointer.', 0xFFFFFF), visibleWhen: FACE_COLORS_ON },
+      { ...color('APPEARANCE_REEL_COLOR', 'Reel Colour',
+        'The reel of minutes on the right, and the run of sprocket holes beside it.', 0xFFFFFF), visibleWhen: FACE_COLORS_ON },
+      { ...color('APPEARANCE_REEL_INK', 'Reel Text Colour',
+        'The minutes on the reel.', 0x000000), visibleWhen: FACE_COLORS_ON },
       {
         type: 'resetButton',
         id: 'resetFaceColors',
         defaultValue: 'Reset Face Colours',
         description: 'Puts the four colours above back to their starting values.',
         resetKeys: ['APPEARANCE_POINTER_COLOR', 'APPEARANCE_POINTER_INK', 'APPEARANCE_REEL_COLOR', 'APPEARANCE_REEL_INK'],
+        visibleWhen: FACE_COLORS_ON,
       },
       {
         type: 'themeBuilder',
@@ -320,6 +324,8 @@ const config = [
       // Quiet Time panel, so the toggle for one lives here beside the rest of the look
       toggle('APPEARANCE_QUIET_TIME_ICON', 'Show Quiet Time Icon',
         'Show a muted-speaker glyph in the hour pointer while Quiet Time is on.', false),
+      toggle('APPEARANCE_REDUCE_MOTION', 'Reduce Motion',
+        'Show each new minute straight away rather than scrolling the reel to it.', false),
     ],
   },
   // --- Layout ---

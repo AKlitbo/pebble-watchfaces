@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added a Reduce Motion setting, which shows each new minute straight away rather than scrolling the reel to it.
+
 ### Changed
 
 - Changed the settings page to shorter headings and plainer wording, with Weather Location now below Weather.
@@ -15,6 +19,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed the settings page buttons and tabs to be easier to tell apart from the rest of the page. Everything you can tap has a brighter edge, and the hints under each part are easier to read.
 - Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.
 - Changed the weather to catch up as soon as your phone comes back after being away, rather than at the next refresh.
+- Changed the four face colours and their reset button to show only while Set Face Colours Yourself is on.
+
+### Fixed
+
+- Fixed the weather fetching twice each time the watchface starts.
 
 ### Notes
 

@@ -96,6 +96,8 @@ typedef struct SidereelSettings
     GColor  pointer_ink;
     GColor  reel_color;
     GColor  reel_ink;
+    // on, the reel jumps to each new minute rather than scrolling to it
+    bool    reduce_motion;
 } SidereelSettings;
 
 static SidereelSettings s_settings;
@@ -218,6 +220,9 @@ static const SettingField s_fields[] = {
     FACE_COLOR(pointer_ink,   APPEARANCE_POINTER_INK,   0xFFFFFF),
     FACE_COLOR(reel_color,    APPEARANCE_REEL_COLOR,    0xFFFFFF),
     FACE_COLOR(reel_ink,      APPEARANCE_REEL_INK,      0x000000),
+
+    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_APPEARANCE_REDUCE_MOTION,
+      .type = SETTING_BOOL, .offset = offsetof(SidereelSettings, reduce_motion), .default_num = 0 },
 };
 
 // --- goal vibe (key 4) ---
@@ -374,6 +379,11 @@ uint8_t sidereel_panel_style(void)
 bool sidereel_face_colors(void)
 {
     return s_settings.face_colors;
+}
+
+bool sidereel_reduce_motion(void)
+{
+    return s_settings.reduce_motion;
 }
 
 GColor sidereel_pointer_color(void)
