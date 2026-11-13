@@ -6,7 +6,14 @@
     "emery"
   ],
   "defines": {
-    "HEALTH_HRV": 1
+    "HEALTH_HRV": 1,
+    "PLUGIN_WEATHER": 1,
+    "PLUGIN_CALENDAR": 1
+  },
+  "providers": {
+    "weather": ["plugin", "openmeteo", "owm", "weatherapi"],
+    "stocks": ["finnhub", "yahoo", "twelvedata", "alphavantage"],
+    "calendar": ["plugin", "ical"]
   },
   "capabilities": [
     "location",
@@ -91,6 +98,7 @@
     "CALENDAR_VIBE_START",
     "CALENDAR_STRIP",
     "CALENDAR_REQUEST",
+    "CALENDAR_SOURCE",
     "CLOCK_WEEK_START",
     "LAYOUT_SLOTS",
     "LAYOUT_NIGHT",

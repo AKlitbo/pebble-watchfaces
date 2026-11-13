@@ -66,8 +66,11 @@
 #define GRIDLOCK_CUSTOM_FLAGS_SIZE    251
 #define GRIDLOCK_CUSTOM_FLAGS_LEN 250
 
-#define GRIDLOCK_WEATHER_VERSION 1
-#define GRIDLOCK_WEATHER_SIZE    3
+#define GRIDLOCK_WEATHER_VERSION 2
+#define GRIDLOCK_WEATHER_SIZE    15
+// frozen size of the v1 weather blob, before the weather source was appended. min_versioned_size
+// stays pinned here so an older short blob still short-reads and the new field keeps its default
+#define GRIDLOCK_WEATHER_V1_SIZE 3
 
 #define GRIDLOCK_HEALTH_VERSION 2
 #define GRIDLOCK_HEALTH_SIZE    12
@@ -98,11 +101,11 @@
 #define GRIDLOCK_ANALOG_VERSION 1
 #define GRIDLOCK_ANALOG_SIZE    2
 
-#define GRIDLOCK_CALENDAR_VERSION 2
-#define GRIDLOCK_CALENDAR_SIZE    6
-// frozen size of the v1 calendar blob, before the event reminder fields were appended.
-// min_versioned_size stays pinned here so an older short blob still short-reads and the new
-// fields keep their defaults
+#define GRIDLOCK_CALENDAR_VERSION 3
+#define GRIDLOCK_CALENDAR_SIZE    14
+// frozen size of the v1 calendar blob, before the event reminder fields and the calendar source
+// were appended. min_versioned_size stays pinned here so an older short blob still short-reads and
+// the new fields keep their defaults
 #define GRIDLOCK_CALENDAR_V1_SIZE 2
 
 // the night layout rides its own key rather than the core blob. core is 132 bytes, and a second
@@ -184,6 +187,7 @@ typedef struct GridlockWeather
     uint8_t version;
     uint8_t temperature_unit;
     uint8_t wind_unit;
+    char    weather_provider[PLUGIN_SOURCE_WEATHER_LEN]; ///< kept for the phone, never read here
 } GridlockWeather;
 _Static_assert(sizeof(GridlockWeather) == GRIDLOCK_WEATHER_SIZE, "weather blob size is frozen; fields append only");
 
@@ -253,6 +257,7 @@ typedef struct GridlockCalendar
     uint8_t vibe_5min;     // VibeChoice for the 5-min-before reminder
     uint8_t vibe_start;    // VibeChoice for the on-start reminder
     uint8_t vibe_mode;     // which reminders fire (a CalendarVibeMode, CAL_VIBE_MODE_NONE is off)
+    char    calendar_source[PLUGIN_SOURCE_CALENDAR_LEN]; ///< kept for the phone, never read here
 } GridlockCalendar;
 _Static_assert(sizeof(GridlockCalendar) == GRIDLOCK_CALENDAR_SIZE, "calendar blob size is frozen; fields append only");
 
@@ -338,6 +343,9 @@ static const SettingField s_weather_fields[] = {
       .type = SETTING_ENUM_U8, .offset = offsetof(GridlockWeather, temperature_unit),
       .enum_count = 2, .affects_weather = true, .default_num = 0 },
     FACE_ENUM(GridlockWeather, wind_unit, WEATHER_WIND_UNIT, 4, 0),
+    // the Data Source pick, kept so a reset of the Pebble app gets it back. the default matches the
+    // page's own, Open-Meteo
+    PLUGIN_SOURCE_WEATHER(offsetof(GridlockWeather, weather_provider), "openmeteo"),
 };
 
 // --- health (key 4) ---
@@ -407,6 +415,9 @@ static const SettingField s_calendar_fields[] = {
     FACE_ENUM(GridlockCalendar, vibe_15min, CALENDAR_VIBE_15MIN, VIBE_COUNT, VIBE_SHORT),
     FACE_ENUM(GridlockCalendar, vibe_5min,  CALENDAR_VIBE_5MIN,  VIBE_COUNT, VIBE_DOUBLE),
     FACE_ENUM(GridlockCalendar, vibe_start, CALENDAR_VIBE_START, VIBE_COUNT, VIBE_LONG),
+    // the Calendar Source pick, kept so a reset of the Pebble app gets it back. the default matches
+    // the page's own, the iCal link
+    PLUGIN_SOURCE_CALENDAR(offsetof(GridlockCalendar, calendar_source), "ical"),
 };
 
 // the companion colour blob. an empty string (or "0") carries no records so the parser leaves
@@ -502,7 +513,7 @@ static const SettingsSchema s_health_schema = {
 static const SettingsSchema s_weather_schema = {
     .key = GRIDLOCK_WEATHER_KEY,
     .version = GRIDLOCK_WEATHER_VERSION,
-    SETTINGS_BLOB(s_weather, GRIDLOCK_WEATHER_SIZE),
+    SETTINGS_BLOB(s_weather, GRIDLOCK_WEATHER_V1_SIZE),
     .fields = s_weather_fields,
     .field_count = ARRAY_LENGTH(s_weather_fields),
     .migrate = NULL,

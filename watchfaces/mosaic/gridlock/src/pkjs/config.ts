@@ -525,28 +525,40 @@ const config = [
     type: 'section',
     items: [
       heading('Calendar Preferences'),
+      // the lead line holds for either source, so the Calendar Source select the plugin define adds
+      // goes straight under it. the iCal line, the link, and the refresh interval only mean
+      // something for an iCal link, so they hide while the events come from a Pebble app plugin
       {
         type: 'text',
-        defaultValue: 'Add a Calendar panel (Next Event, Agenda, or Timeline) to your layout, then paste your private iCal link below.',
+        defaultValue: 'Add a Calendar panel (Next Event, Agenda, or Timeline) to your layout.',
+      },
+      {
+        type: 'text',
+        defaultValue: 'Paste your private iCal link below.',
+        pluginSourceHides: 'CALENDAR_SOURCE',
       },
       {
         type: 'input',
         messageKey: 'CALENDAR_ICS_URL',
         label: 'iCal URL',
+        pluginSourceHides: 'CALENDAR_SOURCE',
         description: 'Paste any calendar\'s private iCal (.ics) address. Google Calendar: Settings and sharing, Integrate calendar, "Secret address in iCal format". Apple iCloud: share a calendar as Public. Outlook: publish the calendar. Treat the link like a password: anyone with it can read your calendar.',
         attributes: {
           placeholder: 'https://.../calendar.ics',
           maxlength: 512,
         },
       },
-      select('CALENDAR_POLL', 'Refresh Interval', [
-        { label: '5 min', value: 0 },
-        { label: '10 min', value: 1 },
-        { label: '15 min', value: 2 },
-        { label: '20 min', value: 3 },
-        { label: '30 min', value: 4 },
-        { label: '1 hour', value: 5 },
-      ], 4, 'How often the watch pulls a fresh copy of your calendar feed. A tighter interval uses more battery.'),
+      {
+        ...select('CALENDAR_POLL', 'Refresh Interval', [
+          { label: '5 min', value: 0 },
+          { label: '10 min', value: 1 },
+          { label: '15 min', value: 2 },
+          { label: '20 min', value: 3 },
+          { label: '30 min', value: 4 },
+          { label: '1 hour', value: 5 },
+        ], 4, 'How often the watch pulls a fresh copy of your calendar feed. A tighter interval uses more battery.'),
+        pluginSourceHides: 'CALENDAR_SOURCE',
+      },
       select('CALENDAR_VIBE_MODE', 'Event Reminders', CALENDAR_VIBE_MODE_OPTIONS, 0, 'Buzz before a timed event starts. Silenced during Quiet Time, and only when a Calendar panel is on your layout. Pick the pattern for each reminder below.'),
       // each pattern shows only under the reminder modes that fire it
       { ...select('CALENDAR_VIBE_15MIN', 'Reminder: 15m Vibration', VIBE_TYPE_OPTIONS, 1), visibleWhen: { key: 'CALENDAR_VIBE_MODE', in: [1] } },

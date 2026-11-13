@@ -21,16 +21,21 @@ export function locationSection(): ClayConfigItem {
     type: 'section',
     items: [
       heading('Location Settings'),
-      toggle('LOCATION_USE_GPS', 'Enable Phone GPS', 'Automatically fetch weather for your current location.', true),
-      toggle('LOCATION_GPS_FALLBACK', 'Fallback to Manual Location', 'If GPS is on but cannot find you, use the city picked below.', true),
+      // the GPS toggles and the manual city only feed a weather fetch, so they hide while the
+      // weather comes from a Pebble app plugin. a face built without a plugin define ignores the mark.
+      // the heading stays unmarked since the time zone below still sits under it
+      { ...toggle('LOCATION_USE_GPS', 'Enable Phone GPS', 'Automatically fetch weather for your current location.', true), pluginSourceHides: 'WEATHER_PROVIDER' },
+      { ...toggle('LOCATION_GPS_FALLBACK', 'Fallback to Manual Location', 'If GPS is on but cannot find you, use the city picked below.', true), pluginSourceHides: 'WEATHER_PROVIDER' },
       {
         type: 'locationsearch',
         messageKey: 'LOCATION_NAME',
         label: 'Manual Location',
+        pluginSourceHides: 'WEATHER_PROVIDER',
         attributes: {
           placeholder: 'Search a city, e.g. Phoenix',
         },
       },
+      // the time zone stays whatever the weather source, since the clock reads it
       {
         type: 'locationsearch',
         messageKey: 'CLOCK_TIMEZONE_1',

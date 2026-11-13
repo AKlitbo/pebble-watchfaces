@@ -4,6 +4,27 @@ All notable changes to the Gridlock watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings.
+- Added a Pebble App: Preferred Source choice for the calendar, under a new Calendar Source setting, which shows the events from the calendars switched on in the Pebble app's calendar settings in place of an iCal link.
+- Added a list on the settings page of the Pebble app plugins this watchface works with.
+- Added a Skip at Start setting under HRV, which sets how many gaps between heartbeats each reading leaves out at the start while the sensor settles. The HRV Tuning panel shows the count in use along its bottom line.
+
+### Changed
+
+- Changed the settings page to follow the order you set the watchface up in, starting with Layout, and moved Analog Clock Style into Appearance. The wording throughout is shorter and plainer.
+- Changed Alternate Time Zone to sit under Clock rather than with the weather location.
+- Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
+- Changed Fall Back to Manual Location to show only while Use Phone GPS is on.
+- Changed the settings page buttons and tabs to be easier to tell apart from the rest of the page. Everything you can tap has a brighter edge, and the hints under each part are easier to read.
+
+### Notes
+
+- The Pebble App: Preferred Source choices need plugins turned on in the Pebble app under Settings, Plugins.
+
 ## [1.8.0] - 2026-11-05
 
 ### Added

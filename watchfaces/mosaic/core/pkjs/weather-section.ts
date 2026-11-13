@@ -35,6 +35,8 @@ export function weatherSection(): ClayConfigItem {
         type: 'input',
         messageKey: 'WEATHER_API_KEY',
         label: 'API Key',
+        // only a fetch uses the key, so it hides while the weather comes from a Pebble app plugin
+        pluginSourceHides: 'WEATHER_PROVIDER',
         description: 'Only required if you selected OpenWeatherMap or WeatherAPI above.',
         attributes: {
           placeholder: 'Paste your private API key here...',
