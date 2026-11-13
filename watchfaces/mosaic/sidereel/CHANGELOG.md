@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. A weather plugin that serves the pressure, dew point, and UV fills those panels too.
+- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. While it is picked, the units and location come from the plugin, and the watchface's own unit and location settings are hidden. A weather plugin that serves the pressure, dew point, and UV fills those panels too.
 - Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
 - Added 1x2 and 2x2 Phone Battery panels showing your phone's battery beside a gauge, the way the Battery panel shows the watch's. They need plugins turned on in the Pebble app, say PLUGINS OFF while they are off, and show two dashes while your phone is away.
 - Added a 1x2 Battery Battery panel showing your watch's battery and your phone's side by side. The phone's half needs plugins turned on in the Pebble app, says OFF while they are off, and shows two dashes while your phone is away.

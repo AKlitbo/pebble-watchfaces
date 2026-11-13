@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. A weather plugin that serves the pressure, dew point, and UV fills those panels too.
+- Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. While it is picked, the units and location come from the plugin, and the watchface's own unit and location settings are hidden. A weather plugin that serves the pressure, dew point, and UV fills those panels too.
 - Added a Pebble App: Preferred Source choice for the calendar, under a new Calendar Source setting, which shows the events from the calendars switched on in the Pebble app's calendar settings in place of an iCal link.
 - Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
 - Added a Pebble App: Preferred Source choice to the stock Data Source, which shows the quotes from a stock plugin you install from the Pebble app store. The plugin keeps its own tickers, and the Stock and Watchlist panels show its first four. While no stock plugin is installed, the choice says so and where to get one.

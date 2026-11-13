@@ -10,10 +10,15 @@
  * The Data Source comes first, with its key row straight under it, since the source decides
  * whether the key row shows at all. On a face built with the weather plugin, the framework's page
  * hook puts the select first anyway, so the section reads the same with the plugin or without it.
+ * The plugin's weather comes in the plugin's own units, so the unit rows hide while it is picked.
  */
 
 import type { ClayConfigItem } from '../../paf/ts/clay/types';
 import { select, heading, WIND_UNIT_OPTIONS } from '../../paf/ts/pkjs/config-rows';
+
+// the units only mean something for a fetch, so they hide while the weather comes from a Pebble app
+// plugin. a face built without a plugin define ignores the mark
+const HIDES = { pluginSourceHides: 'WEATHER_PROVIDER' };
 
 /**
  * The whole section, ready to drop into the page.
@@ -43,11 +48,14 @@ export function weatherSection(): ClayConfigItem {
         // comes from a Pebble app plugin, and a hidden row still keeps and saves the key
         visibleWhen: { key: 'WEATHER_PROVIDER', in: ['owm', 'weatherapi'] },
       },
-      select('WEATHER_TEMPERATURE_UNIT', 'Temperature Unit', [
-        { label: 'Celsius (°C)', value: 0 },
-        { label: 'Fahrenheit (°F)', value: 1 },
-      ], 0),
-      select('WEATHER_WIND_UNIT', 'Wind Speed Unit', WIND_UNIT_OPTIONS, 0),
+      {
+        ...select('WEATHER_TEMPERATURE_UNIT', 'Temperature Unit', [
+          { label: 'Celsius (°C)', value: 0 },
+          { label: 'Fahrenheit (°F)', value: 1 },
+        ], 0),
+        ...HIDES,
+      },
+      { ...select('WEATHER_WIND_UNIT', 'Wind Speed Unit', WIND_UNIT_OPTIONS, 0), ...HIDES },
     ],
   };
 }
