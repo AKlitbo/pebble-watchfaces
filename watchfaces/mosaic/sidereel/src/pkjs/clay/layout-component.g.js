@@ -1074,6 +1074,176 @@ module.exports = {
         }
       });
 
+      // paf/ts/clay/callout-style.ts
+      var CALLOUT_BOX, CALLOUT_BADGE;
+      var init_callout_style = __esm({
+        "paf/ts/clay/callout-style.ts"() {
+          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
+          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
+        }
+      });
+
+      // core/pkjs/clay/builder/ts/layout/plugin-warnings.ts
+      function pluginWarnings(labels, states, picked) {
+        const off = [];
+        const missing = {};
+        labels.forEach(function(label) {
+          const kind = PANEL_KINDS[label];
+          if (!kind || CHOSEN_KINDS.indexOf(kind) >= 0 && !picked[kind]) {
+            return;
+          }
+          const state = states[kind];
+          let panels;
+          if (state === "off") {
+            panels = off;
+          } else if (state === "missing") {
+            panels = missing[kind] = missing[kind] || [];
+          }
+          if (panels && panels.indexOf(label) < 0) {
+            panels.push(label);
+          }
+        });
+        const warnings = [];
+        if (off.length) {
+          warnings.push({ state: "off", kind: null, panels: off });
+        }
+        KIND_NEEDS.forEach(function(entry) {
+          const panels = missing[entry[0]];
+          if (panels) {
+            warnings.push({ state: "missing", kind: entry[0], panels });
+          }
+        });
+        return warnings;
+      }
+      function assignedLabels(library, parse, labelOf) {
+        const labels = [];
+        [library.day, library.night, library.quiet].forEach(function(index) {
+          if (index === ROLE_NONE) {
+            return;
+          }
+          parse(library.layouts[index] || EMPTY_LAYOUT).forEach(function(block) {
+            const label = labelOf(block.module);
+            if (labels.indexOf(label) < 0) {
+              labels.push(label);
+            }
+          });
+        });
+        return labels;
+      }
+      function nameList(panels) {
+        if (panels.length < 3) {
+          return panels.join(" and ");
+        }
+        return panels.slice(0, -1).join(", ") + ", and " + panels[panels.length - 1];
+      }
+      function warningText(warning) {
+        const subject = nameList(warning.panels) + (warning.panels.length > 1 ? " need " : " needs ");
+        if (warning.state === "off") {
+          return subject + "plugins turned on in the Pebble app, under Settings, Plugins.";
+        }
+        let needs = "a plugin";
+        KIND_NEEDS.forEach(function(entry) {
+          if (entry[0] === warning.kind) {
+            needs = entry[1];
+          }
+        });
+        return subject + needs + " in the Pebble app, and your phone has none yet.";
+      }
+      function readStates() {
+        const store = document.querySelector(".pf-plugin-kinds");
+        if (!store || !store.value) {
+          return {};
+        }
+        try {
+          const parsed = JSON.parse(store.value);
+          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+        } catch (e) {
+          return {};
+        }
+      }
+      function createPluginWarnings(after) {
+        const states = readStates();
+        const box = document.createElement("div");
+        let labels = [];
+        let picked = {};
+        box.className = "lb-plugin-warnings";
+        box.setAttribute("style", "padding: 0 12px;");
+        if (after.parentNode) {
+          after.parentNode.insertBefore(box, after.nextSibling);
+        }
+        function draw() {
+          box.innerHTML = "";
+          pluginWarnings(labels, states, picked).forEach(function(warning) {
+            const note = document.createElement("div");
+            const badge = document.createElement("span");
+            const words = document.createElement("span");
+            note.className = "lb-plugin-warning";
+            note.setAttribute("style", CALLOUT_BOX);
+            badge.setAttribute("style", CALLOUT_BADGE);
+            badge.textContent = "!";
+            words.textContent = warningText(warning);
+            note.appendChild(badge);
+            note.appendChild(words);
+            box.appendChild(note);
+          });
+          box.hidden = !box.firstChild;
+        }
+        draw();
+        return {
+          update: function(next) {
+            labels = next;
+            draw();
+          },
+          setPicked: function(next) {
+            picked = next;
+            draw();
+          }
+        };
+      }
+      var PANEL_KINDS, CHOSEN_KINDS, KIND_NEEDS;
+      var init_plugin_warnings = __esm({
+        "core/pkjs/clay/builder/ts/layout/plugin-warnings.ts"() {
+          init_callout_style();
+          init_modes();
+          init_wire();
+          PANEL_KINDS = {
+            "Phone Battery": "phone",
+            "Battery Battery": "phone",
+            "Now Playing": "music",
+            "Weather": "weather",
+            "Conditions": "weather",
+            "Temperature": "weather",
+            "Feels Like": "weather",
+            "Hi/Low": "weather",
+            "Humidity": "weather",
+            "Precipitation": "weather",
+            "Dew Point": "weather",
+            "Wind Speed": "weather",
+            "Pressure": "weather",
+            "UV": "weather",
+            "Forecast (Hourly)": "weather",
+            "Forecast (4-Day)": "weather",
+            "Sun": "weather",
+            "Sunrise": "weather",
+            "Sunset": "weather",
+            "Daylight": "weather",
+            "Stock": "stocks",
+            "Watchlist": "stocks",
+            "Next Event": "calendar",
+            "Agenda": "calendar",
+            "Timeline": "calendar"
+          };
+          CHOSEN_KINDS = ["weather", "stocks", "calendar"];
+          KIND_NEEDS = [
+            ["phone", "the Phone plugin"],
+            ["music", "a music plugin"],
+            ["weather", "a weather plugin"],
+            ["stocks", "a stock plugin"],
+            ["calendar", "a calendar plugin"]
+          ];
+        }
+      });
+
       // sidereel/src/pkjs/clay/builder/ts/layout/init.ts
       var init_exports = {};
       __export(init_exports, {
@@ -1089,6 +1259,7 @@ module.exports = {
         const gridEl = root.querySelector(".lb-grid");
         const paletteContainer = root.querySelector(".lb-palette-container");
         const modesHost = root.querySelector(".lb-modes");
+        const warnings = createPluginWarnings(root.querySelector(".lb-middle-wrap"));
         let blocks = [];
         const library = seedLibrary(readLibrary(), hidden.value || "");
         let loaded = storePresent();
@@ -1104,6 +1275,9 @@ module.exports = {
           self.trigger("change");
           pushAssigned(".gl-night", library.night);
           pushAssigned(".gl-quiet", library.quiet);
+          warnings.update(assignedLabels(library, parseLayoutString, function(module) {
+            return modInfo(MODULES, module).label;
+          }));
         }
         function pushAssigned(selector, index) {
           const input = document.querySelector(selector);
@@ -1252,6 +1426,9 @@ module.exports = {
         root._lbGet = function() {
           return library.layouts[library.day] || EMPTY_LAYOUT;
         };
+        root._lbPluginSources = function(picked) {
+          warnings.setPicked(picked);
+        };
         blocks = parseLayoutString(library.layouts[library.day]);
         render();
         if (!loaded) {
@@ -1285,6 +1462,7 @@ module.exports = {
           init_visuals();
           init_drag2();
           init_palette();
+          init_plugin_warnings();
           init_overlay();
           init_io_panel();
           init_modes();

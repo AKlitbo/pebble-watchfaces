@@ -16,10 +16,13 @@ import themeComponent from './clay/theme-component.g';
 import resetButtonComponent from './clay/reset-button-component';
 import weather from '../../../paf/ts/weather/feature';
 import phone from '../../../paf/ts/phone/feature';
+import layoutPluginSources from '../../../core/pkjs/layout-plugin-sources';
 import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
   components: [controlsComponent, layoutComponent, themeComponent, resetButtonComponent],
+  // hands the layout builder the sources on the Pebble app plugin, for its warning about a panel with no plugin
+  customClay: layoutPluginSources,
   features: [weather, phone],
 });

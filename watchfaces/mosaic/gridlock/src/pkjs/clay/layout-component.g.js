@@ -1088,6 +1088,21 @@ module.exports = {
         });
         return warnings;
       }
+      function assignedLabels(library, parse, labelOf) {
+        const labels = [];
+        [library.day, library.night, library.quiet].forEach(function(index) {
+          if (index === ROLE_NONE) {
+            return;
+          }
+          parse(library.layouts[index] || EMPTY_LAYOUT).forEach(function(block) {
+            const label = labelOf(block.module);
+            if (labels.indexOf(label) < 0) {
+              labels.push(label);
+            }
+          });
+        });
+        return labels;
+      }
       function nameList(panels) {
         if (panels.length < 3) {
           return panels.join(" and ");
@@ -1162,6 +1177,8 @@ module.exports = {
       var init_plugin_warnings = __esm({
         "core/pkjs/clay/builder/ts/layout/plugin-warnings.ts"() {
           init_callout_style();
+          init_modes();
+          init_wire();
           PANEL_KINDS = {
             "Phone Battery": "phone",
             "Battery Battery": "phone",
@@ -1231,22 +1248,9 @@ module.exports = {
           self.trigger("change");
           pushAssigned(".gl-night", library.night);
           pushAssigned(".gl-quiet", library.quiet);
-          warnings.update(assignedLabels());
-        }
-        function assignedLabels() {
-          const labels = [];
-          [library.day, library.night, library.quiet].forEach(function(index) {
-            if (index === ROLE_NONE) {
-              return;
-            }
-            parseLayoutString(library.layouts[index] || EMPTY_LAYOUT).forEach(function(block) {
-              const label = modInfo(MODULES, block.module).label;
-              if (labels.indexOf(label) < 0) {
-                labels.push(label);
-              }
-            });
-          });
-          return labels;
+          warnings.update(assignedLabels(library, parseLayoutString, function(module) {
+            return modInfo(MODULES, module).label;
+          }));
         }
         function pushAssigned(selector, index) {
           const input = document.querySelector(selector);

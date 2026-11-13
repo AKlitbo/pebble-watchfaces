@@ -13,6 +13,9 @@
  */
 
 import { CALLOUT_BADGE, CALLOUT_BOX } from '../../../../../../paf/ts/clay/callout-style';
+import { ROLE_NONE } from './modes';
+import type { LayoutLibrary } from './modes';
+import { EMPTY_LAYOUT } from './wire';
 
 /** A kind of data a panel can read from a plugin, by its name in the face's providers list. */
 export type PluginKind = 'weather' | 'stocks' | 'calendar' | 'music' | 'phone';
@@ -123,6 +126,38 @@ export function pluginWarnings(labels: string[], states: Partial<Record<string, 
   });
 
   return warnings;
+}
+
+/**
+ * The names of the panels on every layout the watch shows, day, night, and Quiet Time, each once.
+ *
+ * The watch starts the phone and music readings for a panel on any of them, so a panel placed only on
+ * the night layout still needs its plugin. A layout no role is assigned to never reaches the watch, so
+ * its panels are left out.
+ *
+ * @param library The face's layouts and the roles assigned to them.
+ * @param parse The face's own reader for a layout string, since each face lays out its grid its own way.
+ * @param labelOf A panel's name, from its id.
+ * @return The names, in the order each was first placed, day first.
+ */
+export function assignedLabels(library: LayoutLibrary, parse: (layout: string) => Array<{ module: number }>, labelOf: (module: number) => string): string[] {
+  const labels: string[] = [];
+
+  [library.day, library.night, library.quiet].forEach(function (index) {
+    if (index === ROLE_NONE) {
+      return;
+    }
+
+    parse(library.layouts[index] || EMPTY_LAYOUT).forEach(function (block) {
+      const label = labelOf(block.module);
+
+      if (labels.indexOf(label) < 0) {
+        labels.push(label);
+      }
+    });
+  });
+
+  return labels;
 }
 
 /** The panels' names as a sentence's subject, such as "Stock and Watchlist". */

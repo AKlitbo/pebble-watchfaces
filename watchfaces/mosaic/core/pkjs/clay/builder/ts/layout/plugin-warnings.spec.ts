@@ -5,10 +5,12 @@
  * are the rules a reader cannot check by eye: a panel that only reads a plugin warns whatever else is
  * picked, a weather, stock, or calendar panel only warns while its source is the plugin, a served
  * kind and a face with no plugin kinds never warn, and plugins off folds every kind into one warning.
+ * The panels it weighs are the ones on every layout a role is assigned to, and no others.
  */
 
 import { describe, test, expect } from 'vitest';
-import { pluginWarnings } from './plugin-warnings';
+import { assignedLabels, pluginWarnings } from './plugin-warnings';
+import { ROLE_NONE } from './modes';
 
 describe('pluginWarnings', () => {
   /** With plugins off the phone and music panels sit empty, so both are named in the one warning. */
@@ -47,10 +49,32 @@ describe('pluginWarnings', () => {
     expect(result).toEqual([]);
   });
 
-  /** Sidereel reads no plugin and its page has no kinds row, so it must show no warning at all. */
+  /** A face that reads no plugin has no kinds row on its page, so it must show no warning at all. */
   test('says nothing on a page with no plugin kinds', () => {
     const result = pluginWarnings(['Weather', 'Phone Battery'], {}, { weather: true });
 
     expect(result).toEqual([]);
+  });
+});
+
+describe('assignedLabels', () => {
+  /** The panels' first fields, as the faces' own readers give them back, so each test reads the ids it placed. */
+  function parse(layout: string): Array<{ module: number }> {
+    return layout === '0' ? [] : layout.split(';').map((record) => ({ module: Number(record.split(',')[0]) }));
+  }
+
+  const NAMES: Record<number, string> = { 2: 'Battery', 3: 'Weather', 20: 'Moon', 75: 'Phone Battery' };
+
+  /**
+   * The watch starts a panel's readings on any layout a role is assigned to, and ignores the rest. A
+   * panel only on the night layout that went unnamed would sit empty after dark with no warning, and
+   * one on a spare layout would warn about a panel the watch never shows.
+   */
+  test('names the panels on the assigned layouts and leaves out the spare ones', () => {
+    const library = { layouts: ['2,0,0,2,1;3,1,0,2,1', '75,0,0,2,1;2,1,0,2,1', '20,0,0,2,2', '0', '0'], day: 0, night: 1, quiet: ROLE_NONE };
+
+    const result = assignedLabels(library, parse, (module) => NAMES[module]);
+
+    expect(result).toEqual(['Battery', 'Weather', 'Phone Battery']);
   });
 });

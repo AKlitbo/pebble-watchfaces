@@ -14,7 +14,7 @@ import { LAYOUT_PRESETS } from './presets';
 import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from '../../../../../../../core/pkjs/clay/builder/ts/layout/visuals';
 import { createDragEngine } from '../../../../../../../core/pkjs/clay/builder/ts/layout/drag';
 import { createPalette } from '../../../../../../../core/pkjs/clay/builder/ts/layout/palette';
-import { createPluginWarnings } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
+import { assignedLabels, createPluginWarnings } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
 import type { PickedKinds } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
 import { createOverlayHost } from '../../../../../../../paf/ts/clay/builder/ts/shared/overlay';
 import { buildIoPanel } from '../../../../../../../paf/ts/clay/builder/ts/shared/io-panel';
@@ -96,31 +96,10 @@ export function init(this: ClayComponentInstance): void {
     pushAssigned('.gl-night', library.night);
     pushAssigned('.gl-quiet', library.quiet);
 
-    warnings.update(assignedLabels());
-  }
-
-  /**
-   * The names of the panels on every layout the watch shows, day, night, and Quiet Time, each once.
-   * The watch starts the phone and music readings for a panel on any of them, so a panel placed only
-   * on the night layout still needs its plugin.
-   */
-  function assignedLabels(): string[] {
-    const labels: string[] = [];
-
-    [library.day, library.night, library.quiet].forEach(function (index) {
-      if (index === ROLE_NONE) {
-        return;
-      }
-
-      parseLayoutString(library.layouts[index] || EMPTY_LAYOUT).forEach(function (block) {
-        const label = modInfo(MODULES, block.module).label;
-
-        if (labels.indexOf(label) < 0) {
-          labels.push(label);
-        }
-      });
-    });
-    return labels;
+    // every layout the watch shows, since the watch starts a panel's readings on any of them
+    warnings.update(assignedLabels(library, parseLayoutString, function (module) {
+      return modInfo(MODULES, module).label;
+    }));
   }
 
   /**
