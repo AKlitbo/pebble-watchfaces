@@ -16,8 +16,6 @@
     "calendar": ["plugin", "ical"]
   },
   "capabilities": [
-    "location",
-    "configurable",
     "health"
   ],
   "targets": {
@@ -55,7 +53,6 @@
     "LOCATION_NAME",
     "LOCATION_USE_GPS",
     "LOCATION_GPS_FALLBACK",
-    "WEATHER_PROVIDER",
     "WEATHER_API_KEY",
     "WEATHER_TEMPERATURE_UNIT",
     "CLOCK_DATE_FORMAT",
@@ -89,17 +86,12 @@
     "STOCK_API_KEY",
     "STOCK_SYMBOLS",
     "STOCK_POLL",
-    "STOCK_STRIP",
-    "STOCK_REQUEST",
     "CALENDAR_ICS_URL",
     "CALENDAR_POLL",
     "CALENDAR_VIBE_MODE",
     "CALENDAR_VIBE_15MIN",
     "CALENDAR_VIBE_5MIN",
     "CALENDAR_VIBE_START",
-    "CALENDAR_STRIP",
-    "CALENDAR_REQUEST",
-    "CALENDAR_SOURCE",
     "CLOCK_WEEK_START",
     "LAYOUT_SLOTS",
     "LAYOUT_NIGHT",

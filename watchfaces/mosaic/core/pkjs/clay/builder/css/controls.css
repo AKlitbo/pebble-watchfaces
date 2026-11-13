@@ -29,6 +29,11 @@
   --mo-danger-press: #a82f24;
   --mo-edge: 2px; /* the drawn edge of a tab that has no border of its own */
   --mo-mono: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  /* the framework's own controls, the location search and the plugins panel, take their focus ring,
+     links, and pressed rows from these, so they wear the page's orange and dark text rather than
+     Clay's */
+  --pf-accent: var(--mo-accent);
+  --pf-on-accent: var(--mo-on-accent);
 }
 
 /* ---- the font every button shares ----

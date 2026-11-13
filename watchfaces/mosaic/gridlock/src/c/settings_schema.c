@@ -66,17 +66,12 @@
 #define GRIDLOCK_CUSTOM_FLAGS_SIZE    251
 #define GRIDLOCK_CUSTOM_FLAGS_LEN 250
 
-#define GRIDLOCK_WEATHER_VERSION 2
-#define GRIDLOCK_WEATHER_SIZE    15
-// frozen size of the v1 weather blob, before the weather source was appended. min_versioned_size
-// stays pinned here so an older short blob still short-reads and the new field keeps its default
-#define GRIDLOCK_WEATHER_V1_SIZE 3
+#define GRIDLOCK_WEATHER_VERSION 1
+#define GRIDLOCK_WEATHER_SIZE    3
 
 #define GRIDLOCK_HEALTH_VERSION 3
 #define GRIDLOCK_HEALTH_SIZE    13
-// frozen size of the v1 health blob, before the four HRV settings were appended. min_versioned_size
-// stays pinned here so an older short blob still short-reads and the new fields keep their defaults
-#define GRIDLOCK_HEALTH_V1_SIZE 9
+// the first health blob was 9 bytes, before the four HRV settings were appended
 
 // the Goal Met Vibe rides its own key, not the health blob: the pick and the custom pattern are
 // short strings (the dropdown value is either a sentinel or a comma list of milliseconds), too big
@@ -101,35 +96,26 @@
 #define GRIDLOCK_ANALOG_VERSION 1
 #define GRIDLOCK_ANALOG_SIZE    2
 
-#define GRIDLOCK_CALENDAR_VERSION 3
-#define GRIDLOCK_CALENDAR_SIZE    14
-// frozen size of the v1 calendar blob, before the event reminder fields and the calendar source
-// were appended. min_versioned_size stays pinned here so an older short blob still short-reads and
-// the new fields keep their defaults
-#define GRIDLOCK_CALENDAR_V1_SIZE 2
+#define GRIDLOCK_CALENDAR_VERSION 2
+#define GRIDLOCK_CALENDAR_SIZE    6
+// the first calendar blob was 2 bytes, before the event reminder fields were appended
 
 // the night layout rides its own key rather than the core blob. core is 132 bytes, and a second
 // 128-byte layout would take it to 260, past the 256 a persist key holds. the watch saves only
 // the first 256 bytes of a longer write, so whatever sits past that would come back as its
-// default on every launch. min_versioned_size is pinned to the v1 size from the first release
-// so appending a field later cannot wipe a night layout in the field
+// default on every launch
 #define GRIDLOCK_NIGHT_VERSION 1
 #define GRIDLOCK_NIGHT_SIZE    132
-#define GRIDLOCK_NIGHT_V1_SIZE 132
 
 // the Quiet Time layout rides its own key for the same reason the night one does: a third
 // 128-byte layout fits in no blob that already holds one
 #define GRIDLOCK_QUIET_VERSION 1
 #define GRIDLOCK_QUIET_SIZE    129
-#define GRIDLOCK_QUIET_V1_SIZE 129
 
 // the wire value for "no night layout". settings_apply_inbox keeps an empty string only for a
 // setting whose default is empty, and this is the default, so an empty one would leave the old
 // grid in place. the custom colours use the same marker for their own empty state
 #define GRIDLOCK_NO_LAYOUT "0"
-
-// four themes. 0 mono. 1 vibrant. 2 custom. 3 mono inverse (see theme.h GridlockTheme)
-#define GRIDLOCK_THEME_COUNT 4
 
 // default layout that matches the Clay config. one block per entry, "module,row,col,w,h"
 #define GRIDLOCK_DEFAULT_LAYOUT "2,0,0,2,2;12,0,2,2,1;13,1,2,2,1;1,2,0,4,1;3,3,0,2,2;6,3,2,2,2"
@@ -187,7 +173,6 @@ typedef struct GridlockWeather
     uint8_t version;
     uint8_t temperature_unit;
     uint8_t wind_unit;
-    char    weather_provider[PLUGIN_SOURCE_WEATHER_LEN]; ///< kept for the phone, never read here
 } GridlockWeather;
 _Static_assert(sizeof(GridlockWeather) == GRIDLOCK_WEATHER_SIZE, "weather blob size is frozen; fields append only");
 
@@ -258,7 +243,6 @@ typedef struct GridlockCalendar
     uint8_t vibe_5min;     // VibeChoice for the 5-min-before reminder
     uint8_t vibe_start;    // VibeChoice for the on-start reminder
     uint8_t vibe_mode;     // which reminders fire (a CalendarVibeMode, CAL_VIBE_MODE_NONE is off)
-    char    calendar_source[PLUGIN_SOURCE_CALENDAR_LEN]; ///< kept for the phone, never read here
 } GridlockCalendar;
 _Static_assert(sizeof(GridlockCalendar) == GRIDLOCK_CALENDAR_SIZE, "calendar blob size is frozen; fields append only");
 
@@ -341,16 +325,8 @@ static const SettingField s_quiet_fields[] = {
 
 // --- weather (key 3) ---
 static const SettingField s_weather_fields[] = {
-    // temperature unit is an inline SETTING_ENUM_U8, not the shared KNOWN_ macro. the config
-    // page shows a dropdown, so a select sends a cstring "0" or "1" on the wire rather than the
-    // bool the shared macro expects
-    { .id = SETTING_TEMPERATURE_UNIT, .message_key = &MESSAGE_KEY_WEATHER_TEMPERATURE_UNIT,
-      .type = SETTING_ENUM_U8, .offset = offsetof(GridlockWeather, temperature_unit),
-      .enum_count = 2, .affects_weather = true, .default_num = 0 },
-    FACE_ENUM(GridlockWeather, wind_unit, WEATHER_WIND_UNIT, 4, 0),
-    // the Data Source pick, kept so a reset of the Pebble app gets it back. the default matches the
-    // page's own, Open-Meteo
-    PLUGIN_SOURCE_WEATHER(offsetof(GridlockWeather, weather_provider), "openmeteo"),
+    KNOWN_TEMPERATURE_UNIT(offsetof(GridlockWeather, temperature_unit)),
+    KNOWN_WIND_UNIT(offsetof(GridlockWeather, wind_unit)),
 };
 
 // --- health (key 4) ---
@@ -421,9 +397,6 @@ static const SettingField s_calendar_fields[] = {
     FACE_ENUM(GridlockCalendar, vibe_15min, CALENDAR_VIBE_15MIN, VIBE_COUNT, VIBE_SHORT),
     FACE_ENUM(GridlockCalendar, vibe_5min,  CALENDAR_VIBE_5MIN,  VIBE_COUNT, VIBE_DOUBLE),
     FACE_ENUM(GridlockCalendar, vibe_start, CALENDAR_VIBE_START, VIBE_COUNT, VIBE_LONG),
-    // the Calendar Source pick, kept so a reset of the Pebble app gets it back. the default matches
-    // the page's own, the iCal link
-    PLUGIN_SOURCE_CALENDAR(offsetof(GridlockCalendar, calendar_source), "ical"),
 };
 
 // the companion colour blob. an empty string (or "0") carries no records so the parser leaves
@@ -519,7 +492,7 @@ static const SettingsSchema s_health_schema = {
 static const SettingsSchema s_weather_schema = {
     .key = GRIDLOCK_WEATHER_KEY,
     .version = GRIDLOCK_WEATHER_VERSION,
-    SETTINGS_BLOB(s_weather, GRIDLOCK_WEATHER_V1_SIZE),
+    SETTINGS_BLOB(s_weather, 3),
     .fields = s_weather_fields,
     .field_count = ARRAY_LENGTH(s_weather_fields),
     .migrate = NULL,

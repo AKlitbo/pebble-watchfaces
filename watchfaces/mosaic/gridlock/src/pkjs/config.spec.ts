@@ -31,11 +31,16 @@ import { pluginSourcePage } from '../../../paf/ts/plugin-sources/page';
 import { CALENDAR_SOURCE_SELECT } from '../../../paf/ts/plugin-sources/calendar';
 import { CALENDAR_STANDARD, WEATHER_STANDARD } from '../../../paf/ts/plugin-sources/standard';
 import { allItems, conditionsOf } from '../../../paf/ts/clay/rows';
-import type { ClayConfigItem } from '../../../paf/ts/clay/types';
+import { messageKeysFrom } from '../../../paf/tools/pkjs/settings-page.ts';
+import type { ClayConfigItem, VisibilityCondition } from '../../../paf/ts/clay/types';
 
-const appinfo = JSON.parse(
-  fs.readFileSync(path.resolve(import.meta.dirname, '../../pebble.appinfo.json'), 'utf8')
-) as { messageKeys: string[] };
+const appinfoPath = path.resolve(import.meta.dirname, '../../pebble.appinfo.json');
+
+const appinfo = JSON.parse(fs.readFileSync(appinfoPath, 'utf8')) as { messageKeys: string[] };
+
+// the face's own keys plus the ones its plugin defines bring, such as WEATHER_PROVIDER, which the
+// build adds to the manifest the way the page sees them
+const messageKeys = messageKeysFrom(appinfoPath);
 
 /** The values the date format select offers, wherever on the page it sits. */
 function dateFormatValues(items: unknown): string[] {
@@ -77,8 +82,8 @@ describe('config page message keys', () => {
   });
 
   /** Every key the page sends must be one the watch was built to receive. */
-  test('every key on the page is declared in the appinfo', () => {
-    const declared = new Set(appinfo.messageKeys);
+  test('every key on the page is one the build gives the watch', () => {
+    const declared = new Set(Object.keys(messageKeys));
 
     const result = pageKeys(config).filter((key) => !declared.has(key));
 
@@ -154,7 +159,6 @@ const BUILT_IN_PLUGINS = [
 /** The page as the phone opens it on a plugin build, with both page hooks run over a copy. */
 function pluginPage(): ClayConfigItem[] {
   const page = JSON.parse(JSON.stringify(config)) as ClayConfigItem[];
-  const messageKeys = Object.fromEntries(appinfo.messageKeys.map((key, index) => [key, index]));
   const state = { pluginUuid: null, lastError: null, lastEmpty: false };
 
   pluginSourcePage(page, {
@@ -198,8 +202,15 @@ function hiddenKeys(page: ClayConfigItem[], picks: Record<string, unknown>): str
   Object.assign(values, picks);
 
   return rows
-    .filter((row) => row.messageKey && !conditionsOf(row).every((condition) => condition.in.some((wanted) => String(wanted) === String(values[condition.key]))))
+    .filter((row) => row.messageKey && !conditionsOf(row).every((condition) => conditionHolds(condition, values[condition.key])))
     .map((row) => row.messageKey as string);
+}
+
+/** Whether a row's condition lets it show for a value, an in list naming it or a notIn list leaving it out. */
+function conditionHolds(condition: VisibilityCondition, value: unknown): boolean {
+  const named = (list: Array<string | number | boolean>) => list.some((listed) => String(listed) === String(value));
+
+  return 'notIn' in condition ? !named(condition.notIn) : named(condition.in);
 }
 
 describe('config page with the Pebble app plugins', () => {

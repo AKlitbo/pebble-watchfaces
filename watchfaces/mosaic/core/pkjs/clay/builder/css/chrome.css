@@ -107,19 +107,19 @@ button[type='submit'] {
 /* the location search's suggestion dropdown. it ships light because it lives in the framework, which
    stays skin-agnostic, so the gridlock palette is painted on from here instead. this sheet is
    injected after the component's own style, so plain declarations are enough */
-.loc-search .loc-list {
+.pf-loc-search .pf-loc-list {
   background: var(--mo-card);
   color: #eceef2;
   border: 2px solid var(--mo-line);
   border-radius: 0;
 }
 
-.loc-search .loc-item {
+.pf-loc-search .pf-loc-item {
   border-bottom: 1px solid #2c3038;
 }
 
-.loc-search .loc-item:hover,
-.loc-search .loc-item:active {
+.pf-loc-search .pf-loc-item:hover,
+.pf-loc-search .pf-loc-item:active {
   background: #ff6a1f;
   color: #1a0c03;
 }
