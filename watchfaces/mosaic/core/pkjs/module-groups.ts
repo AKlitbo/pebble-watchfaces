@@ -81,6 +81,7 @@ const moduleGroups: Record<string, ModuleGroup> = {
   'Status':            'Status',
   'Battery Battery':   'Status',
   'Phone Battery':     'Status',
+  'Now Playing':       'Status',
   'Connection':        'Status',
   'Quiet Time':        'Status',
   'Next Alarm':        'Status',

@@ -77,4 +77,5 @@ module.exports = {
   74: "Red",
   75: "Electric Blue",
   76: "Green",
+  77: "Shocking Pink",
 };

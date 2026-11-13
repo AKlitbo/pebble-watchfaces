@@ -86,6 +86,7 @@ const moduleMeta: Record<string, ModuleMeta> = {
   'Status':        { icon: '📶', blockColor: '#f0a500', slug: 'status' },
   'Battery Battery': { icon: '🔋', blockColor: '#f0a500', slug: 'battery-battery' },
   'Phone Battery': { icon: '📱', blockColor: '#26c6da', slug: 'phone-battery' },
+  'Now Playing':   { icon: '🎵', blockColor: '#ff55ff', slug: 'now-playing' },
   'Big Hour':      { icon: '🕛', blockColor: '#b0bec5', slug: 'big-hour' },
   'Big Minutes':   { icon: '🕧', blockColor: '#b0bec5', slug: 'big-min' },
   'Big Time':      { icon: '🌙', blockColor: '#b0bec5', slug: 'big-time' },

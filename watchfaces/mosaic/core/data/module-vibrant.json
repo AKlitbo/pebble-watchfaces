@@ -75,5 +75,6 @@
   "MOD_HEALTH_HRV_TUNING": { "alias": "MOD_HEALTH_HEARTRATE" },
   "MOD_HEALTH_HR_DAY": { "alias": "MOD_HEALTH_HEARTRATE" },
   "MOD_SYSTEM_PHONE_BATTERY": { "color": "Electric Blue" },
-  "MOD_SYSTEM_BATTERY_PAIR": { "alias": "MOD_SYSTEM_BATTERY" }
+  "MOD_SYSTEM_BATTERY_PAIR": { "alias": "MOD_SYSTEM_BATTERY" },
+  "MOD_MUSIC_NOW_PLAYING": { "color": "Shocking Pink" }
 }

@@ -327,6 +327,17 @@ const MODULE_BASE = [
       { size: '2x2', thumb: 'Phone Battery' },
     ],
   },
+  // what the phone is playing comes from the Pebble app's music plugin. the art fills the tile's height,
+  // so it never has a header
+  {
+    label: 'Now Playing',
+    value: 77,
+    sizes: ['1x4', '2x4'],
+    themeRows: [
+      { size: '1x4', thumb: 'Now Playing', alwaysHeaderless: true },
+      { size: '2x4', thumb: 'Now Playing', alwaysHeaderless: true },
+    ],
+  },
   {
     label: 'Connection',
     value: 31,

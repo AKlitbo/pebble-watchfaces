@@ -83,3 +83,10 @@
  *
  * The watch's own bits: battery, the phone connection, and the quiet time marker.
  */
+
+/**
+ * @defgroup gridlock_mod_music Music
+ * @ingroup gridlock_modules
+ *
+ * What the phone is playing, with its album art.
+ */

@@ -30,6 +30,7 @@ enum
     FONT_TEKO_24,   // one step below TEKO_26 (1x2 time shrink)
     FONT_TEKO_34,   // big stat values (heartrate / steps)
     FONT_STM_12,    // Share Tech Mono caption / AM-PM unit
+    FONT_TEKO_18,   // Now Playing 2x4 artist, and its title when Teko 24 is too wide
     FONT_HEADER,    // panel header label (user-selectable, swapped at runtime)
     FONT_COUNT
 };

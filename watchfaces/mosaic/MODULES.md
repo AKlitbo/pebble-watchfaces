@@ -2,11 +2,13 @@
 
 These are all the panels I've made for the Mosaic faces, shown at every size each one comes in.
 
-Sizes are rows by columns. `1×2` and `2×2` are half the screen wide, and `1×4` and `2×4` span it. Many panels come in more than one size, and a panel shows the same thing on either face. Sidereel reads the time off its own reel, so it leaves out the clock panels and has no full-width sizes. The calendar, stock, connection, Quiet Time, status, and phone battery panels are on Gridlock only.
+Sizes are rows by columns. `1×2` and `2×2` are half the screen wide, and `1×4` and `2×4` span it. Many panels come in more than one size, and a panel shows the same thing on either face. Sidereel reads the time off its own reel, so it leaves out the clock panels and has no full-width sizes. The calendar, stock, connection, Quiet Time, status, phone battery, and Now Playing panels are on Gridlock only.
 
 Next Event, Agenda, and Timeline need a calendar feed, and Stock and Watchlist need a ticker. You set both in Gridlock's settings page.
 
 Phone Battery and Battery Battery read your phone's battery through the Pebble app, so they need plugins turned on there. Until then the phone's number shows two dashes.
+
+Now Playing shows what your phone is playing, with its album art, through the Pebble app's music plugin. It needs plugins turned on there too.
 
 Each face's settings page has a row of starter layouts, so there's something on screen before you've placed anything. They're shown here in the Vibrant theme. None of them is a mode. Drag panels in or take them out and the layout is yours from there.
 
@@ -52,7 +54,7 @@ Gridlock's are Default, Activity, Weather, Data, Sleep, and Creator.
 | **Day Progress**<br>![](gridlock/resources/thumbnails/day-progress-1x4.png) | **Hour Progress**<br>![](gridlock/resources/thumbnails/hour-progress-1x4.png) | **Week Progress**<br>![](gridlock/resources/thumbnails/week-progress-1x4.png) |
 | **Step Goal**<br>![](gridlock/resources/thumbnails/step-goal-1x4.png) | **Distance Goal**<br>![](gridlock/resources/thumbnails/distance-goal-1x4.png) | **Calorie Goal**<br>![](gridlock/resources/thumbnails/calorie-goal-1x4.png) |
 | **Sleep Goal**<br>![](gridlock/resources/thumbnails/sleep-goal-1x4.png) | **Activity Goal**<br>![](gridlock/resources/thumbnails/activity-goal-1x4.png) | **HRV Today**<br>![](gridlock/resources/thumbnails/hrv-day-1x4.png) |
-| **BPM Today**<br>![](gridlock/resources/thumbnails/bpm-day-1x4.png) | | |
+| **BPM Today**<br>![](gridlock/resources/thumbnails/bpm-day-1x4.png) | **Now Playing**<br>![](gridlock/resources/thumbnails/now-playing-1x4.png) | |
 
 ### 2×4
 
@@ -61,7 +63,7 @@ Gridlock's are Default, Activity, Weather, Data, Sleep, and Creator.
 | **Big Time**<br>![](gridlock/resources/thumbnails/big-time-2x4.png) | **Forecast (Hourly)**<br>![](gridlock/resources/thumbnails/forecast-hourly-2x4.png) | **Forecast (4-Day)**<br>![](gridlock/resources/thumbnails/forecast-daily-2x4.png) |
 | **Agenda**<br>![](gridlock/resources/thumbnails/agenda-2x4.png) | **Timeline**<br>![](gridlock/resources/thumbnails/timeline-2x4.png) | **Watchlist**<br>![](gridlock/resources/thumbnails/watchlist-2x4.png) |
 | **Month Grid**<br>![](gridlock/resources/thumbnails/month-2x4.png) | **HRV Today**<br>![](gridlock/resources/thumbnails/hrv-day-2x4.png) | **BPM Today**<br>![](gridlock/resources/thumbnails/bpm-day-2x4.png) |
-| **HRV Tuning**<br>![](gridlock/resources/thumbnails/hrv-tuning-2x4.png) | | |
+| **HRV Tuning**<br>![](gridlock/resources/thumbnails/hrv-tuning-2x4.png) | **Now Playing**<br>![](gridlock/resources/thumbnails/now-playing-2x4.png) | |
 
 ## Sidereel
 

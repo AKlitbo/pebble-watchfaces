@@ -353,6 +353,7 @@
         },
         "system": { "battery": 80, "charging": false, "bluetooth": true, "alarmIn": 442 },
         "phone": { "battery": 84 },
+        "music": { "title": "Clocks", "artist": "Coldplay", "playing": true },
         "stocks": [
           { "symbol": "NVDA", "price": 1180.0, "change": 3.4 },
           { "symbol": "NFLX", "price": 890.55, "change": -0.8 },
@@ -369,6 +370,7 @@
       "walks": {
         "thumbnails": { "panels": "all" },
         "phone": { "panels": { "1x2": ["phone-battery", "battery-battery"], "2x2": ["phone-battery"] } },
+        "music": { "panels": { "1x4": ["now-playing"], "2x4": ["now-playing"] } },
         "presets": {
           "steps": [
             {
@@ -602,6 +604,7 @@
           "moon": "MOD_TIME_MOON",
           "next-event": "MOD_CALENDAR_COUNTDOWN",
           "next-moon": "MOD_TIME_MOON_COUNTDOWN",
+          "now-playing": "MOD_MUSIC_NOW_PLAYING",
           "phone-battery": "MOD_SYSTEM_PHONE_BATTERY",
           "precip": "MOD_WEATHER_PRECIP",
           "pressure": "MOD_WEATHER_PRESSURE",

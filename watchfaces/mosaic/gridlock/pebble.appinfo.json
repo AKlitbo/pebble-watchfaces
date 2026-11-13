@@ -10,7 +10,8 @@
     "PLUGIN_WEATHER": 1,
     "PLUGIN_STOCKS": 1,
     "PLUGIN_CALENDAR": 1,
-    "PLUGIN_PHONE": 1
+    "PLUGIN_PHONE": 1,
+    "PLUGIN_MUSIC": 1
   },
   "providers": {
     "weather": ["plugin", "openmeteo", "owm", "weatherapi"],
@@ -307,6 +308,11 @@
       {
         "type": "font",
         "name": "FONT_TEKO_22",
+        "file": "fonts/Teko-SemiBold.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_TEKO_18",
         "file": "fonts/Teko-SemiBold.ttf"
       },
       {
