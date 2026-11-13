@@ -362,11 +362,6 @@
         "file": "fonts/Quantico-Bold.ttf",
         "characterRegex": "[A-Z0-9 /.'+:-]",
         "pixelHeight": 11
-      },
-      {
-        "type": "raw",
-        "name": "NOTICE",
-        "file": "notice.txt"
       }
     ]
   }

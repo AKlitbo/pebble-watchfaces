@@ -32,12 +32,6 @@
 
 static Window *s_window;
 
-// the license Required Notice, baked into the binary. kept reachable in init() so --gc-sections
-// does not drop it
-static const char GRIDLOCK_NOTICE[] =
-    "Required Notice: Copyright (c) 2026 Andrew Klitbo. "
-    "PolyForm Noncommercial 1.0.0.";
-
 // how often the watch takes a burst of beat gaps for the HRV panel. each burst also reads the heart
 // rate, so this is a battery cost on top of the watch's own heart rate sampling
 // TODO: tune on a Pebble Time 2, the only watch that reports beat gaps
@@ -240,10 +234,6 @@ static void init(void)
 
     // start with a clean goal-vibe slate before the first health reading can land
     goal_vibe_init();
-
-    // keep the notice reachable so --gc-sections does not drop it. the empty asm template is a
-    // genuine use with no data cost beyond the string itself
-    __asm__ volatile("" :: "r"(GRIDLOCK_NOTICE));
 
     // settings overrides only. must run before the stores and engine come up
     dev_apply_overrides();
