@@ -21,8 +21,8 @@
 
 enum
 {
-    FONT_TEKO_78,  // clock
-    FONT_TEKO_72,  // clock fallback for wide strings
+    FONT_TEKO_82,  // clock
+    FONT_TEKO_78,  // clock fallback for the wider .beats reading
     FONT_STM_20,   // date line
     FONT_STM_14,   // the weather / hr / steps readouts, and the battery
     FONT_STM_12,   // date fallback, and the condition fallback

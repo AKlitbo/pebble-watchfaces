@@ -65,8 +65,9 @@ The SVG sources for the weather, glyph, and bluetooth icons are not in this repo
 Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`. Radar Array and Sketchbook Horizon draw no weather icons, so they bundle only the bluetooth glyphs.
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and Sidereel
-- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by Sketchbook Horizon, Gridlock and Sidereel
+- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by IDE VSCode, Sketchbook Horizon, Gridlock and Sidereel
 - **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources fetched into `vendor/svgrepo/`, rendered PNGs bundled by every face
+- **[Phosphor](https://phosphoricons.com)** (the git branch glyph, by way of SVG Repo): MIT, Copyright (c) 2023 Phosphor Icons. SVG source fetched into `vendor/svgrepo/`, rendered PNGs bundled by IDE VSCode
 
 ## Trademarks
 

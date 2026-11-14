@@ -21,7 +21,7 @@ export default buildConfig({
     ],
   },
   bluetooth: {
-    description: 'Show a bluetooth glyph in the status bar - lit when the phone is connected, slashed when it drops.',
+    description: 'Show a bluetooth glyph beside the battery. It is lit while the phone is connected and slashed when the link drops.',
   },
   location: { gpsDefault: false },
   weather: {},

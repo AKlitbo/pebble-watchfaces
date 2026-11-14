@@ -23,9 +23,9 @@
 // grid (weather condition / temp on the left and heart rate / steps on the right). colours
 // are seeded with the Dark+ palette and re-set per theme by apply_theme_colors
 static Zone s_zones[ZONE_COUNT] = {
-    [ZONE_TIME]    = {.rect = SLOT_TIME,  .font_id = FONT_TEKO_78, .align = GTextAlignmentCenter, .color = GColorVividCerulean,
-                      // the @beats token is wider than HH:MM and overflows Teko 78. drop to 72 so it fits
-                      .font_id_fallback = FONT_TEKO_72, .rect_fallback = SLOT_TIME},
+    [ZONE_TIME]    = {.rect = SLOT_TIME,  .font_id = FONT_TEKO_82, .align = GTextAlignmentCenter, .color = GColorVividCerulean,
+                      // the @beats token is wider than any HH:MM and overflows Teko 82. drop to 78 so it fits
+                      .font_id_fallback = FONT_TEKO_78, .rect_fallback = SLOT_TIME_SMALL},
     [ZONE_DATE]    = {.rect = SLOT_DATE,  .font_id = FONT_STM_20, .align = GTextAlignmentCenter, .color = GColorRajah,
                       .font_id_fallback = FONT_STM_14, .rect_fallback = SLOT_DATE},
     [ZONE_COND]    = {.rect = SLOT_COND,  .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine,
@@ -56,8 +56,8 @@ static void apply_theme_colors(uint8_t theme)
  */
 static void load_fonts(void)
 {
+    fonts_register(FONT_TEKO_82, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_82)));
     fonts_register(FONT_TEKO_78, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_78)));
-    fonts_register(FONT_TEKO_72, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_72)));
     fonts_register(FONT_STM_20, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_20)));
     fonts_register(FONT_STM_14, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_14)));
     fonts_register(FONT_STM_12, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_12)));
@@ -97,7 +97,8 @@ static void load_frame(uint8_t theme)
 }
 
 /**
- * @brief Overlays draw-slot: the battery, the weather condition glyph, and the bluetooth glyph.
+ * @brief Overlays draw-slot: the weather condition glyph, and the battery, bluetooth, and Quiet
+ * Time status in the tab strip.
  *
  * @param ctx The graphics context.
  * @param bounds The slot bounds (the full window).
@@ -105,14 +106,8 @@ static void load_frame(uint8_t theme)
  */
 static void draw_overlays(GContext *ctx, GRect bounds, const void *data)
 {
-    widgets_draw_battery(ctx, system_store_battery());
     widgets_draw_weather(ctx, weather_store_cond());
-
-    // honour the show/hide setting. the store owns the connect/disconnect vibe
-    if (settings_u8(SETTING_BLUETOOTH_ICON))
-    {
-        widgets_draw_bt(ctx, system_store_bluetooth());
-    }
+    widgets_draw_status(ctx, system_store_battery(), system_store_bluetooth());
 }
 
 void vscode_setup(Window *window)

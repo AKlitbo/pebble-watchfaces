@@ -47,6 +47,15 @@
       { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
+      { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
+      { "type": "bitmap", "name": "ICON_READOUT_TEMP", "file": "icons/readout-temp.png" },
+      { "type": "bitmap", "name": "ICON_READOUT_HEART", "file": "icons/readout-heart.png" },
+      { "type": "bitmap", "name": "ICON_READOUT_STEPS", "file": "icons/readout-steps.png" },
+      { "type": "bitmap", "name": "ICON_ACTIVITY_FILES", "file": "icons/activity-files.png" },
+      { "type": "bitmap", "name": "ICON_ACTIVITY_SEARCH", "file": "icons/activity-search.png" },
+      { "type": "bitmap", "name": "ICON_ACTIVITY_GIT", "file": "icons/activity-git.png" },
+      { "type": "bitmap", "name": "ICON_ACTIVITY_DEBUG", "file": "icons/activity-debug.png" },
+      { "type": "bitmap", "name": "ICON_ACTIVITY_EXTENSIONS", "file": "icons/activity-extensions.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLEAR", "file": "icons/weather-now-clear.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_CLEAR", "file": "icons/weather-now-night-clear.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLOUDY", "file": "icons/weather-now-cloudy.png" },
@@ -72,13 +81,13 @@
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_THUNDERSTORM", "file": "icons/weather-now-night-thunderstorm.png" },
       {
         "type": "font",
-        "name": "FONT_TEKO_78",
+        "name": "FONT_TEKO_82",
         "file": "fonts/Teko-SemiBold.ttf",
         "characterRegex": "[0-9:@]"
       },
       {
         "type": "font",
-        "name": "FONT_TEKO_72",
+        "name": "FONT_TEKO_78",
         "file": "fonts/Teko-SemiBold.ttf",
         "characterRegex": "[0-9:@]"
       },

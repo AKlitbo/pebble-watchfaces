@@ -8,11 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added a muted speaker glyph beside bluetooth that shows while Quiet Time is on.
 - Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. While it is picked, the units and location come from the plugin, and the watchface's own unit and location settings are hidden.
 - Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
 
 ### Changed
 
+- Changed the editor to a slimmer sidebar with new icons and a bigger clock. The bluetooth glyph moves up beside the battery.
 - Changed a weather source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. A source you already picked stays as it is.
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.

@@ -2,12 +2,12 @@
 
 /*
   Shared layout for the VS Code frame. Authored 1:1 in the 200x228 Emery space so
-  HTML pixel positions line up with the C SLOT_* rects. Palette comes from the
-  theme_<name>.css variables; generate-frame.js renders at true scale by default.
+  HTML pixel positions line up with the C rects in desktops.c. Palette comes from the
+  theme_<name>.css variables, and the frame plugin bakes at true scale.
 
-  The activity bar, tab strip, status bar, and the stat glyphs are baked chrome.
-  The .time / .banner / .data placeholders are cleared before the shipped bake
-  (the app draws them live) and kept only for --preview.
+  The menu bar, activity bar, tab strip, terminal panel, status bar, and the readout
+  glyphs are baked chrome. The .time and .data placeholders are cleared before the
+  shipped bake, since the app draws them live, and only show in a browser preview.
 */
 
 /* Browser-preview backdrop. */
@@ -37,26 +37,28 @@ body {
   font-family: 'Share Tech Mono', monospace;
 }
 
-/* --- Title / menu bar (baked) --- */
-/* opt-in via <div class="watch menubar">: a top bar with menu labels + window
-   controls. scoped to .menubar so the no-menubar frame is unaffected. */
-.titlebar {
-  display: none;
+/* the hand-drawn icons are outlines in their parent's text colour */
+.watch svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.9;
 }
 
-.watch.menubar .titlebar {
+/* --- Title / menu bar (baked) --- */
+.titlebar {
   position: absolute;
   left: 0;
   top: 0;
-  right: 0;
+  width: 200px;
   height: 16px;
   box-sizing: border-box;
   background: var(--activity-bg);
-  color: var(--activity-fg);
+  color: var(--activity-active);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 5px;
+  padding: 0 6px;
   font-size: 9px;
 }
 
@@ -71,70 +73,81 @@ body {
   gap: 8px;
 }
 
-.titlebar .wins .codicon {
-  font-size: 9px;
-}
-
-/* the menu bar pushes the activity bar, tab strip, and editor down by its height */
-.watch.menubar .activity {
-  top: 16px;
-  height: 192px;
-}
-
-.watch.menubar .tabs {
-  top: 16px;
-}
-
-.watch.menubar .editor {
-  top: 46px;
-}
-
 /* --- Activity bar (left rail, baked) --- */
 .activity {
   position: absolute;
   left: 0;
-  top: 0;
-  width: 34px;
-  height: 208px;
+  top: 16px;
+  width: 18px;
+  height: 192px;
   box-sizing: border-box;
   background: var(--activity-bg);
   border-right: var(--activity-border);
+  color: var(--activity-fg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 9px;
-  gap: 14px;
+  padding-top: 7px;
+  gap: 11px;
 }
 
-.activity .codicon {
-  font-size: 17px;
-  color: var(--activity-fg);
+/* each rendered icon PNG is a mask, so the background colour is what shows */
+.icon {
+  display: block;
+  width: 10px;
+  height: 10px;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  background: currentColor;
 }
 
 .activity .active {
   color: var(--activity-active);
-  opacity: 1;
-  position: relative;
 }
 
-/* accent bar uses ::after - codicon glyphs render through ::before, so reusing
-   ::before here would clobber the active icon's glyph content */
-.activity .active::after {
+.icon.files {
+  mask-image: url('../../resources/icons/activity-files.png');
+}
+
+.icon.search {
+  mask-image: url('../../resources/icons/activity-search.png');
+}
+
+.icon.git {
+  mask-image: url('../../resources/icons/activity-git.png');
+}
+
+.icon.debug {
+  mask-image: url('../../resources/icons/activity-debug.png');
+}
+
+.icon.extensions {
+  mask-image: url('../../resources/icons/activity-extensions.png');
+}
+
+/* the status bar reuses the activity bar's branch, since at 8px it blurs into a blob */
+.icon.branch {
+  mask-image: url('../../resources/icons/activity-git.png');
+}
+
+/* the accent bar beside the active icon */
+.activity::before {
   content: '';
   position: absolute;
-  left: -9px;
-  top: -3px;
-  bottom: -3px;
+  left: 0;
+  top: 5px;
   width: 2px;
+  height: 14px;
   background: var(--accent);
 }
 
 /* --- Tab strip (baked) --- */
 .tabs {
   position: absolute;
-  left: 34px;
-  top: 0;
-  right: 0;
+  left: 18px;
+  top: 16px;
+  width: 182px;
+  height: 23px;
   background: var(--tabbar-bg);
   display: flex;
   align-items: flex-end;
@@ -145,8 +158,8 @@ body {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 8px;
+  gap: 4px;
+  padding: 0 7px;
   background: var(--tab-active-bg);
   color: var(--tab-fg);
   font-size: 11px;
@@ -154,162 +167,149 @@ body {
 }
 
 .tab .file-icon {
-  font-size: 11px;
+  font-size: 8px;
+  font-weight: 700;
   color: var(--tab-icon);
 }
 
 .tab .close {
-  font-size: 9px;
+  font-size: 10px;
   opacity: 0.55;
 }
 
-/* --- Tab-strip battery (both % and icon are app-drawn) --- */
-/* the battery icon + percentage are painted by the app (the icon fills to the
-   charge level), so nothing is baked here - only the preview value below. */
-
-/* --- Editor pane (C draws the readouts here) --- */
-.editor {
-  position: absolute;
-  left: 34px;
-  top: 30px;
-  right: 0;
-  bottom: 20px;
-}
-
-/* Live clock (preview only; SLOT_TIME), centered in the void above the terminal. */
+/* --- Clock and date (app-drawn, preview only) --- */
 .time {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 6px;
+  left: 18px;
+  width: 182px;
+  top: 44px;
   text-align: center;
   line-height: 1;
-  font-size: 56px;
-  font-weight: 700;
+  font-family: 'Teko', sans-serif;
+  font-size: 82px;
   color: var(--time-fg);
 }
 
-/* date sits just beneath the clock (preview only; SLOT_DATE) */
 .data.date {
-  left: 0;
-  right: 0;
-  top: 78px;
+  left: 18px;
+  width: 182px;
+  top: 114px;
   text-align: center;
-  font-size: 12px;
+  font-size: 20px;
   color: var(--val-date-fg);
 }
 
-/* --- Terminal panel (baked chrome; C draws the date/temp/steps values) --- */
-/* pinned to the bottom of the editor. children are absolutely placed so the baked
-   glyphs hold their x even though the value text is cleared for the shipped bake. */
+/* --- Terminal panel (baked chrome, the app draws the values) --- */
 .panel {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 18px;
+  top: 148px;
+  width: 182px;
   height: 60px;
   box-sizing: border-box;
   background: var(--panel-bg);
   border-top: var(--panel-border);
-  overflow: hidden;
 }
 
-/* panel tab row (PROBLEMS OUTPUT TERMINAL) */
+/* panel tab row: PROBLEMS OUTPUT TERMINAL */
 .panel-tabs {
   position: absolute;
   left: 6px;
-  top: 4px;
+  top: 2px;
   display: flex;
-  gap: 7px;
-  font-size: 8px;
+  gap: 8px;
+  font-size: 9px;
   color: var(--panel-tab-fg);
 }
 
 .panel-tabs .active {
   color: var(--panel-tab-active-fg);
   border-bottom: 1px solid currentColor;
-  padding-bottom: 1px;
 }
 
 /* baked prompt line: PS E:\> ./status.sh */
 .term-prompt {
   position: absolute;
   left: 6px;
-  top: 16px;
+  top: 14px;
   font-size: 10px;
 }
 
 .term-prompt .ps {
   color: var(--prompt-fg);
 }
+
 .term-prompt .cmd {
   color: var(--cmd-fg);
 }
 
-/* baked stat glyphs in a 2x2 grid, fixed x; C draws each value just to their right.
-   left column: weather condition over temp; right column: heart rate over steps */
-/* fixed-width centered box so the two glyphs in a column share a centerline
-   (their intrinsic widths differ), matching the app-drawn weather icon's box */
-.term-glyph {
+/* readout glyphs: the rendered icon PNG is the mask, so each theme paints it its own colour.
+   each sits in a 12px box beside its value, the same box as the app-drawn weather glyph */
+.glyph {
   position: absolute;
   width: 12px;
-  text-align: center;
-  font-size: 9px;
+  height: 12px;
+  mask-size: 12px 12px;
+  mask-repeat: no-repeat;
 }
 
-/* note: the weather condition glyph (top-left) is app-drawn, not baked.
-   the right column (hr/steps) is indented 5px from the left column */
-.term-glyph.temp {
-  left: 6px;
-  top: 44px;
-  color: var(--val-temp-fg);
-}
-.term-glyph.hr {
-  left: 99px;
-  top: 31px;
-  color: var(--val-hr-fg);
-}
-.term-glyph.steps {
-  left: 99px;
-  top: 44px;
-  color: var(--val-steps-fg);
+.glyph.temp {
+  left: 24px;
+  top: 192px;
+  background: var(--val-temp-fg);
+  mask-image: url('../../resources/icons/readout-temp.png');
 }
 
-/* live terminal values (preview only; cleared for the shipped bake) */
+.glyph.hr {
+  left: 110px;
+  top: 179px;
+  background: var(--val-hr-fg);
+  mask-image: url('../../resources/icons/readout-heart.png');
+}
+
+.glyph.steps {
+  left: 110px;
+  top: 192px;
+  background: var(--val-steps-fg);
+  mask-image: url('../../resources/icons/readout-steps.png');
+}
+
+/* live values (preview only, cleared for the shipped bake) */
 .data {
   position: absolute;
-  font-size: 10px;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .data.cond {
-  left: 18px;
-  top: 31px;
+  left: 38px;
+  top: 178px;
   color: var(--val-cond-fg);
 }
+
 .data.temp {
-  left: 18px;
-  top: 44px;
+  left: 38px;
+  top: 191px;
   color: var(--val-temp-fg);
 }
+
 .data.hr {
-  left: 111px;
-  top: 31px;
+  left: 124px;
+  top: 178px;
   color: var(--val-hr-fg);
 }
+
 .data.steps {
-  left: 111px;
-  top: 44px;
+  left: 124px;
+  top: 191px;
   color: var(--val-steps-fg);
 }
 
-/* battery value in the tab-strip corner (preview only; widget-drawn on-watch).
-   right-aligned so it ends just left of the baked glyph regardless of width */
+/* battery value in the tab strip (preview only, app-drawn on the watch) */
 .data.batt {
-  position: absolute;
   left: 145px;
   width: 32px;
   top: 21px;
-  font-size: 11px;
   text-align: right;
   color: var(--stats-fg);
 }
@@ -318,8 +318,8 @@ body {
 .statusbar {
   position: absolute;
   left: 0;
-  right: 0;
   bottom: 0;
+  width: 200px;
   height: 20px;
   background: var(--status-bg);
   color: var(--status-fg);
@@ -339,20 +339,12 @@ body {
   gap: 4px;
 }
 
-/* leave a gap at the far left for the app-drawn bluetooth glyph (BT_ICON) */
-.statusbar .left {
-  padding-left: 13px;
+.statusbar .right {
+  gap: 6px;
 }
 
-/* language indicator: the {} bracket glyph + the file's language */
-.statusbar .lang {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.statusbar .codicon {
-  font-size: 10px;
+.statusbar .gap {
+  margin-left: 3px;
 }
 
 /* Frame-render mode (?frame): render full size for the screenshot tool. */

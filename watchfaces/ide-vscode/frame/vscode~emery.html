@@ -6,11 +6,7 @@
         <title>VS Code</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap">
-        <!-- Codicons (MIT, github.com/microsoft/vscode-codicons) for the IDE chrome -->
-        <link rel="stylesheet" href="https://microsoft.github.io/vscode-codicons/dist/codicon.css">
-        <!-- Font Awesome (CC BY 4.0) for the battery + steps glyphs -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@600&display=swap">
         <!-- shared Pebble-64 palette: defines the --GColor* variables the themes use -->
         <link rel="stylesheet" type="text/css" href="../paf/plugins/frame/css/pebble-colors.css">
         <link rel="stylesheet" type="text/css" href="css/frame.css">
@@ -18,7 +14,7 @@
     </head>
     <body>
         <div class="viewport">
-            <div class="watch menubar">
+            <div class="watch">
                 <!-- title / menu bar: baked chrome -->
                 <header class="titlebar">
                     <div class="menu">
@@ -27,80 +23,72 @@
                         <span>Help</span>
                     </div>
                     <div class="wins">
-                        <i class="codicon codicon-chrome-minimize"></i>
-                        <i class="codicon codicon-chrome-maximize"></i>
-                        <i class="codicon codicon-chrome-close"></i>
+                        <svg width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><path d="M0 3.5H7"/></svg>
+                        <svg width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><rect x="0.5" y="0.5" width="6" height="6"/></svg>
+                        <svg width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><path d="M0.5 0.5L6.5 6.5M6.5 0.5L0.5 6.5"/></svg>
                     </div>
                 </header>
 
-                <!-- activity bar: baked chrome -->
+                <!-- activity bar: explorer, search, source control, debug, and extensions, each a rendered
+                     icon painted the theme's colour through a mask -->
                 <nav class="activity">
-                    <i class="codicon codicon-files active"></i>
-                    <i class="codicon codicon-search"></i>
-                    <i class="codicon codicon-source-control"></i>
-                    <i class="codicon codicon-debug-alt"></i>
-                    <i class="codicon codicon-extensions"></i>
+                    <i class="icon active files"></i>
+                    <i class="icon search"></i>
+                    <i class="icon git"></i>
+                    <i class="icon debug"></i>
+                    <i class="icon extensions"></i>
                 </nav>
 
-                <!-- editor tab strip: baked chrome -->
+                <!-- editor tab strip: baked chrome. its right end is left empty for the app-drawn
+                     Quiet Time and bluetooth glyphs and the battery -->
                 <div class="tabs">
                     <div class="tab">
-                        <i class="codicon codicon-file-code file-icon"></i>
+                        <span class="file-icon">TS</span>
                         <span>time.ts</span>
-                        <i class="codicon codicon-close close"></i>
+                        <span class="close">&times;</span>
                     </div>
                 </div>
+                <span class="data batt">87%</span>
 
-                <!-- tab-strip battery: both the % and the icon are app-drawn (the icon
-                     fills to the charge level), so nothing is baked here -->
-                <div class="tab-actions">
-                    <span class="data batt">87%</span>
-                </div>
+                <!-- editor pane: the app draws the clock and the date live -->
+                <div class="time">10:42</div>
+                <div class="data date">JUN 18</div>
 
-                <!-- editor pane: the app draws the clock + terminal values live -->
-                <div class="editor">
-                    <!-- single-line hero clock with the date right beneath it -->
-                    <div class="time">08:16</div>
-                    <div class="data date">Jun 18</div>
-
-                    <!-- integrated terminal: prompt + glyphs baked, values app-drawn -->
-                    <div class="panel">
-                        <div class="panel-tabs">
-                            <span>PROBLEMS</span>
-                            <span>OUTPUT</span>
-                            <span class="active">TERMINAL</span>
-                        </div>
-                        <div class="term-prompt"><span class="ps">PS E:\></span> <span class="cmd">./status.sh</span></div>
-
-                        <!-- left column: weather condition over temp. the condition
-                             glyph is app-drawn (swapped per condition + tinted), so it
-                             is not baked here - only its value text -->
-                        <span class="data cond">SUN</span>
-                        <i class="fa-solid fa-temperature-half term-glyph temp"></i>
-                        <span class="data temp">72&deg;</span>
-
-                        <!-- right column: heart rate over steps -->
-                        <i class="fa-solid fa-heart-pulse term-glyph hr"></i>
-                        <span class="data hr">72</span>
-                        <i class="fa-solid fa-person-walking term-glyph steps"></i>
-                        <span class="data steps">6,214</span>
+                <!-- integrated terminal: tabs, prompt, and readout glyphs baked, values app-drawn -->
+                <div class="panel">
+                    <div class="panel-tabs">
+                        <span>PROBLEMS</span>
+                        <span>OUTPUT</span>
+                        <span class="active">TERMINAL</span>
                     </div>
+                    <div class="term-prompt"><span class="ps">PS E:\&gt;</span> <span class="cmd">./status.sh</span></div>
                 </div>
+
+                <!-- readout glyphs, rendered from icons.json and painted the theme's colour through a mask.
+                     the weather glyph is app-drawn, so its spot is left empty -->
+                <i class="glyph temp"></i>
+                <i class="glyph hr"></i>
+                <i class="glyph steps"></i>
+
+                <span class="data cond">CLDY</span>
+                <span class="data temp">21C</span>
+                <span class="data hr">72</span>
+                <span class="data steps">6214</span>
 
                 <!-- status bar: baked chrome -->
                 <footer class="statusbar">
                     <div class="left">
-                        <i class="codicon codicon-source-control"></i>
+                        <i class="icon branch"></i>
                         <span>main</span>
-                        <i class="codicon codicon-error"></i>
+                        <svg class="gap" width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3.4"/><path d="M2.6 2.6L5.4 5.4M5.4 2.6L2.6 5.4"/></svg>
                         <span>0</span>
-                        <i class="codicon codicon-warning"></i>
+                        <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><path d="M4 0.6L7.5 7.4H0.5Z M4 3V5"/></svg>
                         <span>0</span>
                     </div>
                     <div class="right">
                         <span>UTF-8</span>
-                        <span class="lang">{ } TS</span>
-                        <i class="codicon codicon-bell"></i>
+                        <span>{ } TS</span>
+                        <svg width="7" height="8" viewBox="0 0 7 8" aria-hidden="true"><path d="M1 6V3.5A2.5 2.5 0 0 1 6 3.5V6H1Z M2.8 7.2H4.2"/></svg>
                     </div>
                 </footer>
             </div>
