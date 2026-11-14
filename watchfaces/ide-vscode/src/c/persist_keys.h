@@ -13,15 +13,22 @@
  * @ingroup watchface-vscode
  */
 #pragma once
+#include "system/settings/settings.h"
 
 // --- settings blobs (low band, owned by settings_schema.c) ---
 #define VSCODE_SETTINGS_KEY 1
 
 // --- store snapshots (high band, handed to each store's init) ---
 // 251 (calendar) and 254 (stock) are left reserved: this face wires neither. 253 belongs to the
-// location store, which owns its key itself
+// location store, which owns its key itself. SETTINGS_PLUGIN_SOURCE_KEY (249) holds the framework's
+// own copy of the weather source choice
 #define HEALTH_STORE_KEY  252
 #define WEATHER_STORE_KEY 255
 
 // a stray edit that lets the two bands meet breaks the build instead of a watch in the field
 _Static_assert(VSCODE_SETTINGS_KEY < HEALTH_STORE_KEY, "settings keys must stay below the store keys");
+
+// the framework saves the weather source choice under its own key and cannot see these, so a store
+// key landing on it would have the two overwrite each other
+_Static_assert(HEALTH_STORE_KEY != SETTINGS_PLUGIN_SOURCE_KEY && WEATHER_STORE_KEY != SETTINGS_PLUGIN_SOURCE_KEY,
+               "a store key collides with the framework's weather source key");

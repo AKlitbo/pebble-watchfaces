@@ -2,9 +2,9 @@
  * @file settings_schema.c
  * @brief ide-vscode-emery settings schema.
  *
- * This face ships its fields from day one, so it owns version 1 with no legacy
- * migration. It keeps its own struct and persist key, so its blob and versioning
- * are independent of any other face.
+ * The face has only ever added fields to the end, so it stays on version 1 and needs no
+ * migration. It keeps its own struct and persist key, so its blob and versioning are
+ * independent of any other face.
  *
  * @ingroup watchface-vscode
  */
@@ -26,9 +26,10 @@
  * @brief vscode's persisted settings.
  *
  * Fields only ever get added to the end, so there is no older layout to bring forward.
- * A new one bumps the version and a blob already on the watch still reads back fine.
- * The schema's first size is the 25 bytes the first release saved, without the hourly
- * buzz at the end, so a save that short still loads with the buzz on its default.
+ * A field added to the end needs no version bump, since a shorter save already on the
+ * watch reads back with the new field on its default. The schema's first size is the
+ * 25 bytes the first release saved, without the hourly buzz at the end, so a save that
+ * short still loads with the buzz on its default.
  */
 typedef struct VscodeSettings
 {
@@ -69,7 +70,7 @@ static const SettingsSchema s_schema = {
     SETTINGS_BLOB(s_settings, 25),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
-    .migrate = NULL,  // no legacy blobs. this face never existed without these fields
+    .migrate = NULL,  // every older save is this layout cut short, which the first size already covers
 };
 
 const SettingsSchema *vscode_settings_schema(void)
