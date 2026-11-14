@@ -10,6 +10,19 @@
   the value beside it. The .time and .data placeholders are cleared before the shipped bake.
 */
 
+/* the colours by job. the Terminal look sets each again in desktop_dos-ide_terminal.css */
+:root {
+  --ide-screen: var(--GColorOxfordBlue);
+  --ide-code: var(--GColorIcterine);
+  --ide-hotkey: var(--GColorDarkCandyAppleRed);
+  --ide-bar: var(--GColorLightGray);
+  --ide-bar-text: var(--GColorBlack);
+  --ide-frame: var(--GColorWhite);
+  --ide-editor: var(--GColorDukeBlue);
+  --ide-watch: var(--GColorTiffanyBlue);
+  --ide-label: var(--GColorBlack);
+}
+
 body {
   align-items: center;
   justify-content: center;
@@ -30,8 +43,8 @@ body {
   height: 228px;
   position: relative;
   overflow: hidden;
-  background: var(--GColorOxfordBlue);
-  color: var(--GColorIcterine);
+  background: var(--ide-screen);
+  color: var(--ide-code);
   font-family: 'VT323', monospace;
 }
 
@@ -43,7 +56,7 @@ body {
 
 .watch i {
   font-style: normal;
-  color: var(--GColorDarkCandyAppleRed);
+  color: var(--ide-hotkey);
 }
 
 /* --- Menu bar and status line, each with a red hotkey --- */
@@ -54,8 +67,8 @@ body {
   display: flex;
   align-items: center;
   padding: 0 3px;
-  background: var(--GColorLightGray);
-  color: var(--GColorBlack);
+  background: var(--ide-bar);
+  color: var(--ide-bar-text);
   font-size: 15px;
   line-height: 13px;
 }
@@ -76,7 +89,7 @@ body {
 .win {
   left: 0;
   width: 200px;
-  border: 3px double var(--GColorWhite);
+  border: 3px double var(--ide-frame);
 }
 
 /* the title sits centred on the top border */
@@ -86,7 +99,7 @@ body {
   top: -7px;
   transform: translateX(-50%);
   padding: 0 3px;
-  color: var(--GColorWhite);
+  color: var(--ide-frame);
   font-size: 15px;
   font-weight: 400;
   line-height: 11px;
@@ -96,11 +109,11 @@ body {
 .win.editor {
   top: 18px;
   height: 123px;
-  background: var(--GColorDukeBlue);
+  background: var(--ide-editor);
 }
 
 .win.editor b {
-  background: var(--GColorDukeBlue);
+  background: var(--ide-editor);
 }
 
 .code {
@@ -115,15 +128,15 @@ body {
 .win.watchlist {
   top: 144px;
   height: 69px;
-  background: var(--GColorTiffanyBlue);
+  background: var(--ide-watch);
 }
 
 .win.watchlist b {
-  background: var(--GColorTiffanyBlue);
+  background: var(--ide-watch);
 }
 
 .label {
-  color: var(--GColorBlack);
+  color: var(--ide-label);
   font-size: 20px;
   line-height: 20px;
 }

@@ -7,61 +7,99 @@
         {
           "settings": {
             "APPEARANCE_DESKTOP": 0,
-            "APPEARANCE_THEME": 0
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 1,
-            "APPEARANCE_THEME": 0
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 2,
-            "APPEARANCE_THEME": 0
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 3,
-            "APPEARANCE_THEME": 0
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 4,
-            "APPEARANCE_THEME": 0
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 0,
-            "APPEARANCE_THEME": 1
+            "APPEARANCE_THEME": 1,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 0,
-            "APPEARANCE_THEME": 2
+            "APPEARANCE_THEME": 2,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 0,
-            "APPEARANCE_THEME": 3
+            "APPEARANCE_THEME": 3,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 0,
-            "APPEARANCE_THEME": 4
+            "APPEARANCE_THEME": 4,
+            "APPEARANCE_DESKTOP_THEME": 0
           }
         },
         {
           "settings": {
             "APPEARANCE_DESKTOP": 0,
-            "APPEARANCE_THEME": 5
+            "APPEARANCE_THEME": 5,
+            "APPEARANCE_DESKTOP_THEME": 0
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 1,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 1
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 2,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 1
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 3,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 1
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 4,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 1
           }
         }
       ]

@@ -10,6 +10,23 @@
   the value beside it. The .time and .data placeholders are cleared before the shipped bake.
 */
 
+/* the colours by job. the Terminal look sets each again in desktop_dos_terminal.css */
+:root {
+  --dos-screen: var(--GColorDukeBlue);
+  --dos-line: var(--GColorElectricBlue);
+  --dos-title: var(--GColorWhite);
+  --dos-dir: var(--GColorWhite);
+  --dos-pick-bg: var(--GColorTiffanyBlue);
+  --dos-pick: var(--GColorBlack);
+  --dos-exe: var(--GColorIcterine);
+  --dos-prompt: var(--GColorLightGray);
+  --dos-cursor: var(--GColorWhite);
+  --dos-keys-bg: var(--GColorBlack);
+  --dos-keys: var(--GColorWhite);
+  --dos-key-bg: var(--GColorTiffanyBlue);
+  --dos-key: var(--GColorBlack);
+}
+
 body {
   align-items: center;
   justify-content: center;
@@ -30,8 +47,8 @@ body {
   height: 228px;
   position: relative;
   overflow: hidden;
-  background: var(--GColorDukeBlue);
-  color: var(--GColorElectricBlue);
+  background: var(--dos-screen);
+  color: var(--dos-line);
   font-family: 'VT323', monospace;
 }
 
@@ -43,7 +60,7 @@ body {
 
 /* --- Panels --- */
 .panel {
-  border: 3px double var(--GColorElectricBlue);
+  border: 3px double var(--dos-line);
 }
 
 /* the title sits centred on the top border. the lower panels start at y85, so their top double line
@@ -54,8 +71,8 @@ body {
   top: -8px;
   transform: translateX(-50%);
   padding: 0 2px;
-  background: var(--GColorDukeBlue);
-  color: var(--GColorWhite);
+  background: var(--dos-screen);
+  color: var(--dos-title);
   font-size: 16px;
   font-weight: 400;
   line-height: 13px;
@@ -90,16 +107,16 @@ body {
 }
 
 .list .dir {
-  color: var(--GColorWhite);
+  color: var(--dos-dir);
 }
 
 .list .pick {
-  background: var(--GColorTiffanyBlue);
-  color: var(--GColorBlack);
+  background: var(--dos-pick-bg);
+  color: var(--dos-pick);
 }
 
 .list .exe {
-  color: var(--GColorIcterine);
+  color: var(--dos-exe);
 }
 
 .mini {
@@ -107,7 +124,7 @@ body {
   left: 2px;
   right: 2px;
   bottom: 1px;
-  border-top: 1px solid var(--GColorElectricBlue);
+  border-top: 1px solid var(--dos-line);
   font-size: 15px;
   line-height: 11px;
 }
@@ -130,13 +147,13 @@ body {
 .prompt {
   left: 2px;
   top: 197px;
-  color: var(--GColorLightGray);
+  color: var(--dos-prompt);
   font-size: 16px;
   line-height: 13px;
 }
 
 .prompt .cursor {
-  color: var(--GColorWhite);
+  color: var(--dos-cursor);
 }
 
 /* the cyan label boxes are taller than the bar's line, so the bar clips them to its own rows */
@@ -150,16 +167,16 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0 2px;
-  background: var(--GColorBlack);
-  color: var(--GColorWhite);
+  background: var(--dos-keys-bg);
+  color: var(--dos-keys);
   font-size: 16px;
   line-height: 14px;
 }
 
 .keys i {
   padding: 0 1px;
-  background: var(--GColorTiffanyBlue);
-  color: var(--GColorBlack);
+  background: var(--dos-key-bg);
+  color: var(--dos-key);
   font-style: normal;
 }
 

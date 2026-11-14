@@ -29,4 +29,11 @@ const SettingsSchema *vscode_settings_schema(void);
  */
 uint8_t vscode_desktop(void);
 
+/**
+ * @brief The Desktop Theme setting, the look of every desktop but VS Code.
+ *
+ * @return A DesktopTheme.
+ */
+uint8_t vscode_desktop_theme(void);
+
 /** @} */

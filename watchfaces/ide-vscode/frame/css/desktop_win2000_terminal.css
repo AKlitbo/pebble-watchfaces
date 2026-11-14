@@ -1,0 +1,42 @@
+@charset "utf-8";
+
+/*
+  The 2000 desktop's Terminal look: green phosphor on black. It sets the colours
+  desktop_win2000.css uses by job, in the palette's greens, and theme_terminal.css imports it, so a
+  bake of the win2000 frame under the terminal theme draws this look. Every name here carries the
+  desktop's own prefix, so the VS Code page that also imports it is left alone.
+*/
+
+:root {
+  --w2k-desk: var(--GColorBlack);
+  --w2k-ink: var(--GColorGreen);
+  --w2k-face: var(--GColorBlack);
+  --w2k-hi: var(--GColorScreaminGreen);
+  --w2k-dark: var(--GColorDarkGreen);
+  --w2k-shadow: var(--GColorIslamicGreen);
+  --w2k-field: var(--GColorBlack);
+  --w2k-title-1: var(--GColorDarkGreen);
+  --w2k-title-2: var(--GColorIslamicGreen);
+  --w2k-title-3: var(--GColorScreaminGreen);
+  --w2k-title-text: var(--GColorMintGreen);
+  --w2k-muted: var(--GColorIslamicGreen);
+}
+
+/* the start glyph's strap, face, and four panes, each in a green of its own */
+.w2k .start svg :nth-child(1) {
+  fill: var(--GColorDarkGreen);
+}
+
+.w2k .start svg :nth-child(2) {
+  fill: var(--GColorBlack);
+}
+
+.w2k .start svg :nth-child(3),
+.w2k .start svg :nth-child(6) {
+  fill: var(--GColorGreen);
+}
+
+.w2k .start svg :nth-child(4),
+.w2k .start svg :nth-child(5) {
+  fill: var(--GColorMintGreen);
+}

@@ -1,21 +1,23 @@
 /**
  * Inlines the desktop and theme preview screenshots as base64 for the settings page.
  *
- * The Desktop picker shows a shot of each desktop, and the Editor Theme picker a shot of the VS Code
- * desktop in each theme. The stock theme-previews generator inlines one picker's shots, so this
- * builds both maps, each keyed by the value its picker saves.
+ * The Desktop picker shows a shot of each desktop, the Editor Theme picker a shot of the VS Code
+ * desktop in each theme, and the Desktop Theme picker the chosen desktop in its Classic and
+ * Terminal looks. The stock theme-previews generator inlines one picker's shots, so this builds all
+ * three maps, each keyed by the value its picker saves. The Desktop Theme map is keyed by desktop
+ * first, since its shots follow the Desktop picker.
  *
  * The screenshots live in .github/images/ide-vscode/, beside the ones the README uses. A shot that
  * is not there yet is skipped with a warning, and its row in the picker shows the name alone, so
  * the page still builds before every shot is taken.
  *
  * `--from=<folder>` first copies a tap-walk of the `previews` walk into place. The walk shows the
- * five desktops and then VS Code in each theme after Dark, so its ten shots land in that order,
- * and the first one is both the VS Code desktop and the Dark theme.
+ * five desktops, then VS Code in each theme after Dark, then each other desktop in Terminal, so
+ * its shots land in that order, and the first one is both the VS Code desktop and the Dark theme.
  *
  * Run it with `npm run gen:previews` after changing the pictures.
  *
- * Input:  ../../../.github/images/ide-vscode/desktop_<name>.png and theme_<name>.png
+ * Input:  ../../../.github/images/ide-vscode/desktop_<name>[_terminal].png and theme_<name>.png
  * Output: src/pkjs/clay/previews.g.js
  */
 import fs from 'node:fs';
@@ -56,6 +58,16 @@ const WALK_SHOTS = [
   ['theme_cyberpunk.png'],
   ['theme_synthwave.png'],
   ['theme_mono.png'],
+  ['desktop_win95_terminal.png'],
+  ['desktop_win2000_terminal.png'],
+  ['desktop_dos_terminal.png'],
+  ['desktop_dos-ide_terminal.png'],
+];
+
+// the Desktop Theme picker's looks, by the value it saves, and the suffix each look's shot carries
+const LOOKS = [
+  [0, ''],
+  [1, '_terminal'],
 ];
 
 /** Copies a tap-walk's shots into the images folder under the names the pickers read. */
@@ -100,9 +112,16 @@ if (fromArg) {
   copyWalk(fromArg.slice('--from='.length));
 }
 
+// every desktop but VS Code, which has the Editor Theme picker instead
+const desktopTheme = {};
+for (const [value, name] of DESKTOPS.slice(1)) {
+  desktopTheme[String(value)] = previewsFor('desktop', LOOKS.map(([look, suffix]) => [look, name + suffix]));
+}
+
 const previews = {
   desktop: previewsFor('desktop', DESKTOPS),
   theme: previewsFor('theme', THEMES),
+  desktopTheme,
 };
 
 const banner = [

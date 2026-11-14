@@ -11,6 +11,30 @@
   the rect of the value beside it.
 */
 
+/* the colours by job. the Terminal look sets each again in desktop_win95_terminal.css */
+:root {
+  --w95-desk: var(--GColorTiffanyBlue);
+  --w95-ink: var(--GColorBlack);
+  --w95-face: var(--GColorLightGray);
+  --w95-dark: var(--GColorBlack);
+  --w95-hi: var(--GColorWhite);
+  --w95-shadow: var(--GColorDarkGray);
+  --w95-title-off: var(--GColorDarkGray);
+  --w95-title-off-text: var(--GColorLightGray);
+  --w95-title: var(--GColorDukeBlue);
+  --w95-title-text: var(--GColorWhite);
+  --w95-doc: var(--GColorWhite);
+  --w95-doc-edge: var(--GColorPictonBlue);
+  --w95-page: var(--GColorWhite);
+  --w95-gutter: var(--GColorLightGray);
+  --w95-gutter-text: var(--GColorDarkGray);
+  --w95-comment: var(--GColorIslamicGreen);
+  --w95-muted: var(--GColorDarkGray);
+  --w95-console: var(--GColorBlack);
+  --w95-console-text: var(--GColorLightGray);
+  --w95-command: var(--GColorWhite);
+}
+
 body {
   align-items: center;
   justify-content: center;
@@ -31,8 +55,8 @@ body {
   height: 228px;
   position: relative;
   overflow: hidden;
-  background: var(--GColorTiffanyBlue);
-  color: var(--GColorBlack);
+  background: var(--w95-desk);
+  color: var(--w95-ink);
   font-family: 'Pixelify Sans', sans-serif;
 }
 
@@ -40,27 +64,27 @@ body {
 .win {
   position: absolute;
   box-sizing: border-box;
-  background: var(--GColorLightGray);
+  background: var(--w95-face);
   box-shadow:
-    inset 1px 1px 0 var(--GColorLightGray),
-    inset -1px -1px 0 var(--GColorBlack),
-    inset 2px 2px 0 var(--GColorWhite),
-    inset -2px -2px 0 var(--GColorDarkGray);
+    inset 1px 1px 0 var(--w95-face),
+    inset -1px -1px 0 var(--w95-dark),
+    inset 2px 2px 0 var(--w95-hi),
+    inset -2px -2px 0 var(--w95-shadow);
 }
 
 .btn,
 .start {
-  background: var(--GColorLightGray);
+  background: var(--w95-face);
   box-shadow:
-    inset 1px 1px 0 var(--GColorWhite),
-    inset -1px -1px 0 var(--GColorBlack),
-    inset -2px -2px 0 var(--GColorDarkGray);
+    inset 1px 1px 0 var(--w95-hi),
+    inset -1px -1px 0 var(--w95-dark),
+    inset -2px -2px 0 var(--w95-shadow);
 }
 
 .sunk {
   box-shadow:
-    inset 1px 1px 0 var(--GColorDarkGray),
-    inset -1px -1px 0 var(--GColorWhite);
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-hi);
 }
 
 /* --- Title bars --- */
@@ -70,15 +94,15 @@ body {
   align-items: center;
   gap: 2px;
   padding: 0 2px;
-  background: var(--GColorDarkGray);
-  color: var(--GColorLightGray);
+  background: var(--w95-title-off);
+  color: var(--w95-title-off-text);
   font-size: 10px;
   font-weight: 600;
 }
 
 .title.active {
-  background: var(--GColorDukeBlue);
-  color: var(--GColorWhite);
+  background: var(--w95-title);
+  color: var(--w95-title-text);
 }
 
 .title .name {
@@ -89,8 +113,8 @@ body {
 .title .doc {
   width: 7px;
   height: 8px;
-  background: var(--GColorWhite);
-  box-shadow: inset -2px -2px 0 var(--GColorPictonBlue);
+  background: var(--w95-doc);
+  box-shadow: inset -2px -2px 0 var(--w95-doc-edge);
   margin-right: 1px;
 }
 
@@ -100,7 +124,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--GColorBlack);
+  color: var(--w95-ink);
   font-size: 8px;
   line-height: 1;
 }
@@ -135,7 +159,7 @@ body {
 .page {
   flex: 1;
   position: relative;
-  background: var(--GColorWhite);
+  background: var(--w95-page);
   font-family: 'Share Tech Mono', monospace;
 }
 
@@ -147,8 +171,8 @@ body {
   width: 13px;
   box-sizing: border-box;
   padding: 2px 2px 0 0;
-  background: var(--GColorLightGray);
-  color: var(--GColorDarkGray);
+  background: var(--w95-gutter);
+  color: var(--w95-gutter-text);
   font-size: 9px;
   line-height: 11.5px;
   text-align: right;
@@ -159,7 +183,7 @@ body {
   left: 19px;
   top: 1px;
   font-size: 10px;
-  color: var(--GColorIslamicGreen);
+  color: var(--w95-comment);
 }
 
 .where {
@@ -167,7 +191,7 @@ body {
   right: 4px;
   bottom: 2px;
   font-size: 9px;
-  color: var(--GColorDarkGray);
+  color: var(--w95-muted);
 }
 
 /* --- Prompt window --- */
@@ -190,8 +214,8 @@ body {
 .console {
   flex: 1;
   position: relative;
-  background: var(--GColorBlack);
-  color: var(--GColorLightGray);
+  background: var(--w95-console);
+  color: var(--w95-console-text);
   font-family: 'VT323', monospace;
   font-size: 20px;
   line-height: 20px;
@@ -203,7 +227,7 @@ body {
 }
 
 .line .cmd {
-  color: var(--GColorWhite);
+  color: var(--w95-command);
 }
 
 .line.run {

@@ -36,7 +36,8 @@
     "CONNECTION_VIBE_CONNECT",
     "CONNECTION_VIBE_DISCONNECT",
     "BATTERY_DISPLAY",
-    "APPEARANCE_DESKTOP"
+    "APPEARANCE_DESKTOP",
+    "APPEARANCE_DESKTOP_THEME"
   ],
   "resources": {
     "media": [
@@ -50,6 +51,10 @@
       { "type": "bitmap", "name": "IMAGE_BG_WIN2000", "file": "images/background-win2000.png" },
       { "type": "bitmap", "name": "IMAGE_BG_DOS", "file": "images/background-dos.png" },
       { "type": "bitmap", "name": "IMAGE_BG_DOS_IDE", "file": "images/background-dos-ide.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_WIN95_TERMINAL", "file": "images/background-win95-terminal.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_WIN2000_TERMINAL", "file": "images/background-win2000-terminal.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_DOS_TERMINAL", "file": "images/background-dos-terminal.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_DOS_IDE_TERMINAL", "file": "images/background-dos-ide-terminal.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
       { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },

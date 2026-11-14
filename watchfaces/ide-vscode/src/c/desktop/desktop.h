@@ -31,6 +31,14 @@ typedef enum
     DESKTOP_COUNT
 } DesktopId;
 
+/** @brief The Desktop Theme setting's values, the looks every desktop but VS Code has. */
+typedef enum
+{
+    DESKTOP_THEME_CLASSIC,
+    DESKTOP_THEME_TERMINAL,  ///< green phosphor on black
+    DESKTOP_THEME_COUNT
+} DesktopTheme;
+
 /** @brief The engine text-slot ids, one per live readout. */
 enum
 {
@@ -60,7 +68,8 @@ typedef enum
  * @brief One desktop's layout.
  *
  * A zero-sized rect leaves that piece out. VS Code takes its colours from the Theme setting, so
- * its table holds the Dark+ colours and layout.c paints the chosen theme's over them.
+ * its table holds the Dark+ colours and layout.c paints the chosen theme's over them. The other
+ * desktops hold their Classic colours, and layout.c paints greens over them for the Terminal look.
  *
  * A desktop that shows its status as glyphs packs them leftwards from the battery icon: the icon,
  * the percentage, bluetooth, then Quiet Time, STATUS_GAP apart, with anything hidden closing up.
@@ -70,6 +79,7 @@ typedef enum
 typedef struct DesktopLayout
 {
     uint32_t    background;            ///< the baked frame, or 0 when the theme picks it
+    uint32_t    background_terminal;   ///< the baked frame for the Terminal look
     uint32_t    fonts[FONT_COUNT];     ///< the font resource for each slot, 0 for a slot left empty
     const char *system_fonts[FONT_COUNT]; ///< a built-in font key for a slot, which costs no resource
     Zone        zones[ZONE_COUNT];     ///< where each readout sits, in which font and colour

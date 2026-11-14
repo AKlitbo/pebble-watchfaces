@@ -9,6 +9,22 @@
   The .time and .data placeholders are cleared before the shipped bake, since the app draws them.
 */
 
+/* the colours by job. the Terminal look sets each again in desktop_win2000_terminal.css */
+:root {
+  --w2k-desk: var(--GColorLiberty);
+  --w2k-ink: var(--GColorBlack);
+  --w2k-face: var(--GColorLightGray);
+  --w2k-hi: var(--GColorWhite);
+  --w2k-dark: var(--GColorBlack);
+  --w2k-shadow: var(--GColorDarkGray);
+  --w2k-field: var(--GColorWhite);
+  --w2k-title-1: var(--GColorOxfordBlue);
+  --w2k-title-2: var(--GColorLiberty);
+  --w2k-title-3: var(--GColorBabyBlueEyes);
+  --w2k-title-text: var(--GColorWhite);
+  --w2k-muted: var(--GColorDarkGray);
+}
+
 body {
   align-items: center;
   justify-content: center;
@@ -29,8 +45,8 @@ body {
   height: 228px;
   position: relative;
   overflow: hidden;
-  background: var(--GColorLiberty);
-  color: var(--GColorBlack);
+  background: var(--w2k-desk);
+  color: var(--w2k-ink);
   font-family: 'PT Sans', sans-serif;
 }
 
@@ -41,19 +57,19 @@ body {
 
 /* --- Bevels --- */
 .raised {
-  background: var(--GColorLightGray);
+  background: var(--w2k-face);
   box-shadow:
-    inset 1px 1px 0 var(--GColorWhite),
-    inset -1px -1px 0 var(--GColorBlack),
-    inset -2px -2px 0 var(--GColorDarkGray);
+    inset 1px 1px 0 var(--w2k-hi),
+    inset -1px -1px 0 var(--w2k-dark),
+    inset -2px -2px 0 var(--w2k-shadow);
 }
 
 .sunk {
-  background: var(--GColorWhite);
+  background: var(--w2k-field);
   box-shadow:
-    inset 1px 1px 0 var(--GColorDarkGray),
-    inset -1px -1px 0 var(--GColorWhite),
-    inset 2px 2px 0 var(--GColorBlack);
+    inset 1px 1px 0 var(--w2k-shadow),
+    inset -1px -1px 0 var(--w2k-hi),
+    inset 2px 2px 0 var(--w2k-dark);
 }
 
 /* --- Dialog --- */
@@ -74,13 +90,8 @@ body {
   align-items: center;
   gap: 1px;
   padding: 0 2px 0 4px;
-  background: linear-gradient(
-    90deg,
-    var(--GColorOxfordBlue) 0 34%,
-    var(--GColorLiberty) 34% 67%,
-    var(--GColorBabyBlueEyes) 67%
-  );
-  color: var(--GColorWhite);
+  background: linear-gradient(90deg, var(--w2k-title-1) 0 34%, var(--w2k-title-2) 34% 67%, var(--w2k-title-3) 67%);
+  color: var(--w2k-title-text);
   font-size: 10px;
   font-weight: 700;
 }
@@ -97,7 +108,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0 1px 1px 0;
-  color: var(--GColorBlack);
+  color: var(--w2k-ink);
   font-size: 9px;
   font-weight: 700;
   line-height: 9px;
@@ -132,14 +143,14 @@ body {
 
 .tab.raised {
   box-shadow:
-    inset 1px 1px 0 var(--GColorWhite),
-    inset -1px 0 0 var(--GColorBlack);
+    inset 1px 1px 0 var(--w2k-hi),
+    inset -1px 0 0 var(--w2k-dark);
 }
 
 .tab.other {
   height: 11px;
   margin-top: 1px;
-  color: var(--GColorDarkGray);
+  color: var(--w2k-muted);
 }
 
 .panel {
@@ -147,17 +158,17 @@ body {
   top: 33px;
   width: 188px;
   height: 171px;
-  border: 1px solid var(--GColorWhite);
-  border-right-color: var(--GColorDarkGray);
-  border-bottom-color: var(--GColorDarkGray);
+  border: 1px solid var(--w2k-hi);
+  border-right-color: var(--w2k-shadow);
+  border-bottom-color: var(--w2k-shadow);
 }
 
 /* --- Group boxes --- */
 .group {
   left: 10px;
   width: 180px;
-  border: 1px solid var(--GColorDarkGray);
-  box-shadow: 1px 1px 0 var(--GColorWhite);
+  border: 1px solid var(--w2k-shadow);
+  box-shadow: 1px 1px 0 var(--w2k-hi);
 }
 
 .group b {
@@ -165,7 +176,7 @@ body {
   left: 5px;
   top: -7px;
   padding: 0 2px;
-  background: var(--GColorLightGray);
+  background: var(--w2k-face);
   font-size: 10px;
   font-weight: 400;
   line-height: 12px;
@@ -237,10 +248,10 @@ body {
   top: 212px;
   width: 88px;
   height: 14px;
-  background: var(--GColorLightGray);
+  background: var(--w2k-face);
   box-shadow:
-    inset 1px 1px 0 var(--GColorDarkGray),
-    inset -1px -1px 0 var(--GColorWhite);
+    inset 1px 1px 0 var(--w2k-shadow),
+    inset -1px -1px 0 var(--w2k-hi);
 }
 
 /* --- Live values (preview only) --- */

@@ -9,9 +9,9 @@ import buildConfig from '../../paf/ts/pkjs/config-builder';
 import previews from './clay/previews.g';
 
 export default buildConfig({
-  // the Desktop picker leads, then the theme, each with a shot of the choice under it. the theme
-  // picker is spelled out here rather than handed to buildConfig's theme shorthand, since that
-  // renders it first and cannot hide it
+  // the Desktop picker leads, then the look for the chosen desktop, each with a shot of the choice
+  // under it. the theme picker is spelled out here rather than handed to buildConfig's theme
+  // shorthand, since that renders it first and cannot hide it
   appearanceItems: [
     {
       'type': 'themePreview',
@@ -45,6 +45,22 @@ export default buildConfig({
         { 'label': 'Mono (Black & White)', 'value': 5 },
       ],
       'previews': previews.theme,
+    },
+    // every other desktop has a Classic and a Terminal look, kept apart from the VS Code theme so
+    // each choice survives a switch between desktops. the shots under it follow the Desktop picker
+    {
+      'type': 'themePreview',
+      'messageKey': 'APPEARANCE_DESKTOP_THEME',
+      'visibleWhen': { 'key': 'APPEARANCE_DESKTOP', 'notIn': [0] },
+      'label': 'Desktop Theme',
+      'description': 'The desktop in its own colours, or in green on black.',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'Classic', 'value': 0 },
+        { 'label': 'Terminal', 'value': 1 },
+      ],
+      'previews': previews.desktopTheme,
+      'previewsByKey': 'APPEARANCE_DESKTOP',
     },
   ],
   bluetooth: {

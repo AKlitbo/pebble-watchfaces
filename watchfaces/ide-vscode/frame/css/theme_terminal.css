@@ -1,4 +1,10 @@
 @charset "utf-8";
+
+/* each desktop's own Terminal look, so a desktop baked under this theme takes its green colours */
+@import url('desktop_win95_terminal.css');
+@import url('desktop_win2000_terminal.css');
+@import url('desktop_dos_terminal.css');
+@import url('desktop_dos-ide_terminal.css');
 /*
   Terminal (hacker/phosphor) palette: pure-black field, neon-green everything, dashed
   borders. Every value is a Pebble-64 GColor from the frame plugin's pebble-colors.css. The

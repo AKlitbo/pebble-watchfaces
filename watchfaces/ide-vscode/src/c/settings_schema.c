@@ -29,8 +29,8 @@
  * Fields only ever get added to the end, so there is no older layout to bring forward.
  * A field added to the end needs no version bump, since a shorter save already on the
  * watch reads back with the new field on its default. The schema's first size is the
- * 25 bytes the first release saved, without the hourly buzz and the desktop at the end, so a
- * save that short still loads with both on their defaults.
+ * 25 bytes the first release saved, without the hourly buzz and the desktop settings at the end,
+ * so a save that short still loads with each on its default.
  */
 typedef struct VscodeSettings
 {
@@ -46,6 +46,7 @@ typedef struct VscodeSettings
     uint8_t battery_display;
     uint8_t hourly_vibe;
     uint8_t desktop;
+    uint8_t desktop_theme;
 } VscodeSettings;
 
 static VscodeSettings s_settings;
@@ -54,6 +55,7 @@ static VscodeSettings s_settings;
 // and serialises them, but will not index them for a typed read, so the accessor below reaches
 // into the struct. cast because the field table's id is a SettingId and mixing enums is an error
 #define SETTING_DESKTOP ((SettingId)(SETTING_COUNT))
+#define SETTING_DESKTOP_THEME ((SettingId)(SETTING_COUNT + 1))
 
 // every KNOWN_ entry takes its default from the settings page, so the date opens on the compact
 // single line ("JUN 18") the page sets to fit the terminal panel
@@ -75,6 +77,10 @@ static const SettingField s_fields[] = {
     { .id = SETTING_DESKTOP, .message_key = &MESSAGE_KEY_APPEARANCE_DESKTOP,
       .type = SETTING_ENUM_U8, .offset = offsetof(VscodeSettings, desktop),
       .enum_count = DESKTOP_COUNT, .default_num = DESKTOP_VSCODE },
+    // kept apart from the VS Code theme, so each one survives a switch between desktops
+    { .id = SETTING_DESKTOP_THEME, .message_key = &MESSAGE_KEY_APPEARANCE_DESKTOP_THEME,
+      .type = SETTING_ENUM_U8, .offset = offsetof(VscodeSettings, desktop_theme),
+      .enum_count = DESKTOP_THEME_COUNT, .default_num = DESKTOP_THEME_CLASSIC },
 };
 
 static const SettingsSchema s_schema = {
@@ -94,6 +100,11 @@ const SettingsSchema *vscode_settings_schema(void)
 uint8_t vscode_desktop(void)
 {
     return s_settings.desktop;
+}
+
+uint8_t vscode_desktop_theme(void)
+{
+    return s_settings.desktop_theme;
 }
 
 /** @} */

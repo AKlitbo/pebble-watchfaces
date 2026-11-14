@@ -49,6 +49,31 @@ static void apply_theme_colors(DesktopLayout *layout, uint8_t theme)
 }
 
 /**
+ * @brief Paint the Terminal look's greens over a desktop's Classic colours.
+ *
+ * Every desktop's Terminal frame is green on black, so one set of greens serves them all: the
+ * brightest for the clock and the values, a softer one for the date, and darker ones for a status
+ * that is off.
+ *
+ * @param layout The active layout to paint.
+ */
+static void apply_terminal_colors(DesktopLayout *layout)
+{
+    for (uint8_t zone = 0; zone < ZONE_COUNT; zone++)
+    {
+        layout->zones[zone].color = GColorGreen;
+    }
+
+    layout->zones[ZONE_DATE].color = GColorScreaminGreen;
+    layout->wx_color = GColorGreen;
+    layout->batt_color = GColorGreen;
+    layout->batt_fill = GColorGreen;
+    layout->status_color = GColorGreen;
+    layout->status_off_color = GColorIslamicGreen;
+    layout->quiet_color = GColorMintGreen;
+}
+
+/**
  * @brief Load a desktop's fonts into their slots, freeing whatever the last desktop loaded.
  *
  * A desktop that sets two jobs in the same resource gets one loaded font in both slots, which the
@@ -165,6 +190,11 @@ void vscode_apply_theme(void)
     {
         apply_theme_colors(&s_layout, theme);
         frame = bg_resource_for_theme(theme);
+    }
+    else if (vscode_desktop_theme() == DESKTOP_THEME_TERMINAL)
+    {
+        apply_terminal_colors(&s_layout);
+        frame = table->background_terminal;
     }
 
     // the fonts only change with the desktop, and the engine rebuild that follows makes the

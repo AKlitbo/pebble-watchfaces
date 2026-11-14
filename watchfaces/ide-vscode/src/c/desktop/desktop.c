@@ -118,6 +118,7 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     // a code editor window over a prompt window, on a teal desktop with a taskbar
     [DESKTOP_WIN95] = {
         .background = RESOURCE_ID_IMAGE_BG_WIN95,
+        .background_terminal = RESOURCE_ID_IMAGE_BG_WIN95_TERMINAL,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_84,
             [FONT_DATE] = RESOURCE_ID_FONT_STM_14,
@@ -165,6 +166,7 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     // on the right
     [DESKTOP_WIN2000] = {
         .background = RESOURCE_ID_IMAGE_BG_WIN2000,
+        .background_terminal = RESOURCE_ID_IMAGE_BG_WIN2000_TERMINAL,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_75,
         },
@@ -211,6 +213,7 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     // panel of labelled values, a command line, and the function keys
     [DESKTOP_DOS] = {
         .background = RESOURCE_ID_IMAGE_BG_DOS,
+        .background_terminal = RESOURCE_ID_IMAGE_BG_DOS_TERMINAL,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_84,
             [FONT_DATE] = RESOURCE_ID_FONT_VT_20,
@@ -257,6 +260,7 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     // Watch window of labelled values in two columns over a status line of function keys
     [DESKTOP_DOS_IDE] = {
         .background = RESOURCE_ID_IMAGE_BG_DOS_IDE,
+        .background_terminal = RESOURCE_ID_IMAGE_BG_DOS_IDE_TERMINAL,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_100,
             [FONT_DATE] = RESOURCE_ID_FONT_VT_20,

@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+/*
+  The DOS IDE desktop's Terminal look: green phosphor on black. It sets the colours
+  desktop_dos-ide.css uses by job, in the palette's greens, and theme_terminal.css imports it, so a
+  bake of the dos-ide frame under the terminal theme draws this look. Every name here carries the
+  desktop's own prefix, so the VS Code page that also imports it is left alone.
+*/
+
+:root {
+  --ide-screen: var(--GColorBlack);
+  --ide-code: var(--GColorScreaminGreen);
+  --ide-hotkey: var(--GColorMintGreen);
+  --ide-bar: var(--GColorDarkGreen);
+  --ide-bar-text: var(--GColorGreen);
+  --ide-frame: var(--GColorGreen);
+  --ide-editor: var(--GColorBlack);
+  --ide-watch: var(--GColorBlack);
+  --ide-label: var(--GColorIslamicGreen);
+}

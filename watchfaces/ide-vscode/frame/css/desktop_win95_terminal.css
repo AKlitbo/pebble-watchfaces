@@ -1,0 +1,50 @@
+@charset "utf-8";
+
+/*
+  The 95 desktop's Terminal look: green phosphor on black. It sets the colours
+  desktop_win95.css uses by job, in the palette's greens, and theme_terminal.css imports it, so a
+  bake of the win95 frame under the terminal theme draws this look. Every name here carries the
+  desktop's own prefix, so the VS Code page that also imports it is left alone.
+*/
+
+:root {
+  --w95-desk: var(--GColorBlack);
+  --w95-ink: var(--GColorGreen);
+  --w95-face: var(--GColorBlack);
+  --w95-dark: var(--GColorDarkGreen);
+  --w95-hi: var(--GColorScreaminGreen);
+  --w95-shadow: var(--GColorIslamicGreen);
+  --w95-title-off: var(--GColorDarkGreen);
+  --w95-title-off-text: var(--GColorIslamicGreen);
+  --w95-title: var(--GColorIslamicGreen);
+  --w95-title-text: var(--GColorBlack);
+  --w95-doc: var(--GColorGreen);
+  --w95-doc-edge: var(--GColorDarkGreen);
+  --w95-page: var(--GColorBlack);
+  --w95-gutter: var(--GColorDarkGreen);
+  --w95-gutter-text: var(--GColorScreaminGreen);
+  --w95-comment: var(--GColorIslamicGreen);
+  --w95-muted: var(--GColorIslamicGreen);
+  --w95-console: var(--GColorBlack);
+  --w95-console-text: var(--GColorIslamicGreen);
+  --w95-command: var(--GColorGreen);
+}
+
+/* the start glyph's strap, face, and four panes, each in a green of its own */
+.w95 .start svg :nth-child(1) {
+  fill: var(--GColorDarkGreen);
+}
+
+.w95 .start svg :nth-child(2) {
+  fill: var(--GColorBlack);
+}
+
+.w95 .start svg :nth-child(3),
+.w95 .start svg :nth-child(6) {
+  fill: var(--GColorGreen);
+}
+
+.w95 .start svg :nth-child(4),
+.w95 .start svg :nth-child(5) {
+  fill: var(--GColorMintGreen);
+}
