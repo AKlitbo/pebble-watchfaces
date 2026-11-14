@@ -2,7 +2,7 @@
 
 The watchfaces in this repository are under the AGPL-3.0-or-later, see [LICENSE](LICENSE). They bundle the third-party work below, each of which keeps its own licence. This file is how those licences are passed on to anyone a watchface or this repository is given to.
 
-For who made these and what they are used for, see the Credits section of the [README](README.md).
+For who made these and what they are used for, see the Credits section of each face's README, linked from the [Watchfaces](README.md#watchfaces) table.
 
 Each face bundles only what it uses, so the notices are grouped by what ships in which `.pbw`. The Code section ships in Gridlock only, and the General section applies to every face.
 
@@ -28,11 +28,11 @@ All fonts below are under the SIL Open Font License 1.1, published at <https://o
 
 - **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. Licence text in [OFL.txt](watchfaces/radar-array/resources/fonts/OFL.txt)
 
-### Sketchbook
+### Sketchbook Horizon
 
-The faces in this family all set their type in the same face, and each bundles its own copy.
+Sketchbook Horizon sets its type in one face and bundles its own copy.
 
-- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012 Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in each face's [OFL.txt](watchfaces/sketchbook-horizon/resources/fonts/OFL.txt). The settings page carries a Latin subset of it, renamed Sketchbook Hand as the licence asks of a modified version under a Reserved Font Name, built by `watchfaces/sketchbook-horizon/tools/page-font.py`.
+- **[Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand)**: Copyright (c) 2010-2012 Patrick Wagesreiter, with Reserved Font Name "Patrick Hand". Licence text in its [OFL.txt](watchfaces/sketchbook-horizon/resources/fonts/OFL.txt). The settings page carries a Latin subset of it, renamed Sketchbook Hand as the licence asks of a modified version under a Reserved Font Name, built by `watchfaces/sketchbook-horizon/tools/page-font.py`.
 
 ### Mosaic
 
@@ -62,10 +62,10 @@ Both fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), w
 
 The SVG sources for the weather, glyph, and bluetooth icons are not in this repository. They are fetched to regenerate the icons, and only the rendered PNGs are bundled.
 
-Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`. Radar Array and the Sketchbook faces draw no weather icons, so they bundle only the bluetooth glyphs.
+Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`. Radar Array and Sketchbook Horizon draw no weather icons, so they bundle only the bluetooth glyphs.
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and Sidereel
-- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by the Sketchbook faces, Gridlock and Sidereel
+- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by Sketchbook Horizon, Gridlock and Sidereel
 - **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources fetched into `vendor/svgrepo/`, rendered PNGs bundled by every face
 
 ## Trademarks
