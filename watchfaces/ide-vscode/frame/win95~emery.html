@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>95</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Share+Tech+Mono&family=VT323&display=swap">
+        <link rel="stylesheet" type="text/css" href="../paf/plugins/frame/css/pebble-colors.css">
+        <!-- the name leaves out theme_, so the theme swap the VS Code bake does leaves it alone -->
+        <link rel="stylesheet" type="text/css" href="css/desktop_win95.css">
+    </head>
+    <body>
+        <div class="viewport">
+            <div class="watch">
+                <!-- the editor window: the app draws the clock and the date as its second and third lines -->
+                <div class="win editor">
+                    <div class="title active">
+                        <span class="doc"></span>
+                        <span class="name">clock.c - Editor</span>
+                        <span class="btn">_</span><span class="btn">&#9633;</span><span class="btn close">x</span>
+                    </div>
+                    <div class="menu"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+                    <div class="sunk page">
+                        <div class="gutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+                        <div class="comment">// local time</div>
+                        <div class="where">Ln 2, Col 5</div>
+                    </div>
+                </div>
+                <div class="time">10:42</div>
+                <div class="data date">"THU 18 JUN";</div>
+
+                <!-- the prompt window: labels baked, values app-drawn -->
+                <div class="win prompt">
+                    <div class="title">
+                        <span class="name">Prompt</span>
+                        <span class="btn close">x</span>
+                    </div>
+                    <div class="console">
+                        <div class="line run">C:\WATCH&gt;<span class="cmd">status.bat</span></div>
+                        <div class="line wx">WX</div>
+                        <div class="line hr">HR</div>
+                        <div class="line stp">STP</div>
+                    </div>
+                </div>
+                <span class="data val temp">21C</span>
+                <span class="data val cond">CLDY</span>
+                <span class="data val hr">72</span>
+                <span class="data val steps">8431</span>
+
+                <!-- the taskbar: the tray's Quiet Time, bluetooth, and battery are app-drawn -->
+                <div class="win taskbar">
+                    <div class="start">
+                        <svg width="10" height="10" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="0" width="6" height="16" rx="1" fill="#555555"/><rect x="1" y="2" width="14" height="12" rx="3" fill="#000000"/><path d="M3 4.6Q5.2 3.6 7.5 4.2V7.6Q5.2 7 3 8Z" fill="#FF5500"/><path d="M8.5 4.2Q10.8 4.8 13 3.8V7.2Q10.8 8.2 8.5 7.6Z" fill="#55AA00"/><path d="M3 9Q5.2 8 7.5 8.6V12Q5.2 11.4 3 12.4Z" fill="#0055FF"/><path d="M8.5 8.6Q10.8 9.2 13 8.2V11.6Q10.8 12.6 8.5 12Z" fill="#FFAA00"/></svg>
+                        Start
+                    </div>
+                    <div class="sunk task">clock.c</div>
+                    <div class="sunk tray"></div>
+                </div>
+                <span class="data batt">80%</span>
+            </div>
+        </div>
+        <script>
+            // ?frame switches to the shipped chrome-only bake: clear the live
+            // readouts so only the static frame chrome is captured
+            if (location.search.indexOf('frame') >= 0) {
+              document.documentElement.classList.add('frame-render');
+              document.querySelectorAll('.time, .data')
+                      .forEach(function (el) { el.textContent = ''; });
+            }
+        </script>
+    </body>
+</html>

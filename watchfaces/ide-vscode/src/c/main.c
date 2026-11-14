@@ -54,8 +54,8 @@ static TimeConfig time_cfg(void)
  */
 static void on_settings_changed(bool time_or_date_changed)
 {
-    // re-apply the zone colours + frame then rebuild so the text-slots pick them up. the
-    // rebuild also re-pulls every readout covering a battery-display / unit / format change
+    // re-apply the desktop's fonts, colours, and frame, then rebuild so the text-slots pick them
+    // up. the rebuild also re-pulls every readout covering a battery-display / unit / format change
     vscode_apply_theme();
     engine_rebuild();
 
@@ -93,7 +93,7 @@ static void init(void)
     }
 
     s_window = window_create();
-    vscode_setup(s_window);              // fonts + frame + overlays + theme colours
+    vscode_setup(s_window);              // the desktop's fonts, frame, and colours
     engine_init(s_window, vscode_build); // build the slot layers over the frame
     window_stack_push(s_window, true);
 

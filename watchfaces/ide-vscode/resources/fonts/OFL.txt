@@ -1,6 +1,6 @@
-This directory contains the Teko and Share Tech Mono fonts, both licensed under
-the SIL Open Font License Version 1.1 (OFL 1.1). Their copyright notices are
-listed below.
+This directory contains the Teko, Share Tech Mono, and VT323 fonts, all licensed
+under the SIL Open Font License Version 1.1 (OFL 1.1). Their copyright notices
+are listed below.
 
   Teko
     Copyright 2023 The Teko Project Authors
@@ -10,6 +10,9 @@ listed below.
     Copyright (c) 2012, Carrois Type Design, Ralph du Carrois
     (post@carrois.com www.carrois.com),
     with Reserved Font Name 'Share'
+
+  VT323
+    Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
 
 The full text of the SIL Open Font License Version 1.1 is reproduced
 below. It is also available, together with an FAQ, at:

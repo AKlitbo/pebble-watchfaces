@@ -1,13 +1,13 @@
 /**
  * @file fonts.h
- * @brief VS Code font slots, one per Teko / Share Tech Mono size the face loads.
+ * @brief The font slots, one per job a font does on screen.
  *
- * Named for the resource each one holds rather than the job it does, so a slot maps one to one
- * onto the manifest and two roles at the same size share a slot instead of loading it twice.
+ * Each desktop draws in its own fonts, so a slot names the job and the desktop's layout table
+ * names the resource that fills it (see desktop/desktop.c). Two jobs a desktop sets in the same
+ * resource share one loaded font rather than loading it twice.
  *
- * These are the ids passed to the framework's font registry (ui/fonts.h): layout.c load_fonts
- * registers a handle under each and the zone table names the slot from here. Listed in
- * registration order.
+ * These are the ids passed to the framework's font registry (ui/fonts.h), and the zone tables
+ * name the slot from here.
  *
  * @ingroup watchface-vscode
  */
@@ -21,11 +21,11 @@
 
 enum
 {
-    FONT_TEKO_82,  // clock
-    FONT_TEKO_78,  // clock fallback for the wider .beats reading
-    FONT_STM_20,   // date line
-    FONT_STM_14,   // the weather / hr / steps readouts, and the battery
-    FONT_STM_12,   // date fallback, and the condition fallback
+    FONT_CLOCK,        // clock
+    FONT_CLOCK_SMALL,  // clock fallback for the wider .beats reading
+    FONT_DATE,         // date line
+    FONT_TEXT,         // the readouts and the battery
+    FONT_SMALL,        // fallback for a date or a readout too wide for its own font
     FONT_COUNT
 };
 

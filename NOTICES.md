@@ -53,10 +53,11 @@ One of the header fonts is not under the OFL:
 
 ### IDE VSCode
 
-Both fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a copyright notice for each.
+Its fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a copyright notice for each.
 
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
 - **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
+- **[VT323](https://fonts.google.com/specimen/VT323)**: Copyright 2011, The VT323 Project Authors
 
 ## Icons
 

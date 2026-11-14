@@ -35,7 +35,8 @@
     "CONNECTION_BLUETOOTH_ICON",
     "CONNECTION_VIBE_CONNECT",
     "CONNECTION_VIBE_DISCONNECT",
-    "BATTERY_DISPLAY"
+    "BATTERY_DISPLAY",
+    "APPEARANCE_DESKTOP"
   ],
   "resources": {
     "media": [
@@ -45,6 +46,10 @@
       { "type": "bitmap", "name": "IMAGE_BG_CYBERPUNK", "file": "images/background-cyberpunk.png" },
       { "type": "bitmap", "name": "IMAGE_BG_SYNTHWAVE", "file": "images/background-synthwave.png" },
       { "type": "bitmap", "name": "IMAGE_BG_MONO", "file": "images/background-mono.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_WIN95", "file": "images/background-win95.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_WIN2000", "file": "images/background-win2000.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_DOS", "file": "images/background-dos.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_DOS_IDE", "file": "images/background-dos-ide.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
       { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
@@ -105,6 +110,30 @@
         "type": "font",
         "name": "FONT_STM_12",
         "file": "fonts/ShareTechMono-Regular.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_VT_75",
+        "file": "fonts/VT323-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_VT_84",
+        "file": "fonts/VT323-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_VT_100",
+        "file": "fonts/VT323-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_VT_20",
+        "file": "fonts/VT323-Regular.ttf",
+        "characterRegex": "[ -~]"
       },
       {
         "type": "raw",

@@ -1,0 +1,162 @@
+@charset "utf-8";
+
+/*
+  The DOS IDE desktop. Authored 1:1 in the 200x228 Emery space so its pixels line up with the
+  DESKTOP_DOS_IDE rects in desktop.c. It sets its own colours, so the theme sheet the bake adds
+  sets variables this page never reads.
+
+  A VT323 line set at 20px with a 20px line height has its baseline 16px down, and the watch puts
+  VT323 20's baseline 20px below the top of its rect, so a baked label sits 4px below the rect of
+  the value beside it. The .time and .data placeholders are cleared before the shipped bake.
+*/
+
+body {
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  margin: 0;
+  background: #333;
+}
+
+.viewport {
+  width: 200px;
+  height: 228px;
+  overflow: hidden;
+}
+
+.watch {
+  width: 200px;
+  height: 228px;
+  position: relative;
+  overflow: hidden;
+  background: var(--GColorOxfordBlue);
+  color: var(--GColorIcterine);
+  font-family: 'VT323', monospace;
+}
+
+.watch > * {
+  position: absolute;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.watch i {
+  font-style: normal;
+  color: var(--GColorDarkCandyAppleRed);
+}
+
+/* --- Menu bar and status line, each with a red hotkey --- */
+.menu,
+.status {
+  left: 0;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  background: var(--GColorLightGray);
+  color: var(--GColorBlack);
+  font-size: 15px;
+  line-height: 13px;
+}
+
+.menu {
+  top: 0;
+  height: 13px;
+  gap: 7px;
+}
+
+.status {
+  top: 216px;
+  height: 12px;
+  justify-content: space-between;
+}
+
+/* --- Windows --- */
+.win {
+  left: 0;
+  width: 200px;
+  border: 3px double var(--GColorWhite);
+}
+
+/* the title sits centred on the top border */
+.win b {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  transform: translateX(-50%);
+  padding: 0 3px;
+  color: var(--GColorWhite);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 11px;
+}
+
+/* the app draws the clock (ink y49..105) and the date (ink y117..128) in here */
+.win.editor {
+  top: 18px;
+  height: 123px;
+  background: var(--GColorDukeBlue);
+}
+
+.win.editor b {
+  background: var(--GColorDukeBlue);
+}
+
+.code {
+  left: 6px;
+  top: 23px;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+/* four rows, 14px apart from y144. the app draws each value after its label, with the left
+   labels at x6 and the right ones lined up at x92 */
+.win.watchlist {
+  top: 144px;
+  height: 69px;
+  background: var(--GColorTiffanyBlue);
+}
+
+.win.watchlist b {
+  background: var(--GColorTiffanyBlue);
+}
+
+.label {
+  color: var(--GColorBlack);
+  font-size: 20px;
+  line-height: 20px;
+}
+
+/* --- Live values (preview only) --- */
+.time {
+  left: 3px;
+  top: 31px;
+  width: 194px;
+  text-align: center;
+  font-size: 84px;
+  line-height: 84px;
+}
+
+.data.date {
+  left: 3px;
+  top: 106px;
+  width: 194px;
+  text-align: center;
+  color: var(--GColorWhite);
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.data.val {
+  color: var(--GColorWhite);
+  font-size: 20px;
+  line-height: 20px;
+}
+
+/* Frame-render mode (?frame): render full size for the screenshot tool. */
+html.frame-render body {
+  display: block;
+  padding: 0;
+  min-height: 0;
+}

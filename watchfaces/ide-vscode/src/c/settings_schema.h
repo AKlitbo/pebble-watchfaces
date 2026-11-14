@@ -22,4 +22,11 @@
  */
 const SettingsSchema *vscode_settings_schema(void);
 
+/**
+ * @brief The Desktop setting, checked against the desktops this build has.
+ *
+ * @return A DesktopId.
+ */
+uint8_t vscode_desktop(void);
+
 /** @} */

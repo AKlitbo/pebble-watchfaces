@@ -1,0 +1,336 @@
+@charset "utf-8";
+
+/*
+  The 95 desktop. Authored 1:1 in the 200x228 Emery space so its pixels line up with the
+  DESKTOP_WIN95 rects in desktop.c. It sets its own colours, so the theme sheet the bake adds
+  sets variables this page never reads.
+
+  The .time and .data placeholders are cleared before the shipped bake, since the app draws
+  them live. A VT323 line set at 20px with a 20px line height has its baseline 16px down, and the
+  watch puts VT323 20's baseline 20px below the top of its rect, so a baked label sits 4px below
+  the rect of the value beside it.
+*/
+
+body {
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  margin: 0;
+  background: #333;
+}
+
+.viewport {
+  width: 200px;
+  height: 228px;
+  overflow: hidden;
+}
+
+.watch {
+  width: 200px;
+  height: 228px;
+  position: relative;
+  overflow: hidden;
+  background: var(--GColorTiffanyBlue);
+  color: var(--GColorBlack);
+  font-family: 'Pixelify Sans', sans-serif;
+}
+
+/* --- Bevels --- */
+.win {
+  position: absolute;
+  box-sizing: border-box;
+  background: var(--GColorLightGray);
+  box-shadow:
+    inset 1px 1px 0 var(--GColorLightGray),
+    inset -1px -1px 0 var(--GColorBlack),
+    inset 2px 2px 0 var(--GColorWhite),
+    inset -2px -2px 0 var(--GColorDarkGray);
+}
+
+.btn,
+.start {
+  background: var(--GColorLightGray);
+  box-shadow:
+    inset 1px 1px 0 var(--GColorWhite),
+    inset -1px -1px 0 var(--GColorBlack),
+    inset -2px -2px 0 var(--GColorDarkGray);
+}
+
+.sunk {
+  box-shadow:
+    inset 1px 1px 0 var(--GColorDarkGray),
+    inset -1px -1px 0 var(--GColorWhite);
+}
+
+/* --- Title bars --- */
+.title {
+  height: 13px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 2px;
+  background: var(--GColorDarkGray);
+  color: var(--GColorLightGray);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.title.active {
+  background: var(--GColorDukeBlue);
+  color: var(--GColorWhite);
+}
+
+.title .name {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.title .doc {
+  width: 7px;
+  height: 8px;
+  background: var(--GColorWhite);
+  box-shadow: inset -2px -2px 0 var(--GColorPictonBlue);
+  margin-right: 1px;
+}
+
+.btn {
+  width: 11px;
+  height: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--GColorBlack);
+  font-size: 8px;
+  line-height: 1;
+}
+
+.btn.close {
+  margin-left: 2px;
+}
+
+/* --- Editor window --- */
+.editor {
+  left: 3px;
+  top: 3px;
+  width: 194px;
+  height: 141px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menu {
+  height: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px;
+  font-size: 10px;
+}
+
+/* the page runs y34..141, and the app draws the clock (ink y53..101) and the date (y110..120) on it,
+   centred in the text area right of the gutter */
+.page {
+  flex: 1;
+  position: relative;
+  background: var(--GColorWhite);
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.gutter {
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 13px;
+  box-sizing: border-box;
+  padding: 2px 2px 0 0;
+  background: var(--GColorLightGray);
+  color: var(--GColorDarkGray);
+  font-size: 9px;
+  line-height: 11.5px;
+  text-align: right;
+}
+
+.comment {
+  position: absolute;
+  left: 19px;
+  top: 1px;
+  font-size: 10px;
+  color: var(--GColorIslamicGreen);
+}
+
+.where {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: 9px;
+  color: var(--GColorDarkGray);
+}
+
+/* --- Prompt window --- */
+.prompt {
+  left: 3px;
+  top: 146px;
+  width: 194px;
+  height: 63px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prompt .title {
+  height: 12px;
+}
+
+/* the console runs y163..206 */
+.console {
+  flex: 1;
+  position: relative;
+  background: var(--GColorBlack);
+  color: var(--GColorLightGray);
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.line {
+  position: absolute;
+  white-space: nowrap;
+}
+
+.line .cmd {
+  color: var(--GColorWhite);
+}
+
+.line.run {
+  left: 4px;
+  top: -3px;
+}
+
+.line.wx {
+  left: 4px;
+  top: 11px;
+}
+
+.line.hr {
+  left: 4px;
+  top: 25px;
+}
+
+.line.stp {
+  left: 98px;
+  top: 25px;
+}
+
+/* --- Taskbar --- */
+.taskbar {
+  left: 0;
+  top: 210px;
+  width: 200px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 2px;
+}
+
+.start {
+  height: 14px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.task {
+  flex: 1;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 9px;
+}
+
+/* the tray runs x110..198 and y212..226, and the app packs the battery, bluetooth, and Quiet Time
+   into it from the right */
+.tray {
+  width: 88px;
+  height: 14px;
+}
+
+/* --- Live values (preview only) --- */
+.time {
+  position: absolute;
+  left: 21px;
+  width: 172px;
+  top: 34px;
+  text-align: center;
+  font-family: 'VT323', monospace;
+  font-size: 84px;
+  line-height: 84px;
+}
+
+.data {
+  position: absolute;
+  white-space: nowrap;
+}
+
+.data.date {
+  left: 21px;
+  width: 172px;
+  top: 108px;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  color: var(--GColorDukeBlue);
+}
+
+.data.val {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  line-height: 20px;
+  color: var(--GColorWhite);
+}
+
+.data.temp {
+  left: 42px;
+  top: 174px;
+}
+
+.data.cond {
+  left: 104px;
+  top: 174px;
+}
+
+.data.hr {
+  left: 42px;
+  top: 188px;
+}
+
+.data.steps {
+  left: 136px;
+  top: 188px;
+}
+
+.data.batt {
+  left: 143px;
+  width: 34px;
+  top: 209px;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: right;
+}
+
+/* Frame-render mode (?frame): render full size for the screenshot tool. */
+html.frame-render body {
+  display: block;
+  padding: 0;
+  min-height: 0;
+}

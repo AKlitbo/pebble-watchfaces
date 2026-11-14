@@ -12,6 +12,7 @@
 #include "system/settings/settings_catalog.h"
 #include "system/settings/setting_values.h"
 #include "persist_keys.h"
+#include "desktop/desktop.h"
 
 #include <stddef.h>
 
@@ -28,8 +29,8 @@
  * Fields only ever get added to the end, so there is no older layout to bring forward.
  * A field added to the end needs no version bump, since a shorter save already on the
  * watch reads back with the new field on its default. The schema's first size is the
- * 25 bytes the first release saved, without the hourly buzz at the end, so a save that
- * short still loads with the buzz on its default.
+ * 25 bytes the first release saved, without the hourly buzz and the desktop at the end, so a
+ * save that short still loads with both on their defaults.
  */
 typedef struct VscodeSettings
 {
@@ -44,9 +45,15 @@ typedef struct VscodeSettings
     uint8_t vibe_disconnect;
     uint8_t battery_display;
     uint8_t hourly_vibe;
+    uint8_t desktop;
 } VscodeSettings;
 
 static VscodeSettings s_settings;
+
+// the face's own settings, numbered past the shared ones. the library still defaults, sanitises
+// and serialises them, but will not index them for a typed read, so the accessor below reaches
+// into the struct. cast because the field table's id is a SettingId and mixing enums is an error
+#define SETTING_DESKTOP ((SettingId)(SETTING_COUNT))
 
 // every KNOWN_ entry takes its default from the settings page, so the date opens on the compact
 // single line ("JUN 18") the page sets to fit the terminal panel
@@ -62,6 +69,12 @@ static const SettingField s_fields[] = {
     KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(VscodeSettings, vibe_disconnect)),
     KNOWN_BATTERY_DISPLAY(offsetof(VscodeSettings, battery_display)),
     KNOWN_HOURLY_VIBE(offsetof(VscodeSettings, hourly_vibe)),
+
+    // --- the face's own ---
+    // VS Code is the default, so a save from before the Desktop setting reads back as today's look
+    { .id = SETTING_DESKTOP, .message_key = &MESSAGE_KEY_APPEARANCE_DESKTOP,
+      .type = SETTING_ENUM_U8, .offset = offsetof(VscodeSettings, desktop),
+      .enum_count = DESKTOP_COUNT, .default_num = DESKTOP_VSCODE },
 };
 
 static const SettingsSchema s_schema = {
@@ -76,6 +89,11 @@ static const SettingsSchema s_schema = {
 const SettingsSchema *vscode_settings_schema(void)
 {
     return &s_schema;
+}
+
+uint8_t vscode_desktop(void)
+{
+    return s_settings.desktop;
 }
 
 /** @} */

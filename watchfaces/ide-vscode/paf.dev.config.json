@@ -1,1 +1,70 @@
-{ "clock": "08:00" }
+{
+  "clock": "08:00",
+  "walk": "previews",
+  "walks": {
+    "previews": {
+      "steps": [
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 0,
+            "APPEARANCE_THEME": 0
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 1,
+            "APPEARANCE_THEME": 0
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 2,
+            "APPEARANCE_THEME": 0
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 3,
+            "APPEARANCE_THEME": 0
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 4,
+            "APPEARANCE_THEME": 0
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 0,
+            "APPEARANCE_THEME": 1
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 0,
+            "APPEARANCE_THEME": 2
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 0,
+            "APPEARANCE_THEME": 3
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 0,
+            "APPEARANCE_THEME": 4
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 0,
+            "APPEARANCE_THEME": 5
+          }
+        }
+      ]
+    }
+  }
+}

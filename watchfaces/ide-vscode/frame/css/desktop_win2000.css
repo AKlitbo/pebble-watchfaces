@@ -1,0 +1,282 @@
+@charset "utf-8";
+
+/*
+  The 2000 desktop. Authored 1:1 in the 200x228 Emery space so its pixels line up with the
+  DESKTOP_WIN2000 rects in desktop.c. It sets its own colours, so the theme sheet the bake adds
+  sets variables this page never reads.
+
+  Every piece is placed on its own rather than nested, so each coordinate here is a watch pixel.
+  The .time and .data placeholders are cleared before the shipped bake, since the app draws them.
+*/
+
+body {
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  margin: 0;
+  background: #333;
+}
+
+.viewport {
+  width: 200px;
+  height: 228px;
+  overflow: hidden;
+}
+
+.watch {
+  width: 200px;
+  height: 228px;
+  position: relative;
+  overflow: hidden;
+  background: var(--GColorLiberty);
+  color: var(--GColorBlack);
+  font-family: 'PT Sans', sans-serif;
+}
+
+.watch > * {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+/* --- Bevels --- */
+.raised {
+  background: var(--GColorLightGray);
+  box-shadow:
+    inset 1px 1px 0 var(--GColorWhite),
+    inset -1px -1px 0 var(--GColorBlack),
+    inset -2px -2px 0 var(--GColorDarkGray);
+}
+
+.sunk {
+  background: var(--GColorWhite);
+  box-shadow:
+    inset 1px 1px 0 var(--GColorDarkGray),
+    inset -1px -1px 0 var(--GColorWhite),
+    inset 2px 2px 0 var(--GColorBlack);
+}
+
+/* --- Dialog --- */
+.dialog {
+  left: 3px;
+  top: 3px;
+  width: 194px;
+  height: 204px;
+}
+
+/* the title's gradient stepped into three palette bands */
+.title {
+  left: 6px;
+  top: 6px;
+  width: 188px;
+  height: 13px;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 0 2px 0 4px;
+  background: linear-gradient(
+    90deg,
+    var(--GColorOxfordBlue) 0 34%,
+    var(--GColorLiberty) 34% 67%,
+    var(--GColorBabyBlueEyes) 67%
+  );
+  color: var(--GColorWhite);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.title .name {
+  flex: 1;
+}
+
+/* each glyph sits centred in the face of its button, the part inside the bevel's dark edge */
+.btn {
+  width: 12px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1px 1px 0;
+  color: var(--GColorBlack);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 9px;
+}
+
+.btn svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+/* the Time tab is raised and open into the panel below it, and the other two sit a step lower */
+.tabs {
+  left: 8px;
+  top: 21px;
+  height: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 1px;
+  z-index: 1;
+}
+
+.tab {
+  height: 13px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 11px;
+}
+
+.tab.raised {
+  box-shadow:
+    inset 1px 1px 0 var(--GColorWhite),
+    inset -1px 0 0 var(--GColorBlack);
+}
+
+.tab.other {
+  height: 11px;
+  margin-top: 1px;
+  color: var(--GColorDarkGray);
+}
+
+.panel {
+  left: 6px;
+  top: 33px;
+  width: 188px;
+  height: 171px;
+  border: 1px solid var(--GColorWhite);
+  border-right-color: var(--GColorDarkGray);
+  border-bottom-color: var(--GColorDarkGray);
+}
+
+/* --- Group boxes --- */
+.group {
+  left: 10px;
+  width: 180px;
+  border: 1px solid var(--GColorDarkGray);
+  box-shadow: 1px 1px 0 var(--GColorWhite);
+}
+
+.group b {
+  position: absolute;
+  left: 5px;
+  top: -7px;
+  padding: 0 2px;
+  background: var(--GColorLightGray);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 12px;
+}
+
+/* the app draws the clock (ink y50..92) and the date (ink y99..109) centred in here */
+.group.clock {
+  top: 41px;
+  height: 74px;
+}
+
+.group.sensors {
+  top: 124px;
+  height: 76px;
+}
+
+.label {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+/* each field holds one Gothic 18 Bold value, its capitals 2px clear of the bevel each side */
+.field {
+  width: 80px;
+  height: 18px;
+}
+
+/* --- Taskbar --- */
+.taskbar {
+  left: 0;
+  top: 210px;
+  width: 200px;
+  height: 18px;
+}
+
+.start {
+  left: 2px;
+  top: 212px;
+  width: 42px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px 1px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 10px;
+}
+
+/* the title runs out of room, so it ends in an ellipsis the way a crowded taskbar does */
+.task {
+  left: 47px;
+  top: 212px;
+  width: 60px;
+  height: 14px;
+  padding: 0 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 14px;
+}
+
+/* the tray runs x110..198 and y212..226, and the app packs the battery, bluetooth, and Quiet Time
+   into it from the right */
+.tray {
+  left: 110px;
+  top: 212px;
+  width: 88px;
+  height: 14px;
+  background: var(--GColorLightGray);
+  box-shadow:
+    inset 1px 1px 0 var(--GColorDarkGray),
+    inset -1px -1px 0 var(--GColorWhite);
+}
+
+/* --- Live values (preview only) --- */
+.time {
+  left: 11px;
+  width: 178px;
+  top: 32px;
+  text-align: center;
+  font-family: 'VT323', monospace;
+  font-size: 75px;
+  line-height: 75px;
+}
+
+.data {
+  white-space: nowrap;
+}
+
+.data.date {
+  left: 11px;
+  width: 178px;
+  top: 96px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--GColorOxfordBlue);
+}
+
+.data.val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 14px;
+}
+
+/* Frame-render mode (?frame): render full size for the screenshot tool. */
+html.frame-render body {
+  display: block;
+  padding: 0;
+  min-height: 0;
+}

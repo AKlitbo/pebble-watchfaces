@@ -1,0 +1,207 @@
+@charset "utf-8";
+
+/*
+  The DOS desktop. Authored 1:1 in the 200x228 Emery space so its pixels line up with the
+  DESKTOP_DOS rects in desktop.c. It sets its own colours, so the theme sheet the bake adds sets
+  variables this page never reads.
+
+  A VT323 line set at 20px with a 20px line height has its baseline 16px down, and the watch puts
+  VT323 20's baseline 20px below the top of its rect, so a baked label sits 4px below the rect of
+  the value beside it. The .time and .data placeholders are cleared before the shipped bake.
+*/
+
+body {
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  margin: 0;
+  background: #333;
+}
+
+.viewport {
+  width: 200px;
+  height: 228px;
+  overflow: hidden;
+}
+
+.watch {
+  width: 200px;
+  height: 228px;
+  position: relative;
+  overflow: hidden;
+  background: var(--GColorDukeBlue);
+  color: var(--GColorElectricBlue);
+  font-family: 'VT323', monospace;
+}
+
+.watch > * {
+  position: absolute;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* --- Panels --- */
+.panel {
+  border: 3px double var(--GColorElectricBlue);
+}
+
+/* the title sits centred on the top border. the lower panels start at y85, so their top double line
+   is the clock panel's bottom one and their titles sit on it */
+.panel b {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  transform: translateX(-50%);
+  padding: 0 2px;
+  background: var(--GColorDukeBlue);
+  color: var(--GColorWhite);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 13px;
+}
+
+/* the app draws the clock (ink y14..62) and the date (ink y68..79) in here */
+.panel.clock {
+  left: 1px;
+  top: 3px;
+  width: 198px;
+  height: 85px;
+}
+
+.panel.clock b {
+  top: -7px;
+}
+
+.panel.files {
+  left: 1px;
+  top: 85px;
+  width: 66px;
+  height: 111px;
+}
+
+.list {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 8px;
+  font-size: 15px;
+  line-height: 11px;
+}
+
+.list .dir {
+  color: var(--GColorWhite);
+}
+
+.list .pick {
+  background: var(--GColorTiffanyBlue);
+  color: var(--GColorBlack);
+}
+
+.list .exe {
+  color: var(--GColorIcterine);
+}
+
+.mini {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 1px;
+  border-top: 1px solid var(--GColorElectricBlue);
+  font-size: 15px;
+  line-height: 11px;
+}
+
+/* the app draws each value at x137, and on the batt row the gauge beside the label */
+.panel.info {
+  left: 67px;
+  top: 85px;
+  width: 132px;
+  height: 111px;
+}
+
+.label {
+  left: 72px;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+/* --- Command line and function keys --- */
+.prompt {
+  left: 2px;
+  top: 197px;
+  color: var(--GColorLightGray);
+  font-size: 16px;
+  line-height: 13px;
+}
+
+.prompt .cursor {
+  color: var(--GColorWhite);
+}
+
+/* the cyan label boxes are taller than the bar's line, so the bar clips them to its own rows */
+.keys {
+  left: 0;
+  top: 214px;
+  width: 200px;
+  height: 14px;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2px;
+  background: var(--GColorBlack);
+  color: var(--GColorWhite);
+  font-size: 16px;
+  line-height: 14px;
+}
+
+.keys i {
+  padding: 0 1px;
+  background: var(--GColorTiffanyBlue);
+  color: var(--GColorBlack);
+  font-style: normal;
+}
+
+/* --- Live values (preview only) --- */
+.time {
+  left: 4px;
+  top: -5px;
+  width: 192px;
+  text-align: center;
+  color: var(--GColorWhite);
+  font-size: 84px;
+  line-height: 84px;
+}
+
+.data.date {
+  left: 4px;
+  top: 63px;
+  width: 192px;
+  text-align: center;
+  color: var(--GColorIcterine);
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.data.val {
+  left: 137px;
+  color: var(--GColorWhite);
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.data.on {
+  color: var(--GColorScreaminGreen);
+}
+
+.data.quiet {
+  color: var(--GColorIcterine);
+}
+
+/* Frame-render mode (?frame): render full size for the screenshot tool. */
+html.frame-render body {
+  display: block;
+  padding: 0;
+  min-height: 0;
+}

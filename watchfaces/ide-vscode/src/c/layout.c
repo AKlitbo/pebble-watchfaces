@@ -1,8 +1,8 @@
 /**
  * @file layout.c
- * @brief ide-vscode-emery face: the zone table bound to shared readouts, the baked VS Code
- * frame, and the overlays draw-slot (battery + weather glyph + bluetooth). No shell. The
- * face drives the engine directly from main.
+ * @brief ide-vscode-emery face: the chosen desktop's layout table bound to shared readouts, its
+ * baked frame, and the overlays draw-slot (battery, weather glyph, Quiet Time, and bluetooth).
+ * No shell. The face drives the engine directly from main.
  */
 #include "layout.h"
 
@@ -13,74 +13,115 @@
 #include "ui/icon_cache.h"
 #include "theme/theme.h"
 #include "widgets/widgets.h"
+#include "settings_schema.h"
 #include "io/stores/system_store.h"
 #include "io/stores/weather_store.h"
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
 
-// --- Zone Table ---
-// the readouts: the hero clock with the date centred beneath it plus the terminal 2x2
-// grid (weather condition / temp on the left and heart rate / steps on the right). colours
-// are seeded with the Dark+ palette and re-set per theme by apply_theme_colors
-static Zone s_zones[ZONE_COUNT] = {
-    [ZONE_TIME]    = {.rect = SLOT_TIME,  .font_id = FONT_TEKO_82, .align = GTextAlignmentCenter, .color = GColorVividCerulean,
-                      // the @beats token is wider than any HH:MM and overflows Teko 82. drop to 78 so it fits
-                      .font_id_fallback = FONT_TEKO_78, .rect_fallback = SLOT_TIME_SMALL},
-    [ZONE_DATE]    = {.rect = SLOT_DATE,  .font_id = FONT_STM_20, .align = GTextAlignmentCenter, .color = GColorRajah,
-                      .font_id_fallback = FONT_STM_14, .rect_fallback = SLOT_DATE},
-    [ZONE_COND]    = {.rect = SLOT_COND,  .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine,
-                      .font_id_fallback = FONT_STM_12, .rect_fallback = SLOT_COND},
-    [ZONE_WEATHER] = {.rect = SLOT_TEMP,  .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorMediumAquamarine},
-    [ZONE_HR]      = {.rect = SLOT_HR,    .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorRed},
-    [ZONE_STEPS]   = {.rect = SLOT_STEPS, .font_id = FONT_STM_14, .align = GTextAlignmentLeft, .color = GColorCeleste},
-};
+// the table the screen draws from. a copy, so the VS Code theme can paint its colours over it and
+// the engine's zones point somewhere that outlives the rebuild
+static DesktopLayout s_layout;
+
+// 0xFF = nothing loaded yet, which forces the first load
+static uint8_t s_loaded_desktop = 0xFF;
 
 /**
- * @brief Set the editor zone text colours to the current theme's palette.
+ * @brief Paint a VS Code theme's colours over the Dark+ ones in the table.
  *
+ * @param layout The active layout to paint.
  * @param theme The theme setting value.
  */
-static void apply_theme_colors(uint8_t theme)
+static void apply_theme_colors(DesktopLayout *layout, uint8_t theme)
 {
-    s_zones[ZONE_TIME].color    = time_color_for_theme(theme);
-    s_zones[ZONE_DATE].color    = date_color_for_theme(theme);
-    s_zones[ZONE_COND].color    = stats_color_for_theme(theme);
-    s_zones[ZONE_WEATHER].color = stats_color_for_theme(theme);
-    s_zones[ZONE_HR].color      = hr_color_for_theme(theme);
-    s_zones[ZONE_STEPS].color   = steps_color_for_theme(theme);
+    GColor stats = stats_color_for_theme(theme);
+
+    layout->zones[ZONE_TIME].color = time_color_for_theme(theme);
+    layout->zones[ZONE_DATE].color = date_color_for_theme(theme);
+    layout->zones[ZONE_COND].color = stats;
+    layout->zones[ZONE_WEATHER].color = stats;
+    layout->zones[ZONE_HR].color = hr_color_for_theme(theme);
+    layout->zones[ZONE_STEPS].color = steps_color_for_theme(theme);
+    layout->wx_color = stats;
+    layout->batt_color = stats;
+    layout->batt_fill = stats;
+    layout->status_color = stats;
 }
 
 /**
- * @brief The hero clock uses condensed Teko (tall + narrow). The terminal readouts use
- * Share Tech Mono at the sizes each slot needs.
+ * @brief Load a desktop's fonts into their slots, freeing whatever the last desktop loaded.
+ *
+ * A desktop that sets two jobs in the same resource gets one loaded font in both slots, which the
+ * registry frees once.
+ *
+ * @param layout The desktop's layout table.
  */
-static void load_fonts(void)
+static void load_fonts(const DesktopLayout *layout)
 {
-    fonts_register(FONT_TEKO_82, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_82)));
-    fonts_register(FONT_TEKO_78, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEKO_78)));
-    fonts_register(FONT_STM_20, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_20)));
-    fonts_register(FONT_STM_14, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_14)));
-    fonts_register(FONT_STM_12, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_STM_12)));
+    fonts_unload_all();
+
+    bool loaded[FONT_COUNT] = {false};
+
+    for (uint8_t slot = 0; slot < FONT_COUNT; slot++)
+    {
+        // a built-in font belongs to the firmware, so it is parked rather than loaded and freed
+        if (layout->system_fonts[slot])
+        {
+            fonts_register_system(slot, fonts_get_system_font(layout->system_fonts[slot]));
+            loaded[slot] = true;
+            continue;
+        }
+
+        uint32_t resource = layout->fonts[slot];
+        if (!resource)
+        {
+            continue;
+        }
+
+        // a slot sharing a font that failed to load stays empty too. fonts_get hands back the
+        // system font for a failed slot, and registering that as the face's own would free a
+        // firmware font on the way out
+        bool shared = false;
+        for (uint8_t earlier = 0; earlier < slot; earlier++)
+        {
+            if (layout->fonts[earlier] == resource)
+            {
+                if (loaded[earlier])
+                {
+                    fonts_register(slot, fonts_get(earlier));
+                    loaded[slot] = true;
+                }
+
+                shared = true;
+                break;
+            }
+        }
+
+        if (!shared)
+        {
+            loaded[slot] = fonts_load(slot, resource);
+        }
+    }
 }
 
-// --- Baked VS Code frame ---
+// --- Baked frame ---
 static BitmapLayer *s_frame_layer;
 static GBitmap *s_frame_bitmap;
-static uint8_t s_loaded_theme = 0xFF;  // 0xFF = nothing loaded yet (forces first load)
+static uint32_t s_loaded_frame;
 
 /**
- * @brief (Re)load the baked frame for a theme.
+ * @brief (Re)load the baked frame, freeing the old one first so only one is ever held.
  *
- * @param theme The theme setting value.
+ * @param resource The frame's resource id.
  */
-static void load_frame(uint8_t theme)
+static void load_frame(uint32_t resource)
 {
-    if (theme == s_loaded_theme && s_frame_bitmap)
+    if (resource == s_loaded_frame && s_frame_bitmap)
     {
         return;
     }
 
-    s_loaded_theme = theme;
+    s_loaded_frame = resource;
 
     if (s_frame_bitmap)
     {
@@ -88,7 +129,7 @@ static void load_frame(uint8_t theme)
         s_frame_bitmap = NULL;
     }
 
-    s_frame_bitmap = gbitmap_create_with_resource(bg_resource_for_theme(theme));
+    s_frame_bitmap = gbitmap_create_with_resource(resource);
 
     if (s_frame_layer)
     {
@@ -97,8 +138,8 @@ static void load_frame(uint8_t theme)
 }
 
 /**
- * @brief Overlays draw-slot: the weather condition glyph, and the battery, bluetooth, and Quiet
- * Time status in the tab strip.
+ * @brief Overlays draw-slot: a clock drawn a glyph at a time, the battery, the weather condition
+ * glyph, and the Quiet Time and bluetooth status.
  *
  * @param ctx The graphics context.
  * @param bounds The slot bounds (the full window).
@@ -106,28 +147,75 @@ static void load_frame(uint8_t theme)
  */
 static void draw_overlays(GContext *ctx, GRect bounds, const void *data)
 {
-    widgets_draw_weather(ctx, weather_store_cond());
-    widgets_draw_status(ctx, system_store_battery(), system_store_bluetooth());
+    widgets_draw_spaced_clock(ctx, &s_layout);
+    widgets_draw_weather(ctx, &s_layout, weather_store_cond());
+    widgets_draw_status(ctx, &s_layout, system_store_battery(), system_store_bluetooth());
+}
+
+void vscode_apply_theme(void)
+{
+    uint8_t desktop = vscode_desktop();
+    uint8_t theme = settings_u8(SETTING_THEME);
+    const DesktopLayout *table = desktop_layout(desktop);
+
+    s_layout = *table;
+
+    uint32_t frame = table->background;
+    if (desktop == DESKTOP_VSCODE)
+    {
+        apply_theme_colors(&s_layout, theme);
+        frame = bg_resource_for_theme(theme);
+    }
+
+    // the fonts only change with the desktop, and the engine rebuild that follows makes the
+    // text layers again, so none of them is left holding a freed font
+    if (desktop != s_loaded_desktop)
+    {
+        load_fonts(table);
+        s_loaded_desktop = desktop;
+    }
+
+    load_frame(frame);
+}
+
+const DesktopLayout *vscode_layout(void)
+{
+    return &s_layout;
 }
 
 void vscode_setup(Window *window)
 {
-    uint8_t theme = settings_u8(SETTING_THEME);
-    apply_theme_colors(theme);
-    load_fonts();
-
     Layer *root = window_get_root_layer(window);
     window_set_background_color(window, GColorBlack);
 
     // the frame bitmap sits at the bottom under the engine's slot layers
     s_frame_layer = bitmap_layer_create(layer_get_bounds(root));
     layer_add_child(root, bitmap_layer_get_layer(s_frame_layer));
-    load_frame(theme);
+
+    vscode_apply_theme();
 }
 
 // the build below writes all seven slots without reading max, so the engine's cap has to hold them
 // a slot added below raises this count too
 _Static_assert(ENGINE_SLOTS_MAX >= 7, "vscode_build writes seven slots");
+
+/**
+ * @brief The text function for a zone, the desktop's own when it has one.
+ *
+ * @param zone The zone id.
+ * @param plain The framework readout the zone uses otherwise.
+ * @return The function to run.
+ */
+static ReadoutText text_for(uint8_t zone, ReadoutText plain)
+{
+    // a clock drawn a glyph at a time is painted by the overlays slot, so its text slot stays empty
+    if (zone == ZONE_TIME && s_layout.clock_pitch)
+    {
+        return NULL;
+    }
+
+    return s_layout.text[zone] ? s_layout.text[zone] : plain;
+}
 
 uint8_t vscode_build(EngineSlot *out, uint8_t max, GRect bounds)
 {
@@ -136,21 +224,14 @@ uint8_t vscode_build(EngineSlot *out, uint8_t max, GRect bounds)
     // overlays first so they sit under the text readouts
     out[i++] = (EngineSlot){.frame = bounds, .draw = draw_overlays};
 
-    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_TIME],    .text = readout_time};
-    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_DATE],    .text = readout_date};
-    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_COND],    .text = readout_weather_cond};
-    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_WEATHER], .text = readout_weather_temp};
-    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_HR],      .text = readout_hr};
-    out[i++] = (EngineSlot){.zone = &s_zones[ZONE_STEPS],   .text = readout_steps};
+    out[i++] = (EngineSlot){.zone = &s_layout.zones[ZONE_TIME],    .text = text_for(ZONE_TIME, readout_time)};
+    out[i++] = (EngineSlot){.zone = &s_layout.zones[ZONE_DATE],    .text = text_for(ZONE_DATE, readout_date)};
+    out[i++] = (EngineSlot){.zone = &s_layout.zones[ZONE_COND],    .text = text_for(ZONE_COND, readout_weather_cond)};
+    out[i++] = (EngineSlot){.zone = &s_layout.zones[ZONE_WEATHER], .text = text_for(ZONE_WEATHER, readout_weather_temp)};
+    out[i++] = (EngineSlot){.zone = &s_layout.zones[ZONE_HR],      .text = text_for(ZONE_HR, readout_hr)};
+    out[i++] = (EngineSlot){.zone = &s_layout.zones[ZONE_STEPS],   .text = text_for(ZONE_STEPS, readout_steps)};
 
     return i;
-}
-
-void vscode_apply_theme(void)
-{
-    uint8_t theme = settings_u8(SETTING_THEME);
-    apply_theme_colors(theme);
-    load_frame(theme);
 }
 
 void vscode_teardown(void)
@@ -166,5 +247,8 @@ void vscode_teardown(void)
     }
 
     fonts_unload_all();
-    s_loaded_theme = 0xFF;  // force a reload if the window is recreated
+
+    // force a reload if the window is recreated
+    s_loaded_desktop = 0xFF;
+    s_loaded_frame = 0;
 }
