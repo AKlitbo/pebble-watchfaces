@@ -4,6 +4,22 @@ All notable changes to the IDE VSCode watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
+- Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.
+
+### Fixed
+
+- Fixed the weather fetching twice each time the watchface starts.
+- Fixed the settings page showing extra space under and beside its controls in the Pebble app on Android while plugins are on.
+
+### Notes
+
+- This release needs watch firmware 4.44.3 or later. On older firmware the watch lists IDE VSCode as incompatible until it updates.
+
 ## [1.5.3] - 2026-10-12
 
 ### Fixed

@@ -25,9 +25,10 @@
 /**
  * @brief vscode's persisted settings.
  *
- * Version 1 carries every field, so there is no older layout to bring forward.
- * Fields only ever get added to the end from here. A new one bumps the version
- * and a blob already on the watch still reads back fine.
+ * Fields only ever get added to the end, so there is no older layout to bring forward.
+ * A new one bumps the version and a blob already on the watch still reads back fine.
+ * The schema's first size is the 25 bytes the first release saved, without the hourly
+ * buzz at the end, so a save that short still loads with the buzz on its default.
  */
 typedef struct VscodeSettings
 {
@@ -46,28 +47,26 @@ typedef struct VscodeSettings
 
 static VscodeSettings s_settings;
 
-// the date defaults to a compact single line ("JUN 18") to fit the terminal panel
+// every KNOWN_ entry takes its default from the settings page, so the date opens on the compact
+// single line ("JUN 18") the page sets to fit the terminal panel
 // 6 themes: Dark+ / Light / Terminal / Cyberpunk / Synthwave / Mono
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(VscodeSettings, temperature_unit)),
-    KNOWN_DATE_FORMAT(offsetof(VscodeSettings, date_format), "%b %d"),
+    KNOWN_DATE_FORMAT(offsetof(VscodeSettings, date_format)),
     KNOWN_THEME(offsetof(VscodeSettings, theme), 6),
-    KNOWN_STEPS_MODE(offsetof(VscodeSettings, steps_mode), STEPS_MODE_COUNT),
-    KNOWN_TIME_FORMAT(offsetof(VscodeSettings, time_format), TIME_FORMAT_COUNT),
+    KNOWN_STEPS_MODE(offsetof(VscodeSettings, steps_mode)),
+    KNOWN_TIME_FORMAT(offsetof(VscodeSettings, time_format)),
     KNOWN_BLUETOOTH_ICON(offsetof(VscodeSettings, bluetooth_icon)),
-    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(VscodeSettings, vibe_connect), VIBE_COUNT),
-    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(VscodeSettings, vibe_disconnect), VIBE_COUNT),
-    KNOWN_BATTERY_DISPLAY(offsetof(VscodeSettings, battery_display), BATTERY_DISPLAY_COUNT),
-    KNOWN_HOURLY_VIBE(offsetof(VscodeSettings, hourly_vibe), VIBE_COUNT),
+    KNOWN_BLUETOOTH_VIBE_CONNECT(offsetof(VscodeSettings, vibe_connect)),
+    KNOWN_BLUETOOTH_VIBE_DISCONNECT(offsetof(VscodeSettings, vibe_disconnect)),
+    KNOWN_BATTERY_DISPLAY(offsetof(VscodeSettings, battery_display)),
+    KNOWN_HOURLY_VIBE(offsetof(VscodeSettings, hourly_vibe)),
 };
 
 static const SettingsSchema s_schema = {
     .key = VSCODE_SETTINGS_KEY,
     .version = VSCODE_SETTINGS_VERSION,
-    // unshipped fields all landed in v1 so the current struct is the v1 size
-    .min_versioned_size = sizeof(VscodeSettings),
-    .blob = &s_settings,
-    .blob_size = SETTINGS_BLOB_SIZE(VscodeSettings),
+    SETTINGS_BLOB(s_settings, 25),
     .fields = s_fields,
     .field_count = ARRAY_LENGTH(s_fields),
     .migrate = NULL,  // no legacy blobs. this face never existed without these fields

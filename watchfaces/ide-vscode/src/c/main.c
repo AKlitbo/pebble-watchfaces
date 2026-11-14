@@ -12,11 +12,10 @@
 #include "io/appmessage/appmessage.h"
 #include "ui/engine/engine.h"
 #include "io/stores/health_store.h"
-#include "io/stores/store_poll.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
-#include "dev/dev.h"
+#include "dev/dev_hooks.h"
 #include "layout.h"
 #include "persist_keys.h"
 #include "system/settings/settings.h"
@@ -24,8 +23,7 @@
 #include "settings_schema.h"
 #include "system/vibe/vibe.h"
 
-// weather polls the phone this often. the reconnect catch-up reuses it as the staleness gate so
-// the two cadences can never drift apart
+// weather polls the phone this often
 #define WEATHER_POLL_MIN 30
 
 static Window *s_window;
@@ -40,7 +38,7 @@ static TimeConfig time_cfg(void)
     bool hourly = settings_u8(SETTING_HOURLY_VIBE) != VIBE_NONE;
 
     return (TimeConfig){
-        .live = !DEV_MODE,      // a dev build keeps the clock its fixture pinned
+        .live = true,
         .minute_tick = !beats,  // .beats replaces the clock
         .beats = beats,
         .hourly = hourly,       // a .beats clock still wakes on the hour for the buzz
@@ -79,21 +77,6 @@ static void on_time_tick(void)
     vibe_hourly(time_store_tm(), settings_u8(SETTING_HOURLY_VIBE));
 }
 
-/**
- * @brief The phone app just reconnected, so catch up a reading that went stale while it was away.
- *
- * The phone's pkjs may have been closed for the whole gap, and the store's own poll is 30 min, so
- * without this the face sits on an old reading. Gating on age means bluetooth flapping cannot
- * re-fetch faster than the normal cadence.
- */
-static void on_phone_reconnected(void)
-{
-    if (store_poll_reconnect_due(weather_store_age_s(), WEATHER_POLL_MIN))
-    {
-        appmessage_request_weather();
-    }
-}
-
 static void init(void)
 {
     settings_init(vscode_settings_schema());
@@ -120,7 +103,6 @@ static void init(void)
     health_store_subscribe(engine_mark_dirty);
     weather_store_subscribe(engine_mark_dirty);
     system_store_subscribe(engine_mark_dirty);
-    system_store_on_reconnect(on_phone_reconnected);
 
     // coords aren't displayed so that channel stays unregistered and the JS sends none
     // weather_store owns the weather channel itself. main only wires settings
