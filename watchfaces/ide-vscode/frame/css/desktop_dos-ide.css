@@ -85,6 +85,11 @@ body {
   justify-content: space-between;
 }
 
+.status span {
+  position: relative;
+  top: -1px;
+}
+
 /* --- Windows --- */
 .win {
   left: 0;
@@ -123,8 +128,8 @@ body {
   line-height: 20px;
 }
 
-/* four rows, 14px apart from y144. the app draws each value after its label, with the left
-   labels at x6 and the right ones lined up at x92 */
+/* four rows, 14px apart from y144, laid out as a table. the left labels sit at x6 with their
+   values at x54, and the right labels at x92 with their values at x148 */
 .win.watchlist {
   top: 144px;
   height: 69px;
@@ -132,6 +137,7 @@ body {
 }
 
 .win.watchlist b {
+  top: -9px;
   background: var(--ide-watch);
 }
 

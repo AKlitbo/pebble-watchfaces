@@ -78,7 +78,7 @@ body {
   line-height: 13px;
 }
 
-/* the app draws the clock (ink y14..62) and the date (ink y68..79) in here */
+/* the app draws the clock (ink y15..63) and the date (ink y68..79) in here */
 .panel.clock {
   left: 1px;
   top: 3px;
@@ -110,9 +110,22 @@ body {
   color: var(--dos-dir);
 }
 
+/* the cursor bar sits a pixel below the line box, so the text sits centred in it */
 .list .pick {
-  background: var(--dos-pick-bg);
+  position: relative;
+  z-index: 0;
   color: var(--dos-pick);
+}
+
+.list .pick:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 1px;
+  height: 11px;
+  z-index: -1;
+  background: var(--dos-pick-bg);
 }
 
 .list .exe {
@@ -146,7 +159,7 @@ body {
 /* --- Command line and function keys --- */
 .prompt {
   left: 2px;
-  top: 197px;
+  top: 198px;
   color: var(--dos-prompt);
   font-size: 16px;
   line-height: 13px;
@@ -165,7 +178,7 @@ body {
   overflow: hidden;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 0 2px;
   background: var(--dos-keys-bg);
   color: var(--dos-keys);
@@ -173,7 +186,15 @@ body {
   line-height: 14px;
 }
 
+/* the text sits a pixel high in the bar, so the descenders of p, y, and Q clear its bottom */
+.keys span,
 .keys i {
+  line-height: 12px;
+}
+
+.keys i {
+  display: inline-block;
+  height: 14px;
   padding: 0 1px;
   background: var(--dos-key-bg);
   color: var(--dos-key);

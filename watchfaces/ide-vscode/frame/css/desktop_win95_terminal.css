@@ -30,21 +30,22 @@
   --w95-command: var(--GColorGreen);
 }
 
-/* the start glyph's strap, face, and four panes, each in a green of its own */
-.w95 .start svg :nth-child(1) {
+/* the start glyph in greens: a dark strap, a black face, and its four panes checkered in a bright
+   and a mid green so they still read as four at ten pixels */
+.w95 .start .strap {
   fill: var(--GColorDarkGreen);
 }
 
-.w95 .start svg :nth-child(2) {
+.w95 .start .body {
   fill: var(--GColorBlack);
 }
 
-.w95 .start svg :nth-child(3),
-.w95 .start svg :nth-child(6) {
+.w95 .start .pane-a,
+.w95 .start .pane-d {
   fill: var(--GColorGreen);
 }
 
-.w95 .start svg :nth-child(4),
-.w95 .start svg :nth-child(5) {
-  fill: var(--GColorMintGreen);
+.w95 .start .pane-b,
+.w95 .start .pane-c {
+  fill: var(--GColorIslamicGreen);
 }

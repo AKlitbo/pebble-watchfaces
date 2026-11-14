@@ -138,7 +138,7 @@ body {
   left: 3px;
   top: 3px;
   width: 194px;
-  height: 141px;
+  height: 139px;
   padding: 3px;
   display: flex;
   flex-direction: column;
@@ -154,7 +154,7 @@ body {
   font-size: 10px;
 }
 
-/* the page runs y34..141, and the app draws the clock (ink y53..101) and the date (y110..120) on it,
+/* the page runs y34..139, and the app draws the clock (ink y53..101) and the date (y110..120) on it,
    centred in the text area right of the gutter */
 .page {
   flex: 1;
@@ -197,7 +197,7 @@ body {
 /* --- Prompt window --- */
 .prompt {
   left: 3px;
-  top: 146px;
+  top: 144px;
   width: 194px;
   height: 63px;
   padding: 3px;
@@ -210,7 +210,7 @@ body {
   height: 12px;
 }
 
-/* the console runs y163..206 */
+/* the console runs y161..204 */
 .console {
   flex: 1;
   position: relative;
@@ -253,9 +253,9 @@ body {
 /* --- Taskbar --- */
 .taskbar {
   left: 0;
-  top: 210px;
+  top: 208px;
   width: 200px;
-  height: 18px;
+  height: 20px;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -263,7 +263,7 @@ body {
 }
 
 .start {
-  height: 14px;
+  height: 16px;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -274,18 +274,18 @@ body {
 
 .task {
   flex: 1;
-  height: 14px;
+  height: 16px;
   display: flex;
   align-items: center;
   padding: 0 4px;
   font-size: 9px;
 }
 
-/* the tray runs x110..198 and y212..226, and the app packs the battery, bluetooth, and Quiet Time
+/* the tray runs x110..198 and y210..225, and the app packs the battery, bluetooth, and Quiet Time
    into it from the right */
 .tray {
   width: 88px;
-  height: 14px;
+  height: 16px;
 }
 
 /* --- Live values (preview only) --- */

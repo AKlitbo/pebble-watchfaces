@@ -183,13 +183,15 @@ body {
   height: 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 4px;
+  gap: 3px;
+  padding: 0 2px;
   border: 1px solid var(--nb-edge);
   border-bottom: none;
   border-left: none;
   color: var(--nb-muted);
-  font-size: 9px;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: -0.5px;
 }
 
 /* the open file's tab is a step taller, white, and capped in the accent */
@@ -207,7 +209,7 @@ body {
 }
 
 /* --- Editor --- */
-/* the app draws the clock (ink y64..109) and the date (ink y122..132) in here */
+/* the app draws the clock (ink y64..109) and the date (ink y120..134) in here */
 .editor {
   left: 12px;
   top: 44px;
@@ -254,11 +256,13 @@ body {
   border-top: 1px solid var(--nb-edge);
 }
 
+/* a 10px line box sits the title a pixel above the middle of the bar */
 .output .head {
   height: 12px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding-left: 5px;
+  line-height: 10px;
   background: var(--nb-face);
   font-size: 9px;
   font-weight: 600;
@@ -268,7 +272,7 @@ body {
 .output .done {
   position: absolute;
   left: 5px;
-  top: 49px;
+  top: 50px;
   color: var(--nb-success);
   font-family: 'Cousine', monospace;
   font-size: 7px;
@@ -334,12 +338,12 @@ body {
 
 .data.date {
   left: 22px;
-  top: 120px;
+  top: 116px;
   width: 178px;
   text-align: center;
   color: var(--GColorWindsorTan);
   font-family: 'Share Tech Mono', monospace;
-  font-size: 14px;
+  font-size: 20px;
 }
 
 .data.val {

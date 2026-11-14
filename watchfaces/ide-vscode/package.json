@@ -11,6 +11,7 @@
     "node": "^22.18.0 || >=24.2.0"
   },
   "scripts": {
+    "gen:page-font": "python tools/page-font.py",
     "gen:previews": "node tools/embed-previews.mjs",
     "test": "vitest run --config config/vitest.config.ts --passWithNoTests",
     "test:watch": "vitest --config config/vitest.config.ts",

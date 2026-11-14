@@ -9,25 +9,26 @@ import buildConfig from '../../paf/ts/pkjs/config-builder';
 import previews from './clay/previews.g';
 
 export default buildConfig({
-  // the Desktop picker leads, then the look for the chosen desktop, each with a shot of the choice
-  // under it. the theme picker is spelled out here rather than handed to buildConfig's theme
-  // shorthand, since that renders it first and cannot hide it
+  heading: 'Runtime Settings',
+  intro: 'Pick a desktop for the watchface, then set up the weather so its readouts have something to show.',
+  // the Desktop dropdown leads, then the look for the chosen desktop with a shot of it, the way
+  // Sketchbook's scene and palette pickers sit. the theme picker is spelled out here rather than
+  // handed to buildConfig's theme shorthand, since that renders it first and cannot hide it
   appearanceItems: [
     {
-      'type': 'themePreview',
+      'type': 'select',
       'messageKey': 'APPEARANCE_DESKTOP',
       'label': 'Desktop',
-      'description': 'The look of the whole watchface: a VS Code editor, a 95 or 2000 desktop, a DOS file manager, a DOS code editor, or a NetBeans editor.',
+      'description': 'Which computer the watchface is drawn as. Its look and a picture of it are below.',
       'defaultValue': 0,
       'options': [
-        { 'label': 'VS Code', 'value': 0 },
-        { 'label': '95', 'value': 1 },
-        { 'label': '2000', 'value': 2 },
-        { 'label': 'DOS', 'value': 3 },
-        { 'label': 'DOS IDE', 'value': 4 },
-        { 'label': 'NetBeans', 'value': 5 },
+        { 'label': 'VSCode Editor', 'value': 0 },
+        { 'label': 'Desktop 95', 'value': 1 },
+        { 'label': 'Desktop 2000', 'value': 2 },
+        { 'label': 'DOS Norton Commander', 'value': 3 },
+        { 'label': 'DOS Turbo C++ Editor', 'value': 4 },
+        { 'label': 'NetBeans Editor', 'value': 5 },
       ],
-      'previews': previews.desktop,
     },
     // only VS Code has themes, so the picker hides for the other desktops and keeps its choice
     {
@@ -35,7 +36,7 @@ export default buildConfig({
       'messageKey': 'APPEARANCE_THEME',
       'visibleWhen': { 'key': 'APPEARANCE_DESKTOP', 'in': [0] },
       'label': 'Editor Theme',
-      'description': 'Colour scheme for the editor frame and readouts.',
+      'description': 'The colours of the VS Code desktop.',
       'defaultValue': 0,
       'options': [
         { 'label': 'Dark', 'value': 0 },
@@ -54,7 +55,7 @@ export default buildConfig({
       'messageKey': 'APPEARANCE_DESKTOP_THEME',
       'visibleWhen': { 'key': 'APPEARANCE_DESKTOP', 'notIn': [0] },
       'label': 'Desktop Theme',
-      'description': 'The desktop in its own colours, or in green on black.',
+      'description': "Classic keeps the desktop's own colours. Terminal draws it in green on black.",
       'defaultValue': 0,
       'options': [
         { 'label': 'Classic', 'value': 0 },
@@ -79,6 +80,6 @@ export default buildConfig({
     description: 'What the steps readout shows: step count, or distance walked.',
   },
   battery: {
-    description: 'What the battery readout shows: the icon, the percentage, or both. DOS and DOS IDE give the percentage a line of its own, so it always shows there.',
+    description: 'What the battery readout shows: the icon, the percentage, or both. DOS Norton Commander and DOS Turbo C++ Editor give the percentage a line of its own, so it always shows there.',
   },
 });

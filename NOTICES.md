@@ -56,7 +56,7 @@ One of the header fonts is not under the OFL:
 Its fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a copyright notice for each.
 
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
-- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
+- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. The settings page carries a Latin subset of it, renamed Runtime Mono as the licence asks of a modified version under a Reserved Font Name, built by `watchfaces/ide-vscode/tools/page-font.py` along with a subset of VT323
 - **[VT323](https://fonts.google.com/specimen/VT323)**: Copyright 2011, The VT323 Project Authors
 - **[Cousine](https://fonts.google.com/specimen/Cousine)**: Copyright 2026 The Cousine Project Authors
 
@@ -68,7 +68,7 @@ Which of these a face bundles depends on what it draws. See each face's `resourc
 
 - **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and Sidereel
 - **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by IDE VSCode, Sketchbook Horizon, Gridlock and Sidereel
-- **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources fetched into `vendor/svgrepo/`, rendered PNGs bundled by every face
+- **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources fetched into `vendor/svgrepo/`, rendered PNGs bundled by every face but IDE VSCode, which draws its own pixel bluetooth glyphs
 - **[Phosphor](https://phosphoricons.com)** (the git branch glyph, by way of SVG Repo): MIT, Copyright (c) 2023 Phosphor Icons. SVG source fetched into `vendor/svgrepo/`, rendered PNGs bundled by IDE VSCode
 
 ## Trademarks
@@ -76,5 +76,9 @@ Which of these a face bundles depends on what it draws. See each face's `resourc
 Visual Studio Code is a trademark of Microsoft. The IDE VSCode face is an unaffiliated homage and is not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
 
 Apache NetBeans and NetBeans are trademarks of The Apache Software Foundation. The face's NetBeans desktop is an unaffiliated homage and is not endorsed by or associated with The Apache Software Foundation. No trademark licence is granted or implied.
+
+Norton Commander is a trademark of Gen Digital Inc. The face's DOS Norton Commander desktop is an unaffiliated homage and is not endorsed by or associated with Gen Digital. No trademark licence is granted or implied.
+
+Turbo C++ is a trademark of Embarcadero Technologies. The face's DOS Turbo C++ Editor desktop is an unaffiliated homage and is not endorsed by or associated with Embarcadero. No trademark licence is granted or implied.
 
 Refer to each source above for the full terms.

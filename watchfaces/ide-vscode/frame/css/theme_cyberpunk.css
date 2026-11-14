@@ -29,7 +29,7 @@
   /* terminal panel: black field, scarlet prompt, yellow command, neon syntax values */
   --panel-bg: var(--GColorBlack);
   --panel-border: 1px solid var(--GColorFolly);
-  --panel-tab-fg: var(--GColorDarkGray);
+  --panel-tab-fg: var(--GColorLightGray);
   --panel-tab-active-fg: var(--GColorWhite);
   --prompt-fg: var(--GColorFolly);
   --cmd-fg: var(--GColorIcterine);

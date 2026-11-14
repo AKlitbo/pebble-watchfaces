@@ -1,6 +1,6 @@
 {
-  "bluetooth":                       { "svg": "svgrepo/bluetooth-on",                         "size": [10, 10] },
-  "bluetooth-slash":                 { "svg": "svgrepo/bluetooth-slash",                      "size": [10, 10] },
+  "bluetooth":                       { "svg": "pixel/bluetooth-10",                           "size": [10, 10] },
+  "bluetooth-slash":                 { "svg": "pixel/bluetooth-slash-10",                     "size": [10, 10] },
   "quiet-on":                        { "svg": "uxwing/volume-muted-icon",                     "size": [11, 8] },
   "readout-temp":                    { "svg": "uxwing/thermometer-icon",                      "size": [12, 12] },
   "readout-heart":                   { "svg": "uxwing/heart-pulse-icon",                      "size": [12, 12] },

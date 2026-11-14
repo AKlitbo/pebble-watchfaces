@@ -207,16 +207,16 @@ body {
 /* --- Taskbar --- */
 .taskbar {
   left: 0;
-  top: 210px;
+  top: 208px;
   width: 200px;
-  height: 18px;
+  height: 20px;
 }
 
 .start {
   left: 2px;
-  top: 212px;
+  top: 210px;
   width: 42px;
-  height: 14px;
+  height: 16px;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -229,25 +229,25 @@ body {
 /* the title runs out of room, so it ends in an ellipsis the way a crowded taskbar does */
 .task {
   left: 47px;
-  top: 212px;
+  top: 210px;
   width: 60px;
-  height: 14px;
+  height: 16px;
   padding: 0 4px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 9px;
   font-weight: 700;
-  line-height: 14px;
+  line-height: 16px;
 }
 
-/* the tray runs x110..198 and y212..226, and the app packs the battery, bluetooth, and Quiet Time
+/* the tray runs x110..198 and y210..225, and the app packs the battery, bluetooth, and Quiet Time
    into it from the right */
 .tray {
   left: 110px;
-  top: 212px;
+  top: 210px;
   width: 88px;
-  height: 14px;
+  height: 16px;
   background: var(--w2k-face);
   box-shadow:
     inset 1px 1px 0 var(--w2k-shadow),

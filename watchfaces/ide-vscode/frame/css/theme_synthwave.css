@@ -28,7 +28,7 @@
   /* terminal panel: blue field, pink prompt, yellow command, neon syntax values */
   --panel-bg: var(--GColorOxfordBlue);
   --panel-border: 1px solid var(--GColorShockingPink);
-  --panel-tab-fg: var(--GColorLiberty);
+  --panel-tab-fg: var(--GColorBabyBlueEyes);
   --panel-tab-active-fg: var(--GColorWhite);
   --prompt-fg: var(--GColorShockingPink);
   --cmd-fg: var(--GColorIcterine);

@@ -8,15 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Desktop setting that puts the clock on a VS Code editor, a 95 desktop, a 2000 dialog, a DOS file manager, a DOS IDE, or a NetBeans editor. VS Code is the default and keeps its Editor Theme setting, and each of the others has a Classic look and a green on black Terminal look.
-- Added a picture of each choice under the Desktop and Editor Theme settings.
-- Added a muted speaker glyph beside bluetooth that shows while Quiet Time is on. DOS and DOS IDE write Quiet Time as ON or OFF instead.
+- Added a Desktop setting that puts the clock on VSCode Editor, Desktop 95, Desktop 2000, DOS Norton Commander, DOS Turbo C++ Editor, or NetBeans Editor. VSCode Editor is the default and keeps its Editor Theme setting, and each of the others has a Classic look and a green on black Terminal look.
+- Added a picture of each look under the Editor Theme and Desktop Theme settings.
+- Added a muted speaker glyph beside bluetooth that shows while Quiet Time is on. DOS Norton Commander and DOS Turbo C++ Editor write Quiet Time as ON or OFF instead.
 - Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. While it is picked, the units and location come from the plugin, and the watchface's own unit and location settings are hidden.
 - Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
 
 ### Changed
 
 - Changed the VS Code desktop to a slimmer sidebar with new icons and a bigger clock. The bluetooth glyph moves up beside the battery.
+- Changed the settings page to match the desktops, with each section a 95-style window and arrows to step through the desktop and theme pictures.
 - Changed a weather source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. A source you already picked stays as it is.
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.

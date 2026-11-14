@@ -27,7 +27,7 @@
   /* terminal panel: black field, white prompt, everything in grayscale */
   --panel-bg: var(--GColorBlack);
   --panel-border: 1px solid var(--GColorDarkGray);
-  --panel-tab-fg: var(--GColorDarkGray);
+  --panel-tab-fg: var(--GColorLightGray);
   --panel-tab-active-fg: var(--GColorWhite);
   --prompt-fg: var(--GColorWhite);
   --cmd-fg: var(--GColorLightGray);

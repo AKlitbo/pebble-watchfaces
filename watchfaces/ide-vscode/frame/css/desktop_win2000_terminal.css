@@ -22,21 +22,22 @@
   --w2k-muted: var(--GColorIslamicGreen);
 }
 
-/* the start glyph's strap, face, and four panes, each in a green of its own */
-.w2k .start svg :nth-child(1) {
+/* the start glyph in greens: a dark strap, a black face, and its four panes checkered in a bright
+   and a mid green so they still read as four at ten pixels */
+.w2k .start .strap {
   fill: var(--GColorDarkGreen);
 }
 
-.w2k .start svg :nth-child(2) {
+.w2k .start .body {
   fill: var(--GColorBlack);
 }
 
-.w2k .start svg :nth-child(3),
-.w2k .start svg :nth-child(6) {
+.w2k .start .pane-a,
+.w2k .start .pane-d {
   fill: var(--GColorGreen);
 }
 
-.w2k .start svg :nth-child(4),
-.w2k .start svg :nth-child(5) {
-  fill: var(--GColorMintGreen);
+.w2k .start .pane-b,
+.w2k .start .pane-c {
+  fill: var(--GColorIslamicGreen);
 }
