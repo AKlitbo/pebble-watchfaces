@@ -28,6 +28,7 @@ typedef enum
     DESKTOP_WIN2000,
     DESKTOP_DOS,
     DESKTOP_DOS_IDE,
+    DESKTOP_NETBEANS,
     DESKTOP_COUNT
 } DesktopId;
 

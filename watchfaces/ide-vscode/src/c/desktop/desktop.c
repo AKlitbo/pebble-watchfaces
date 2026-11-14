@@ -5,8 +5,8 @@
  * Every rect is in watch pixels and matches the frame page it draws over. A font of size N puts
  * its baseline N pixels below the top of the rect, so each text rect starts where the font's own
  * blank space above the capitals lines the ink up with the chrome. Share Tech Mono 14 inks from
- * y+4, VT323 20 from y+9, VT323 75 from y+33, VT323 84 from y+36, VT323 100 from y+44, and
- * Teko 82 from y+30.
+ * y+4, VT323 20 from y+9, VT323 75 from y+33, VT323 84 from y+36, VT323 100 from y+44,
+ * Cousine Bold 64 from y+20, and Teko 82 from y+30.
  *
  * @ingroup watchface-vscode
  */
@@ -306,6 +306,55 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
         .status_color = GColorWhite,
         .status_off_color = GColorWhite,
         .quiet_color = GColorWhite,
+    },
+
+    // a Java IDE: a menu bar and toolbar, side tabs, the clock as a line of code in the editor, and
+    // an output panel with the readouts over a build line
+    [DESKTOP_NETBEANS] = {
+        .background = RESOURCE_ID_IMAGE_BG_NETBEANS,
+        .background_terminal = RESOURCE_ID_IMAGE_BG_NETBEANS_TERMINAL,
+        .fonts = {
+            [FONT_CLOCK] = RESOURCE_ID_FONT_COUSINE_64,
+            [FONT_DATE] = RESOURCE_ID_FONT_STM_14,
+            [FONT_TEXT] = RESOURCE_ID_FONT_STM_14,
+        },
+        .zones = {
+            // the clock and date sit centred in the editor right of the gutter (x22..200), inked
+            // y64..109 and y122..132
+            [ZONE_TIME] = {.rect = {{22, 44}, {178, 80}}, .font_id = FONT_CLOCK, .align = GTextAlignmentCenter,
+                           .color = GColorBlack},
+            [ZONE_DATE] = {.rect = {{22, 118}, {178, 20}}, .font_id = FONT_DATE, .align = GTextAlignmentCenter,
+                           .color = GColorWindsorTan},
+            // the output panel's 2x2 grid. weather condition over temp, heart rate over steps
+            [ZONE_COND] = {.rect = {{31, 162}, {70, 18}}, .font_id = FONT_TEXT, .align = GTextAlignmentLeft,
+                           .color = GColorCobaltBlue},
+            [ZONE_WEATHER] = {.rect = {{31, 177}, {70, 18}}, .font_id = FONT_TEXT, .align = GTextAlignmentLeft,
+                              .color = GColorCobaltBlue},
+            [ZONE_HR] = {.rect = {{119, 162}, {78, 18}}, .font_id = FONT_TEXT, .align = GTextAlignmentLeft,
+                         .color = GColorDarkCandyAppleRed},
+            [ZONE_STEPS] = {.rect = {{119, 177}, {78, 18}}, .font_id = FONT_TEXT, .align = GTextAlignmentLeft,
+                            .color = GColorMidnightGreen},
+        },
+        .text = {
+            [ZONE_DATE] = date_quoted,
+        },
+        // Cousine Bold renders crisply at 64, but at its own 38px advance the widest time is 190px.
+        // drawn a glyph at a time 36px apart with a 22px colon, it is 166px and fits the editor
+        .clock_pitch = 36,
+        .clock_colon_pitch = 22,
+        // in the 12px column above the baked thermometer
+        .wx_icon = {{17, 165}, {12, 12}},
+        .wx_color = GColorCobaltBlue,
+        // the toolbar's right end, packed from the cell at the right edge
+        .batt_style = BATT_STYLE_OUTLINE,
+        .batt_icon = {{181, 16}, {13, 8}},
+        .batt_text = {{0, 11}, {0, 18}},
+        .batt_font = FONT_TEXT,
+        .batt_color = GColorBlack,
+        .batt_fill = GColorIslamicGreen,
+        .bt = {{0, 15}, {10, 10}},
+        .quiet = {{0, 16}, {11, 8}},
+        .status_color = GColorBlack,
     },
 };
 

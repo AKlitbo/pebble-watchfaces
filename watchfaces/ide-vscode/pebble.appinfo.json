@@ -51,10 +51,12 @@
       { "type": "bitmap", "name": "IMAGE_BG_WIN2000", "file": "images/background-win2000.png" },
       { "type": "bitmap", "name": "IMAGE_BG_DOS", "file": "images/background-dos.png" },
       { "type": "bitmap", "name": "IMAGE_BG_DOS_IDE", "file": "images/background-dos-ide.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_NETBEANS", "file": "images/background-netbeans.png" },
       { "type": "bitmap", "name": "IMAGE_BG_WIN95_TERMINAL", "file": "images/background-win95-terminal.png" },
       { "type": "bitmap", "name": "IMAGE_BG_WIN2000_TERMINAL", "file": "images/background-win2000-terminal.png" },
       { "type": "bitmap", "name": "IMAGE_BG_DOS_TERMINAL", "file": "images/background-dos-terminal.png" },
       { "type": "bitmap", "name": "IMAGE_BG_DOS_IDE_TERMINAL", "file": "images/background-dos-ide-terminal.png" },
+      { "type": "bitmap", "name": "IMAGE_BG_NETBEANS_TERMINAL", "file": "images/background-netbeans-terminal.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH", "file": "icons/bluetooth.png" },
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
       { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
@@ -66,6 +68,9 @@
       { "type": "bitmap", "name": "ICON_ACTIVITY_GIT", "file": "icons/activity-git.png" },
       { "type": "bitmap", "name": "ICON_ACTIVITY_DEBUG", "file": "icons/activity-debug.png" },
       { "type": "bitmap", "name": "ICON_ACTIVITY_EXTENSIONS", "file": "icons/activity-extensions.png" },
+      { "type": "bitmap", "name": "ICON_TOOLBAR_OPEN", "file": "icons/toolbar-open.png" },
+      { "type": "bitmap", "name": "ICON_TOOLBAR_SAVE", "file": "icons/toolbar-save.png" },
+      { "type": "bitmap", "name": "ICON_TOOLBAR_BUILD", "file": "icons/toolbar-build.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLEAR", "file": "icons/weather-now-clear.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_NIGHT_CLEAR", "file": "icons/weather-now-night-clear.png" },
       { "type": "bitmap", "name": "ICON_WEATHER_NOW_CLOUDY", "file": "icons/weather-now-cloudy.png" },
@@ -132,6 +137,12 @@
         "type": "font",
         "name": "FONT_VT_100",
         "file": "fonts/VT323-Regular.ttf",
+        "characterRegex": "[0-9:@]"
+      },
+      {
+        "type": "font",
+        "name": "FONT_COUSINE_64",
+        "file": "fonts/Cousine-Bold.ttf",
         "characterRegex": "[0-9:@]"
       },
       {

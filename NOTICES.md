@@ -58,6 +58,7 @@ Its fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), wh
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
 - **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'
 - **[VT323](https://fonts.google.com/specimen/VT323)**: Copyright 2011, The VT323 Project Authors
+- **[Cousine](https://fonts.google.com/specimen/Cousine)**: Copyright 2026 The Cousine Project Authors
 
 ## Icons
 
@@ -73,5 +74,7 @@ Which of these a face bundles depends on what it draws. See each face's `resourc
 ## Trademarks
 
 Visual Studio Code is a trademark of Microsoft. The IDE VSCode face is an unaffiliated homage and is not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
+
+Apache NetBeans and NetBeans are trademarks of The Apache Software Foundation. The face's NetBeans desktop is an unaffiliated homage and is not endorsed by or associated with The Apache Software Foundation. No trademark licence is granted or implied.
 
 Refer to each source above for the full terms.

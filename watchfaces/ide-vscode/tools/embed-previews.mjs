@@ -12,7 +12,7 @@
  * the page still builds before every shot is taken.
  *
  * `--from=<folder>` first copies a tap-walk of the `previews` walk into place. The walk shows the
- * five desktops, then VS Code in each theme after Dark, then each other desktop in Terminal, so
+ * six desktops, then VS Code in each theme after Dark, then each other desktop in Terminal, so
  * its shots land in that order, and the first one is both the VS Code desktop and the Dark theme.
  *
  * Run it with `npm run gen:previews` after changing the pictures.
@@ -36,6 +36,7 @@ const DESKTOPS = [
   [2, 'win2000'],
   [3, 'dos'],
   [4, 'dos-ide'],
+  [5, 'netbeans'],
 ];
 const THEMES = [
   [0, 'dark'],
@@ -53,6 +54,7 @@ const WALK_SHOTS = [
   ['desktop_win2000.png'],
   ['desktop_dos.png'],
   ['desktop_dos-ide.png'],
+  ['desktop_netbeans.png'],
   ['theme_light.png'],
   ['theme_terminal.png'],
   ['theme_cyberpunk.png'],
@@ -62,6 +64,7 @@ const WALK_SHOTS = [
   ['desktop_win2000_terminal.png'],
   ['desktop_dos_terminal.png'],
   ['desktop_dos-ide_terminal.png'],
+  ['desktop_netbeans_terminal.png'],
 ];
 
 // the Desktop Theme picker's looks, by the value it saves, and the suffix each look's shot carries

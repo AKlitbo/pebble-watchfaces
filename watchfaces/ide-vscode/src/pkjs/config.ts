@@ -17,7 +17,7 @@ export default buildConfig({
       'type': 'themePreview',
       'messageKey': 'APPEARANCE_DESKTOP',
       'label': 'Desktop',
-      'description': 'The look of the whole watchface: a VS Code editor, a 95 or 2000 desktop, a DOS file manager, or a DOS code editor.',
+      'description': 'The look of the whole watchface: a VS Code editor, a 95 or 2000 desktop, a DOS file manager, a DOS code editor, or a NetBeans editor.',
       'defaultValue': 0,
       'options': [
         { 'label': 'VS Code', 'value': 0 },
@@ -25,6 +25,7 @@ export default buildConfig({
         { 'label': '2000', 'value': 2 },
         { 'label': 'DOS', 'value': 3 },
         { 'label': 'DOS IDE', 'value': 4 },
+        { 'label': 'NetBeans', 'value': 5 },
       ],
       'previews': previews.desktop,
     },

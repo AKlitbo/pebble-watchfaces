@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+/*
+  The NetBeans desktop's Terminal look: green phosphor on black. It sets the colours
+  desktop_netbeans.css uses by job, in the palette's greens, and theme_terminal.css imports it, so a
+  bake of the netbeans frame under the terminal theme draws this look. Every name here carries the
+  desktop's own prefix, so the VS Code page that also imports it is left alone.
+*/
+
+:root {
+  --nb-face: var(--GColorBlack);
+  --nb-edge: var(--GColorIslamicGreen);
+  --nb-ink: var(--GColorGreen);
+  --nb-page: var(--GColorBlack);
+  --nb-rule: var(--GColorDarkGreen);
+  --nb-muted: var(--GColorIslamicGreen);
+  --nb-keyword: var(--GColorScreaminGreen);
+  --nb-accent: var(--GColorGreen);
+  --nb-open: var(--GColorGreen);
+  --nb-save: var(--GColorGreen);
+  --nb-build: var(--GColorScreaminGreen);
+  --nb-run: var(--GColorGreen);
+  --nb-run-edge: var(--GColorDarkGreen);
+  --nb-debug: var(--GColorGreen);
+  --nb-weather: var(--GColorGreen);
+  --nb-heart: var(--GColorGreen);
+  --nb-steps: var(--GColorGreen);
+  --nb-success: var(--GColorGreen);
+}

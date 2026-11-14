@@ -1,6 +1,6 @@
-This directory contains the Teko, Share Tech Mono, and VT323 fonts, all licensed
-under the SIL Open Font License Version 1.1 (OFL 1.1). Their copyright notices
-are listed below.
+This directory contains the Teko, Share Tech Mono, VT323, and Cousine fonts, all
+licensed under the SIL Open Font License Version 1.1 (OFL 1.1). Their copyright
+notices are listed below.
 
   Teko
     Copyright 2023 The Teko Project Authors
@@ -13,6 +13,10 @@ are listed below.
 
   VT323
     Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
+
+  Cousine
+    Copyright 2026 The Cousine Project Authors
+    (https://github.com/googlefonts/cousine)
 
 The full text of the SIL Open Font License Version 1.1 is reproduced
 below. It is also available, together with an FAQ, at:

@@ -41,6 +41,13 @@
         },
         {
           "settings": {
+            "APPEARANCE_DESKTOP": 5,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 0
+          }
+        },
+        {
+          "settings": {
             "APPEARANCE_DESKTOP": 0,
             "APPEARANCE_THEME": 1,
             "APPEARANCE_DESKTOP_THEME": 0
@@ -98,6 +105,13 @@
         {
           "settings": {
             "APPEARANCE_DESKTOP": 4,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 1
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 5,
             "APPEARANCE_THEME": 0,
             "APPEARANCE_DESKTOP_THEME": 1
           }

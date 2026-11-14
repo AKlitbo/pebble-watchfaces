@@ -1,0 +1,369 @@
+@charset "utf-8";
+
+/*
+  The NetBeans desktop. Authored 1:1 in the 200x228 Emery space so its pixels line up with the
+  DESKTOP_NETBEANS rects in desktop.c. It sets its own colours, so the theme sheet the bake adds
+  sets variables this page never reads.
+
+  Every piece is placed on its own rather than nested, so each coordinate here is a watch pixel.
+  The .time and .data placeholders are cleared before the shipped bake, since the app draws them.
+*/
+
+/* the colours by job. the Terminal look sets each again in desktop_netbeans_terminal.css */
+:root {
+  --nb-face: var(--GColorLightGray);
+  --nb-edge: var(--GColorDarkGray);
+  --nb-ink: var(--GColorBlack);
+  --nb-page: var(--GColorWhite);
+  --nb-rule: var(--GColorLightGray);
+  --nb-muted: var(--GColorDarkGray);
+  --nb-keyword: var(--GColorBlue);
+  --nb-accent: var(--GColorChromeYellow);
+  --nb-open: var(--GColorWindsorTan);
+  --nb-save: var(--GColorDukeBlue);
+  --nb-build: var(--GColorDarkGray);
+  --nb-run: var(--GColorIslamicGreen);
+  --nb-run-edge: var(--GColorDarkGreen);
+  --nb-debug: var(--GColorWindsorTan);
+  --nb-weather: var(--GColorCobaltBlue);
+  --nb-heart: var(--GColorDarkCandyAppleRed);
+  --nb-steps: var(--GColorMidnightGreen);
+  --nb-success: var(--GColorIslamicGreen);
+}
+
+body {
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  margin: 0;
+  background: #333;
+}
+
+.viewport {
+  width: 200px;
+  height: 228px;
+  overflow: hidden;
+}
+
+.watch {
+  width: 200px;
+  height: 228px;
+  position: relative;
+  overflow: hidden;
+  background: var(--nb-page);
+  color: var(--nb-ink);
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.watch > * {
+  position: absolute;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* each rendered icon PNG is a mask, so the background colour is what shows */
+.icon,
+.glyph {
+  display: block;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* --- Menu bar and toolbar --- */
+.menu {
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 4px;
+  background: var(--nb-face);
+  font-size: 9px;
+}
+
+/* the toolbar's right end (x110..198) is left for the app's packed battery, bluetooth, and Quiet Time */
+.toolbar {
+  left: 0;
+  top: 12px;
+  width: 200px;
+  height: 17px;
+  background: var(--nb-face);
+  border-bottom: 1px solid var(--nb-edge);
+}
+
+.toolbar > * {
+  position: absolute;
+  top: 3px;
+}
+
+.icon.open {
+  left: 4px;
+  width: 12px;
+  height: 10px;
+  background: var(--nb-open);
+  mask-image: url('../../resources/icons/toolbar-open.png');
+}
+
+.icon.save {
+  left: 19px;
+  width: 10px;
+  height: 10px;
+  background: var(--nb-save);
+  mask-image: url('../../resources/icons/toolbar-save.png');
+}
+
+.sep {
+  left: 32px;
+  top: 2px;
+  width: 1px;
+  height: 12px;
+  background: var(--nb-edge);
+}
+
+.icon.build {
+  left: 36px;
+  width: 11px;
+  height: 10px;
+  background: var(--nb-build);
+  mask-image: url('../../resources/icons/toolbar-build.png');
+}
+
+.run {
+  left: 50px;
+  top: 2px;
+  fill: var(--nb-run);
+  stroke: var(--nb-run-edge);
+  stroke-width: 0.8;
+}
+
+.icon.debug {
+  left: 64px;
+  width: 10px;
+  height: 10px;
+  background: var(--nb-debug);
+  mask-image: url('../../resources/icons/activity-debug.png');
+}
+
+/* --- The side tabs and the tab strip --- */
+.side {
+  left: 0;
+  top: 29px;
+  width: 12px;
+  height: 181px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding-top: 6px;
+  background: var(--nb-face);
+  border-right: 1px solid var(--nb-edge);
+  font-size: 8px;
+}
+
+.side span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.tabs {
+  left: 12px;
+  top: 29px;
+  width: 188px;
+  height: 15px;
+  display: flex;
+  align-items: flex-end;
+  padding-left: 2px;
+  background: var(--nb-face);
+}
+
+.tab {
+  height: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  border: 1px solid var(--nb-edge);
+  border-bottom: none;
+  border-left: none;
+  color: var(--nb-muted);
+  font-size: 9px;
+}
+
+/* the open file's tab is a step taller, white, and capped in the accent */
+.tab.on {
+  height: 13px;
+  border-left: 1px solid var(--nb-edge);
+  border-top: 2px solid var(--nb-accent);
+  background: var(--nb-page);
+  color: var(--nb-ink);
+}
+
+.tab.on b {
+  font-weight: 400;
+  color: var(--nb-muted);
+}
+
+/* --- Editor --- */
+/* the app draws the clock (ink y64..109) and the date (ink y122..132) in here */
+.editor {
+  left: 12px;
+  top: 44px;
+  width: 188px;
+  height: 104px;
+  font-family: 'Cousine', monospace;
+}
+
+.gutter {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 104px;
+  border-right: 1px solid var(--nb-rule);
+  color: var(--nb-muted);
+  font-size: 8px;
+  line-height: 9px;
+}
+
+.gutter span {
+  position: absolute;
+  right: 2px;
+}
+
+.code {
+  position: absolute;
+  left: 14px;
+  top: 2px;
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.code .keyword {
+  color: var(--nb-keyword);
+}
+
+/* --- Output panel --- */
+.output {
+  left: 12px;
+  top: 148px;
+  width: 188px;
+  height: 62px;
+  border-top: 1px solid var(--nb-edge);
+}
+
+.output .head {
+  height: 12px;
+  display: flex;
+  align-items: center;
+  padding-left: 5px;
+  background: var(--nb-face);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* the build line runs the panel's width, 2px clear of the status bar */
+.output .done {
+  position: absolute;
+  left: 5px;
+  top: 49px;
+  color: var(--nb-success);
+  font-family: 'Cousine', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 9px;
+}
+
+/* readout glyphs beside the app-drawn values, each in the 12px column of the weather glyph above */
+.glyph {
+  width: 12px;
+  height: 12px;
+}
+
+.glyph.hr {
+  left: 105px;
+  top: 165px;
+  background: var(--nb-heart);
+  mask-image: url('../../resources/icons/readout-heart.png');
+}
+
+.glyph.temp {
+  left: 17px;
+  top: 180px;
+  background: var(--nb-weather);
+  mask-image: url('../../resources/icons/readout-temp.png');
+}
+
+.glyph.steps {
+  left: 105px;
+  top: 180px;
+  background: var(--nb-steps);
+  mask-image: url('../../resources/icons/readout-steps.png');
+}
+
+/* --- Status bar --- */
+.status {
+  left: 0;
+  top: 210px;
+  width: 200px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 6px;
+  background: var(--nb-face);
+  border-top: 1px solid var(--nb-edge);
+  font-size: 9px;
+}
+
+/* --- Live values (preview only) --- */
+.time {
+  left: 22px;
+  top: 52px;
+  width: 178px;
+  text-align: center;
+  font-family: 'Cousine', monospace;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 64px;
+  letter-spacing: -2px;
+}
+
+.data.date {
+  left: 22px;
+  top: 120px;
+  width: 178px;
+  text-align: center;
+  color: var(--GColorWindsorTan);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+}
+
+.data.val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  line-height: 14px;
+}
+
+.data.cond,
+.data.temp {
+  color: var(--nb-weather);
+}
+
+.data.hr {
+  color: var(--nb-heart);
+}
+
+.data.steps {
+  color: var(--nb-steps);
+}
+
+/* Frame-render mode (?frame): render full size for the screenshot tool. */
+html.frame-render body {
+  display: block;
+  padding: 0;
+  min-height: 0;
+}
