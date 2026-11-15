@@ -1,11 +1,10 @@
 /**
- * Inlines the desktop and theme preview screenshots as base64 for the settings page.
+ * Inlines the theme preview screenshots as base64 for the settings page.
  *
- * The Desktop picker shows a shot of each desktop, the Editor Theme picker a shot of the VS Code
- * desktop in each theme, and the Desktop Theme picker the chosen desktop in its Classic, Dark, and
- * Terminal looks. The stock theme-previews generator inlines one picker's shots, so this builds all
- * three maps, each keyed by the value its picker saves. The Desktop Theme map is keyed by desktop
- * first, since its shots follow the Desktop picker.
+ * The Editor Theme picker shows the VS Code desktop in each theme, and the Desktop Theme picker the
+ * chosen desktop in its Classic, Dark, and Terminal looks. The stock theme-previews generator inlines
+ * one picker's shots, so this builds both maps, each keyed by the value its picker saves. The Desktop
+ * Theme map is keyed by desktop first, since its shots follow the Desktop dropdown.
  *
  * The screenshots live in .github/images/runtime/, beside the ones the README uses. A shot that
  * is not there yet is skipped with a warning, and its row in the picker shows the name alone, so
@@ -13,13 +12,12 @@
  *
  * `--from=<folder>` first copies a tap-walk of the `previews` walk into place. The walk shows the
  * six desktops, then VS Code in each theme after Dark, then each other desktop in Terminal, then
- * each in Dark, so its shots land in that order. The first one is both the VS Code desktop and the
- * Dark theme.
+ * each in Dark, so its shots land in that order. The first one is the VS Code desktop in Dark.
  *
  * Run it with `npm run gen:previews` after changing the pictures.
  *
- * Input:  ../../../.github/images/runtime/desktop_<name>.png, desktop_<name>_<look>.png, and
- *         theme_<name>.png
+ * Input:  ../../../.github/images/runtime/desktop_<name>.png and desktop_<name>_<look>.png, where
+ *         VS Code's look is its theme
  * Output: src/pkjs/clay/previews.g.js
  */
 import fs from 'node:fs';
@@ -40,28 +38,29 @@ const DESKTOPS = [
   [4, 'dos-ide'],
   [5, 'netbeans'],
 ];
+// VS Code's Dark theme is its plain desktop shot, and each other theme carries the theme's name
 const THEMES = [
-  [0, 'dark'],
-  [1, 'light'],
-  [2, 'terminal'],
-  [3, 'cyberpunk'],
-  [4, 'synthwave'],
-  [5, 'mono'],
+  [0, 'vscode'],
+  [1, 'vscode_light'],
+  [2, 'vscode_terminal'],
+  [3, 'vscode_cyberpunk'],
+  [4, 'vscode_synthwave'],
+  [5, 'vscode_mono'],
 ];
 
 // the files each tap-walk shot is copied to, in the walk's order
 const WALK_SHOTS = [
-  ['desktop_vscode.png', 'theme_dark.png'],
+  ['desktop_vscode.png'],
   ['desktop_win95.png'],
   ['desktop_win2000.png'],
   ['desktop_dos.png'],
   ['desktop_dos-ide.png'],
   ['desktop_netbeans.png'],
-  ['theme_light.png'],
-  ['theme_terminal.png'],
-  ['theme_cyberpunk.png'],
-  ['theme_synthwave.png'],
-  ['theme_mono.png'],
+  ['desktop_vscode_light.png'],
+  ['desktop_vscode_terminal.png'],
+  ['desktop_vscode_cyberpunk.png'],
+  ['desktop_vscode_synthwave.png'],
+  ['desktop_vscode_mono.png'],
   ['desktop_win95_terminal.png'],
   ['desktop_win2000_terminal.png'],
   ['desktop_dos_terminal.png'],
@@ -130,8 +129,7 @@ for (const [value, name] of DESKTOPS.slice(1)) {
 }
 
 const previews = {
-  desktop: previewsFor('desktop', DESKTOPS),
-  theme: previewsFor('theme', THEMES),
+  theme: previewsFor('desktop', THEMES),
   desktopTheme,
 };
 
