@@ -1,5 +1,5 @@
 {
-  "name": "pebble-watchfaces-ide-vscode",
+  "name": "pebble-watchfaces-runtime",
   "author": "Null Syntax",
   "license": "AGPL-3.0-or-later",
   "private": true,

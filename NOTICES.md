@@ -51,12 +51,12 @@ One of the header fonts is not under the OFL:
 
 - **[LECO 2014](https://www.1001fonts.com/leco-2014-font.html)**: released into the public domain by its author. It ships as `LECO2014-Regular.ttf` beside the others, and the note at the foot of each face's `OFL.txt` says so, since the OFL text there does not cover it.
 
-### IDE VSCode
+### Runtime
 
-Its fonts share one [OFL.txt](watchfaces/ide-vscode/resources/fonts/OFL.txt), which carries a copyright notice for each.
+Its fonts share one [OFL.txt](watchfaces/runtime/resources/fonts/OFL.txt), which carries a copyright notice for each.
 
 - **[Teko](https://fonts.google.com/specimen/Teko)**: Copyright 2023 The Teko Project Authors
-- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. The settings page carries a Latin subset of it, renamed Runtime Mono as the licence asks of a modified version under a Reserved Font Name, built by `watchfaces/ide-vscode/tools/page-font.py` along with a subset of VT323
+- **[Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono)**: Copyright (c) 2012, Carrois Type Design, Ralph du Carrois, with Reserved Font Name 'Share'. The settings page carries a Latin subset of it, renamed Runtime Mono as the licence asks of a modified version under a Reserved Font Name, built by `watchfaces/runtime/tools/page-font.py` along with a subset of VT323
 - **[VT323](https://fonts.google.com/specimen/VT323)**: Copyright 2011, The VT323 Project Authors
 - **[Cousine](https://fonts.google.com/specimen/Cousine)**: Copyright 2026 The Cousine Project Authors
 
@@ -66,14 +66,14 @@ The SVG sources for the weather, glyph, and bluetooth icons are not in this repo
 
 Which of these a face bundles depends on what it draws. See each face's `resources/icons.json`. Radar Array and Sketchbook Horizon draw no weather icons, so they bundle only the bluetooth glyphs.
 
-- **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font License 1.1 for the font, MIT for the code. Rendered PNGs bundled by IDE / VS Code, Gridlock and Sidereel
-- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by IDE VSCode, Sketchbook Horizon, Gridlock and Sidereel
-- **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources fetched into `vendor/svgrepo/`, rendered PNGs bundled by every face but IDE VSCode, which draws its own pixel bluetooth glyphs
-- **[Phosphor](https://phosphoricons.com)** (the git branch glyph, by way of SVG Repo): MIT, Copyright (c) 2023 Phosphor Icons. SVG source fetched into `vendor/svgrepo/`, rendered PNGs bundled by IDE VSCode
+- **[Weather Icons by Erik Flowers](https://github.com/erikflowers/weather-icons)**: SIL Open Font License 1.1 for the font, MIT for the code. Rendered PNGs bundled by Runtime, Gridlock and Sidereel
+- **[UXWing](https://uxwing.com)** (the health, weather, time and system glyphs): the [UXWing licence](https://uxwing.com/license/), which allows use without attribution but does not allow redistributing the icons themselves. SVG sources fetched separately, rendered PNGs bundled by Runtime, Sketchbook Horizon, Gridlock and Sidereel
+- **[SVG Repo](https://www.svgrepo.com)** (the bluetooth glyphs): [CC Attribution](https://www.svgrepo.com/page/licensing/#CC%20Attribution). SVG sources fetched into `vendor/svgrepo/`, rendered PNGs bundled by every face but Runtime, which draws its own pixel bluetooth glyphs
+- **[Phosphor](https://phosphoricons.com)** (the git branch glyph, by way of SVG Repo): MIT, Copyright (c) 2023 Phosphor Icons. SVG source fetched into `vendor/svgrepo/`, rendered PNGs bundled by Runtime
 
 ## Trademarks
 
-Visual Studio Code is a trademark of Microsoft. The IDE VSCode face is an unaffiliated homage and is not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
+Visual Studio Code is a trademark of Microsoft. The Runtime face's VSCode IDE desktop is an unaffiliated homage and is not endorsed by or associated with Microsoft. No trademark licence is granted or implied.
 
 Apache NetBeans and NetBeans are trademarks of The Apache Software Foundation. The face's NetBeans desktop is an unaffiliated homage and is not endorsed by or associated with The Apache Software Foundation. No trademark licence is granted or implied.
 

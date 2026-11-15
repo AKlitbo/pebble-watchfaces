@@ -1,6 +1,6 @@
-# IDE VSCode
+# Runtime
 
-<img src="../../.github/images/ide-vscode/theme_dark.png" width="100" title="Dark"> <img src="../../.github/images/ide-vscode/theme_light.png" width="100" title="Light"> <img src="../../.github/images/ide-vscode/theme_terminal.png" width="100" title="Terminal"> <img src="../../.github/images/ide-vscode/theme_cyberpunk.png" width="100" title="Cyberpunk"> <img src="../../.github/images/ide-vscode/theme_synthwave.png" width="100" title="Synthwave '84"> <img src="../../.github/images/ide-vscode/theme_mono.png" width="100" title="Mono (Black & White)">
+<img src="../../.github/images/runtime/theme_dark.png" width="100" title="Dark"> <img src="../../.github/images/runtime/theme_light.png" width="100" title="Light"> <img src="../../.github/images/runtime/theme_terminal.png" width="100" title="Terminal"> <img src="../../.github/images/runtime/theme_cyberpunk.png" width="100" title="Cyberpunk"> <img src="../../.github/images/runtime/theme_synthwave.png" width="100" title="Synthwave '84"> <img src="../../.github/images/runtime/theme_mono.png" width="100" title="Mono (Black & White)">
 
 A code editor watchface for the Pebble Time 2, laid out like Visual Studio Code.
 
@@ -15,13 +15,13 @@ A code editor watchface for the Pebble Time 2, laid out like Visual Studio Code.
 
 ## Installation
 
-Download `ide-vscode-emery-<version>.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone. It runs on the Pebble Time 2 (Emery) only.
+Download `runtime-emery-<version>.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone. It runs on the Pebble Time 2 (Emery) only.
 
 Enable Phone GPS is off on a new install, so pick a Manual Location or turn GPS on before the weather can show.
 
 ## Configuration
 
-Open IDE VSCode's settings in the Pebble app.
+Open Runtime's settings in the Pebble app.
 
 | Section | Setting | What It Does |
 | :-- | :-- | :-- |
@@ -73,4 +73,4 @@ Each release is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Disclaimer
 
-Visual Studio Code is a trademark of Microsoft. The **IDE VSCode** face is an unaffiliated homage and is not endorsed by or associated with Microsoft.
+Visual Studio Code is a trademark of Microsoft. The **Runtime** face's VSCode IDE desktop is an unaffiliated homage and is not endorsed by or associated with Microsoft.

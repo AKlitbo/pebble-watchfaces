@@ -1,6 +1,6 @@
-# Changelog - IDE VSCode
+# Changelog - Runtime
 
-All notable changes to the IDE VSCode watchface are documented in this file.
+All notable changes to the Runtime watchface, formerly IDE VSCode, are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Changed the watchface's name from IDE VSCode to Runtime, since it now draws six desktops rather than only VS Code. It is the same watchface, so it updates in place and keeps your settings.
 - Changed the VS Code desktop to a slimmer sidebar with new icons and a bigger clock. The bluetooth glyph moves up beside the battery.
 - Changed the settings page to match the desktops, with each section a 95-style window.
 - Changed a weather source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. A source you already picked stays as it is.
@@ -31,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Notes
 
-- This release needs watch firmware 4.44.3 or later. On older firmware the watch lists IDE VSCode as incompatible until it updates.
+- This release needs watch firmware 4.44.3 or later. On older firmware the watch lists Runtime as incompatible until it updates.
 - The Pebble App: Preferred Source choice needs plugins turned on in the Pebble app under Settings, Plugins.
 - Pebble app plugins, including my Weather Enhanced, work the same way as the weather sources on this settings page. If the Pebble app makes plugins the default, these sources may be phased out in a later release.
 - The first time the watchface starts after this update, your phone sends your settings to the watch once more. Nothing needs doing.

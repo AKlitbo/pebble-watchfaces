@@ -1,6 +1,6 @@
 /**
  * @file settings_schema.c
- * @brief ide-vscode-emery settings schema.
+ * @brief runtime-emery settings schema.
  *
  * The face has only ever added fields to the end, so it stays on version 1 and needs no
  * migration. It keeps its own struct and persist key, so its blob and versioning are

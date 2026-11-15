@@ -1,6 +1,6 @@
 /**
  * @file settings_schema.h
- * @brief ide-vscode-emery settings schema.
+ * @brief runtime-emery settings schema.
  *
  * A brand-new face that ships its fields from day one, so it starts clean at
  * version 1 with no migration history.

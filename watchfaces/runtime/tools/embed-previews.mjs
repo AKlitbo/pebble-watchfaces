@@ -7,7 +7,7 @@
  * three maps, each keyed by the value its picker saves. The Desktop Theme map is keyed by desktop
  * first, since its shots follow the Desktop picker.
  *
- * The screenshots live in .github/images/ide-vscode/, beside the ones the README uses. A shot that
+ * The screenshots live in .github/images/runtime/, beside the ones the README uses. A shot that
  * is not there yet is skipped with a warning, and its row in the picker shows the name alone, so
  * the page still builds before every shot is taken.
  *
@@ -18,7 +18,7 @@
  *
  * Run it with `npm run gen:previews` after changing the pictures.
  *
- * Input:  ../../../.github/images/ide-vscode/desktop_<name>.png, desktop_<name>_<look>.png, and
+ * Input:  ../../../.github/images/runtime/desktop_<name>.png, desktop_<name>_<look>.png, and
  *         theme_<name>.png
  * Output: src/pkjs/clay/previews.g.js
  */
@@ -28,7 +28,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const unit = path.resolve(here, '..');
-const imagesDir = path.resolve(here, '../../../.github/images/ide-vscode');
+const imagesDir = path.resolve(here, '../../../.github/images/runtime');
 const outFile = path.resolve(here, '../src/pkjs/clay/previews.g.js');
 
 // the value each picker saves, and the name its screenshot is filed under

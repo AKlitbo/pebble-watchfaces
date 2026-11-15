@@ -7,7 +7,7 @@ These are my Pebble watchfaces, all built on my shared [framework](https://githu
 | Preview | Watchface | What It Shows | Watches |
 | :--: | :-- | :-- | :-- |
 | <img src=".github/images/radar-array/theme_default.png" width="75" title="Radar Array"> | [Radar Array](watchfaces/radar-array/) | A radar scope with the time, the date, your coordinates, the temperature, your heart rate, and your steps. | Pebble Time 2 |
-| <img src=".github/images/ide-vscode/theme_dark.png" width="75" title="IDE VSCode"> | [IDE VSCode](watchfaces/ide-vscode/) | A code editor with the time, the date, the weather, your heart rate, your steps, and the battery. | Pebble Time 2 |
+| <img src=".github/images/runtime/desktops-classic.gif" width="75" title="Runtime"> | [Runtime](watchfaces/runtime/) | The time on six old and new desktops, from VS Code to DOS, with the weather, your heart rate, your steps, and the battery. | Pebble Time 2 |
 | <img src=".github/images/gridlock/layout_everyday.png" width="75" title="Gridlock"> | [Gridlock](watchfaces/mosaic/gridlock/) | A grid you fill with panels for the time, the weather and forecast, your health, your calendar, and stock quotes. | Pebble Time 2 |
 | <img src=".github/images/sidereel/layout_everyday.png" width="75" title="Sidereel"> | [Sidereel](watchfaces/mosaic/sidereel/) | A reel of minutes beside an hour pointer, with panels for the date, the weather, and your health. | Pebble Time 2 |
 | <img src=".github/images/sketchbook-horizon/sketchbook-emery.gif" width="75" title="Sketchbook Horizon"> | [Sketchbook Horizon](watchfaces/sketchbook-horizon/) | A hand-drawn landscape whose sky follows the sun and the weather, with the time, the date, and your stats. | Pebble Time 2 and Pebble Round 2 |

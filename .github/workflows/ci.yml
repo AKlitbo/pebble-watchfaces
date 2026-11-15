@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
           - { face: radar-array, unit: watchfaces/radar-array }
-          - { face: ide-vscode, unit: watchfaces/ide-vscode }
+          - { face: runtime, unit: watchfaces/runtime }
           - { face: gridlock, unit: watchfaces/mosaic }
           - { face: sidereel, unit: watchfaces/mosaic }
           - { face: sketchbook-horizon, unit: watchfaces/sketchbook-horizon }

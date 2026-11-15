@@ -1,6 +1,6 @@
 /**
  * @file layout.c
- * @brief ide-vscode-emery face: the chosen desktop's layout table bound to shared readouts, its
+ * @brief runtime-emery face: the chosen desktop's layout table bound to shared readouts, its
  * baked frame, and the overlays draw-slot (battery, weather glyph, Quiet Time, and bluetooth).
  * No shell. The face drives the engine directly from main.
  */

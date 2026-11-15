@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief ide-vscode-emery entry point: wires services to their stores and drives the slot
+ * @brief runtime-emery entry point: wires services to their stores and drives the slot
  * engine directly (no shell).
  *
  * Shows the weather condition and temperature in the terminal stats row, so it polls
