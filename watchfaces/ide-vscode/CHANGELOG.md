@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Changed the VS Code desktop to a slimmer sidebar with new icons and a bigger clock. The bluetooth glyph moves up beside the battery.
-- Changed the settings page to match the desktops, with each section a 95-style window and arrows to step through the desktop and theme pictures.
+- Changed the settings page to match the desktops, with each section a 95-style window.
 - Changed a weather source you have never picked to start on Pebble App: Preferred Source when a plugin on your phone serves it. A source you already picked stays as it is.
 - Changed the weather API Key to show only for OpenWeatherMap and WeatherAPI.com, the two sources that need one.
 - Changed the weather API Key to keep a key for each source. Switching between OpenWeatherMap and WeatherAPI.com shows that source's own key, and switching back no longer needs the key pasted again.
@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Fixed the weather fetching twice each time the watchface starts.
 - Fixed the settings page showing extra space under and beside its controls in the Pebble app on Android while plugins are on.
+- Fixed installing or updating the watchface asking for every permission at once, which held the weather until you answered. Each permission now says what it is for, and is asked for when it is first needed.
+- Fixed the settings page showing Location Settings above Weather. It now sits straight under Weather, so picking a weather plugin hides it right below.
 
 ### Notes
 
