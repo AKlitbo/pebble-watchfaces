@@ -49,6 +49,27 @@ static void apply_theme_colors(DesktopLayout *layout, uint8_t theme)
 }
 
 /**
+ * @brief Paint a look's own live colours over a desktop's Classic ones.
+ *
+ * @param layout The active layout to paint.
+ * @param colors The look's colours.
+ */
+static void apply_desktop_colors(DesktopLayout *layout, const DesktopColors *colors)
+{
+    for (uint8_t zone = 0; zone < ZONE_COUNT; zone++)
+    {
+        layout->zones[zone].color = colors->zones[zone];
+    }
+
+    layout->wx_color = colors->wx;
+    layout->batt_color = colors->batt;
+    layout->batt_fill = colors->batt_fill;
+    layout->status_color = colors->status;
+    layout->status_off_color = colors->status_off;
+    layout->quiet_color = colors->quiet;
+}
+
+/**
  * @brief Paint the Terminal look's greens over a desktop's Classic colours.
  *
  * Every desktop's Terminal frame is green on black, so one set of greens serves them all: the
@@ -195,6 +216,16 @@ void vscode_apply_theme(void)
     {
         apply_terminal_colors(&s_layout);
         frame = table->background_terminal;
+    }
+    else if (vscode_desktop_theme() == DESKTOP_THEME_DARK)
+    {
+        // a desktop whose Dark look only darkens the chrome keeps its Classic live colours
+        if (table->dark)
+        {
+            apply_desktop_colors(&s_layout, table->dark);
+        }
+
+        frame = table->background_dark;
     }
 
     // the fonts only change with the desktop, and the engine rebuild that follows makes the

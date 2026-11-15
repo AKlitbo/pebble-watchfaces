@@ -8,9 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Desktop setting that puts the clock on VSCode Editor, Desktop 95, Desktop 2000, DOS Norton Commander, DOS Turbo C++ Editor, or NetBeans Editor. VSCode Editor is the default and keeps its Editor Theme setting, and each of the others has a Classic look and a green on black Terminal look.
+- Added a Desktop setting that puts the clock on VSCode IDE, Desktop 95, Desktop 2000, DOS Norton Commander, DOS Turbo C++ IDE, or NetBeans IDE. VSCode IDE is the default and keeps its Editor Theme setting, and each of the others has a Classic look, a Dark look, and a green on black Terminal look.
 - Added a picture of each look under the Editor Theme and Desktop Theme settings.
-- Added a muted speaker glyph beside bluetooth that shows while Quiet Time is on. DOS Norton Commander and DOS Turbo C++ Editor write Quiet Time as ON or OFF instead.
+- Added a muted speaker glyph beside bluetooth that shows while Quiet Time is on. DOS Norton Commander and DOS Turbo C++ IDE write Quiet Time as ON or OFF instead.
 - Added a Pebble App: Preferred Source choice to the weather Data Source, which shows the weather for the first location in the Pebble app's weather settings. While it is picked, the units and location come from the plugin, and the watchface's own unit and location settings are hidden.
 - Added a list on the settings page of the Pebble app plugins this watchface works with, each with the version that has been tested.
 

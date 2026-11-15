@@ -2,7 +2,7 @@
  * Inlines the desktop and theme preview screenshots as base64 for the settings page.
  *
  * The Desktop picker shows a shot of each desktop, the Editor Theme picker a shot of the VS Code
- * desktop in each theme, and the Desktop Theme picker the chosen desktop in its Classic and
+ * desktop in each theme, and the Desktop Theme picker the chosen desktop in its Classic, Dark, and
  * Terminal looks. The stock theme-previews generator inlines one picker's shots, so this builds all
  * three maps, each keyed by the value its picker saves. The Desktop Theme map is keyed by desktop
  * first, since its shots follow the Desktop picker.
@@ -12,12 +12,14 @@
  * the page still builds before every shot is taken.
  *
  * `--from=<folder>` first copies a tap-walk of the `previews` walk into place. The walk shows the
- * six desktops, then VS Code in each theme after Dark, then each other desktop in Terminal, so
- * its shots land in that order, and the first one is both the VS Code desktop and the Dark theme.
+ * six desktops, then VS Code in each theme after Dark, then each other desktop in Terminal, then
+ * each in Dark, so its shots land in that order. The first one is both the VS Code desktop and the
+ * Dark theme.
  *
  * Run it with `npm run gen:previews` after changing the pictures.
  *
- * Input:  ../../../.github/images/ide-vscode/desktop_<name>[_terminal].png and theme_<name>.png
+ * Input:  ../../../.github/images/ide-vscode/desktop_<name>.png, desktop_<name>_<look>.png, and
+ *         theme_<name>.png
  * Output: src/pkjs/clay/previews.g.js
  */
 import fs from 'node:fs';
@@ -65,12 +67,18 @@ const WALK_SHOTS = [
   ['desktop_dos_terminal.png'],
   ['desktop_dos-ide_terminal.png'],
   ['desktop_netbeans_terminal.png'],
+  ['desktop_win95_dark.png'],
+  ['desktop_win2000_dark.png'],
+  ['desktop_dos_dark.png'],
+  ['desktop_dos-ide_dark.png'],
+  ['desktop_netbeans_dark.png'],
 ];
 
 // the Desktop Theme picker's looks, by the value it saves, and the suffix each look's shot carries
 const LOOKS = [
   [0, ''],
   [1, '_terminal'],
+  [2, '_dark'],
 ];
 
 /** Copies a tap-walk's shots into the images folder under the names the pickers read. */

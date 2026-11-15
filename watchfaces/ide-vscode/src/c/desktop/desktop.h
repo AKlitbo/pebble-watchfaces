@@ -32,11 +32,17 @@ typedef enum
     DESKTOP_COUNT
 } DesktopId;
 
-/** @brief The Desktop Theme setting's values, the looks every desktop but VS Code has. */
+/**
+ * @brief The Desktop Theme setting's values, the looks every desktop but VS Code has.
+ *
+ * Dark came after Terminal, so it takes the next value and a saved Classic or Terminal keeps its
+ * meaning. The settings page lists them Classic, Dark, Terminal.
+ */
 typedef enum
 {
     DESKTOP_THEME_CLASSIC,
     DESKTOP_THEME_TERMINAL,  ///< green phosphor on black
+    DESKTOP_THEME_DARK,      ///< the desktop's own chrome, darkened
     DESKTOP_THEME_COUNT
 } DesktopTheme;
 
@@ -51,6 +57,18 @@ enum
     ZONE_STEPS,
     ZONE_COUNT
 };
+
+/** @brief A look's live colours: the readouts, the weather glyph, the battery, and the status. */
+typedef struct DesktopColors
+{
+    GColor zones[ZONE_COUNT];  ///< each readout's text
+    GColor wx;                 ///< the weather glyph's tint
+    GColor batt;               ///< the percentage, and the battery's outline or full blocks
+    GColor batt_fill;          ///< the cell's fill above 20%
+    GColor status;             ///< the glyphs' tint, or the status text while on
+    GColor status_off;         ///< the status text while off
+    GColor quiet;              ///< Quiet Time's ON text
+} DesktopColors;
 
 /** @brief Writes a readout's text, the same shape as the framework's readouts. */
 typedef void (*ReadoutText)(char *out, size_t n);
@@ -70,7 +88,8 @@ typedef enum
  *
  * A zero-sized rect leaves that piece out. VS Code takes its colours from the Theme setting, so
  * its table holds the Dark+ colours and layout.c paints the chosen theme's over them. The other
- * desktops hold their Classic colours, and layout.c paints greens over them for the Terminal look.
+ * desktops hold their Classic colours. layout.c paints greens over them for the Terminal look, and
+ * the table's own Dark colours for the Dark look.
  *
  * A desktop that shows its status as glyphs packs them leftwards from the battery icon: the icon,
  * the percentage, bluetooth, then Quiet Time, STATUS_GAP apart, with anything hidden closing up.
@@ -81,6 +100,8 @@ typedef struct DesktopLayout
 {
     uint32_t    background;            ///< the baked frame, or 0 when the theme picks it
     uint32_t    background_terminal;   ///< the baked frame for the Terminal look
+    uint32_t    background_dark;       ///< the baked frame for the Dark look
+    const DesktopColors *dark;         ///< the Dark look's live colours, or NULL to keep the Classic ones
     uint32_t    fonts[FONT_COUNT];     ///< the font resource for each slot, 0 for a slot left empty
     const char *system_fonts[FONT_COUNT]; ///< a built-in font key for a slot, which costs no resource
     Zone        zones[ZONE_COUNT];     ///< where each readout sits, in which font and colour

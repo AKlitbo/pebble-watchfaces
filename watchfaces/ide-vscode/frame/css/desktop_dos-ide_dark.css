@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+/*
+  The DOS Turbo C++ IDE desktop's Dark look: a black editor, a dark grey menu bar and status line with red hotkeys, and a dark cyan Watch window. It sets the colours desktop_dos-ide.css uses by job,
+  and theme_dark.css imports it, so a bake of the dos-ide frame under the dark theme draws this
+  look. Every name here carries the desktop's own prefix, so the VS Code page that also imports it
+  is left alone.
+*/
+
+:root {
+  --ide-screen: var(--GColorBlack);
+  --ide-code: var(--GColorIcterine);
+  --ide-hotkey: var(--GColorSunsetOrange);
+  --ide-bar: var(--GColorDarkGray);
+  --ide-bar-text: var(--GColorWhite);
+  --ide-frame: var(--GColorWhite);
+  --ide-editor: var(--GColorBlack);
+  --ide-watch: var(--GColorMidnightGreen);
+  --ide-label: var(--GColorLightGray);
+}

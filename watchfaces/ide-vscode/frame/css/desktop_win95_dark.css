@@ -1,0 +1,31 @@
+@charset "utf-8";
+
+/*
+  The 95 desktop's Dark look: dark grey windows with light bevels and white text on a deep teal desktop, keeping the navy title bar and black fields. It sets the colours desktop_win95.css uses by job,
+  and theme_dark.css imports it, so a bake of the win95 frame under the dark theme draws this
+  look. Every name here carries the desktop's own prefix, so the VS Code page that also imports it
+  is left alone.
+*/
+
+:root {
+  --w95-desk: var(--GColorMidnightGreen);
+  --w95-ink: var(--GColorWhite);
+  --w95-face: var(--GColorDarkGray);
+  --w95-dark: var(--GColorBlack);
+  --w95-hi: var(--GColorLightGray);
+  --w95-shadow: var(--GColorBlack);
+  --w95-title-off: var(--GColorBlack);
+  --w95-title-off-text: var(--GColorLightGray);
+  --w95-title: var(--GColorDukeBlue);
+  --w95-title-text: var(--GColorWhite);
+  --w95-doc: var(--GColorWhite);
+  --w95-doc-edge: var(--GColorPictonBlue);
+  --w95-page: var(--GColorBlack);
+  --w95-gutter: var(--GColorDarkGray);
+  --w95-gutter-text: var(--GColorLightGray);
+  --w95-comment: var(--GColorMayGreen);
+  --w95-muted: var(--GColorLightGray);
+  --w95-console: var(--GColorBlack);
+  --w95-console-text: var(--GColorLightGray);
+  --w95-command: var(--GColorWhite);
+}

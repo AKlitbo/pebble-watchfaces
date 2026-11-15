@@ -22,12 +22,12 @@ export default buildConfig({
       'description': 'Which computer the watchface is drawn as. Its look and a picture of it are below.',
       'defaultValue': 0,
       'options': [
-        { 'label': 'VSCode Editor', 'value': 0 },
+        { 'label': 'VSCode IDE', 'value': 0 },
         { 'label': 'Desktop 95', 'value': 1 },
         { 'label': 'Desktop 2000', 'value': 2 },
         { 'label': 'DOS Norton Commander', 'value': 3 },
-        { 'label': 'DOS Turbo C++ Editor', 'value': 4 },
-        { 'label': 'NetBeans Editor', 'value': 5 },
+        { 'label': 'DOS Turbo C++ IDE', 'value': 4 },
+        { 'label': 'NetBeans IDE', 'value': 5 },
       ],
     },
     // only VS Code has themes, so the picker hides for the other desktops and keeps its choice
@@ -48,17 +48,20 @@ export default buildConfig({
       ],
       'previews': previews.theme,
     },
-    // every other desktop has a Classic and a Terminal look, kept apart from the VS Code theme so
-    // each choice survives a switch between desktops. the shots under it follow the Desktop picker
+    // every other desktop has a Classic, a Dark, and a Terminal look, kept apart from the VS Code
+    // theme so each choice survives a switch between desktops. Dark saves 2, since it came after
+    // Terminal, so a saved Classic or Terminal keeps its meaning. the shots under it follow the
+    // Desktop picker
     {
       'type': 'themePreview',
       'messageKey': 'APPEARANCE_DESKTOP_THEME',
       'visibleWhen': { 'key': 'APPEARANCE_DESKTOP', 'notIn': [0] },
       'label': 'Desktop Theme',
-      'description': "Classic keeps the desktop's own colours. Terminal draws it in green on black.",
+      'description': "Classic keeps the desktop's own colours. Dark darkens its chrome and keeps its accents. Terminal draws it in green on black.",
       'defaultValue': 0,
       'options': [
         { 'label': 'Classic', 'value': 0 },
+        { 'label': 'Dark', 'value': 2 },
         { 'label': 'Terminal', 'value': 1 },
       ],
       'previews': previews.desktopTheme,
@@ -80,6 +83,6 @@ export default buildConfig({
     description: 'What the steps readout shows: step count, or distance walked.',
   },
   battery: {
-    description: 'What the battery readout shows: the icon, the percentage, or both. DOS Norton Commander and DOS Turbo C++ Editor give the percentage a line of its own, so it always shows there.',
+    description: 'What the battery readout shows: the icon, the percentage, or both. DOS Norton Commander and DOS Turbo C++ IDE give the percentage a line of its own, so it always shows there.',
   },
 });

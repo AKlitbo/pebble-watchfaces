@@ -60,6 +60,63 @@ static void hr_bpm(char *out, size_t n)
     snprintf(out, n, "%s bpm", hr);
 }
 
+// the 95 Dark look: white on the black page, console, and fields, and the date's blue brightened
+// so it reads on black
+static const DesktopColors s_win95_dark = {
+    .zones = {
+        [ZONE_TIME] = GColorWhite,
+        [ZONE_DATE] = GColorPictonBlue,
+        [ZONE_COND] = GColorWhite,
+        [ZONE_WEATHER] = GColorWhite,
+        [ZONE_HR] = GColorWhite,
+        [ZONE_STEPS] = GColorWhite,
+    },
+    .wx = GColorWhite,
+    .batt = GColorWhite,
+    .batt_fill = GColorIslamicGreen,
+    .status = GColorWhite,
+    .status_off = GColorLightGray,
+    .quiet = GColorWhite,
+};
+
+// the 2000 Dark look: white in the black fields and on the dark grey dialog, and the date's navy
+// lightened so it reads on dark grey
+static const DesktopColors s_win2000_dark = {
+    .zones = {
+        [ZONE_TIME] = GColorWhite,
+        [ZONE_DATE] = GColorBabyBlueEyes,
+        [ZONE_COND] = GColorWhite,
+        [ZONE_WEATHER] = GColorWhite,
+        [ZONE_HR] = GColorWhite,
+        [ZONE_STEPS] = GColorWhite,
+    },
+    .wx = GColorWhite,
+    .batt = GColorWhite,
+    .batt_fill = GColorIslamicGreen,
+    .status = GColorWhite,
+    .status_off = GColorLightGray,
+    .quiet = GColorWhite,
+};
+
+// the NetBeans Dark look: a white clock, the string orange of its dark syntax for the date, and
+// each readout's colour lightened to read on the near-black output panel
+static const DesktopColors s_netbeans_dark = {
+    .zones = {
+        [ZONE_TIME] = GColorWhite,
+        [ZONE_DATE] = GColorRajah,
+        [ZONE_COND] = GColorPictonBlue,
+        [ZONE_WEATHER] = GColorPictonBlue,
+        [ZONE_HR] = GColorSunsetOrange,
+        [ZONE_STEPS] = GColorElectricBlue,
+    },
+    .wx = GColorPictonBlue,
+    .batt = GColorWhite,
+    .batt_fill = GColorIslamicGreen,
+    .status = GColorWhite,
+    .status_off = GColorLightGray,
+    .quiet = GColorWhite,
+};
+
 static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     // the editor right of an 18px activity bar, with a terminal panel at the foot. the colours here
     // are Dark+, and the theme paints its own over them
@@ -112,6 +169,8 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     [DESKTOP_WIN95] = {
         .background = RESOURCE_ID_IMAGE_BG_WIN95,
         .background_terminal = RESOURCE_ID_IMAGE_BG_WIN95_TERMINAL,
+        .background_dark = RESOURCE_ID_IMAGE_BG_WIN95_DARK,
+        .dark = &s_win95_dark,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_84,
             [FONT_DATE] = RESOURCE_ID_FONT_STM_14,
@@ -161,6 +220,8 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     [DESKTOP_WIN2000] = {
         .background = RESOURCE_ID_IMAGE_BG_WIN2000,
         .background_terminal = RESOURCE_ID_IMAGE_BG_WIN2000_TERMINAL,
+        .background_dark = RESOURCE_ID_IMAGE_BG_WIN2000_DARK,
+        .dark = &s_win2000_dark,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_75,
         },
@@ -209,6 +270,7 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     [DESKTOP_DOS] = {
         .background = RESOURCE_ID_IMAGE_BG_DOS,
         .background_terminal = RESOURCE_ID_IMAGE_BG_DOS_TERMINAL,
+        .background_dark = RESOURCE_ID_IMAGE_BG_DOS_DARK,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_84,
             [FONT_DATE] = RESOURCE_ID_FONT_VT_20,
@@ -256,6 +318,7 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     [DESKTOP_DOS_IDE] = {
         .background = RESOURCE_ID_IMAGE_BG_DOS_IDE,
         .background_terminal = RESOURCE_ID_IMAGE_BG_DOS_IDE_TERMINAL,
+        .background_dark = RESOURCE_ID_IMAGE_BG_DOS_IDE_DARK,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_VT_100,
             [FONT_DATE] = RESOURCE_ID_FONT_VT_20,
@@ -308,6 +371,8 @@ static const DesktopLayout s_desktops[DESKTOP_COUNT] = {
     [DESKTOP_NETBEANS] = {
         .background = RESOURCE_ID_IMAGE_BG_NETBEANS,
         .background_terminal = RESOURCE_ID_IMAGE_BG_NETBEANS_TERMINAL,
+        .background_dark = RESOURCE_ID_IMAGE_BG_NETBEANS_DARK,
+        .dark = &s_netbeans_dark,
         .fonts = {
             [FONT_CLOCK] = RESOURCE_ID_FONT_COUSINE_64,
             [FONT_DATE] = RESOURCE_ID_FONT_STM_20,

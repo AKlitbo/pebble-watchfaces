@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+/*
+  The NetBeans IDE desktop's Dark look: its own dark theme, with a near-black editor and output, dark grey bars and panels, light text, brightened syntax colours, and the toolbar glyphs lightened where they would vanish. It sets the colours desktop_netbeans.css uses by job,
+  and theme_dark.css imports it, so a bake of the netbeans frame under the dark theme draws this
+  look. Every name here carries the desktop's own prefix, so the VS Code page that also imports it
+  is left alone.
+*/
+
+:root {
+  --nb-face: var(--GColorDarkGray);
+  --nb-edge: var(--GColorBlack);
+  --nb-ink: var(--GColorWhite);
+  --nb-page: var(--GColorBlack);
+  --nb-rule: var(--GColorDarkGray);
+  --nb-muted: var(--GColorLightGray);
+  --nb-keyword: var(--GColorPictonBlue);
+  --nb-accent: var(--GColorChromeYellow);
+  --nb-open: var(--GColorRajah);
+  --nb-save: var(--GColorPictonBlue);
+  --nb-build: var(--GColorLightGray);
+  --nb-run: var(--GColorScreaminGreen);
+  --nb-run-edge: var(--GColorIslamicGreen);
+  --nb-debug: var(--GColorRajah);
+  --nb-weather: var(--GColorPictonBlue);
+  --nb-heart: var(--GColorSunsetOrange);
+  --nb-steps: var(--GColorElectricBlue);
+  --nb-success: var(--GColorScreaminGreen);
+}

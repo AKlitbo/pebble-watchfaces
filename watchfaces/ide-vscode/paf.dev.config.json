@@ -115,6 +115,41 @@
             "APPEARANCE_THEME": 0,
             "APPEARANCE_DESKTOP_THEME": 1
           }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 1,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 2
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 2,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 2
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 3,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 2
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 4,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 2
+          }
+        },
+        {
+          "settings": {
+            "APPEARANCE_DESKTOP": 5,
+            "APPEARANCE_THEME": 0,
+            "APPEARANCE_DESKTOP_THEME": 2
+          }
         }
       ]
     }

@@ -1,0 +1,23 @@
+@charset "utf-8";
+
+/*
+  The 2000 desktop's Dark look: a dark grey dialog with light bevels and white text on a deep slate desktop, keeping the stepped title gradient and black fields. It sets the colours desktop_win2000.css uses by job,
+  and theme_dark.css imports it, so a bake of the win2000 frame under the dark theme draws this
+  look. Every name here carries the desktop's own prefix, so the VS Code page that also imports it
+  is left alone.
+*/
+
+:root {
+  --w2k-desk: var(--GColorOxfordBlue);
+  --w2k-ink: var(--GColorWhite);
+  --w2k-face: var(--GColorDarkGray);
+  --w2k-hi: var(--GColorLightGray);
+  --w2k-dark: var(--GColorBlack);
+  --w2k-shadow: var(--GColorBlack);
+  --w2k-field: var(--GColorBlack);
+  --w2k-title-1: var(--GColorOxfordBlue);
+  --w2k-title-2: var(--GColorLiberty);
+  --w2k-title-3: var(--GColorBabyBlueEyes);
+  --w2k-title-text: var(--GColorWhite);
+  --w2k-muted: var(--GColorLightGray);
+}

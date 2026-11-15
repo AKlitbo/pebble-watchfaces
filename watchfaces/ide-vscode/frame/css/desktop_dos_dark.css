@@ -1,0 +1,24 @@
+@charset "utf-8";
+
+/*
+  The DOS Norton Commander desktop's Dark look: black panels in place of blue, keeping the cyan borders, the cyan cursor bar, the yellow highlights, and the function key bar. It sets the colours desktop_dos.css uses by job,
+  and theme_dark.css imports it, so a bake of the dos frame under the dark theme draws this
+  look. Every name here carries the desktop's own prefix, so the VS Code page that also imports it
+  is left alone.
+*/
+
+:root {
+  --dos-screen: var(--GColorBlack);
+  --dos-line: var(--GColorElectricBlue);
+  --dos-title: var(--GColorWhite);
+  --dos-dir: var(--GColorWhite);
+  --dos-pick-bg: var(--GColorTiffanyBlue);
+  --dos-pick: var(--GColorBlack);
+  --dos-exe: var(--GColorIcterine);
+  --dos-prompt: var(--GColorLightGray);
+  --dos-cursor: var(--GColorWhite);
+  --dos-keys-bg: var(--GColorBlack);
+  --dos-keys: var(--GColorWhite);
+  --dos-key-bg: var(--GColorTiffanyBlue);
+  --dos-key: var(--GColorBlack);
+}

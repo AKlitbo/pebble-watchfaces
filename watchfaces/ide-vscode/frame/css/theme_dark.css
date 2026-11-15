@@ -1,4 +1,12 @@
 @charset "utf-8";
+
+/* each desktop's own Dark look, so a desktop baked under this theme takes its dark colours. a
+   desktop's Classic look bakes under the light theme, whose sheet sets only VS Code's colours */
+@import url('desktop_win95_dark.css');
+@import url('desktop_win2000_dark.css');
+@import url('desktop_dos_dark.css');
+@import url('desktop_dos-ide_dark.css');
+@import url('desktop_netbeans_dark.css');
 /*
   VS Code Dark+ palette for the frame chrome. Every value is a Pebble-64 GColor
   pulled from the frame plugin's pebble-colors.css, so baked fills land on real colors with no

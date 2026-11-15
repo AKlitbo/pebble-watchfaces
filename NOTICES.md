@@ -79,6 +79,6 @@ Apache NetBeans and NetBeans are trademarks of The Apache Software Foundation. T
 
 Norton Commander is a trademark of Gen Digital Inc. The face's DOS Norton Commander desktop is an unaffiliated homage and is not endorsed by or associated with Gen Digital. No trademark licence is granted or implied.
 
-Turbo C++ is a trademark of Embarcadero Technologies. The face's DOS Turbo C++ Editor desktop is an unaffiliated homage and is not endorsed by or associated with Embarcadero. No trademark licence is granted or implied.
+Turbo C++ is a trademark of Embarcadero Technologies. The face's DOS Turbo C++ IDE desktop is an unaffiliated homage and is not endorsed by or associated with Embarcadero. No trademark licence is granted or implied.
 
 Refer to each source above for the full terms.
