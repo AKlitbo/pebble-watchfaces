@@ -4,6 +4,13 @@ All notable changes to the Sketchbook Horizon watchface are documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed installing or updating the watchface asking for every permission at once, which held the weather until you answered. Each permission now says what it is for, and is asked for when it is first needed.
+- Fixed the settings page showing Location Settings above Weather. It now sits straight under Weather, so picking a weather plugin hides it right below.
+
 ## [1.1.0] - 2026-11-13
 
 ### Added

@@ -4,6 +4,12 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed installing or updating the watchface asking for every permission at once, which held the weather until you answered. Each permission now says what it is for, and is asked for when it is first needed.
+
 ## [1.6.0] - 2026-11-13
 
 ### Added
