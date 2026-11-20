@@ -18,7 +18,7 @@ A watchface for the Pebble Time 2 that puts the time on an old or new computer s
 1. **Install the Watchface.** Download `runtime-emery-<version>.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone. It runs on the Pebble Time 2 (Emery) only, and needs watch firmware 4.44.3 or later.
 2. **Allow Its Permissions** when the Pebble app asks, as [Permissions](#permissions) covers.
 3. **Set Up the Weather.** Enable Phone GPS is off on a new install, so pick a Manual Location or turn GPS on before the weather can show.
-4. **Turn Plugins On** to use a weather plugin. In the Pebble app, go to Settings, Plugins, and turn on Plugins / permissions preview, then pick Pebble App: Preferred Source as the Data Source.
+4. **Use a Weather Plugin** if you like. Pick Pebble App: Preferred Source as the Data Source, which shows once a plugin on your phone serves the weather.
 
 ## Configuration
 
@@ -43,23 +43,24 @@ Open Runtime's settings in the Pebble app.
 | Health | Stats Readout | Steps, the default, or the distance walked in miles or kilometres. |
 | Health | Battery | Icon + Percent, the default, Icon Only, or Percent Only. DOS Norton Commander and DOS Turbo C++ IDE always show the percentage. |
 
-**Plugins This Watchface Supports.** A closed panel at the foot of the page lists the weather plugins tested with Runtime and marks the ones on your phone.
+**Plugins This Face Supports.** A closed panel at the foot of the page lists the weather plugins tested with Runtime and marks the ones on your phone.
 
 ## Permissions
 
-The Pebble app asks for these while Plugins / permissions preview is on. None is required, so allow only what your weather source uses. After an update that asks for new permissions, the weather stays empty until you allow them.
+The Pebble app asks for each of these when the face first needs it. None is required, so allow only what you use. After an update that asks for new permissions, a readout stays empty until you allow the one it needs. The steps and heart rate need Health, and the weather needs Location or Internet.
 
 - **Location:** for Enable Phone GPS and for a weather plugin.
+- **Health:** for the steps and heart rate readouts.
 - **Internet for `open-meteo.com`, `openweathermap.org`, and `weatherapi.com`:** for the weather source you pick, and the Manual Location search.
 
 ## Weather Sources
 
 - **Open-Meteo:** free, with no account or key.
 - **OpenWeatherMap** and **WeatherAPI.com:** free tiers, each needing an account and an API key.
-- **Pebble App: Preferred Source:** the weather plugin you prefer in the Pebble app, such as its built-in Weather or one from the Pebble app store. It shows once plugins are on and a plugin on your phone serves the weather.
+- **Pebble App: Preferred Source:** the weather plugin you prefer in the Pebble app, such as its built-in Weather or one from the Pebble app store. It shows once a plugin on your phone serves the weather.
 
 > [!WARNING]
-> Runtime does not need plugins today. If plugins ever become the default in the Pebble app, its own sources may be removed, and the weather would need a plugin.
+> Runtime does not need plugins today. Plugins are now on for everyone in the Pebble app, so its own weather sources may be removed in a later release, and the weather would then need a plugin.
 
 **The Place.** With Enable Phone GPS on, the weather is for where the phone is, and otherwise for the Manual Location. A plugin's weather follows the Pebble app's first weather location and its units, so the face hides its own unit and location settings.
 

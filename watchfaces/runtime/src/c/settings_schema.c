@@ -62,7 +62,7 @@ static VscodeSettings s_settings;
 // 6 themes: Dark+ / Light / Terminal / Cyberpunk / Synthwave / Mono
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(VscodeSettings, temperature_unit)),
-    KNOWN_DATE_FORMAT(offsetof(VscodeSettings, date_format)),
+    KNOWN_DATE_FORMAT(VscodeSettings, date_format),
     KNOWN_THEME(offsetof(VscodeSettings, theme), 6),
     KNOWN_STEPS_MODE(offsetof(VscodeSettings, steps_mode)),
     KNOWN_TIME_FORMAT(offsetof(VscodeSettings, time_format)),

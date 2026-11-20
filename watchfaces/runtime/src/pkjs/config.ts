@@ -71,7 +71,7 @@ export default buildConfig({
   bluetooth: {
     description: 'Show a bluetooth glyph beside the battery. It is lit while the phone is connected and slashed when the link drops.',
   },
-  location: { gpsDefault: false },
+  location: { gpsDefault: false, placeholder: 'Search a city, e.g. Phoenix' },
   weather: {},
   temperature: {},
   hourlyVibe: {},
