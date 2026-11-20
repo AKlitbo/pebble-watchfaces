@@ -158,7 +158,7 @@ export default buildConfig({
   // the date line runs through readout_date, so it can end in a .beats reading. it opens on a
   // readout-style "SAT 19 JUN" rather than the numeric default, which suits the hand-drawn lettering
   date: { beats: true, default: '%a %d %b' },
-  location: { gpsDefault: true },
+  location: { gpsDefault: true, placeholder: 'Search a city, e.g. Phoenix' },
   weather: {},
   temperature: {},
   hourlyVibe: {},

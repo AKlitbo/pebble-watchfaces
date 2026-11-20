@@ -74,7 +74,7 @@ static SketchbookSettings s_settings;
 // page opens on
 static const SettingField s_fields[] = {
     KNOWN_TEMPERATURE_UNIT(offsetof(SketchbookSettings, temperature_unit)),
-    KNOWN_DATE_FORMAT(offsetof(SketchbookSettings, date_format)),
+    KNOWN_DATE_FORMAT(SketchbookSettings, date_format),
     KNOWN_THEME(offsetof(SketchbookSettings, theme), THEME_COUNT),
     KNOWN_STEPS_MODE(offsetof(SketchbookSettings, steps_mode)),
     KNOWN_TIME_FORMAT(offsetof(SketchbookSettings, time_format)),

@@ -4,6 +4,17 @@ All notable changes to the Sketchbook Horizon watchface are documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Changed the list of supported plugins on the settings page to say "this face" rather than "this watchface".
+- Changed the settings page to carry only the palette pictures for your own watch, which makes it over a third smaller.
+
+### Notes
+
+- This release lists Pebble Health among the watchface's permissions, with the reason "To show your Pebble Health readings". If the Pebble app is set to ask before older apps use permissions, it asks you once after the update to allow health.
+
 ## [1.1.1] - 2026-11-14
 
 ### Fixed

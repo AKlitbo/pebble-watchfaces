@@ -27,7 +27,7 @@ A hand-drawn landscape watchface for the Pebble Time 2 and the Pebble Round 2, w
 1. **Install the Watchface.** Download `sketchbook-horizon-<version>.pbw` from [Releases](https://github.com/AKlitbo/pebble-watchfaces/releases) and open it with the Pebble app on your phone. The one file installs on the Pebble Time 2 (Emery) and the Pebble Round 2 (Gabbro), and needs watch firmware 4.44.3 or later.
 2. **Allow Its Permissions** when the Pebble app asks, as [Permissions](#permissions) covers.
 3. **Pick a Weather Source** under Weather on the settings page. Open-Meteo works with no setup.
-4. **Turn Plugins On** to use a weather plugin. In the Pebble app, go to Settings, Plugins, and turn on Plugins / permissions preview, then pick Pebble App: Preferred Source as the Data Source.
+4. **Use a Weather Plugin** if you like. Pick Pebble App: Preferred Source as the Data Source, which shows once a plugin on your phone serves the weather.
 
 ## Configuration
 
@@ -57,13 +57,14 @@ Open Sketchbook Horizon's settings in the Pebble app.
 | Location Settings | Fallback to Manual Location | Uses the Manual Location when GPS cannot find you. On by default. |
 | Location Settings | Manual Location | The city the weather is for when GPS is off or cannot find you. |
 
-**Plugins This Watchface Supports.** A closed panel at the foot of the page lists the weather plugins tested with Sketchbook Horizon and marks the ones on your phone.
+**Plugins This Face Supports.** A closed panel at the foot of the page lists the weather plugins tested with Sketchbook Horizon and marks the ones on your phone.
 
 ## Permissions
 
-The Pebble app asks for these while Plugins / permissions preview is on. None is required, so allow only what your weather source uses. After an update that asks for new permissions, the weather stays empty until you allow them.
+The Pebble app asks for each of these when the face first needs it. None is required, so allow only what you use. After an update that asks for new permissions, a readout stays empty until you allow the one it needs. The steps and heart rate need Health, and the weather needs Location or Internet.
 
 - **Location:** for Enable Phone GPS and for a weather plugin.
+- **Health:** for the steps and heart rate readouts.
 - **Internet for `open-meteo.com`:** for Open-Meteo and the Manual Location search.
 - **Internet for `openweathermap.org` and `weatherapi.com`:** only while that one is your Data Source.
 
@@ -71,10 +72,10 @@ The Pebble app asks for these while Plugins / permissions preview is on. None is
 
 - **Open-Meteo:** free, with no account or key.
 - **OpenWeatherMap** and **WeatherAPI.com:** free tiers, each needing an account and an API key.
-- **Pebble App: Preferred Source:** the weather plugin you prefer in the Pebble app, such as its built-in Weather or one from the Pebble app store. It shows once plugins are on and a plugin on your phone serves the weather.
+- **Pebble App: Preferred Source:** the weather plugin you prefer in the Pebble app, such as its built-in Weather or one from the Pebble app store. It shows once a plugin on your phone serves the weather.
 
 > [!WARNING]
-> Sketchbook Horizon does not need plugins today. If plugins ever become the default in the Pebble app, its own sources may be removed, and the weather would need a plugin.
+> Sketchbook Horizon does not need plugins today. Plugins are now on for everyone in the Pebble app, so its own weather sources may be removed in a later release, and the weather would then need a plugin.
 
 ## How It Works
 
