@@ -280,7 +280,7 @@ void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
 
     // --- header: solid label block plus a 50% checker across the rest of the strip ---
     // the spec's nudge seats the chosen font in the 14px strip
-    const HeaderFontSpec *header = header_font_spec(settings_u8(SETTING_HEADER_FONT));
+    const HeaderFontSpec *header = header_font_spec(sidereel_header_font());
     const char *label_text = def->get_label ? def->get_label(gctx.size) : def->label;
     GFont header_font = fonts_get(FONT_HEADER);
     GSize text_size = graphics_text_layout_get_content_size(label_text, header_font,

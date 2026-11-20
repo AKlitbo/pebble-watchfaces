@@ -172,16 +172,10 @@ bool gridlock_module_headerless(uint8_t module, ModuleSize size);
 bool gridlock_module_borderless(uint8_t module, ModuleSize size);
 
 /**
- * @brief The goal targets worked out (the saved menu choice turned into a real value).
+ * @brief The face's own settings, with a menu choice turned into its real value. The daily goals are
+ * the framework's, read with goals_steps(settings_u8(SETTING_GOAL_STEPS)) and the like.
  * @{
  */
-int gridlock_goal_steps(void);
-int gridlock_goal_calories(void);
-int gridlock_goal_distance_m(void); ///< Today's distance goal in meters
-int gridlock_goal_sleep_min(void);
-int gridlock_goal_active_min(void);
-int gridlock_hr_limit(void);
-
 /** @brief Which HRV bursts count for the main reading, as an HrvCount: not walking, only still, or any. */
 uint8_t gridlock_hrv_count(void);
 
@@ -198,16 +192,18 @@ int gridlock_hrv_walk_steps(void);
  */
 int gridlock_hrv_settle_gaps(void);
 
-/** @brief The Goal Met Vibe pick string: empty (off), a sentinel (S/L/D/C), or a comma list of milliseconds. */
-const char *gridlock_goal_vibe_pick(void);
-/** @brief The user's own Goal Met Vibe pattern, a comma list of milliseconds, used when the pick is Custom. */
-const char *gridlock_goal_vibe_custom(void);
 uint8_t gridlock_wind_unit(void);
 /// Number of Analog Face styles (0 classic round, then the rectangular and round dials)
 #define GRIDLOCK_ANALOG_STYLE_COUNT 9
 uint8_t gridlock_analog_style(void); ///< Analog Face Style pick (0 classic round, 1 to 6 other dials)
 /// Panel Style pick (0 Classic, 1 Rounded). Indexes the panel_styles table the grid engine frames with
 uint8_t gridlock_panel_style(void);
+/**
+ * @brief The Header Font pick, which font the panel headers draw with.
+ *
+ * @return An index into the header_fonts table.
+ */
+uint8_t gridlock_header_font(void);
 uint8_t gridlock_hourly_vibe(void); ///< VibeChoice buzzed at the top of each hour (VIBE_NONE is off)
 uint8_t gridlock_week_start(void); ///< First day of the week for the calendar panels (0 Sunday, 1 Monday)
 int gridlock_stock_poll_min(void); ///< Minutes between stock quote requests
@@ -351,8 +347,9 @@ void gridlock_set_layout(const char *layout);
 void gridlock_set_time_zone_1(const char *value);
 
 /**
- * @brief Sets the custom colours string in memory only (it is not saved). The dev harness
- * uses this to flip per-module colours and header/border on/off without the config page.
+ * @brief Sets the custom colours string in memory only (it is not saved). The long text channel
+ * calls it with the colours a save brings, and the save after it writes the two blobs. The dev
+ * harness uses it to flip per-module colours and header/border on/off without the config page.
  *
  * @param value An APPEARANCE_CUSTOM_COLORS wire string: the "~3" sparse form ("~3", the 5-char
  *              colour records, "|", then the 3-char flag records), or "0" for none. Anything
@@ -363,8 +360,9 @@ void gridlock_set_custom_colors(const char *value);
 /**
  * @brief Rebuilds the combined APPEARANCE_CUSTOM_COLORS wire string from the two persisted sections.
  *
- * The inverse of gridlock_set_custom_colors: used to seed the phone (outbound settings) with the
- * single "~3 colours | flags" string even though the watch stores the two halves separately.
+ * The inverse of gridlock_set_custom_colors. The long text channel uses it to send the phone the
+ * single "~3 colours | flags" string in the settings reply, even though the watch stores the two
+ * halves separately. It also checks a save against it, so colours that did not move cost nothing.
  *
  * @param out Buffer that receives the combined string.
  * @param n Size of out.

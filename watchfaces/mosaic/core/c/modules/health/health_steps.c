@@ -1,7 +1,8 @@
 #include "health_steps.h"
 #include "mosaic/draw/stat_panel.h"
 #include "io/stores/health_store.h"
-#include "settings_schema.h"
+#include "health/goals.h"
+#include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
 #include "system/units/units.h"
 #include "text/number_format.h"
@@ -65,9 +66,10 @@ static void steps_value_2x2(char *out, size_t n)
 // distance measured against a distance
 static void steps_goal(char *out, size_t n, int *value, int *goal)
 {
-    number_group(out, n, gridlock_goal_steps());
+    int target = goals_steps(settings_u8(SETTING_GOAL_STEPS));
+    number_group(out, n, target);
     *value = health_store_steps();
-    *goal = gridlock_goal_steps();
+    *goal = target;
 }
 
 static const StatPanelDesc steps_desc = {

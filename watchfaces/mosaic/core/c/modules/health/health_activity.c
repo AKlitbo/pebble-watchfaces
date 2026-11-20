@@ -3,7 +3,8 @@
 #include "text/number_format.h"
 #include "mosaic/draw/common.h"
 #include "io/stores/health_store.h"
-#include "settings_schema.h"
+#include "health/goals.h"
+#include "system/settings/settings.h"
 #include <stdio.h>
 
 static void act_value_1x2(char *out, size_t n, const char **unit_out)
@@ -12,12 +13,13 @@ static void act_value_1x2(char *out, size_t n, const char **unit_out)
     *unit_out = "MIN";
 }
 
-// the goal path prepends "OF ", so "%d MIN" reads as "OF <goal> MIN" like it did by hand
+// the goal path puts "OF " in front, so "%d MIN" reads as "OF <goal> MIN"
 static void act_goal(char *out, size_t n, int *value, int *goal)
 {
-    snprintf(out, n, "%d MIN", gridlock_goal_active_min());
+    int target = goals_active_min(settings_u8(SETTING_GOAL_ACTIVE));
+    snprintf(out, n, "%d MIN", target);
     *value = health_store_active_min();
-    *goal = gridlock_goal_active_min();
+    *goal = target;
 }
 
 static const StatPanelDesc activity_desc = {

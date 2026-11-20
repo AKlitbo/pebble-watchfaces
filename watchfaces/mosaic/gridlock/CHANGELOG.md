@@ -4,6 +4,17 @@ All notable changes to the Gridlock watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Changed the calendar plugin's name in the list of supported plugins to Calendar Enhanced + iCal, its new name in the Pebble app store.
+
+### Fixed
+
+- Fixed a daily goal sometimes never buzzing on a day you met it. Yesterday's total could reach the watch just after midnight and count as today's goal already met.
+- Fixed a goal buzzing hours after you met it, when the watchface opened before your activity had been read.
+
 ## [1.9.1] - 2026-11-14
 
 ### Fixed

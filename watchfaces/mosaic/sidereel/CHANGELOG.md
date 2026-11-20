@@ -4,6 +4,13 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed a daily goal sometimes never buzzing on a day you met it. Yesterday's total could reach the watch just after midnight and count as today's goal already met.
+- Fixed a goal buzzing hours after you met it, when the watchface opened before your activity had been read.
+
 ## [1.6.1] - 2026-11-14
 
 ### Fixed

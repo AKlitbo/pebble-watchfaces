@@ -13,23 +13,20 @@ import { serializeLayout, parseLayoutString, EMPTY_LAYOUT } from './codec';
 import { LAYOUT_PRESETS } from './presets';
 import { buildModuleList, modInfo, thumbFor, fillBlockVisual } from '../../../../../../../core/pkjs/clay/builder/ts/layout/visuals';
 import { createDragEngine } from '../../../../../../../core/pkjs/clay/builder/ts/layout/drag';
-import { createPalette } from '../../../../../../../core/pkjs/clay/builder/ts/layout/palette';
-import { assignedLabels, createPluginWarnings } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
-import type { PickedKinds } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-warnings';
+import { PALETTE_GROUPS } from '../../../../../../../core/pkjs/clay/builder/ts/layout/palette-groups';
+import { assignedLabels, PANEL_KINDS } from '../../../../../../../core/pkjs/clay/builder/ts/layout/plugin-panels';
+import { createPalette } from '../../../../../../../paf/ts/clay/builder/ts/shared/palette';
+import { createPluginWarnings } from '../../../../../../../paf/ts/clay/builder/ts/shared/plugin-warnings';
 import { createOverlayHost } from '../../../../../../../paf/ts/clay/builder/ts/shared/overlay';
 import { buildIoPanel } from '../../../../../../../paf/ts/clay/builder/ts/shared/io-panel';
 import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, ROLE_NONE } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { ModesBar } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../../../../../../../core/pkjs/clay/builder/ts/types';
 
-/**
- * The set/get handles init hangs on the root element for the manipulator, and the one the face's
- * page code calls with the sources the wearer picked.
- */
+/** The set/get handles init hangs on the root element for the manipulator. */
 interface LbHooks {
   _lbSet(value: string): void;
   _lbGet(): string;
-  _lbPluginSources(picked: PickedKinds): void;
 }
 
 /**
@@ -51,7 +48,11 @@ export function init(this: ClayComponentInstance): void {
   const modesHost = root.querySelector('.lb-modes') as HTMLElement;
 
   // the warning for a placed panel the phone has no plugin for sits under the watch, above the palette
-  const warnings = createPluginWarnings(root.querySelector('.lb-middle-wrap') as HTMLElement);
+  const warnings = createPluginWarnings({
+    root: root,
+    after: root.querySelector('.lb-middle-wrap') as HTMLElement,
+    panelKinds: PANEL_KINDS,
+  });
 
   let blocks: Block[] = [];
 
@@ -211,6 +212,7 @@ export function init(this: ClayComponentInstance): void {
   const palette = createPalette({
     container: paletteContainer,
     modules: MODULES,
+    groups: PALETTE_GROUPS,
     sizes: BLOCK_SIZES.map(function (size) {
       return { key: size.key, wide: size.w === GRID_COLS };
     }),
@@ -295,10 +297,6 @@ export function init(this: ClayComponentInstance): void {
 
   root._lbGet = function () {
     return library.layouts[library.day] || EMPTY_LAYOUT;
-  };
-
-  root._lbPluginSources = function (picked) {
-    warnings.setPicked(picked);
   };
 
   blocks = parseLayoutString(library.layouts[library.day]);

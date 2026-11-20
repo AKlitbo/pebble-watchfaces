@@ -9,7 +9,6 @@
  */
 #include <pebble.h>
 
-#include "mosaic/goal_vibe.h"
 #include "dev/dev.h"
 #include "io/appmessage/appmessage.h"
 #include "io/stores/health_store.h"
@@ -86,7 +85,7 @@ static void on_time_tick(void)
 // the store callbacks are void(*)(void) so they cannot carry their own tag
 static void on_health_changed(void)
 {
-    goal_vibe_update();
+    vibe_goal();
     engine_mark_dirty_tags(TAG_HEALTH);
 }
 
@@ -127,6 +126,9 @@ static void init(void)
                                          .hr_history = HEALTH_HR_HISTORY, .step_history = HEALTH_STEP_HISTORY, .distance = true,
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         time_store_init(time_cfg(), NULL);
+        // the health store reads its totals without calling back, so the goal buzz takes its first
+        // look here. it waits for the time store, since it files each goal under the day
+        vibe_goal();
         weather_store_init((WeatherConfig){.live = true, .poll_min = 30,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
     }
@@ -145,10 +147,6 @@ static void init(void)
     engine_init(s_window, sidereel_build);
     window_stack_push(s_window, true);
 
-    // take stock of today's goals before the first reading lands, so reopening the face on a
-    // goal already met stays quiet
-    goal_vibe_init();
-
     time_store_subscribe(on_time_tick);
     health_store_subscribe(on_health_changed);
     weather_store_subscribe(on_weather_changed);
@@ -159,9 +157,9 @@ static void init(void)
     appmessage_on_settings_changed(on_settings_changed);
 
     // the packed appearance string is too big for one persist slot, so it arrives and leaves
-    // through its own pair of hooks rather than the settings field table
-    appmessage_on_custom_colors(sidereel_set_custom_colors);
-    appmessage_set_custom_colors_provider(sidereel_get_custom_colors);
+    // through the long text channel rather than the settings field table
+    appmessage_set_long_text(MESSAGE_KEY_APPEARANCE_CUSTOM_COLORS, SIDEREEL_CUSTOM_COLORS_CAP, sidereel_get_custom_colors,
+                             sidereel_set_custom_colors);
     appmessage_open(4096);
 
     dev_start(sidereel_apply_theme);

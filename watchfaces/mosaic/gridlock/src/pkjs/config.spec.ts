@@ -32,13 +32,13 @@ import { describe, test, expect } from 'vitest';
 import config from './config';
 import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/testing/page-keys';
 import type { PageModule } from '../../../core/pkjs/testing/page-keys';
-import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
+import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette-groups';
 import { pluginSourcePage } from '../../../paf/ts/plugin-sources/page';
 import { CALENDAR_SOURCE_SELECT } from '../../../paf/ts/plugin-sources/calendar';
 import { CALENDAR_STANDARD, STOCK_STANDARD, WEATHER_STANDARD } from '../../../paf/ts/plugin-sources/standard';
-import { allItems, conditionsOf } from '../../../paf/ts/clay/rows';
+import { allItems, conditionsOf, ruleNames } from '../../../paf/ts/clay/rows';
 import { messageKeysFrom } from '../../../paf/tools/pkjs/settings-page.ts';
-import type { ClayConfigItem, VisibilityCondition } from '../../../paf/ts/clay/types';
+import type { ClayConfigItem, VisibilityCondition, VisibilityRule } from '../../../paf/ts/clay/types';
 
 const appinfoPath = path.resolve(import.meta.dirname, '../../pebble.appinfo.json');
 
@@ -220,8 +220,17 @@ function hiddenKeys(page: ClayConfigItem[], picks: Record<string, unknown>): str
   Object.assign(values, picks);
 
   return rows
-    .filter((row) => row.messageKey && !conditionsOf(row).every((condition) => conditionHolds(condition, values[condition.key])))
+    .filter((row) => row.messageKey && !conditionsOf(row).every((rule) => ruleHolds(rule, values)))
     .map((row) => row.messageKey as string);
+}
+
+/** Whether a visibleWhen entry lets its row show, a plain condition holding or any one inside its anyOf. */
+function ruleHolds(rule: VisibilityRule, values: Record<string, unknown>): boolean {
+  if ('anyOf' in rule) {
+    return rule.anyOf.some((condition) => conditionHolds(condition, values[condition.key]));
+  }
+
+  return conditionHolds(rule, values[rule.key]);
 }
 
 /** Whether a row's condition lets it show for a value, an in list naming it or a notIn list leaving it out. */
@@ -302,7 +311,7 @@ describe('config page with the Pebble app plugins', () => {
     const result = sectionHolding(page, 'LOCATION_USE_GPS');
 
     expect(result?.hideWhenEmpty).toBe(true);
-    expect((result?.items || []).every((row) => conditionsOf(row).some((condition) => condition.key === 'WEATHER_PROVIDER'))).toBe(true);
+    expect((result?.items || []).every((row) => conditionsOf(row).some((rule) => ruleNames(rule, 'WEATHER_PROVIDER')))).toBe(true);
   });
 });
 

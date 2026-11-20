@@ -5,7 +5,8 @@
 #include "io/stores/health_store.h"
 #include "math/scale.h"
 #include "math/series.h"
-#include "settings_schema.h"
+#include "health/goals.h"
+#include "system/settings/settings.h"
 #include "text/number_format.h"
 #include <stdio.h>
 
@@ -81,7 +82,7 @@ static void health_steps_graph_body(GridCtx *gctx)
     // the step goal under the total, small, so the bars read as progress toward it
     char goalbuf[16];
     char goalline[24];
-    number_group(goalbuf, sizeof(goalbuf), gridlock_goal_steps());
+    number_group(goalbuf, sizeof(goalbuf), goals_steps(settings_u8(SETTING_GOAL_STEPS)));
     snprintf(goalline, sizeof(goalline), "OF %s", goalbuf);
     gh_caption(gctx, goalline, 20);
 }

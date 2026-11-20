@@ -32,6 +32,14 @@
 // and the Quiet Time layout its own again, for the same reason
 #define GRIDLOCK_QUIET_KEY        13
 
+// how long each half of the custom colours string may run, the colours under
+// GRIDLOCK_CUSTOM_THEME_KEY and the flags under GRIDLOCK_CUSTOM_FLAGS_KEY
+#define GRIDLOCK_CUSTOM_COLORS_LEN 250
+#define GRIDLOCK_CUSTOM_FLAGS_LEN  250
+// the most the joined string takes on the long text channel. gridlock_get_custom_colors writes each
+// half up to its whole buffer with a bar between them, and the end of the text after
+#define GRIDLOCK_CUSTOM_COLORS_CAP (GRIDLOCK_CUSTOM_COLORS_LEN + 1 + GRIDLOCK_CUSTOM_FLAGS_LEN + 1)
+
 // --- store snapshots (high band, handed to each store's init) ---
 // 253 is the location store's slot, left reserved: this face doesn't wire location
 #define HRV_STORE_KEY      250

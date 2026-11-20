@@ -27,6 +27,9 @@
 // to append
 #define SIDEREEL_CUSTOM_COLORS_LEN 250
 #define SIDEREEL_CUSTOM_FLAGS_LEN  160
+// the most the joined string takes on the long text channel. sidereel_get_custom_colors writes each
+// half up to its whole buffer with a bar between them, and the end of the text after
+#define SIDEREEL_CUSTOM_COLORS_CAP (SIDEREEL_CUSTOM_COLORS_LEN + 1 + SIDEREEL_CUSTOM_FLAGS_LEN + 1)
 
 // the Goal Met Vibe rides its own key: the two rhythm strings come to 187 bytes, which the main
 // blob has no room for beside the layout and the place name

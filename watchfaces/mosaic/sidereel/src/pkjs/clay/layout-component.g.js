@@ -16,7 +16,7 @@ module.exports = {
 
   template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Pick a layout, then drag panels in to place them.<br>The gap in the middle is the hour pointer, so a tall panel sits above it or below it, never across.</p>  </div>  <div class=\"lb-modes\"></div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Health</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Solar</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Activity</button>        <div class=\"lb-actions-tools\">          <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>          <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>        </div>      </div>    </div>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
 
-  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid var(--mo-line);box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-tools{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:6px;border-top:1px solid #2c3038}.lb-actions-side .lb-btn{line-height:1.3}.lb-actions-tools .lb-btn-io{white-space:normal}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;border:1px solid;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-grid{position:relative;display:grid;align-self:flex-start;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:var(--mo-inset);border:1px dashed var(--mo-line);border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.blocked{border-style:solid;cursor:not-allowed}.lb-cell.reel{background:#d8d8d8;border-color:#bbb}.lb-cell.pointer{background:#7a1f1f;border-color:#a33}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:var(--mo-card);border:2px solid var(--mo-line);border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid var(--mo-line);border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:var(--mo-inset);color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;text-transform:uppercase;border:2px solid}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid;border-radius:0;font-size:11px}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}.lb-assign-lbl{flex-shrink:0;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{width:100%;box-sizing:border-box;min-width:0;padding:6px 4px;border:2px solid var(--mo-line-control);border-radius:0;background:var(--mo-inset);color:var(--mo-ink);font-family:var(--mo-mono);font-size:11px}.lb-drawer-wrap{padding:0 12px;margin-top:8px;width:100%;box-sizing:border-box}.lb-tabs{display:flex;gap:4px;position:relative;z-index:1}.lb-tab{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;font-size:10px;text-transform:uppercase;margin-bottom:-1px}.lb-groups{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}.lb-groups[hidden]{display:none}.lb-group{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0 !important;margin:0 !important;padding:5px 6px 3px !important;border:none;border-bottom:2px solid;border-radius:0;font-size:9px;text-transform:uppercase}.lb-group-ic{font-size:12px;line-height:1}.lb-group-nm{white-space:nowrap}.lb-drawer-panes{background:var(--mo-panel);border-radius:0;padding:10px 8px;border:1px solid var(--mo-line)}.lb-filter{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--mo-line);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-filter-all{flex-shrink:0;min-width:0 !important;margin:0 !important;padding:4px 8px !important;border:1px solid;border-radius:0;font:inherit}.lb-drawer{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.lb-pal-item{min-height:42px;flex-shrink:0;box-sizing:border-box;padding:2px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.lb-pal-item.narrow{width:calc((100% - 24px) / 4);max-width:94px}.lb-pal-item.wide{width:calc((100% - 8px) / 2);max-width:192px}.lb-pal-item:active{opacity:0.7}.lb-pal-item.placed{opacity:0.3;pointer-events:none}.lb-pal-icon{font-size:20px;line-height:1;color:#fff}.lb-pal-img{width:100%;height:auto;display:block}",
+  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid var(--mo-line);box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-tools{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:6px;border-top:1px solid #2c3038}.lb-actions-side .lb-btn{line-height:1.3}.lb-actions-tools .lb-btn-io{white-space:normal}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;border:1px solid;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-grid{position:relative;display:grid;align-self:flex-start;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:var(--mo-inset);border:1px dashed var(--mo-line);border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.blocked{border-style:solid;cursor:not-allowed}.lb-cell.reel{background:#d8d8d8;border-color:#bbb}.lb-cell.pointer{background:#7a1f1f;border-color:#a33}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:var(--mo-card);border:2px solid var(--mo-line);border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid var(--mo-line);border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:var(--mo-inset);color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;text-transform:uppercase;border:2px solid}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid;border-radius:0;font-size:11px}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}.lb-assign-lbl{flex-shrink:0;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{width:100%;box-sizing:border-box;min-width:0;padding:6px 4px;border:2px solid var(--mo-line-control);border-radius:0;background:var(--mo-inset);color:var(--mo-ink);font-family:var(--mo-mono);font-size:11px}.pf-palette{padding:0 var(--pf-palette-gutter,12px);margin-top:8px;width:100%;box-sizing:border-box}.pf-palette-sizes{display:flex;gap:4px;position:relative;z-index:1}.pf-palette-size{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;font-size:10px;text-transform:uppercase;margin-bottom:-1px}.pf-palette-groups{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}.pf-palette-groups[hidden]{display:none}.pf-palette-group{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0 !important;margin:0 !important;padding:5px 6px 3px !important;border:none;border-bottom:2px solid;border-radius:0;font-size:9px;text-transform:uppercase}.pf-palette-group-icon{font-size:12px;line-height:1}.pf-palette-group-name{white-space:nowrap}.pf-palette-box{background:var(--pf-palette-panel,transparent);border-radius:0;padding:10px 8px;border:1px solid var(--pf-palette-line,rgba(128,128,128,0.4))}.pf-palette-status{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--pf-palette-line,rgba(128,128,128,0.4));font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.pf-palette-all{flex-shrink:0;min-width:0 !important;margin:0 !important;padding:4px 8px !important;border:1px solid;border-radius:0;font:inherit}.pf-palette-tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.pf-palette-tile{min-height:42px;flex-shrink:0;box-sizing:border-box;padding:2px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.pf-palette-tile.narrow{width:calc((100% - 24px) / 4);max-width:94px}.pf-palette-tile.wide{width:calc((100% - 8px) / 2);max-width:192px}.pf-palette-tile:active{opacity:0.7}.pf-palette-tile.placed{opacity:0.3;pointer-events:none}.pf-palette-icon{font-size:20px;line-height:1;color:#fff}.pf-palette-shot{width:100%;height:auto;display:block}",
 
   manipulator: {
     set: function (value) {
@@ -683,21 +683,24 @@ module.exports = {
         }
       });
 
-      // core/pkjs/clay/builder/ts/layout/palette.ts
+      // paf/ts/clay/builder/ts/shared/palette.ts
       var palette_exports = {};
       __export(palette_exports, {
-        PALETTE_GROUPS: () => PALETTE_GROUPS,
+        OTHER_GROUP: () => OTHER_GROUP,
         createPalette: () => createPalette,
         groupsForSize: () => groupsForSize
       });
-      function groupsForSize(modules, size) {
+      function groupsForSize(modules, groups, size) {
         const known = {};
         const sections = [];
         const atSize = modules.filter(function(module) {
           return module.sizes.indexOf(size) !== -1;
         });
-        for (let index = 0; index < PALETTE_GROUPS.length; index++) {
-          const group = PALETTE_GROUPS[index];
+        for (let index = 0; index < groups.length; index++) {
+          const group = groups[index];
+          if (known[group.name]) {
+            continue;
+          }
           const members = atSize.filter(function(module) {
             return module.group === group.name;
           });
@@ -720,34 +723,34 @@ module.exports = {
         let activeSize = "";
         let activeWide = false;
         const wrap = document.createElement("div");
-        wrap.className = "lb-drawer-wrap";
+        wrap.className = "pf-palette";
         const tabBar = document.createElement("div");
-        tabBar.className = "lb-tabs";
+        tabBar.className = "pf-palette-sizes";
         const groupBar = document.createElement("div");
-        groupBar.className = "lb-groups";
-        const panes = document.createElement("div");
-        panes.className = "lb-drawer-panes";
+        groupBar.className = "pf-palette-groups";
+        const box = document.createElement("div");
+        box.className = "pf-palette-box";
         const pane = document.createElement("div");
-        pane.className = "lb-drawer-pane";
-        panes.appendChild(groupBar);
-        panes.appendChild(pane);
+        pane.className = "pf-palette-pane";
+        box.appendChild(groupBar);
+        box.appendChild(pane);
         function buildTile(module, size) {
           const tile = document.createElement("div");
           const shot = env.thumbFor(module.value, size);
-          tile.className = "lb-pal-item " + (activeWide ? "wide" : "narrow");
+          tile.className = "pf-palette-tile " + (activeWide ? "wide" : "narrow");
           tile.dataset.value = String(module.value);
           tile.title = module.label;
           if (shot) {
             const img = document.createElement("img");
             tile.style.background = "#000";
-            img.className = "lb-pal-img";
+            img.className = "pf-palette-shot";
             img.src = shot;
             img.alt = module.label;
             tile.appendChild(img);
           } else {
             const icon = document.createElement("div");
             tile.style.background = module.color;
-            icon.className = "lb-pal-icon";
+            icon.className = "pf-palette-icon";
             icon.textContent = module.icon;
             tile.appendChild(icon);
           }
@@ -761,12 +764,12 @@ module.exports = {
           const icon = document.createElement("span");
           const name = document.createElement("span");
           tab.type = "button";
-          tab.className = "lb-group";
+          tab.className = "pf-palette-group";
           tab.title = group ? group.name : "Every panel";
           tab.setAttribute("aria-pressed", String(pressed));
-          icon.className = "lb-group-ic";
+          icon.className = "pf-palette-group-icon";
           icon.textContent = group ? group.icon : "\u25A6";
-          name.className = "lb-group-nm";
+          name.className = "pf-palette-group-name";
           name.textContent = group ? group.name : ALL;
           tab.appendChild(icon);
           tab.appendChild(name);
@@ -777,14 +780,14 @@ module.exports = {
           return tab;
         }
         function applyPlaced() {
-          const tiles = pane.querySelectorAll(".lb-pal-item");
+          const tiles = pane.querySelectorAll(".pf-palette-tile");
           for (let index = 0; index < tiles.length; index++) {
             const value = parseInt(tiles[index].dataset.value || "", 10);
             tiles[index].classList.toggle("placed", placed.indexOf(value) !== -1);
           }
         }
         function draw() {
-          const sections = groupsForSize(env.modules, activeSize);
+          const sections = groupsForSize(env.modules, env.groups, activeSize);
           const single = sections.length < 2;
           let pick = chosen[activeSize];
           let total = 0;
@@ -814,23 +817,23 @@ module.exports = {
           const showing = pick === ALL ? null : sections.filter(function(section) {
             return section.group.name === pick;
           })[0];
-          const drawer = document.createElement("div");
-          drawer.className = "lb-drawer";
+          const tiles = document.createElement("div");
+          tiles.className = "pf-palette-tiles";
           const listed = showing ? [showing] : sections;
           for (let index = 0; index < listed.length; index++) {
             for (let moduleIndex = 0; moduleIndex < listed[index].modules.length; moduleIndex++) {
-              drawer.appendChild(buildTile(listed[index].modules[moduleIndex], activeSize));
+              tiles.appendChild(buildTile(listed[index].modules[moduleIndex], activeSize));
             }
           }
-          pane.appendChild(drawer);
+          pane.appendChild(tiles);
           if (showing) {
             const status = document.createElement("div");
             const what = document.createElement("span");
             const all = document.createElement("button");
-            status.className = "lb-filter";
+            status.className = "pf-palette-status";
             what.textContent = showing.group.name + " \xB7 " + showing.modules.length + " of " + total;
             all.type = "button";
-            all.className = "lb-filter-all";
+            all.className = "pf-palette-all";
             all.textContent = "Show all";
             all.addEventListener("click", function() {
               chosen[activeSize] = ALL;
@@ -843,7 +846,7 @@ module.exports = {
           applyPlaced();
         }
         function selectSize(size) {
-          const tabs = tabBar.querySelectorAll(".lb-tab");
+          const tabs = tabBar.querySelectorAll(".pf-palette-size");
           activeSize = size.key;
           activeWide = size.wide;
           for (let index = 0; index < tabs.length; index++) {
@@ -854,12 +857,12 @@ module.exports = {
         let first = null;
         for (let index = 0; index < env.sizes.length; index++) {
           const size = env.sizes[index];
-          if (groupsForSize(env.modules, size.key).length === 0) {
+          if (groupsForSize(env.modules, env.groups, size.key).length === 0) {
             continue;
           }
           const tab = document.createElement("button");
           tab.type = "button";
-          tab.className = "lb-tab";
+          tab.className = "pf-palette-size";
           tab.dataset.size = size.key;
           tab.textContent = size.key;
           tab.addEventListener("click", function() {
@@ -871,7 +874,7 @@ module.exports = {
           }
         }
         wrap.appendChild(tabBar);
-        wrap.appendChild(panes);
+        wrap.appendChild(box);
         env.container.appendChild(wrap);
         if (first) {
           selectSize(first);
@@ -883,23 +886,9 @@ module.exports = {
           }
         };
       }
-      var GROUP_ICONS, PALETTE_GROUPS, OTHER_GROUP, ALL;
+      var OTHER_GROUP, ALL;
       var init_palette = __esm({
-        "core/pkjs/clay/builder/ts/layout/palette.ts"() {
-          GROUP_ICONS = {
-            "Clock": "\u23F0",
-            "Date": "\u{1F4C5}",
-            "Progress": "\u{1F4CA}",
-            "Weather": "\u{1F324}",
-            "Sky": "\u{1F317}",
-            "Health": "\u2764\uFE0F",
-            "Goals": "\u{1F3AF}",
-            "Calendar & Stocks": "\u{1F4C8}",
-            "Status": "\u{1F50B}"
-          };
-          PALETTE_GROUPS = Object.keys(GROUP_ICONS).map(function(name) {
-            return { name, icon: GROUP_ICONS[name] };
-          });
+        "paf/ts/clay/builder/ts/shared/palette.ts"() {
           OTHER_GROUP = { name: "Other", icon: "\xB7" };
           ALL = "All";
         }
@@ -1074,47 +1063,28 @@ module.exports = {
         }
       });
 
-      // paf/ts/clay/callout-style.ts
-      var CALLOUT_BOX, CALLOUT_BADGE;
-      var init_callout_style = __esm({
-        "paf/ts/clay/callout-style.ts"() {
-          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
-          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
+      // core/pkjs/clay/builder/ts/layout/palette-groups.ts
+      var GROUP_ICONS, PALETTE_GROUPS;
+      var init_palette_groups = __esm({
+        "core/pkjs/clay/builder/ts/layout/palette-groups.ts"() {
+          GROUP_ICONS = {
+            "Clock": "\u23F0",
+            "Date": "\u{1F4C5}",
+            "Progress": "\u{1F4CA}",
+            "Weather": "\u{1F324}",
+            "Sky": "\u{1F317}",
+            "Health": "\u2764\uFE0F",
+            "Goals": "\u{1F3AF}",
+            "Calendar & Stocks": "\u{1F4C8}",
+            "Status": "\u{1F50B}"
+          };
+          PALETTE_GROUPS = Object.keys(GROUP_ICONS).map(function(name) {
+            return { name, icon: GROUP_ICONS[name] };
+          });
         }
       });
 
-      // core/pkjs/clay/builder/ts/layout/plugin-warnings.ts
-      function pluginWarnings(labels, states, picked) {
-        const off = [];
-        const missing = {};
-        labels.forEach(function(label) {
-          const kind = PANEL_KINDS[label];
-          if (!kind || CHOSEN_KINDS.indexOf(kind) >= 0 && !picked[kind]) {
-            return;
-          }
-          const state = states[kind];
-          let panels;
-          if (state === "off") {
-            panels = off;
-          } else if (state === "missing") {
-            panels = missing[kind] = missing[kind] || [];
-          }
-          if (panels && panels.indexOf(label) < 0) {
-            panels.push(label);
-          }
-        });
-        const warnings = [];
-        if (off.length) {
-          warnings.push({ state: "off", kind: null, panels: off });
-        }
-        KIND_NEEDS.forEach(function(entry) {
-          const panels = missing[entry[0]];
-          if (panels) {
-            warnings.push({ state: "missing", kind: entry[0], panels });
-          }
-        });
-        return warnings;
-      }
+      // core/pkjs/clay/builder/ts/layout/plugin-panels.ts
       function assignedLabels(library, parse, labelOf) {
         const labels = [];
         [library.day, library.night, library.quiet].forEach(function(index) {
@@ -1130,80 +1100,9 @@ module.exports = {
         });
         return labels;
       }
-      function nameList(panels) {
-        if (panels.length < 3) {
-          return panels.join(" and ");
-        }
-        return panels.slice(0, -1).join(", ") + ", and " + panels[panels.length - 1];
-      }
-      function warningText(warning) {
-        const subject = nameList(warning.panels) + (warning.panels.length > 1 ? " need " : " needs ");
-        if (warning.state === "off") {
-          return subject + "plugins turned on in the Pebble app, under Settings, Plugins.";
-        }
-        let needs = "a plugin";
-        KIND_NEEDS.forEach(function(entry) {
-          if (entry[0] === warning.kind) {
-            needs = entry[1];
-          }
-        });
-        return subject + needs + " in the Pebble app, and your phone has none yet.";
-      }
-      function readStates() {
-        const store = document.querySelector(".pf-plugin-kinds");
-        if (!store || !store.value) {
-          return {};
-        }
-        try {
-          const parsed = JSON.parse(store.value);
-          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-        } catch (e) {
-          return {};
-        }
-      }
-      function createPluginWarnings(after) {
-        const states = readStates();
-        const box = document.createElement("div");
-        let labels = [];
-        let picked = {};
-        box.className = "lb-plugin-warnings";
-        box.setAttribute("style", "padding: 0 12px;");
-        if (after.parentNode) {
-          after.parentNode.insertBefore(box, after.nextSibling);
-        }
-        function draw() {
-          box.innerHTML = "";
-          pluginWarnings(labels, states, picked).forEach(function(warning) {
-            const note = document.createElement("div");
-            const badge = document.createElement("span");
-            const words = document.createElement("span");
-            note.className = "lb-plugin-warning";
-            note.setAttribute("style", CALLOUT_BOX);
-            badge.setAttribute("style", CALLOUT_BADGE);
-            badge.textContent = "!";
-            words.textContent = warningText(warning);
-            note.appendChild(badge);
-            note.appendChild(words);
-            box.appendChild(note);
-          });
-          box.hidden = !box.firstChild;
-        }
-        draw();
-        return {
-          update: function(next) {
-            labels = next;
-            draw();
-          },
-          setPicked: function(next) {
-            picked = next;
-            draw();
-          }
-        };
-      }
-      var PANEL_KINDS, CHOSEN_KINDS, KIND_NEEDS;
-      var init_plugin_warnings = __esm({
-        "core/pkjs/clay/builder/ts/layout/plugin-warnings.ts"() {
-          init_callout_style();
+      var PANEL_KINDS;
+      var init_plugin_panels = __esm({
+        "core/pkjs/clay/builder/ts/layout/plugin-panels.ts"() {
           init_modes();
           init_wire();
           PANEL_KINDS = {
@@ -1233,6 +1132,127 @@ module.exports = {
             "Agenda": "calendar",
             "Timeline": "calendar"
           };
+        }
+      });
+
+      // paf/ts/clay/callout-style.ts
+      var CALLOUT_BOX, CALLOUT_BADGE;
+      var init_callout_style = __esm({
+        "paf/ts/clay/callout-style.ts"() {
+          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
+          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
+        }
+      });
+
+      // paf/ts/clay/builder/ts/shared/plugin-warnings.ts
+      function pluginWarnings(panels, panelKinds, states, picked) {
+        const off = [];
+        const missing = {};
+        panels.forEach(function(panel) {
+          const kind = panelKinds[panel];
+          if (!kind || CHOSEN_KINDS.indexOf(kind) >= 0 && !picked[kind]) {
+            return;
+          }
+          const state = states[kind];
+          let named;
+          if (state === "off") {
+            named = off;
+          } else if (state === "missing") {
+            named = missing[kind] = missing[kind] || [];
+          }
+          if (named && named.indexOf(panel) < 0) {
+            named.push(panel);
+          }
+        });
+        const warnings = [];
+        if (off.length) {
+          warnings.push({ state: "off", kind: null, panels: off });
+        }
+        KIND_NEEDS.forEach(function(entry) {
+          const named = missing[entry[0]];
+          if (named) {
+            warnings.push({ state: "missing", kind: entry[0], panels: named });
+          }
+        });
+        return warnings;
+      }
+      function nameList(panels) {
+        if (panels.length < 3) {
+          return panels.join(" and ");
+        }
+        return panels.slice(0, -1).join(", ") + ", and " + panels[panels.length - 1];
+      }
+      function warningText(warning) {
+        const subject = nameList(warning.panels) + (warning.panels.length > 1 ? " need " : " needs ");
+        if (warning.state === "off") {
+          return subject + "plugins turned on in the Pebble app, under Settings, Plugins.";
+        }
+        let needs = "a plugin";
+        KIND_NEEDS.forEach(function(entry) {
+          if (entry[0] === warning.kind) {
+            needs = entry[1];
+          }
+        });
+        return subject + needs + " in the Pebble app, and your phone has none yet.";
+      }
+      function readStates() {
+        const store = document.querySelector("." + KINDS_ROW_CLASS);
+        if (!store || !store.value) {
+          return {};
+        }
+        try {
+          const parsed = JSON.parse(store.value);
+          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+        } catch (e) {
+          return {};
+        }
+      }
+      function createPluginWarnings(env) {
+        const states = readStates();
+        const box = document.createElement("div");
+        let panels = [];
+        let picked = {};
+        box.className = "pf-plugin-warnings";
+        box.setAttribute("style", "padding: 0 var(--pf-palette-gutter, 12px);");
+        if (env.after.parentNode) {
+          env.after.parentNode.insertBefore(box, env.after.nextSibling);
+        }
+        function draw() {
+          box.innerHTML = "";
+          pluginWarnings(panels, env.panelKinds, states, picked).forEach(function(warning) {
+            const note = document.createElement("div");
+            const badge = document.createElement("span");
+            const words = document.createElement("span");
+            note.className = "pf-plugin-warning";
+            note.setAttribute("style", CALLOUT_BOX);
+            badge.setAttribute("style", CALLOUT_BADGE);
+            badge.textContent = "!";
+            words.textContent = warningText(warning);
+            note.appendChild(badge);
+            note.appendChild(words);
+            box.appendChild(note);
+          });
+          box.hidden = !box.firstChild;
+        }
+        function setPicked(next) {
+          picked = next;
+          draw();
+        }
+        env.root._pfPluginSources = setPicked;
+        draw();
+        return {
+          update: function(next) {
+            panels = next;
+            draw();
+          },
+          setPicked
+        };
+      }
+      var KINDS_ROW_CLASS, CHOSEN_KINDS, KIND_NEEDS;
+      var init_plugin_warnings = __esm({
+        "paf/ts/clay/builder/ts/shared/plugin-warnings.ts"() {
+          init_callout_style();
+          KINDS_ROW_CLASS = "pf-plugin-kinds";
           CHOSEN_KINDS = ["weather", "stocks", "calendar"];
           KIND_NEEDS = [
             ["phone", "the Phone plugin"],
@@ -1259,7 +1279,11 @@ module.exports = {
         const gridEl = root.querySelector(".lb-grid");
         const paletteContainer = root.querySelector(".lb-palette-container");
         const modesHost = root.querySelector(".lb-modes");
-        const warnings = createPluginWarnings(root.querySelector(".lb-middle-wrap"));
+        const warnings = createPluginWarnings({
+          root,
+          after: root.querySelector(".lb-middle-wrap"),
+          panelKinds: PANEL_KINDS
+        });
         let blocks = [];
         const library = seedLibrary(readLibrary(), hidden.value || "");
         let loaded = storePresent();
@@ -1357,6 +1381,7 @@ module.exports = {
         const palette = createPalette({
           container: paletteContainer,
           modules: MODULES,
+          groups: PALETTE_GROUPS,
           sizes: BLOCK_SIZES.map(function(size) {
             return { key: size.key, wide: size.w === GRID_COLS };
           }),
@@ -1426,9 +1451,6 @@ module.exports = {
         root._lbGet = function() {
           return library.layouts[library.day] || EMPTY_LAYOUT;
         };
-        root._lbPluginSources = function(picked) {
-          warnings.setPicked(picked);
-        };
         blocks = parseLayoutString(library.layouts[library.day]);
         render();
         if (!loaded) {
@@ -1461,6 +1483,8 @@ module.exports = {
           init_presets();
           init_visuals();
           init_drag2();
+          init_palette_groups();
+          init_plugin_panels();
           init_palette();
           init_plugin_warnings();
           init_overlay();

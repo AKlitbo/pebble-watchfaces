@@ -53,7 +53,7 @@ function pointer(type: string, clientX: number, clientY: number): MouseEvent {
 
 /** Clicks the palette's group tab with this name. */
 function pickGroup(root: HTMLElement, name: string): void {
-  root.querySelector<HTMLElement>('.lb-group[title="' + name + '"]').click();
+  root.querySelector<HTMLElement>('.pf-palette-group[title="' + name + '"]').click();
 }
 
 beforeEach(() => {
@@ -177,7 +177,7 @@ describe('drag and drop', () => {
   test('dragging a palette module onto the grid places it', () => {
     const { ctx, root } = mountLayout();
 
-    const batteryItem = root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]');
+    const batteryItem = root.querySelector<HTMLElement>('.pf-palette-tile[data-value="2"]');
 
     batteryItem.dispatchEvent(pointer('pointerdown', 5, 5));
     document.dispatchEvent(pointer('pointermove', 6, 6));
@@ -201,7 +201,7 @@ describe('drag and drop', () => {
     mounted.ctx.initialize();
     pickGroup(mounted.root, 'Status');
 
-    mounted.root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]').dispatchEvent(pointer('pointerdown', 5, 5));
+    mounted.root.querySelector<HTMLElement>('.pf-palette-tile[data-value="2"]').dispatchEvent(pointer('pointerdown', 5, 5));
     document.dispatchEvent(pointer('pointermove', 6, 6));
     document.dispatchEvent(pointer('pointerup', 5, 5));
     pickGroup(mounted.root, 'Weather');
@@ -209,7 +209,7 @@ describe('drag and drop', () => {
     const result = mounted.ctx.get();
 
     expect(result).toBe('2,0,0,2,1');
-    expect(mounted.root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]').classList.contains('placed')).toBe(true);
+    expect(mounted.root.querySelector<HTMLElement>('.pf-palette-tile[data-value="2"]').classList.contains('placed')).toBe(true);
   });
 
   /** If dragging off grid stops removing, the only way to clear one block is Clear all. */
@@ -250,7 +250,7 @@ describe('drag and drop', () => {
   test('pointercancel cleans up the ghost and places nothing', () => {
     const { ctx, root } = mountLayout();
 
-    root.querySelector<HTMLElement>('.lb-pal-item[data-value="2"]').dispatchEvent(pointer('pointerdown', 5, 5));
+    root.querySelector<HTMLElement>('.pf-palette-tile[data-value="2"]').dispatchEvent(pointer('pointerdown', 5, 5));
     document.dispatchEvent(pointer('pointercancel', 5, 5));
     document.dispatchEvent(pointer('pointerup', 5, 5));
     const result = ctx.get();

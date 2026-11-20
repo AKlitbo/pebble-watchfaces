@@ -41,8 +41,8 @@
 // grid in place
 #define SIDEREEL_NO_LAYOUT "0"
 
-// the Goal Met Vibe strings, sized as gridlock sizes them: the longest preset dropdown value
-// plus room to spare, and the config's 120 character cap on the custom box
+// the Goal Met Vibe strings, sized as the catalogue's KNOWN_GOAL_VIBE entries write them: the longest
+// pick plus room to spare, and the 120 character cap on the custom box with its end
 #define SIDEREEL_GOAL_VIBE_PICK_LEN   64
 #define SIDEREEL_GOAL_VIBE_CUSTOM_LEN 122
 #define SIDEREEL_GOAL_VIBE_SIZE       (1 + SIDEREEL_GOAL_VIBE_PICK_LEN + SIDEREEL_GOAL_VIBE_CUSTOM_LEN)
@@ -78,7 +78,7 @@ typedef struct SidereelSettings
     char    layout[SIDEREEL_LAYOUT_LEN];
     uint8_t theme;
     char    time_zone_1[40];
-    // the goals the health panels measure against, each an index into its table below
+    // the goals the health panels measure against, each an index into the framework's goals.h
     uint8_t goal_steps;
     uint8_t goal_calories;
     uint8_t goal_sleep;
@@ -153,16 +153,6 @@ _Static_assert(sizeof(SidereelGoalVibe) == SIDEREEL_GOAL_VIBE_SIZE, "goal vibe b
 
 static SidereelGoalVibe s_goal_vibe;
 
-// goal option values looked up by the saved menu choice, matching gridlock's tables so the same
-// pick means the same number on either face
-static const int16_t s_steps_goals[]   = {5000, 7500, 10000, 12500, 15000, 20000, 25000};
-static const int16_t s_cal_goals[]     = {500, 1000, 1500, 2000, 2500, 3000};
-static const int16_t s_sleep_goals_h[] = {6, 7, 8, 9, 10};
-static const int16_t s_active_goals[]  = {15, 30, 45, 60, 90};
-static const int16_t s_hr_limits[]     = {150, 160, 170, 180, 190, 200};
-// distance goals in meters. the readout converts to the user's miles/km at draw time
-static const int16_t s_dist_goals_m[]  = {2000, 3000, 5000, 8000, 10000, 15000, 20000};
-
 // face-only enum field. rides its own message key and is read straight off the face struct
 #define FACE_ENUM(member, key, count, dflt)                                          \
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_##key, .type = SETTING_ENUM_U8, \
@@ -176,7 +166,7 @@ static const int16_t s_dist_goals_m[]  = {2000, 3000, 5000, 8000, 10000, 15000, 
 static const SettingField s_fields[] = {
     KNOWN_THEME(offsetof(SidereelSettings, theme), THEME_COUNT),
     KNOWN_TEMPERATURE_UNIT(offsetof(SidereelSettings, temperature_unit)),
-    KNOWN_DATE_FORMAT(offsetof(SidereelSettings, date_format)),
+    KNOWN_DATE_FORMAT(SidereelSettings, date_format),
     KNOWN_STEPS_MODE(offsetof(SidereelSettings, steps_mode)),
     KNOWN_TIME_FORMAT(offsetof(SidereelSettings, time_format)),
     KNOWN_HOURLY_VIBE(offsetof(SidereelSettings, hourly_vibe)),
@@ -197,21 +187,23 @@ static const SettingField s_fields[] = {
       .default_str = "" },
 
     // the goals every health panel measures against, and the units and week start the shared
-    // panel bodies read. defaults match gridlock's so a panel reads the same on either face
+    // panel bodies read. the goals are the catalogue's entries, so the panels and vibe_goal read
+    // them by setting id
     KNOWN_DISTANCE_UNIT(offsetof(SidereelSettings, distance_unit)),
-    FACE_ENUM(goal_steps,    HEALTH_GOAL_STEPS,    ARRAY_LENGTH(s_steps_goals),   2),
-    FACE_ENUM(goal_calories, HEALTH_GOAL_CALORIES, ARRAY_LENGTH(s_cal_goals),     3),
-    FACE_ENUM(goal_sleep,    HEALTH_GOAL_SLEEP,    ARRAY_LENGTH(s_sleep_goals_h), 2),
-    FACE_ENUM(goal_active,   HEALTH_GOAL_ACTIVE,   ARRAY_LENGTH(s_active_goals),  1),
-    FACE_ENUM(goal_hr,       HEALTH_GOAL_HR,       ARRAY_LENGTH(s_hr_limits),     3),
-    FACE_ENUM(goal_distance, HEALTH_GOAL_DISTANCE, ARRAY_LENGTH(s_dist_goals_m),  2),
+    KNOWN_GOAL_STEPS(offsetof(SidereelSettings, goal_steps)),
+    KNOWN_GOAL_CALORIES(offsetof(SidereelSettings, goal_calories)),
+    KNOWN_GOAL_SLEEP(offsetof(SidereelSettings, goal_sleep)),
+    KNOWN_GOAL_ACTIVE(offsetof(SidereelSettings, goal_active)),
+    KNOWN_GOAL_HR(offsetof(SidereelSettings, goal_hr)),
+    KNOWN_GOAL_DISTANCE(offsetof(SidereelSettings, goal_distance)),
     KNOWN_WIND_UNIT(offsetof(SidereelSettings, wind_unit)),
     FACE_ENUM(week_start,    CLOCK_WEEK_START,     2, 0),
 
-    // how the face is framed. the header font is the catalogue's entry, so panel.c reads it with
-    // settings_u8(SETTING_HEADER_FONT) rather than reaching into this struct
+    // how the face is framed. the page's header font count is held to the header font table, so a
+    // choice the page offers always has a font
     FACE_ENUM(panel_style, APPEARANCE_PANEL_STYLE, PANEL_STYLE_COUNT, 0),
-    KNOWN_HEADER_FONT(offsetof(SidereelSettings, header_font), HEADER_FONT_COUNT),
+    FACE_ENUM(header_font, APPEARANCE_HEADER_FONT, SETTINGS_COUNT_CHECKED(APPEARANCE_HEADER_FONT, HEADER_FONT_COUNT),
+              SETTINGS_DEFAULT(APPEARANCE_HEADER_FONT)),
 
     // the four face colours, and their switch. they start on the Vibrant row's chrome, so
     // turning them on lands somewhere other than mono before a single pick
@@ -227,13 +219,11 @@ static const SettingField s_fields[] = {
 };
 
 // --- goal vibe (key 4) ---
-// both ride as plain strings. the dropdown value is the pick (a sentinel or a comma list of
+// both ride as plain strings. the dropdown value is the pick (a marker or a comma list of
 // milliseconds), and the input holds the user's own comma list for when the pick is Custom
 static const SettingField s_goal_vibe_fields[] = {
-    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_HEALTH_GOAL_VIBE, .type = SETTING_CSTRING,
-      .offset = offsetof(SidereelGoalVibe, pick), .size = sizeof(s_goal_vibe.pick), .default_str = "" },
-    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_HEALTH_GOAL_VIBE_CUSTOM, .type = SETTING_CSTRING,
-      .offset = offsetof(SidereelGoalVibe, custom), .size = sizeof(s_goal_vibe.custom), .default_str = "" },
+    KNOWN_GOAL_VIBE(SidereelGoalVibe, pick),
+    KNOWN_GOAL_VIBE_CUSTOM(SidereelGoalVibe, custom),
 };
 
 // --- night (key 5) ---
@@ -383,6 +373,11 @@ uint8_t sidereel_panel_style(void)
     return s_settings.panel_style;
 }
 
+uint8_t sidereel_header_font(void)
+{
+    return s_settings.header_font;
+}
+
 bool sidereel_face_colors(void)
 {
     return s_settings.face_colors;
@@ -435,50 +430,6 @@ void sidereel_set_face_colors(bool on, GColor pointer, GColor pointer_ink, GColo
     s_settings.reel_ink = reel_ink;
 }
 
-/**
- * @brief The number behind a goal pick, falling back to the first option if the index is past
- * the end of its table.
- *
- * @param table The goal values, in menu order.
- * @param count How many the table holds.
- * @param index The saved menu choice.
- * @return The goal value.
- */
-static int goal_value(const int16_t *table, uint8_t count, uint8_t index)
-{
-    return table[index < count ? index : 0];
-}
-
-int gridlock_goal_steps(void)
-{
-    return goal_value(s_steps_goals, ARRAY_LENGTH(s_steps_goals), s_settings.goal_steps);
-}
-
-int gridlock_goal_calories(void)
-{
-    return goal_value(s_cal_goals, ARRAY_LENGTH(s_cal_goals), s_settings.goal_calories);
-}
-
-int gridlock_goal_distance_m(void)
-{
-    return goal_value(s_dist_goals_m, ARRAY_LENGTH(s_dist_goals_m), s_settings.goal_distance);
-}
-
-int gridlock_goal_sleep_min(void)
-{
-    return goal_value(s_sleep_goals_h, ARRAY_LENGTH(s_sleep_goals_h), s_settings.goal_sleep) * 60;
-}
-
-int gridlock_goal_active_min(void)
-{
-    return goal_value(s_active_goals, ARRAY_LENGTH(s_active_goals), s_settings.goal_active);
-}
-
-int gridlock_hr_limit(void)
-{
-    return goal_value(s_hr_limits, ARRAY_LENGTH(s_hr_limits), s_settings.goal_hr);
-}
-
 uint8_t gridlock_hrv_count(void)
 {
     return 0;
@@ -513,16 +464,6 @@ const char *gridlock_wind_unit_label(void)
 const char *gridlock_temp_unit_label(void)
 {
     return s_settings.temperature_unit ? "°F" : "°C";
-}
-
-const char *gridlock_goal_vibe_pick(void)
-{
-    return s_goal_vibe.pick;
-}
-
-const char *gridlock_goal_vibe_custom(void)
-{
-    return s_goal_vibe.custom;
 }
 
 /** @} */

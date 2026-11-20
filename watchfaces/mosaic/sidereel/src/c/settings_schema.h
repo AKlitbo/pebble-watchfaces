@@ -74,6 +74,13 @@ const char *sidereel_timezone_1(void);
 uint8_t sidereel_panel_style(void);
 
 /**
+ * @brief The header font pick, which font the panel headers draw with.
+ *
+ * @return An index into the header_fonts table.
+ */
+uint8_t sidereel_header_font(void);
+
+/**
  * @brief Whether the four colours below paint over the running theme's chrome.
  *
  * @return True to use them, false to leave every theme as it comes.
@@ -145,15 +152,9 @@ void sidereel_set_face_colors(bool on, GColor pointer, GColor pointer_ink, GColo
 
 // --- what the shared panel bodies ask their face for ---
 // declared under the names those files already call, so a panel from core needs no edit. the
-// goals, units and week start come straight off this face's own settings, the same as gridlock
-// answers them. only the clock and time zone shapes are face-specific, and those live in
-// engine/grid_shim.c
-int gridlock_goal_steps(void);
-int gridlock_goal_calories(void);
-int gridlock_goal_distance_m(void);
-int gridlock_goal_sleep_min(void);
-int gridlock_goal_active_min(void);
-int gridlock_hr_limit(void);
+// units and week start come straight off this face's own settings, the same as gridlock answers
+// them. the goals are the framework's, read by setting id. only the clock and time zone shapes are
+// face-specific, and those live in engine/grid_shim.c
 /** @brief Which HRV bursts count. Sidereel has no HRV, so this is always the default, not while walking. */
 uint8_t gridlock_hrv_count(void);
 uint8_t gridlock_wind_unit(void);
@@ -189,10 +190,5 @@ bool gridlock_format_clock(char *out, size_t n, int hour24, int minute);
  * @return True when any layout places it.
  */
 bool mosaic_places_module(uint8_t type);
-
-// the Goal Met Vibe, read by the shared goal_vibe.c. the pick is a sentinel or a comma list of
-// milliseconds, and the custom box holds the user's own list for when the pick is Custom
-const char *gridlock_goal_vibe_pick(void);
-const char *gridlock_goal_vibe_custom(void);
 
 /** @} */

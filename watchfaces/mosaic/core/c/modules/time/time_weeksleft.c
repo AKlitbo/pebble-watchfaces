@@ -7,8 +7,7 @@
 static void weeksleft_value(char *out, size_t n, const char **unit_out)
 {
     const struct tm *t = time_store_tm();
-    // whole weeks left, worked out from the days remaining in the year
-    snprintf(out, n, "%d", date_days_left_in_year(t->tm_year + 1900, t->tm_yday) / 7);
+    snprintf(out, n, "%d", date_weeks_left_in_year(t->tm_year + 1900, t->tm_yday));
     *unit_out = "WKS";
 }
 

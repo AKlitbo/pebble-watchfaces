@@ -421,7 +421,7 @@ uint8_t gridlock_build(EngineSlot *out, uint8_t max, GRect bounds)
 
     // the header font's seating nudge is the same for every cell too, so resolve it here from
     // the user's Header Font pick (the font handle itself lives under FONT_HEADER, set in main)
-    const HeaderFontSpec *header = header_font_spec(settings_u8(SETTING_HEADER_FONT));
+    const HeaderFontSpec *header = header_font_spec(gridlock_header_font());
     s_header_dx = header->dx;
     s_header_dy = header->dy;
 

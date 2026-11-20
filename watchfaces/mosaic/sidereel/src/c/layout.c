@@ -91,7 +91,7 @@ static uint8_t s_header_choice = 0xFF;
 
 void sidereel_apply_header_font(void)
 {
-    uint8_t choice = settings_u8(SETTING_HEADER_FONT);
+    uint8_t choice = sidereel_header_font();
     if (choice == s_header_choice)
     {
         return;

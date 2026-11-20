@@ -2,7 +2,8 @@
 #include "clock/duration.h"
 #include "mosaic/draw/stat_panel.h"
 #include "io/stores/health_store.h"
-#include "settings_schema.h"
+#include "health/goals.h"
+#include "system/settings/settings.h"
 #include <stdio.h>
 
 static void sleep_value_1x2(char *out, size_t n, const char **unit_out)
@@ -34,7 +35,7 @@ static void sleep_value_2x2(char *out, size_t n)
 
 static void sleep_goal(char *out, size_t n, int *value, int *goal)
 {
-    int g = gridlock_goal_sleep_min();
+    int g = goals_sleep_min(settings_u8(SETTING_GOAL_SLEEP));
     if (g % 60 == 0)
     {
         snprintf(out, n, "%dH", g / 60);

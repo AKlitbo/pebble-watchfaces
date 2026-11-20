@@ -62,7 +62,7 @@ bool sidereel_module_borderless(uint8_t module, ModuleSize size);
 /**
  * @brief Store a freshly arrived combined string, splitting it across the two blobs.
  *
- * Wired to appmessage_on_custom_colors.
+ * Wired to appmessage_set_long_text as its receiver.
  *
  * @param combined The "~3 colours | flags" string.
  */
@@ -71,7 +71,7 @@ void sidereel_set_custom_colors(const char *combined);
 /**
  * @brief Rebuild the combined string from the two blobs.
  *
- * Wired to appmessage_set_custom_colors_provider so the config page reopens on what the watch
+ * Wired to appmessage_set_long_text as its provider, so the config page reopens on what the watch
  * actually holds.
  *
  * @param out The buffer to write into.

@@ -99,7 +99,7 @@ Open Sidereel's settings in the Pebble app.
 | Fall Back to Manual Location | Uses the Manual Location when GPS cannot find you. On by default. |
 | Manual Location | The city for the weather when GPS is off or cannot find you. |
 
-**Plugins This Watchface Supports.** A panel at the foot of the page lists the plugins tested with Sidereel and marks the ones on your phone.
+**Plugins This Face Supports.** A panel at the foot of the page lists the plugins tested with Sidereel and marks the ones on your phone.
 
 ## Permissions
 

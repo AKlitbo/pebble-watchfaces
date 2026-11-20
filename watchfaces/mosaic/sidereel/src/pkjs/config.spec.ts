@@ -27,7 +27,7 @@ import path from 'node:path';
 import { describe, test, expect } from 'vitest';
 import config from './config';
 import { pageKeys, layoutModules, sectionHolding } from '../../../core/pkjs/testing/page-keys';
-import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette';
+import { PALETTE_GROUPS } from '../../../core/pkjs/clay/builder/ts/layout/palette-groups';
 import { allItems } from '../../../paf/ts/clay/rows';
 import type { ClayConfigItem } from '../../../paf/ts/clay/types';
 

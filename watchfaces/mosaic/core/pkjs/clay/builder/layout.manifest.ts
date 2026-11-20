@@ -21,6 +21,7 @@ export default {
   name: 'layoutBuilder',
   hookPrefix: '_lb',
   template: 'html/layout.html',
+  // the palette and its stylesheet are the framework's, since the family keeps neither
   styles: ['css/layout.css', 'css/palette.css'],
   pieces: [
     'ts/shared/thumbs',
@@ -32,7 +33,7 @@ export default {
     'ts/layout/presets',
     'ts/layout/visuals',
     'ts/layout/drag',
-    'ts/layout/palette',
+    'ts/shared/palette',
     'ts/layout/modes',
     'ts/layout/init',
   ],

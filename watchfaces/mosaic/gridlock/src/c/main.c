@@ -24,7 +24,6 @@
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
 #include "settings_schema.h"
-#include "mosaic/goal_vibe.h"
 #include "mosaic/layout_switch.h"
 #include "mosaic/phone_gate.h"
 #include "persist_keys.h"
@@ -125,7 +124,7 @@ static uint8_t s_header_choice = 0xFF;
  */
 static void apply_header_font(void)
 {
-    uint8_t choice = settings_u8(SETTING_HEADER_FONT);
+    uint8_t choice = gridlock_header_font();
     if (choice == s_header_choice)
     {
         return;
@@ -270,7 +269,7 @@ static void on_time_changed(void)
 static void on_weather_changed(void) { layout_switch_tick(); engine_mark_dirty_tags(FEATURE_WEATHER); }
 static void on_stock_changed(void)   { engine_mark_dirty_tags(FEATURE_STOCK); }
 static void on_calendar_changed(void) { engine_mark_dirty_tags(FEATURE_CALENDAR); }
-static void on_health_changed(void)  { goal_vibe_update(); engine_mark_dirty_tags(FEATURE_HEALTH); }
+static void on_health_changed(void)  { vibe_goal(); engine_mark_dirty_tags(FEATURE_HEALTH); }
 static void on_system_changed(void)  { engine_mark_dirty_tags(FEATURE_SYSTEM); }
 static void on_phone_changed(void)   { engine_mark_dirty_tags(FEATURE_PHONE); }
 static void on_music_changed(void)   { engine_mark_dirty_tags(FEATURE_MUSIC); }
@@ -278,9 +277,6 @@ static void on_music_changed(void)   { engine_mark_dirty_tags(FEATURE_MUSIC); }
 static void init(void)
 {
     settings_init(gridlock_settings_schema());
-
-    // start with a clean goal-vibe slate before the first health reading can land
-    goal_vibe_init();
 
     // each store owns its own source. init starts it (live) or seeds it. dev mode applies the
     // settings paf.dev.config.json gives, then seeds every store (live=false) for deterministic
@@ -311,6 +307,9 @@ static void init(void)
                                          .persist_key = HEALTH_STORE_KEY}, NULL);
         // run the minute tick only. the .beats readout rides that same tick
         time_store_init((TimeConfig){.live = true, .minute_tick = true, .beats = false}, NULL);
+        // the health store reads its totals without calling back, so the goal buzz takes its first
+        // look here. it waits for the time store, since it files each goal under the day
+        vibe_goal();
         weather_store_init((WeatherConfig){.live = true, .poll_min = 30, .persist_key = WEATHER_STORE_KEY}, NULL);
         // the poll interval comes from the config (Finnhub only, see the Clay note)
         stock_store_init((StockConfig){.live = true, .poll_min = gridlock_stock_poll_min(), .persist_key = STOCK_STORE_KEY}, NULL);
@@ -342,10 +341,10 @@ static void init(void)
 
     // the stores own their channels + poll. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);
-    // custom colours are stored split across two keys, so they bypass the settings table: split on
-    // the way in, rebuild on the way out
-    appmessage_on_custom_colors(gridlock_set_custom_colors);
-    appmessage_set_custom_colors_provider(gridlock_get_custom_colors);
+    // custom colours are stored split across two keys, so they skip the settings table
+    // the long text channel splits them on the way in and puts them back together on the way out
+    appmessage_set_long_text(MESSAGE_KEY_APPEARANCE_CUSTOM_COLORS, GRIDLOCK_CUSTOM_COLORS_CAP, gridlock_get_custom_colors,
+                             gridlock_set_custom_colors);
     appmessage_open(6144);
 
 #ifdef BUILD_WATCHAPP

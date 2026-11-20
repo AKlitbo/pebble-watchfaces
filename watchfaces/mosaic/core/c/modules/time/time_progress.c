@@ -1,6 +1,6 @@
 #include "engine/grid_engine.h"
 #include "time_progress.h"
-#include "time_progress_calc.h"
+#include "clock/progress.h"
 #include "mosaic/draw/grid_helpers.h"
 #include "mosaic/draw/common.h"
 #include "mosaic/draw/icons.h"

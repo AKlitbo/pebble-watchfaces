@@ -125,7 +125,7 @@ The HRV Tuning panel shows each reading's movement, steps, and skip count, to he
 | :-- | :-- |
 | Vibrate on Connect and Vibrate on Disconnect | A Short, Long, or Double buzz when the phone reconnects or drops. None by default. |
 
-**Plugins This Watchface Supports.** A panel at the foot of the page lists the plugins tested with Gridlock and marks the ones on your phone.
+**Plugins This Face Supports.** A panel at the foot of the page lists the plugins tested with Gridlock and marks the ones on your phone.
 
 ## Permissions
 

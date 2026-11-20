@@ -1,6 +1,7 @@
 #include "health_distance.h"
 #include "mosaic/draw/stat_panel.h"
 #include "io/stores/health_store.h"
+#include "health/goals.h"
 #include "settings_schema.h"
 #include "system/units/units.h"
 #include <stdio.h>
@@ -39,9 +40,10 @@ static void dist_value_2x2(char *out, size_t n)
 
 static void dist_goal(char *out, size_t n, int *value, int *goal)
 {
-    units_format_distance(out, n, gridlock_goal_distance_m(), gridlock_distance_in_miles());
+    int target = goals_distance_m(settings_u8(SETTING_GOAL_DISTANCE));
+    units_format_distance(out, n, target, gridlock_distance_in_miles());
     *value = health_store_distance_m();
-    *goal = gridlock_goal_distance_m();
+    *goal = target;
 }
 
 static const StatPanelDesc distance_desc = {

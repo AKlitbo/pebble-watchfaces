@@ -34,6 +34,9 @@
      Clay's */
   --pf-accent: var(--mo-accent);
   --pf-on-accent: var(--mo-on-accent);
+  /* the framework's palette lays itself out and takes the fill and edge of its box from these */
+  --pf-palette-panel: var(--mo-panel);
+  --pf-palette-line: var(--mo-line);
 }
 
 /* ---- the font every button shares ----
@@ -45,10 +48,10 @@
 :root .lb-btn,
 :root .lb-io-btn,
 :root .tb-io-btn,
-:root .lb-filter-all,
+:root .pf-palette-all,
 :root .lb-ltab,
-:root .lb-tab,
-:root .lb-group {
+:root .pf-palette-size,
+:root .pf-palette-group {
   font-family: var(--mo-mono);
   font-weight: 700;
 }
@@ -64,13 +67,13 @@
 /* Show All takes its font from the status line around it, but the browser gives every button
    normal letter spacing, so it keeps that like the builder's other buttons */
 :root .lb-btn,
-:root .lb-filter-all {
+:root .pf-palette-all {
   letter-spacing: normal;
 }
 
 :root .lb-ltab,
-:root .lb-tab,
-:root .lb-group {
+:root .pf-palette-size,
+:root .pf-palette-group {
   letter-spacing: 0.5px;
 }
 
@@ -96,7 +99,7 @@
 :root .tb-bar-btn,
 :root .tb-nav-btn,
 :root .tb-edit-btn,
-:root .lb-filter-all,
+:root .pf-palette-all,
 :root .component-button button,
 :root .component-submit button {
   cursor: pointer;
@@ -113,7 +116,7 @@
 :root .tb-bar-btn.ghost,
 :root .tb-bar-btn.io,
 :root .tb-nav-btn,
-:root .lb-filter-all,
+:root .pf-palette-all,
 :root .component-button button {
   background: var(--mo-raise);
   border-color: var(--mo-line-control);
@@ -126,7 +129,7 @@
 :root .tb-bar-btn.ghost:active,
 :root .tb-bar-btn.io:active,
 :root .tb-nav-btn:active,
-:root .lb-filter-all:active,
+:root .pf-palette-all:active,
 :root .component-button button:active {
   background: var(--mo-raise-press);
   border-color: var(--mo-ink-2);
@@ -169,7 +172,7 @@
 /* ---- tabs: the layout tabs, the size tabs, and Mono | Vibrant. a row of edged cells with the
    picked one solid, so a tab that is not picked still reads as something to tap ---- */
 :root .lb-ltab,
-:root .lb-tab,
+:root .pf-palette-size,
 :root .tb-mv-opt {
   background: var(--mo-inset);
   color: var(--mo-ink-2);
@@ -182,18 +185,18 @@
 }
 
 /* the size tabs have no border, since one would make them taller. the edge is drawn inside instead */
-:root .lb-tab {
+:root .pf-palette-size {
   box-shadow: inset 0 0 0 var(--mo-edge) var(--mo-line-control);
 }
 
 :root .lb-ltab:active,
-:root .lb-tab:active,
+:root .pf-palette-size:active,
 :root .tb-mv-opt:active {
   background: var(--mo-raise-press);
 }
 
 :root .lb-ltab.active,
-:root .lb-tab.active,
+:root .pf-palette-size.active,
 :root .tb-mv-opt.sel {
   background: var(--mo-accent);
   border-color: var(--mo-accent);
@@ -210,7 +213,7 @@
 /* the group tabs are the second row down, so the picked one is a tint and an underline, not a
    second solid orange that competes with the size tab above it. the sides and top are drawn inside
    the box, and the bottom is the 2px border the underline already uses */
-:root .lb-group {
+:root .pf-palette-group {
   background: var(--mo-inset);
   border-bottom-color: var(--mo-line-control);
   box-shadow:
@@ -221,11 +224,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-:root .lb-group:active {
+:root .pf-palette-group:active {
   background: var(--mo-raise-press);
 }
 
-:root .lb-group[aria-pressed='true'] {
+:root .pf-palette-group[aria-pressed='true'] {
   background: var(--mo-accent-tint);
   border-bottom-color: var(--mo-accent);
   box-shadow:
@@ -236,7 +239,7 @@
 }
 
 /* the count beside Show All is status, so it takes the quieter ink and leaves orange to the controls */
-:root .lb-filter {
+:root .pf-palette-status {
   color: var(--mo-ink-2);
 }
 
@@ -265,17 +268,17 @@
   :root .tb-bar-btn.ghost:hover,
   :root .tb-bar-btn.io:hover,
   :root .tb-nav-btn:hover,
-  :root .lb-filter-all:hover,
+  :root .pf-palette-all:hover,
   :root .lb-ltab:hover,
   :root .component-button button:hover {
     border-color: var(--mo-accent);
   }
 
-  :root .lb-tab:not(.active):hover {
+  :root .pf-palette-size:not(.active):hover {
     box-shadow: inset 0 0 0 var(--mo-edge) var(--mo-accent);
   }
 
-  :root .lb-group:hover {
+  :root .pf-palette-group:hover {
     border-bottom-color: var(--mo-accent);
     box-shadow:
       inset 0 1px 0 var(--mo-accent),

@@ -3,7 +3,8 @@
 #include "text/number_format.h"
 #include "mosaic/draw/common.h"
 #include "io/stores/health_store.h"
-#include "settings_schema.h"
+#include "health/goals.h"
+#include "system/settings/settings.h"
 #include <stdio.h>
 
 static void hr_value_1x2(char *out, size_t n, const char **unit_out)
@@ -14,9 +15,10 @@ static void hr_value_1x2(char *out, size_t n, const char **unit_out)
 
 static void hr_goal(char *out, size_t n, int *value, int *goal)
 {
-    snprintf(out, n, "%d BPM", gridlock_hr_limit());
+    int target = goals_hr_limit(settings_u8(SETTING_GOAL_HR));
+    snprintf(out, n, "%d BPM", target);
     *value = health_store_hr();
-    *goal = gridlock_hr_limit();
+    *goal = target;
 }
 
 static const StatPanelDesc heartrate_desc = {

@@ -57,15 +57,14 @@
 // worst case never crowds one 256 byte key. this key holds only the colour section.
 // version 2 changed the format inside the same 251 byte struct rather than appending a field, so
 // its first size is still 251
+// GRIDLOCK_CUSTOM_COLORS_LEN sits in persist_keys.h beside the cap it sets
 #define GRIDLOCK_CUSTOM_THEME_VERSION 2
 #define GRIDLOCK_CUSTOM_THEME_SIZE    251
-#define GRIDLOCK_CUSTOM_COLORS_LEN 250
 
 // the flag section (per-module header/border) of the same custom string, in its own key so
 // colours + flags each stay inside the 256 byte persist limit
 #define GRIDLOCK_CUSTOM_FLAGS_VERSION 1
 #define GRIDLOCK_CUSTOM_FLAGS_SIZE    251
-#define GRIDLOCK_CUSTOM_FLAGS_LEN 250
 
 #define GRIDLOCK_WEATHER_VERSION 1
 #define GRIDLOCK_WEATHER_SIZE    3
@@ -183,7 +182,7 @@ typedef struct GridlockHealth
     uint8_t version;
     uint8_t steps_mode;
     uint8_t distance_unit;
-    // goals (stored as the menu choice and turned into a value by the tables below)
+    // goals, each stored as the menu choice and turned into a value by the framework's goals.h
     uint8_t goal_steps;
     uint8_t goal_calories;
     uint8_t goal_sleep;
@@ -268,14 +267,6 @@ static GridlockGoalVibe  s_goal_vibe;
 static GridlockNight     s_night;
 static GridlockQuiet     s_quiet;
 
-// goal option values looked up by the saved menu choice
-static const int16_t s_steps_goals[]   = {5000, 7500, 10000, 12500, 15000, 20000, 25000};
-static const int16_t s_cal_goals[]     = {500, 1000, 1500, 2000, 2500, 3000};
-static const int16_t s_sleep_goals_h[] = {6, 7, 8, 9, 10};
-static const int16_t s_active_goals[]  = {15, 30, 45, 60, 90};
-static const int16_t s_hr_limits[]     = {150, 160, 170, 180, 190, 200};
-// distance goals in meters. the readout converts to the user's miles/km at draw time
-static const int16_t s_dist_goals_m[]  = {2000, 3000, 5000, 8000, 10000, 15000, 20000};
 // the top of still for an HRV burst, in milli-g a sample at 10 Hz
 static const int16_t s_hrv_still_limits[] = {30, 40, 50, 60, 80, 100, 150, 200};
 // the steps through an HRV burst that make it a walk
@@ -300,8 +291,9 @@ static const SettingField s_core_fields[] = {
     { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_LAYOUT, .type = SETTING_CSTRING,
       .offset = offsetof(GridlockCore, layout), .size = sizeof(s_core.layout),
       .default_str = GRIDLOCK_DEFAULT_LAYOUT },
-    // the catalogue's entry, so the header font reads back with settings_u8(SETTING_HEADER_FONT)
-    KNOWN_HEADER_FONT(offsetof(GridlockCore, header_font), HEADER_FONT_COUNT),
+    // the page's count is held to the header font table, so a choice the page offers always has a font
+    FACE_ENUM(GridlockCore, header_font, APPEARANCE_HEADER_FONT,
+              SETTINGS_COUNT_CHECKED(APPEARANCE_HEADER_FONT, HEADER_FONT_COUNT), SETTINGS_DEFAULT(APPEARANCE_HEADER_FONT)),
     FACE_ENUM(GridlockCore, panel_style, APPEARANCE_PANEL_STYLE, PANEL_STYLE_COUNT, 0),
 };
 
@@ -334,12 +326,13 @@ static const SettingField s_weather_fields[] = {
 static const SettingField s_health_fields[] = {
     KNOWN_STEPS_MODE(offsetof(GridlockHealth, steps_mode)),
     KNOWN_DISTANCE_UNIT(offsetof(GridlockHealth, distance_unit)),
-    FACE_ENUM(GridlockHealth, goal_steps, HEALTH_GOAL_STEPS, ARRAY_LENGTH(s_steps_goals), 2),
-    FACE_ENUM(GridlockHealth, goal_calories, HEALTH_GOAL_CALORIES, ARRAY_LENGTH(s_cal_goals), 3),
-    FACE_ENUM(GridlockHealth, goal_sleep, HEALTH_GOAL_SLEEP, ARRAY_LENGTH(s_sleep_goals_h), 2),
-    FACE_ENUM(GridlockHealth, goal_active, HEALTH_GOAL_ACTIVE, ARRAY_LENGTH(s_active_goals), 1),
-    FACE_ENUM(GridlockHealth, goal_hr, HEALTH_GOAL_HR, ARRAY_LENGTH(s_hr_limits), 3),
-    FACE_ENUM(GridlockHealth, goal_distance, HEALTH_GOAL_DISTANCE, ARRAY_LENGTH(s_dist_goals_m), 2),
+    // the goals are the catalogue's entries, so the panels and vibe_goal read them by setting id
+    KNOWN_GOAL_STEPS(offsetof(GridlockHealth, goal_steps)),
+    KNOWN_GOAL_CALORIES(offsetof(GridlockHealth, goal_calories)),
+    KNOWN_GOAL_SLEEP(offsetof(GridlockHealth, goal_sleep)),
+    KNOWN_GOAL_ACTIVE(offsetof(GridlockHealth, goal_active)),
+    KNOWN_GOAL_HR(offsetof(GridlockHealth, goal_hr)),
+    KNOWN_GOAL_DISTANCE(offsetof(GridlockHealth, goal_distance)),
     FACE_ENUM(GridlockHealth, hrv_count, HEALTH_HRV_COUNT, 3, 0),
     FACE_ENUM(GridlockHealth, hrv_still, HEALTH_HRV_STILL, ARRAY_LENGTH(s_hrv_still_limits), 3),
     FACE_ENUM(GridlockHealth, hrv_walk, HEALTH_HRV_WALK, ARRAY_LENGTH(s_hrv_walk_steps), 1),
@@ -347,18 +340,16 @@ static const SettingField s_health_fields[] = {
 };
 
 // --- goal vibe (key 11) ---
-// both ride as plain strings. the dropdown value is the pick (a sentinel or a comma list of
+// both ride as plain strings. the dropdown value is the pick (a marker or a comma list of
 // milliseconds), and the input holds the user's own comma list for when the pick is Custom
 static const SettingField s_goal_vibe_fields[] = {
-    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_HEALTH_GOAL_VIBE, .type = SETTING_CSTRING,
-      .offset = offsetof(GridlockGoalVibe, pick), .size = sizeof(s_goal_vibe.pick), .default_str = "" },
-    { .id = SETTING_COUNT, .message_key = &MESSAGE_KEY_HEALTH_GOAL_VIBE_CUSTOM, .type = SETTING_CSTRING,
-      .offset = offsetof(GridlockGoalVibe, custom), .size = sizeof(s_goal_vibe.custom), .default_str = "" },
+    KNOWN_GOAL_VIBE(GridlockGoalVibe, pick),
+    KNOWN_GOAL_VIBE_CUSTOM(GridlockGoalVibe, custom),
 };
 
 // --- clock (key 5) ---
 static const SettingField s_clock_fields[] = {
-    KNOWN_DATE_FORMAT(offsetof(GridlockClock, date_format)),
+    KNOWN_DATE_FORMAT(GridlockClock, date_format),
     { .id = SETTING_TIME_FORMAT, .message_key = &MESSAGE_KEY_CLOCK_TIME_FORMAT,
       .type = SETTING_ENUM_U8, .offset = offsetof(GridlockClock, time_format),
       .enum_count = TIME_FORMAT_COUNT, .affects_layout = true, .default_num = 0 },
@@ -424,10 +415,11 @@ _Static_assert(sizeof(GridlockCustomFlags) == GRIDLOCK_CUSTOM_FLAGS_SIZE, "custo
 
 static GridlockCustomFlags s_custom_flags;
 
-// APPEARANCE_CUSTOM_COLORS is not a framework field: the combined "~3 colours | flags" string can exceed a
-// single 256 byte persist key, so appmessage.c hands it to gridlock_set_custom_colors (which splits
-// it into the two blobs above) and reads it back via gridlock_get_custom_colors. both blobs still
-// persist through their schemas below. they just carry no message field.
+// APPEARANCE_CUSTOM_COLORS is not a field in the table. the combined "~3 colours | flags" string can
+// run past a single 256 byte persist key, so main.c hands it to the framework's long text channel.
+// that channel passes it to gridlock_set_custom_colors, which splits it into the two blobs above, and
+// reads it back through gridlock_get_custom_colors. both blobs still persist through their schemas
+// below. they just carry no message field
 
 // the schemas are chained tail first so each .companion points at an already-defined link.
 // each key loads independently, so the order carries no meaning beyond the forward reference
@@ -1042,49 +1034,19 @@ bool gridlock_module_borderless(uint8_t module, ModuleSize size)
     return false;
 }
 
-// --- goals ---
+// --- menu tables ---
 
 /**
- * @brief Looks up a goal value by its saved menu choice, kept inside the table.
+ * @brief Looks up a value by its saved menu choice, kept inside the table.
  *
  * @param table The table of option values.
  * @param count How long the table is.
  * @param index The saved menu choice.
  * @return The value found.
  */
-static int goal_value(const int16_t *table, uint8_t count, uint8_t index)
+static int menu_value(const int16_t *table, uint8_t count, uint8_t index)
 {
     return table[index < count ? index : 0];
-}
-
-int gridlock_goal_steps(void)
-{
-    return goal_value(s_steps_goals, ARRAY_LENGTH(s_steps_goals), s_health.goal_steps);
-}
-
-int gridlock_goal_calories(void)
-{
-    return goal_value(s_cal_goals, ARRAY_LENGTH(s_cal_goals), s_health.goal_calories);
-}
-
-int gridlock_goal_distance_m(void)
-{
-    return goal_value(s_dist_goals_m, ARRAY_LENGTH(s_dist_goals_m), s_health.goal_distance);
-}
-
-int gridlock_goal_sleep_min(void)
-{
-    return goal_value(s_sleep_goals_h, ARRAY_LENGTH(s_sleep_goals_h), s_health.goal_sleep) * 60;
-}
-
-int gridlock_goal_active_min(void)
-{
-    return goal_value(s_active_goals, ARRAY_LENGTH(s_active_goals), s_health.goal_active);
-}
-
-int gridlock_hr_limit(void)
-{
-    return goal_value(s_hr_limits, ARRAY_LENGTH(s_hr_limits), s_health.goal_hr);
 }
 
 uint8_t gridlock_hrv_count(void)
@@ -1094,27 +1056,17 @@ uint8_t gridlock_hrv_count(void)
 
 int gridlock_hrv_still_mg(void)
 {
-    return goal_value(s_hrv_still_limits, ARRAY_LENGTH(s_hrv_still_limits), s_health.hrv_still);
+    return menu_value(s_hrv_still_limits, ARRAY_LENGTH(s_hrv_still_limits), s_health.hrv_still);
 }
 
 int gridlock_hrv_walk_steps(void)
 {
-    return goal_value(s_hrv_walk_steps, ARRAY_LENGTH(s_hrv_walk_steps), s_health.hrv_walk);
+    return menu_value(s_hrv_walk_steps, ARRAY_LENGTH(s_hrv_walk_steps), s_health.hrv_walk);
 }
 
 int gridlock_hrv_settle_gaps(void)
 {
-    return goal_value(s_hrv_settle_gaps, ARRAY_LENGTH(s_hrv_settle_gaps), s_health.hrv_settle);
-}
-
-const char *gridlock_goal_vibe_pick(void)
-{
-    return s_goal_vibe.pick;
-}
-
-const char *gridlock_goal_vibe_custom(void)
-{
-    return s_goal_vibe.custom;
+    return menu_value(s_hrv_settle_gaps, ARRAY_LENGTH(s_hrv_settle_gaps), s_health.hrv_settle);
 }
 
 uint8_t gridlock_wind_unit(void)
@@ -1132,6 +1084,11 @@ uint8_t gridlock_panel_style(void)
     return s_core.panel_style;
 }
 
+uint8_t gridlock_header_font(void)
+{
+    return s_core.header_font;
+}
+
 uint8_t gridlock_hourly_vibe(void)
 {
     return s_clock.hourly_vibe;
@@ -1144,12 +1101,12 @@ uint8_t gridlock_week_start(void)
 
 int gridlock_stock_poll_min(void)
 {
-    return goal_value(s_stock_poll_min, ARRAY_LENGTH(s_stock_poll_min), s_stocks.stock_poll);
+    return menu_value(s_stock_poll_min, ARRAY_LENGTH(s_stock_poll_min), s_stocks.stock_poll);
 }
 
 int gridlock_calendar_poll_min(void)
 {
-    return goal_value(s_calendar_poll_min, ARRAY_LENGTH(s_calendar_poll_min), s_calendar.calendar_poll);
+    return menu_value(s_calendar_poll_min, ARRAY_LENGTH(s_calendar_poll_min), s_calendar.calendar_poll);
 }
 
 uint8_t gridlock_calendar_vibe_mode(void)

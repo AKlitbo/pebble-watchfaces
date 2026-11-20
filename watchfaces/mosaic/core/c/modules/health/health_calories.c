@@ -1,7 +1,8 @@
 #include "health_calories.h"
 #include "mosaic/draw/stat_panel.h"
 #include "io/stores/health_store.h"
-#include "settings_schema.h"
+#include "health/goals.h"
+#include "system/settings/settings.h"
 #include "text/number_format.h"
 #include <stdio.h>
 
@@ -19,9 +20,10 @@ static void cal_value_1x2(char *out, size_t n, const char **unit_out)
 
 static void cal_goal(char *out, size_t n, int *value, int *goal)
 {
-    number_group(out, n, gridlock_goal_calories());
+    int target = goals_calories(settings_u8(SETTING_GOAL_CALORIES));
+    number_group(out, n, target);
     *value = health_store_calories();
-    *goal = gridlock_goal_calories();
+    *goal = target;
 }
 
 static const StatPanelDesc calories_desc = {
