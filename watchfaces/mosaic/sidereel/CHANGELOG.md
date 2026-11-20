@@ -4,12 +4,20 @@ All notable changes to the Sidereel watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.6.2] - 2026-11-20
+
+### Changed
+
+- Changed the list of supported plugins on the settings page to say "this face" rather than "this watchface".
 
 ### Fixed
 
 - Fixed a daily goal sometimes never buzzing on a day you met it. Yesterday's total could reach the watch just after midnight and count as today's goal already met.
 - Fixed a goal buzzing hours after you met it, when the watchface opened before your activity had been read.
+
+### Notes
+
+- This release lists Pebble Health among the watchface's permissions, with the reason "To show your Pebble Health readings". If the Pebble app is set to ask before older apps use permissions, it asks you once after the update to allow health.
 
 ## [1.6.1] - 2026-11-14
 
