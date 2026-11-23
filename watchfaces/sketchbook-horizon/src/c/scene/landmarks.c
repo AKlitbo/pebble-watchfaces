@@ -1,13 +1,14 @@
 /**
  * @file landmarks.c
- * @brief What the landmark scenes share: on a round screen, the two-post sign the temperature goes
- * on.
+ * @brief What the landmark scenes share: the water, and on a round screen the two-post sign the
+ * temperature goes on.
  *
  * @ingroup watchface-sketchbook
  */
 #include "scene/landmarks.h"
 
 #include "scene/reading.h"
+#include "draw/ground.h"
 #include "draw/letter.h"
 
 /**
@@ -20,7 +21,16 @@
 #define SIGN_TOP 136       ///< Top of the board
 #define SIGN_H 16          ///< How tall the board is
 #define SIGN_FOOT 164      ///< Where the posts reach the ground
+#endif
 
+void landmarks_draw_water(GContext *ctx, GRect bounds, GColor water, GColor bank, GColor ripple)
+{
+    int top = LM_Y(LM_HORIZON);
+
+    ground_water(ctx, bounds, top, top + 5, LM_Y(LM_SCENE_BOTTOM), water, bank, ripple);
+}
+
+#if defined(PBL_ROUND)
 void landmarks_draw_sign(GContext *ctx, int x, int pad, int radius, GColor post, GColor board, GColor ink)
 {
     char temp[16];

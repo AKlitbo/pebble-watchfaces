@@ -20,6 +20,7 @@
 
 #include "scene/frame.h"
 #include "theme/ridgeline.h"
+#include "theme/skyline.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -40,6 +41,18 @@
 #define LM_W(w) LM_X(w)  ///< A width on the rectangle, spread the same way a column is
 
 #define LM_HORIZON 108       ///< The rectangle row the land or the water starts on, as on Skyline
+#define LM_SCENE_BOTTOM 133  ///< The last rectangle row the scene draws into before the clock
+
+/**
+ * @brief Lay water from the horizon down and ripple it, as a river or a bay reads at rest.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param water The water's colour.
+ * @param bank The colour of the far bank's edge.
+ * @param ripple The colour of the broken marks on the water.
+ */
+void landmarks_draw_water(GContext *ctx, GRect bounds, GColor water, GColor bank, GColor ripple);
 
 #if defined(PBL_ROUND)
 /**
@@ -101,6 +114,28 @@ void giza_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
  * @param frame This frame's reading. Its ground row is a RidgelineGround.
  */
 void giza_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
+
+/**
+ * @brief Paint the Niagara Falls scene's ground: the river, the falls and their mist, the rainbow
+ * by day, the cliffs, and the water below.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a SkylineGround.
+ */
+void niagara_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather in the Niagara Falls scene: the barrel with the
+ * temperature on it.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a SkylineGround.
+ */
+void niagara_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif
 
 /**

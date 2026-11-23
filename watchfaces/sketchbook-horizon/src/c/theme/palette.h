@@ -86,7 +86,8 @@ typedef struct GroundReadouts
  * layout and the stats row, and marks such as tufts, trails, sign posts, tank legs, ripples, and
  * wakes. The date-up layouts move the date onto the status bar, where it takes `bar_ink`. Each scene
  * picks `dim` so it reads on its own ground in every theme, so a new mark down there takes `dim`
- * rather than borrowing a colour picked for something else.
+ * rather than borrowing a colour picked for something else. Niagara's falls take it too, streaked
+ * over the cloud the curtain is filled with.
  */
 typedef struct CommonPalette
 {
