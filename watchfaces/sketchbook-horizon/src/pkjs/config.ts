@@ -141,6 +141,31 @@ export default buildConfig({
         { 'label': 'Clock Only', 'value': 2 },
       ],
     },
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_ANIMATION',
+      'label': 'Animation',
+      'description': 'Play a short animation of the scene when you open the watchface, and when you flick your wrist or raise it to look at the watch. The weather moves, and so do the details of the scene you picked. It holds still during Quiet Time and when the battery is low. Raise to Look uses a little more battery than a flick.',
+      'defaultValue': 0,
+      'options': [
+        { 'label': 'Off', 'value': 0 },
+        { 'label': 'Flick of the Wrist', 'value': 1 },
+        { 'label': 'Raise to Look', 'value': 2 },
+      ],
+    },
+    {
+      'type': 'select',
+      'messageKey': 'APPEARANCE_RAISE_DELAY',
+      'visibleWhen': { 'key': 'APPEARANCE_ANIMATION', 'in': [2] },
+      'label': 'Raise Delay',
+      'description': 'How long the watch has to stay raised before the scene moves. Short starts sooner. Long ignores more arm swings.',
+      'defaultValue': 1,
+      'options': [
+        { 'label': 'Short', 'value': 0 },
+        { 'label': 'Medium', 'value': 1 },
+        { 'label': 'Long', 'value': 2 },
+      ],
+    },
   ],
   clockItems: [
     {

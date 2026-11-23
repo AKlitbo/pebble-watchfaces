@@ -157,26 +157,51 @@ static void draw_bands(GContext *ctx, GRect bounds, const CommonPalette *pal)
 /**
  * @brief Scatter the star field. Night only.
  *
+ * In a burst each star takes its own turn to dip. A cross pulls its arms in, a bright dot drops to
+ * a faint one, and a faint one winks out for a frame. Each keeps its own place in an eight frame
+ * beat, so the field never pulses all at once.
+ *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param stars The scene's own field.
  * @param count How many there are.
+ * @param anim Where the burst has got to.
  */
-static void draw_stars(GContext *ctx, const CommonPalette *pal, const SketchbookStar *stars, int count)
+static void draw_stars(GContext *ctx, const CommonPalette *pal, const SketchbookStar *stars, int count,
+    AnimPhase anim)
 {
     graphics_context_set_stroke_width(ctx, 1);
 
     for (int i = 0; i < count; i++)
     {
         GPoint at = GPoint(stars[i].x, stars[i].y);
+        int size = stars[i].size;
+
+        if (anim.tick)
+        {
+            int beat = (anim.tick + sketchbook_sky_light_rank(i, 11)) % 8;
+
+            if (size == 2 && beat < 2)
+            {
+                size = 1;
+            }
+            else if (size == 1 && beat == 3)
+            {
+                size = 0;
+            }
+            else if (size == 0 && beat == 5)
+            {
+                continue;
+            }
+        }
 
         // the faint ones sit back in the star colour and the bright ones come forward in the
         // disc colour, which is what stops the field reading as one flat spray of dots
-        GColor color = stars[i].size == 0 ? pal->star : pal->disc;
+        GColor color = size == 0 ? pal->star : pal->disc;
         graphics_context_set_fill_color(ctx, color);
         graphics_context_set_stroke_color(ctx, color);
 
-        if (stars[i].size == 2)
+        if (size == 2)
         {
             graphics_draw_line(ctx, GPoint(at.x - 3, at.y), GPoint(at.x + 3, at.y));
             graphics_draw_line(ctx, GPoint(at.x, at.y - 3), GPoint(at.x, at.y + 3));
@@ -184,8 +209,57 @@ static void draw_stars(GContext *ctx, const CommonPalette *pal, const Sketchbook
         }
         else
         {
-            graphics_fill_circle(ctx, at, stars[i].size);
+            graphics_fill_circle(ctx, at, size);
         }
+    }
+}
+
+/**
+ * @brief Send a shooting star across the top of the sky, partway through a burst that brings one.
+ *
+ * It comes in off the right edge and runs down to the left with a short tail, then the tail burns
+ * out after the head has gone. It is drawn over the arc's dashes and under the moon. It is never
+ * there when still.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ * @param anim Where the burst has got to.
+ */
+static void draw_shooting_star(GContext *ctx, const CommonPalette *pal, AnimPhase anim)
+{
+    // a storm's longer burst never brings one, since its sky is covered, so the frames are an
+    // ordinary burst's
+    int t = anim.tick;
+    if (!anim.extras || t < 5 || t > 13)
+    {
+        return;
+    }
+
+    // high in the sky, under the status bar and well clear of the scene's ground. it starts just
+    // off the right edge and stops right of the middle, clear of where the moon tops its arc
+    int x0 = PBL_DISPLAY_WIDTH + 4;
+    int y0 = PBL_IF_ROUND_ELSE(40, 26);
+    int run = PBL_DISPLAY_WIDTH / 3;
+
+    // the head crosses over seven frames, coming in off the edge with its tail behind it, then the
+    // tail burns out behind where it went over the next two
+    int along = t <= 11 ? ((t - 5) * run) / 6 : run;
+    int tail = t <= 11 ? (along < 14 ? along : 14) : 14 - (t - 11) * 6;
+
+    GPoint head = GPoint(x0 - along, y0 + along / 3);
+    GPoint back = GPoint(head.x + tail, head.y - tail / 3);
+
+    graphics_context_set_stroke_color(ctx, pal->disc);
+    graphics_context_set_stroke_width(ctx, 1);
+    if (tail > 0)
+    {
+        graphics_draw_line(ctx, head, back);
+    }
+
+    if (t <= 11)
+    {
+        graphics_context_set_fill_color(ctx, pal->disc);
+        graphics_fill_circle(ctx, head, 1);
     }
 }
 
@@ -210,14 +284,20 @@ static void draw_arc(GContext *ctx, const CommonPalette *pal)
 /**
  * @brief Draw the sun: a filled disc, an ink outline, and eight uneven rays.
  *
+ * In a burst the ray lengths step round the rays, so the sun shimmers.
+ *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param at The disc's centre.
+ * @param anim Where the burst has got to.
  */
-static void draw_sun(GContext *ctx, const CommonPalette *pal, GPoint at)
+static void draw_sun(GContext *ctx, const CommonPalette *pal, GPoint at, AnimPhase anim)
 {
     // uneven ray lengths, one per eighth turn, so the burst looks scrawled rather than stamped
     static const int16_t ray_len[] = {9, 6, 10, 7, 9, 6, 10, 7};
+
+    // two trips round the four lengths over a burst, which lands back on the still pattern
+    unsigned shift = (unsigned)anim_loop(anim, 4, 2);
 
     graphics_context_set_stroke_color(ctx, pal->disc);
     graphics_context_set_stroke_width(ctx, 3);
@@ -228,7 +308,7 @@ static void draw_sun(GContext *ctx, const CommonPalette *pal, GPoint at)
         int32_t sin_a = sin_lookup(angle);
         int32_t cos_a = cos_lookup(angle);
         int inner = SKETCHBOOK_DISC_R + 4;
-        int outer = inner + ray_len[i];
+        int outer = inner + ray_len[(i + shift) % ARRAY_LENGTH(ray_len)];
 
         graphics_draw_line(ctx,
             GPoint(at.x + (inner * sin_a) / TRIG_MAX_RATIO, at.y - (inner * cos_a) / TRIG_MAX_RATIO),
@@ -368,8 +448,9 @@ static void draw_moon(GContext *ctx, const CommonPalette *pal, GPoint at)
  * @param pal The palette in use.
  * @param at The disc's centre.
  * @param night True to draw the moon rather than the sun.
+ * @param anim Where the burst has got to.
  */
-static void draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at, bool night)
+static void draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at, bool night, AnimPhase anim)
 {
     if (night)
     {
@@ -377,7 +458,7 @@ static void draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at, bool n
     }
     else
     {
-        draw_sun(ctx, pal, at);
+        draw_sun(ctx, pal, at, anim);
     }
 }
 
@@ -391,14 +472,21 @@ void sketchbook_sky_draw(GContext *ctx, GRect bounds, const SceneFrame *frame)
 
     if (frame->night)
     {
-        draw_stars(ctx, pal, g->stars, g->star_count);
+        draw_stars(ctx, pal, g->stars, g->star_count, frame->anim);
     }
 
     draw_arc(ctx, pal);
 
+    // only where the sky is open enough to see one, and in front of the arc's dashes so they never
+    // break it up. the moon goes on after, so it passes behind
+    if (frame->night && frame->sky.celestial != CEL_HIDDEN)
+    {
+        draw_shooting_star(ctx, pal, frame->anim);
+    }
+
     if (frame->sky.celestial != CEL_HIDDEN)
     {
-        draw_disc(ctx, pal, frame->disc, frame->night);
+        draw_disc(ctx, pal, frame->disc, frame->night, frame->anim);
     }
 }
 

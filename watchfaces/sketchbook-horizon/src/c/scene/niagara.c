@@ -174,6 +174,9 @@ void niagara_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 
     // the water pouring over the brink, in close streaks down the curtain, some running further
     // than others so it reads as falling water rather than as railings
+    // in a burst short breaks run down every streak in the curtain's own colour, which is what makes
+    // the water pour. each streak starts its breaks at its own height
+    int pour = anim_loop(frame->anim, 10, 3);
     graphics_context_set_stroke_color(ctx, pal->dim);
     for (int x = 34, i = 0; x < 168; x += 4, i++)
     {
@@ -181,6 +184,16 @@ void niagara_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
         int brink = 69 + (from_mid * from_mid * 4) / (70 * 70);
         int reach = 98 - (i % 3) * 4;
         graphics_draw_line(ctx, GPoint(LM_X(x), LM_Y(brink + 2)), GPoint(LM_X(x), LM_Y(reach)));
+
+        if (frame->anim.tick)
+        {
+            graphics_context_set_stroke_color(ctx, pal->cloud);
+            for (int y = brink + 3 + (pour + i * 7) % 10; y + 1 < reach; y += 10)
+            {
+                graphics_draw_line(ctx, GPoint(LM_X(x), LM_Y(y)), GPoint(LM_X(x), LM_Y(y) + 1));
+            }
+            graphics_context_set_stroke_color(ctx, pal->dim);
+        }
     }
 
     if (!frame->night && frame->sky.celestial != CEL_HIDDEN)
@@ -191,7 +204,10 @@ void niagara_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     graphics_context_set_fill_color(ctx, pal->cloud);
     for (unsigned i = 0; i < ARRAY_LENGTH(s_mist); i++)
     {
-        graphics_fill_circle(ctx, GPoint(LM_X(s_mist[i].x), LM_Y(s_mist[i].y)), LM_W(s_mist[i].r));
+        // in a burst each puff swells and shrinks out of step with the next, so the mist breathes
+        int breathe = anim_sway(frame->anim, 2, 2, (TRIG_MAX_ANGLE / 5) * (int)i);
+        graphics_fill_circle(ctx, GPoint(LM_X(s_mist[i].x), LM_Y(s_mist[i].y) - breathe / 2),
+            LM_W(s_mist[i].r) + breathe);
     }
     graphics_fill_rect(ctx, GRect(LM_X(30), LM_Y(102), LM_X(170) - LM_X(30), LM_Y(108) - LM_Y(102)), 0, GCornerNone);
 
@@ -205,7 +221,7 @@ void niagara_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
         graphics_draw_circle(ctx, s_trees[i], r);
     }
 
-    landmarks_draw_water(ctx, bounds, ground->water, pal->ink, pal->dim);
+    landmarks_draw_water(ctx, bounds, ground->water, pal->ink, pal->dim, frame->anim);
 }
 
 #if defined(PBL_ROUND)

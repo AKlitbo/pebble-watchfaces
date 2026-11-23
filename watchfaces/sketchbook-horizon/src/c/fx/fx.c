@@ -2,6 +2,10 @@
  * @file fx.c
  * @brief The cloud, precipitation, wash and lightning draws.
  *
+ * In a burst the lone cloud rolls in from the left, the rain, snow and drizzle fall, the fog's wisps
+ * drift, and a storm's lightning strikes. The overcast band holds still, so a wet burst moves
+ * nothing behind the scene's ground.
+ *
  * @ingroup watchface-sketchbook
  */
 #include "fx/fx.h"
@@ -9,6 +13,8 @@
 #include "scene/geometry.h"
 #include "theme/palette.h"
 #include "math/scale.h"
+#include "draw/marks.h"
+#include "anim/anim.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -28,6 +34,17 @@
 /// The fewest drops the column under a drifting cloud gets, so drizzle reads as a fall rather than
 /// a few stray specks
 #define COLUMN_DROPS_MIN 12
+
+/// How far left a burst pulls the lone cloud before it rolls home. Far enough that it starts well
+/// clear of the disc it parks on
+#define ROLL_REACH 45
+
+/// The furthest left a roll carries the lone cloud's middle. That sits its left puff's middle on the
+/// rectangle's edge, and a round screen keeps it further in, since the glass curves over the corner
+#define ROLL_FLOOR PBL_IF_ROUND_ELSE(40, 16)
+
+/// How many times rain falls through its band in a burst. Snow and drizzle fall through once
+#define RAIN_PASSES 2
 
 // a puff's lobes, in eighths. across is of the puff's half width, up and the radius are of its
 // lobe radius. seven of them, each its own size and height and tallest just off-centre, so the top
@@ -56,6 +73,20 @@ static int tone_of(GColor c)
 }
 
 /**
+ * @brief One step lighter on the watch's 64 colours, each channel moved up one notch.
+ *
+ * @param c The colour.
+ * @return The lighter colour.
+ */
+static GColor lighter(GColor c)
+{
+    c.r = c.r < 3 ? c.r + 1 : 3;
+    c.g = c.g < 3 ? c.g + 1 : 3;
+    c.b = c.b < 3 ? c.b + 1 : 3;
+    return c;
+}
+
+/**
  * @brief The palette colour that shades a cloud's underside: whichever of ink, sky_lo and dim sits
  * furthest below the cloud in brightness.
  *
@@ -63,18 +94,24 @@ static int tone_of(GColor c)
  * and sky_lo is the cloud's own colour on Sketchbook by day and Blueprint by night. Where none is
  * darker it falls back to ink, which at least always stands off the cloud.
  *
+ * On a strike's frame the cloud and sky_lo are a step lighter but ink and dim are not, which on
+ * some night palettes would swap the shading to ink for that one frame. So the comparison lifts ink
+ * and dim a step too, and the shading stays the same field and lightens with the cloud.
+ *
  * @param pal The palette in use.
+ * @param lit True on a strike's frame.
  * @return The colour to stipple the underside with.
  */
-static GColor shade_tone(const CommonPalette *pal)
+static GColor shade_tone(const CommonPalette *pal, bool lit)
 {
     const GColor picks[] = {pal->ink, pal->sky_lo, pal->dim};
+    const GColor tones[] = {lit ? lighter(pal->ink) : pal->ink, pal->sky_lo, lit ? lighter(pal->dim) : pal->dim};
     GColor best = pal->ink;
     int best_gap = 0;
 
     for (unsigned i = 0; i < ARRAY_LENGTH(picks); i++)
     {
-        int gap = tone_of(pal->cloud) - tone_of(picks[i]);
+        int gap = tone_of(pal->cloud) - tone_of(tones[i]);
 
         if (gap > best_gap)
         {
@@ -226,10 +263,11 @@ static bool lowest_at(const Puff *puffs, int count, int i, int x)
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param lit True on a strike's frame, which the shading's pick allows for.
  * @param puffs The puffs making up the cloud.
  * @param count How many puffs there are.
  */
-static void draw_puffs(GContext *ctx, const CommonPalette *pal, const Puff *puffs, int count)
+static void draw_puffs(GContext *ctx, const CommonPalette *pal, bool lit, const Puff *puffs, int count)
 {
     for (int pass = 0; pass < 2; pass++)
     {
@@ -257,7 +295,7 @@ static void draw_puffs(GContext *ctx, const CommonPalette *pal, const Puff *puff
         }
     }
 
-    graphics_context_set_stroke_color(ctx, shade_tone(pal));
+    graphics_context_set_stroke_color(ctx, shade_tone(pal, lit));
 
     for (int i = 0; i < count; i++)
     {
@@ -308,6 +346,12 @@ static void drifting_puffs(const SceneFrame *frame, Puff out[2])
     // the high end keeps the cloud off the scene's ground when it is low
     int y = clamp_int(disc.y + g->cloud_drop, g->cloud_y_min, g->cloud_y_max);
 
+    // a burst pulls it out left and rolls it home onto its still spot
+    // a cloud parked near the left edge rolls a shorter way, so its left puff never slips off the
+    // screen or behind the round glass
+    int reach = x - ROLL_FLOOR;
+    x -= anim_settle(frame->anim, reach < ROLL_REACH ? reach : ROLL_REACH, ANIM_ROLL_LEAD);
+
     out[0] = (Puff){x - 16, y, 18, g->drift_lobe_a};
     out[1] = (Puff){x + 14, y - 4, 20, g->drift_lobe_b};
 }
@@ -329,13 +373,13 @@ void sketchbook_fx_draw_clouds(GContext *ctx, const SceneFrame *frame)
     // whole band off the scene's ground
     if (sky->clouds == CLOUDS_OVERCAST)
     {
-        draw_puffs(ctx, pal, g->overcast, g->overcast_count);
+        draw_puffs(ctx, pal, frame->lit, g->overcast, g->overcast_count);
         return;
     }
 
     Puff drifting[2];
     drifting_puffs(frame, drifting);
-    draw_puffs(ctx, pal, drifting, ARRAY_LENGTH(drifting));
+    draw_puffs(ctx, pal, frame->lit, drifting, ARRAY_LENGTH(drifting));
 }
 
 /**
@@ -381,27 +425,35 @@ static int cloud_base_at(const Puff *puffs, int count, int x)
 }
 
 /**
+ * @brief Which kind of particle this one is. A mixed fall takes turns between drizzle and rain.
+ *
+ * @param kind The fall's PrecipKind.
+ * @param index The particle's number.
+ * @return The PrecipKind this particle draws as.
+ */
+static int particle_kind(uint8_t kind, int index)
+{
+    if (kind == PRECIP_MIXED)
+    {
+        return (index & 1) ? PRECIP_DROPS : PRECIP_DASHES;
+    }
+
+    return kind;
+}
+
+/**
  * @brief Draw one falling particle as a thin 1px mark.
  *
  * Rain is a slanted streak in two lengths, with a shorter twin beside every fourth long one. Snow
  * is a small plus, a small cross, or a single flake. Drizzle is a 2px tick.
  *
  * @param ctx The graphics context.
- * @param kind A PrecipKind.
+ * @param kind The particle's own PrecipKind, from particle_kind, so never PRECIP_MIXED.
  * @param at Where the particle starts.
- * @param index The particle's number. It picks the half of a mixed fall, then the shape within
- * its own kind.
+ * @param index The particle's number among its own kind, which picks its shape.
  */
-static void draw_particle(GContext *ctx, uint8_t kind, GPoint at, int index)
+static void draw_particle(GContext *ctx, int kind, GPoint at, int index)
 {
-    // a mixed fall takes turns between its two kinds, so each kind counts only its own particles
-    // counting all of them would land every streak on an even number and never draw a twin
-    if (kind == PRECIP_MIXED)
-    {
-        kind = (index & 1) ? PRECIP_DROPS : PRECIP_DASHES;
-        index /= 2;
-    }
-
     int x = at.x;
     int y = at.y;
 
@@ -512,6 +564,11 @@ static int coprime_stride(int stride, int span)
  * Particle positions come from the minute rather than a random number, so the scene shifts
  * once a minute on the tick that is already happening and never costs a timer.
  *
+ * In a burst every particle falls a whole number of times through its band and comes back in under
+ * the cloud, so the last frame runs straight into the still one. Rain falls twice and slides along
+ * its own slant as it drops. Snow and drizzle fall once, and each flake drifts from side to side.
+ * The column under the lone cloud rolls in with it.
+ *
  * @param ctx The graphics context.
  * @param frame This frame's reading.
  */
@@ -581,34 +638,76 @@ static void draw_precip(GContext *ctx, const SceneFrame *frame)
         }
 
         int y;
+        int rest = from;
+        int kind = particle_kind(sky->precip, i);
+        int fall = anim_loop(frame->anim, column ? bottom - from : band, kind == PRECIP_DASHES ? RAIN_PASSES : 1);
 
         // a column holds only a handful of drops, so each takes its own row down the column's
         // height, nudged a few pixels either way. a scatter bunches them at the bottom and leaves
         // the air under the cloud empty
         if (column)
         {
-            y = from + (i * (bottom - from)) / drops + (int)((mix >> 8) % 7) - 3;
-            y = clamp_int(y, from, bottom - 1);
+            rest = from + (i * (bottom - from)) / drops + (int)((mix >> 8) % 7) - 3;
+            rest = clamp_int(rest, from, bottom - 1);
+            y = from + (rest - from + fall) % (bottom - from);
         }
         else
         {
             // the stride runs over the whole band and is then squeezed in under the cloud
             // a stride over just the depth under the cloud lines up with itself at some depths
             // and stacks a run of streaks into a ladder
-            y = from + ((i * y_stride + minute * 19) % band) * (bottom - from) / band;
+            y = from + ((i * y_stride + minute * 19 + fall) % band) * (bottom - from) / band;
         }
 
-        draw_particle(ctx, sky->precip, GPoint(x, y), i);
+        // a streak falls along its own slant, so it slides left as it drops and comes back in up on
+        // the right when it wraps
+        if (kind == PRECIP_DASHES && fall)
+        {
+            if (!column)
+            {
+                rest = from + ((i * y_stride + minute * 19) % band) * (bottom - from) / band;
+            }
+
+            x -= ((y - rest) * 3) / 10;
+
+            // the slant can carry a streak out from under its lone cloud, so it stops at the
+            // column's sides
+            if (column && (x < col_left || x >= col_left + col_w))
+            {
+                continue;
+            }
+
+            // a streak that has wrapped back up can land under a lower part of the cloud, so it
+            // stays hidden until it falls clear of the cloud there
+            int over = cloud_base_at(cloud, cloud_count, x);
+            if (over >= 0 && y < over + FALL_GAP)
+            {
+                continue;
+            }
+        }
+        else if (kind == PRECIP_FLAKES)
+        {
+            // a flake drifts from side to side instead
+            x += anim_sway(frame->anim, 2, 2, (TRIG_MAX_ANGLE / 7) * i);
+        }
+
+        // a mixed fall takes turns between its two kinds, so each kind counts only its own
+        // particles. counting all of them would land every streak on an even number and never draw
+        // a twin
+        draw_particle(ctx, kind, GPoint(x, y), sky->precip == PRECIP_MIXED ? i / 2 : i);
     }
 }
 
 /**
  * @brief Draw the wash lying over the ground: the scene's fog, haze or mist.
  *
+ * In a burst its two solid wisps drift apart and back, so the bank reads as moving air.
+ *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param anim Where the burst has got to.
  */
-static void draw_wash(GContext *ctx, const CommonPalette *pal)
+static void draw_wash(GContext *ctx, const CommonPalette *pal, AnimPhase anim)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();
 
@@ -630,9 +729,10 @@ static void draw_wash(GContext *ctx, const CommonPalette *pal)
 
     // a couple of solid wisps through the densest part, which gives the wash an edge to read
     // against and stops it looking like flat noise
+    int drift = anim_swell(anim, 6);
     graphics_context_set_stroke_width(ctx, 3);
-    graphics_draw_line(ctx, GPoint(18, g->wash_wisp_hi_y), GPoint(74, g->wash_wisp_hi_y));
-    graphics_draw_line(ctx, GPoint(96, g->wash_wisp_lo_y), GPoint(158, g->wash_wisp_lo_y));
+    graphics_draw_line(ctx, GPoint(18 - drift, g->wash_wisp_hi_y), GPoint(74 - drift, g->wash_wisp_hi_y));
+    graphics_draw_line(ctx, GPoint(96 + drift, g->wash_wisp_lo_y), GPoint(158 + drift, g->wash_wisp_lo_y));
     graphics_context_set_stroke_width(ctx, 1);
 }
 
@@ -659,6 +759,82 @@ static void bolt_corners(const SceneGeometry *g, const BoltSpot *spot, GPoint ou
     {
         out[k] = GPoint(spot->x + spot->flip * (s_zigzag[k][0] * spot->h) / 64, y0 + (s_zigzag[k][1] * spot->h) / 64);
     }
+}
+
+// the frames a strike lands on, counted as if the burst were ANIM_STORM_TICKS long. one early, one in
+// the middle, and the last one that lingers into the still frame, which is the storm the face shows
+// between bursts
+static const uint8_t s_strikes[] = {6, 18, 25};
+
+/// How many frames the bolts stay out from each strike
+#define STRIKE_FRAMES 3
+
+/// How long after the first strike its bolts flicker back for a frame
+#define STRIKE_FLICKER 4
+
+/**
+ * @brief Where in a storm's burst the lightning is, scaled to a storm's own length.
+ *
+ * @param anim The phase.
+ * @return The frame, counted as if the burst were ANIM_STORM_TICKS long.
+ */
+static int storm_frame(AnimPhase anim)
+{
+    return anim.ticks ? (anim.tick * ANIM_STORM_TICKS) / anim.ticks : 0;
+}
+
+/**
+ * @brief Whether the bolts are out on this frame.
+ *
+ * They show between bursts, since that is how the still face says storm. In a burst they go out,
+ * then show for the frames after each strike, with a flicker after the first. The last strike
+ * lingers into the still frame.
+ *
+ * @param anim The phase.
+ * @return True to draw them.
+ */
+static bool bolts_out(AnimPhase anim)
+{
+    int t = storm_frame(anim);
+
+    if (anim.tick == 0 || t >= s_strikes[ARRAY_LENGTH(s_strikes) - 1] || t == s_strikes[0] + STRIKE_FLICKER)
+    {
+        return true;
+    }
+
+    for (unsigned i = 0; i < ARRAY_LENGTH(s_strikes); i++)
+    {
+        if (t >= s_strikes[i] && t < s_strikes[i] + STRIKE_FRAMES)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool sketchbook_fx_flash(AnimPhase anim)
+{
+    int t = storm_frame(anim);
+
+    for (unsigned i = 0; anim.tick && i < ARRAY_LENGTH(s_strikes); i++)
+    {
+        if (t == s_strikes[i])
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void sketchbook_fx_flash_palette(CommonPalette *pal)
+{
+    // the sky colours go one step lighter, so each palette keeps its own hue. the scenes paint
+    // walls, sails, mist and the rest in these too, so the whole scene flashes with the sky
+    pal->sky_hi = lighter(pal->sky_hi);
+    pal->sky_lo = lighter(pal->sky_lo);
+    pal->cloud = lighter(pal->cloud);
 }
 
 /**
@@ -708,6 +884,42 @@ static void draw_bolts(GContext *ctx, const CommonPalette *pal)
     graphics_context_set_stroke_width(ctx, 1);
 }
 
+void sketchbook_fx_draw_birds(GContext *ctx, const SceneFrame *frame)
+{
+    const SceneGeometry *g = sketchbook_scene_geometry();
+    AnimPhase anim = frame->anim;
+
+    // only under an open sky, with the sun out and nothing falling
+    bool fair = frame->sky.celestial != CEL_HIDDEN && frame->sky.precip == PRECIP_NONE;
+    if (!anim.extras || frame->night || !fair)
+    {
+        return;
+    }
+
+    // halfway between where the upper sky gives way to the lower and the arc's baseline, nudged up
+    // a little
+    int y = (g->sky_band_y + g->arc_base_y) / 2 - 6;
+
+    graphics_context_set_stroke_color(ctx, frame->palette->ink);
+    graphics_context_set_stroke_width(ctx, 1);
+
+    // the second bird trails the first a little behind and above it, and is a touch smaller
+    static const int8_t pair[][3] = {{0, 0, 6}, {14, -5, 5}};
+    for (unsigned i = 0; i < ARRAY_LENGTH(pair); i++)
+    {
+        int x;
+        if (!anim_cross(anim, PBL_DISPLAY_WIDTH + 10 + pair[i][0], -24 + pair[i][0], 1, anim.ticks - 1, &x))
+        {
+            continue;
+        }
+
+        // a downstroke every other pair of frames, each bird out of step with the other. the same
+        // shallow lift as Shoreline's gulls
+        int lift = ((anim.tick + (int)i) / 2) % 2 ? -2 : 2;
+        marks_bird(ctx, GPoint(x, y + pair[i][1]), pair[i][2], lift);
+    }
+}
+
 void sketchbook_fx_draw_weather(GContext *ctx, const SceneFrame *frame)
 {
     const CommonPalette *pal = frame->palette;
@@ -718,10 +930,10 @@ void sketchbook_fx_draw_weather(GContext *ctx, const SceneFrame *frame)
 
     if (frame->sky.wash)
     {
-        draw_wash(ctx, pal);
+        draw_wash(ctx, pal, frame->anim);
     }
 
-    if (frame->sky.bolt)
+    if (frame->sky.bolt && bolts_out(frame->anim))
     {
         draw_bolts(ctx, pal);
     }

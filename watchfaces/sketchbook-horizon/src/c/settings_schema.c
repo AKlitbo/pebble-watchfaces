@@ -53,6 +53,8 @@ typedef struct SketchbookSettings
     uint8_t night_palette;
     bool    use_quiet_palette;
     uint8_t quiet_palette;
+    uint8_t animation;
+    uint8_t raise_delay;
 } SketchbookSettings;
 
 static SketchbookSettings s_settings;
@@ -69,6 +71,8 @@ static SketchbookSettings s_settings;
 #define SETTING_NIGHT_PALETTE    ((SettingId)(SETTING_COUNT + 6))
 #define SETTING_QUIET_PALETTE_ON ((SettingId)(SETTING_COUNT + 7))
 #define SETTING_QUIET_PALETTE    ((SettingId)(SETTING_COUNT + 8))
+#define SETTING_ANIMATION        ((SettingId)(SETTING_COUNT + 9))
+#define SETTING_RAISE_DELAY      ((SettingId)(SETTING_COUNT + 10))
 
 // every KNOWN_ entry takes its default from the settings page, so a fresh watch shows what the
 // page opens on
@@ -112,6 +116,14 @@ static const SettingField s_fields[] = {
     { .id = SETTING_QUIET_PALETTE, .message_key = &MESSAGE_KEY_APPEARANCE_QUIET_PALETTE,
       .type = SETTING_ENUM_U8, .offset = offsetof(SketchbookSettings, quiet_palette),
       .enum_count = THEME_COUNT, .default_num = 0 },
+    // off unless the wearer turns it on, which a save from before the field existed never did
+    { .id = SETTING_ANIMATION, .message_key = &MESSAGE_KEY_APPEARANCE_ANIMATION,
+      .type = SETTING_ENUM_U8, .offset = offsetof(SketchbookSettings, animation),
+      .enum_count = ANIM_TRIGGER_COUNT, .default_num = ANIM_OFF },
+    // Medium unless picked, 0.3 seconds
+    { .id = SETTING_RAISE_DELAY, .message_key = &MESSAGE_KEY_APPEARANCE_RAISE_DELAY,
+      .type = SETTING_ENUM_U8, .offset = offsetof(SketchbookSettings, raise_delay),
+      .enum_count = ANIM_RAISE_DELAY_COUNT, .default_num = 1 },
 };
 
 static const SettingsSchema s_schema = {
@@ -144,6 +156,16 @@ uint8_t sketchbook_layout(void)
 bool sketchbook_show_meridiem(void)
 {
     return s_settings.meridiem;
+}
+
+AnimTrigger sketchbook_animation(void)
+{
+    return (AnimTrigger)s_settings.animation;
+}
+
+uint8_t sketchbook_raise_delay(void)
+{
+    return s_settings.raise_delay;
 }
 
 void sketchbook_palette_pick(PalettePick *out)

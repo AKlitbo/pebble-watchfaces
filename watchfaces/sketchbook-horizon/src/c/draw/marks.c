@@ -42,4 +42,12 @@ void marks_tree(GContext *ctx, GPoint foot, GPoint top, const int8_t (*branches)
     }
 }
 
+void marks_bird(GContext *ctx, GPoint at, int span, int lift)
+{
+    graphics_draw_line(ctx, GPoint(at.x - span, at.y), GPoint(at.x - span / 2, at.y - lift));
+    graphics_draw_line(ctx, GPoint(at.x - span / 2, at.y - lift), at);
+    graphics_draw_line(ctx, at, GPoint(at.x + span / 2, at.y - lift));
+    graphics_draw_line(ctx, GPoint(at.x + span / 2, at.y - lift), GPoint(at.x + span, at.y));
+}
+
 /** @} */

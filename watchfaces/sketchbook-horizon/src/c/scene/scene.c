@@ -36,18 +36,23 @@
 //
 // a scene's front is what a round screen draws in front of the weather, the temperature's holder
 // or the mast that carries it. the rectangle has none
+//
+// a scene still by day has no water, smoke, traffic or falls of its own to move in a burst. Half
+// Dome's headlamps only show after dark, so it counts too
 static const SceneDef s_scenes[] = {
     [SCENE_RIDGELINE] = {
         .geometry = &ridgeline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
         .ground = ridgeline_draw_ground, .front = PBL_IF_ROUND_ELSE(ridgeline_draw_front, NULL),
         .clock_only_y = 119,
         .bolts = &ridgeline_bolts,
+        .still_by_day = true,
     },
     [SCENE_SHORELINE] = {
         .geometry = &shoreline_geometry, .ground_for_theme = shoreline_ground_for_theme,
         .ground = shoreline_draw_ground, .front = PBL_IF_ROUND_ELSE(shoreline_draw_front, NULL),
         .clock_only_y = 113,
         .bolts = &shoreline_bolts,
+        .own_birds = true,
     },
     [SCENE_SKYLINE] = {
         .geometry = &skyline_geometry, .ground_for_theme = skyline_ground_for_theme,
@@ -72,18 +77,21 @@ static const SceneDef s_scenes[] = {
         .ground = giza_draw_ground, .front = PBL_IF_ROUND_ELSE(giza_draw_front, NULL),
         .clock_only_y = 113,
         .bolts = &giza_bolts,
+        .still_by_day = true,
     },
     [SCENE_HALF_DOME] = {
         .geometry = &skyline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
         .ground = half_dome_draw_ground, .front = PBL_IF_ROUND_ELSE(half_dome_draw_front, NULL),
         .clock_only_y = 113,
         .bolts = &half_dome_bolts,
+        .still_by_day = true,
     },
     [SCENE_ULURU] = {
         .geometry = &skyline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
         .ground = uluru_draw_ground, .front = PBL_IF_ROUND_ELSE(uluru_draw_front, NULL),
         .clock_only_y = 113,
         .bolts = &uluru_bolts,
+        .still_by_day = true,
     },
     [SCENE_NIAGARA] = {
         .geometry = &skyline_geometry, .ground_for_theme = skyline_ground_for_theme,
@@ -102,6 +110,7 @@ static const SceneDef s_scenes[] = {
         .ground = monument_valley_draw_ground, .front = PBL_IF_ROUND_ELSE(monument_valley_draw_front, NULL),
         .clock_only_y = 113,
         .bolts = &monument_valley_bolts,
+        .still_by_day = true,
     },
 };
 

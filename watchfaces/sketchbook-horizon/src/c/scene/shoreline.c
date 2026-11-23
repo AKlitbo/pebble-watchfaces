@@ -15,6 +15,7 @@
 #include "ui/readouts.h"
 #include "ui/fonts.h"
 #include "draw/fonts.h"
+#include "draw/marks.h"
 #include "draw/measure.h"
 #include "clock/tide.h"
 #include "theme/shoreline.h"
@@ -272,14 +273,15 @@ static bool dither_keeps(int x, int y, int level)
  * @brief Draw the gulls crossing the sky. Day only, the way the stars are night only.
  *
  * Four strokes each, which at this size is the whole bird. The flock slides along on the minute
- * tick and takes a few hours to cross, so it has always moved by the next time you look up and
- * is never caught mid-flap.
+ * tick and takes a few hours to cross, so it has always moved by the next time you look up. In a
+ * burst the gulls beat their wings, each out of step with the next.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param minutes The running minute count, which carries the flock across.
+ * @param anim Where the burst has got to.
  */
-static void draw_birds(GContext *ctx, const CommonPalette *pal, int32_t minutes)
+static void draw_birds(GContext *ctx, const CommonPalette *pal, int32_t minutes, AnimPhase anim)
 {
     // a loose flock rather than a row, since birds evenly spaced read as a border print
     static const Gull flock[] = {
@@ -301,11 +303,13 @@ static void draw_birds(GContext *ctx, const CommonPalette *pal, int32_t minutes)
         int span = flock[i].span;
         int lift = 2;  // flat: a wing that rises as far as it reaches comes out as a mountain
 
-        // two shallow chevrons meeting at the body, which is all a gull is this far off
-        graphics_draw_line(ctx, GPoint(x - span, y), GPoint(x - span / 2, y - lift));
-        graphics_draw_line(ctx, GPoint(x - span / 2, y - lift), GPoint(x, y));
-        graphics_draw_line(ctx, GPoint(x, y), GPoint(x + span / 2, y - lift));
-        graphics_draw_line(ctx, GPoint(x + span / 2, y - lift), GPoint(x + span, y));
+        // a downstroke drops the wingtips under the body for a frame or two
+        if (anim.tick && ((anim.tick + (int)i) / 2) % 2)
+        {
+            lift = -2;
+        }
+
+        marks_bird(ctx, GPoint(x, y), span, lift);
     }
 }
 
@@ -395,10 +399,12 @@ static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
  * @param pal The palette in use.
  * @param disc Where the sun or moon is.
  * @param base The waterline's baseline.
+ * @param anim Where the burst has got to. The wobble walks down the glitter twice, so it shimmers.
  */
-static void draw_glitter(GContext *ctx, const CommonPalette *pal, GPoint disc, int base)
+static void draw_glitter(GContext *ctx, const CommonPalette *pal, GPoint disc, int base, AnimPhase anim)
 {
     static const int8_t wobble[] = {0, 2, -1, 1, -2, 0, 1, -1, 2, -2, 1, 0};
+    int walk = anim_loop(anim, ARRAY_LENGTH(wobble), 2);
 
     int waterline = base + shore_offset(disc.x);
     int band = waterline - HORIZON_Y;
@@ -410,7 +416,7 @@ static void draw_glitter(GContext *ctx, const CommonPalette *pal, GPoint disc, i
     {
         int down = y - HORIZON_Y;
         int half = 1 + (down * 7) / band;
-        int shift = wobble[(unsigned)(down / 2) % ARRAY_LENGTH(wobble)];
+        int shift = wobble[(unsigned)(down / 2 + walk) % ARRAY_LENGTH(wobble)];
 
         graphics_draw_line(ctx, GPoint(disc.x - half + shift, y), GPoint(disc.x + half + shift, y));
     }
@@ -430,9 +436,10 @@ static void draw_glitter(GContext *ctx, const CommonPalette *pal, GPoint disc, i
  * @param base The waterline's baseline.
  * @param minute The clock minute, which slides the rows along.
  * @param choppy True to break the ranks up into rougher water.
+ * @param anim Where the burst has got to. Every row runs one gap along.
  */
 static void draw_waves(GContext *ctx, const ShorelineGround *ground, const int8_t *shore, int base, int minute,
-    bool choppy)
+    bool choppy, AnimPhase anim)
 {
     graphics_context_set_stroke_color(ctx, ground->foam);
     graphics_context_set_stroke_width(ctx, 1);
@@ -441,7 +448,7 @@ static void draw_waves(GContext *ctx, const ShorelineGround *ground, const int8_
     {
         int dash = 2 + row;        // crests widen as they come in
         int gap = 15 + row * 6;    // and thin out, so the far water reads as further off
-        int slide = (minute * (row + 2)) % gap;
+        int slide = (minute * (row + 2) + anim_loop(anim, gap, 1)) % gap;
 
         for (int x = slide - gap; x < SCREEN_W; x += gap)
         {
@@ -471,9 +478,10 @@ static void draw_waves(GContext *ctx, const ShorelineGround *ground, const int8_
  * @param base The tide base.
  * @param level How far in the tide has come, 0 to 100.
  * @param minute The current minute, which is what the bob rides on.
+ * @param anim Where the burst has got to. The boat rides the swell up and down twice.
  * @return The boat's anchor point.
  */
-static GPoint boat_anchor(int base, int level, int minute)
+static GPoint boat_anchor(int base, int level, int minute, AnimPhase anim)
 {
     // the drift spans the screen it is on, so a wider watch sails the whole width rather than
     // stopping where a 200px one used to
@@ -482,7 +490,7 @@ static GPoint boat_anchor(int base, int level, int minute)
 
     // sat in the near water rather than on the line where the far water gives way to it, so the
     // hull has one shade behind it instead of straddling two
-    return GPoint(x, HORIZON_Y + (band * 55) / 100 + ((minute % 3) - 1));
+    return GPoint(x, HORIZON_Y + (band * 55) / 100 + ((minute % 3) - 1) + anim_sway(anim, 1, 2, 0));
 }
 
 /**
@@ -502,11 +510,12 @@ static GPoint boat_anchor(int base, int level, int minute)
  * @param level How far in the tide is, 0 to 100.
  * @param rising True while the tide is flooding, which leans the rectangle's sail.
  * @param minute The clock minute, which bobs it a pixel.
+ * @param anim Where the burst has got to, which rocks it on the swell.
  */
 static void draw_boat(GContext *ctx, const CommonPalette *pal, const ShorelineGround *ground,
-    int base, int level, bool rising, int minute)
+    int base, int level, bool rising, int minute, AnimPhase anim)
 {
-    GPoint at = boat_anchor(base, level, minute);
+    GPoint at = boat_anchor(base, level, minute, anim);
     int x = at.x, y = at.y;
 
 #if defined(PBL_ROUND)
@@ -559,11 +568,13 @@ static void draw_boat(GContext *ctx, const CommonPalette *pal, const ShorelineGr
  * @param ground The scene's ground row.
  * @param shore The shore curve, one offset per column.
  * @param base The waterline's baseline.
+ * @param anim Where the burst has got to. The spray walks once along the edge as the surf breaks.
  */
-static void draw_surf(GContext *ctx, const ShorelineGround *ground, const int8_t *shore, int base)
+static void draw_surf(GContext *ctx, const ShorelineGround *ground, const int8_t *shore, int base, AnimPhase anim)
 {
     // mostly nothing, so the flecks land in clumps rather than at a steady interval
     static const int8_t spray[] = {0, 0, 3, 0, 0, 0, 5, 0, 2, 0, 0, 4, 0, 0, 0, 3, 0, 0, 6, 0, 0, 2, 0};
+    int walk = anim_loop(anim, ARRAY_LENGTH(spray), 1);
 
     graphics_context_set_stroke_color(ctx, ground->foam);
     graphics_context_set_stroke_width(ctx, 1);
@@ -573,7 +584,7 @@ static void draw_surf(GContext *ctx, const ShorelineGround *ground, const int8_t
         int waterline = waterline_at(shore, x, base);
         graphics_draw_line(ctx, GPoint(x, waterline - SURF_H + 1), GPoint(x, waterline));
 
-        int lift = spray[(unsigned)x % ARRAY_LENGTH(spray)];
+        int lift = spray[(unsigned)(x + walk) % ARRAY_LENGTH(spray)];
         if (lift)
         {
             graphics_draw_pixel(ctx, GPoint(x, waterline - SURF_H - lift));
@@ -596,11 +607,12 @@ static void draw_surf(GContext *ctx, const ShorelineGround *ground, const int8_t
  * @param level How far in the tide has come, 0 to 100.
  * @param rising True while the tide is flooding, which is the way the sail leans.
  * @param minute The current minute.
+ * @param anim Where the burst has got to, so the mast rides with the hull.
  */
 static void draw_pennant(GContext *ctx, const CommonPalette *pal, const ShorelineGround *ground,
-    int base, int level, bool rising, int minute)
+    int base, int level, bool rising, int minute, AnimPhase anim)
 {
-    GPoint at = boat_anchor(base, level, minute);
+    GPoint at = boat_anchor(base, level, minute, anim);
     int x = at.x, y = at.y;
 
     // there is room out here for a proper boat, so it gets one: a taller mast flying a pennant
@@ -680,7 +692,7 @@ void shoreline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     // the way the stars do at night
     if (!frame->night)
     {
-        draw_birds(ctx, pal, tide.minutes);
+        draw_birds(ctx, pal, tide.minutes, frame->anim);
     }
 
     draw_water(ctx, bounds, pal, ground, s_shore, tide.base);
@@ -688,14 +700,14 @@ void shoreline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     // the reflection only exists while there is something up there to cast it
     if (frame->sky.celestial != CEL_HIDDEN && frame->disc.y < HORIZON_Y)
     {
-        draw_glitter(ctx, pal, frame->disc, tide.base);
+        draw_glitter(ctx, pal, frame->disc, tide.base, frame->anim);
     }
 
-    draw_waves(ctx, ground, s_shore, tide.base, frame->minute, choppy(frame->cond));
+    draw_waves(ctx, ground, s_shore, tide.base, frame->minute, choppy(frame->cond), frame->anim);
 
-    draw_boat(ctx, pal, ground, tide.base, tide.level, tide.rising, frame->minute);
+    draw_boat(ctx, pal, ground, tide.base, tide.level, tide.rising, frame->minute, frame->anim);
 
-    draw_surf(ctx, ground, s_shore, tide.base);
+    draw_surf(ctx, ground, s_shore, tide.base, frame->anim);
 }
 
 #if defined(PBL_ROUND)
@@ -705,7 +717,8 @@ void shoreline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
 
     // the pennant goes in front of the weather. the reading is the one thing on the face that has
     // to stay readable in every condition, and painted with the hull it sits behind the rain
-    draw_pennant(ctx, frame->palette, frame->ground, tide.base, tide.level, tide.rising, frame->minute);
+    draw_pennant(ctx, frame->palette, frame->ground, tide.base, tide.level, tide.rising, frame->minute,
+        frame->anim);
 }
 #endif
 

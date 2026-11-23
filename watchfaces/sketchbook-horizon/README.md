@@ -43,6 +43,8 @@ Open Sketchbook Horizon's settings in the Pebble app.
 | Appearance | Use Quiet Time Palette and Quiet Time Palette | Paints the Quiet Time Palette during Quiet Time, even at night. Off by default. |
 | Appearance | Layout | Balanced, the default, puts the date under the clock and the stats along the bottom. Time Focused moves the date to the top bar for a bigger clock. Clock Only drops the stats too. Pebble Time 2 only. |
 | Appearance | Show Quiet Time Icon | A speaker next to bluetooth, muted during Quiet Time. Off by default. |
+| Appearance | Animation | Plays a short animation of the scene when you open the watchface, and on a Flick of the Wrist or when you Raise to Look. Holds still during Quiet Time and on a low battery. Off by default. |
+| Appearance | Raise Delay | How long the watch has to stay raised before the scene moves under Raise to Look: Short, Medium, or Long. Medium by default. |
 | Bluetooth | Show Connection Icon | The bluetooth glyph in the top bar, slashed when the phone drops. On by default. |
 | Bluetooth | Vibrate on Connect and Vibrate on Disconnect | A Short, Long, or Double buzz when the phone reconnects or drops. None by default. |
 | Clock | Date Format | Such as 2026.0618 or THU 18 JUN, the default. The .beat formats add .beats to the date. |

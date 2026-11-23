@@ -296,14 +296,80 @@ static void draw_bridge(GContext *ctx, const CommonPalette *pal, const SkylineGr
 }
 
 /**
+ * @brief Whether a lamp on the deck is burning on this frame.
+ *
+ * A lamp is on once the evening passes its place in the queue. In a burst two of the lit ones
+ * sputter, going out for a frame or two and catching again.
+ *
+ * @param i Which lamp, counted from the left.
+ * @param lit How lit the crossing is, 0 to 100.
+ * @param anim Where the burst has got to.
+ * @return True when it is burning.
+ */
+static bool lamp_on(int i, int lit, AnimPhase anim)
+{
+    if (sketchbook_sky_light_rank(i, 7) >= lit)
+    {
+        return false;
+    }
+
+    if (anim.tick && (i == 2 || i == 6))
+    {
+        int beat = (anim.tick + i) % 9;
+        return beat != 3 && beat != 4 && beat != 7;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Send the traffic over the deck during a burst, one car each way.
+ *
+ * Each starts off one side and is off the other by the end, so the still frame has an empty road.
+ * The near lane runs left to right and the far lane, a row higher, right to left, so the two never
+ * drive through each other. Once the lamps are coming on a car is a block in the lamps' colour, its
+ * lights seen side on, and by day a dark shape.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ * @param ground The scene's ground row.
+ * @param anim Where the burst has got to.
+ * @param lit How lit the crossing is, 0 to 100.
+ */
+static void draw_traffic(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground, AnimPhase anim,
+    int lit)
+{
+    // nothing crosses when still, and the fill is left as the lamps left it
+    if (anim.tick == 0)
+    {
+        return;
+    }
+
+    graphics_context_set_fill_color(ctx, lit > 0 ? ground->lamp : pal->ink);
+
+    int x;
+    if (anim_cross(anim, -6, SCREEN_W + 2, 1, anim.ticks - 1, &x))
+    {
+        graphics_fill_rect(ctx, GRect(x, DECK_Y - 2, 5, 2), 0, GCornerNone);
+    }
+
+    if (anim_cross(anim, SCREEN_W + 2, -6, 4, anim.ticks - 1, &x))
+    {
+        graphics_fill_rect(ctx, GRect(x, DECK_Y - 4, 5, 2), 0, GCornerNone);
+    }
+}
+
+/**
  * @brief Draw the lamps along the deck, lit or not.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param ground The scene's ground row.
  * @param lit How lit the crossing is, 0 to 100.
+ * @param anim Where the burst has got to, which makes a couple of the lamps sputter.
  */
-static void draw_lamps(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground, int lit)
+static void draw_lamps(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground, int lit,
+    AnimPhase anim)
 {
     // each lamp is a short post off the deck with the lamp on top of it. the post and an unlit
     // lamp's outline take the linework colour for the same reason the cables do: they have to hold
@@ -312,7 +378,7 @@ static void draw_lamps(GContext *ctx, const CommonPalette *pal, const SkylineGro
 
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
     {
-        bool on = sketchbook_sky_light_rank(i, 7) < lit;
+        bool on = lamp_on(i, lit, anim);
 
         graphics_draw_line(ctx, GPoint(x, DECK_Y - 1), GPoint(x, DECK_Y - 6));
 
@@ -330,8 +396,8 @@ static void draw_lamps(GContext *ctx, const CommonPalette *pal, const SkylineGro
 /**
  * @brief Lay the river down and put the crossing back on it upside down.
  *
- * The water is a mirror rather than a shore: no swell, no edge, nothing moving. What gives it
- * away is entirely what it is reflecting, which is why every mark here is broken rather than
+ * The water is a mirror rather than a shore, with no swell and no edge. What gives it away is
+ * entirely what it is reflecting, which is why every mark here is broken rather than
  * solid. The deck and the towers come back in the linework so the river reads as water in broad
  * daylight too, and the lamps add their streaks on top once they are on.
  *
@@ -341,15 +407,19 @@ static void draw_lamps(GContext *ctx, const CommonPalette *pal, const SkylineGro
  * @param ground The scene's ground row.
  * @param lit How lit the crossing is, 0 to 100.
  * @param minute The clock minute, which shifts the break pattern.
+ * @param anim Where the burst has got to. The reflections waver and the streaks shimmer.
  */
 static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
-    const SkylineGround *ground, int lit, int minute)
+    const SkylineGround *ground, int lit, int minute, AnimPhase anim)
 {
     static const int8_t wobble[] = {0, 1, -1, 0, 1, 0, -1, 1, 0, -1, 0, 1};
 
     // the river and its far bank, and the open water past the mirror ticking over now and then.
     // the ripples start well under the deck's reflection, so the two never share a row
-    ground_water(ctx, bounds, WATER_TOP, MIRROR_TOP + 8, SCENE_BOTTOM, ground->water, pal->ink, pal->dim);
+    ground_water(ctx, bounds, WATER_TOP, MIRROR_TOP + 8, SCENE_BOTTOM, ground->water, pal->ink, pal->dim, anim);
+
+    // in a burst the wobble walks along the reflections once, so they waver and settle back
+    int waver = anim_loop(anim, ARRAY_LENGTH(wobble), 1);
 
     // the deck coming back up at you, in the ripples' colour. the dashes and the gaps between them
     // both vary, because an even one would read as a ruled line rather than as something floating
@@ -360,7 +430,7 @@ static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
     for (int x = 0, i = 0; x < bounds.size.w; i++)
     {
         int len = dash[(unsigned)i % ARRAY_LENGTH(dash)];
-        int y = MIRROR_TOP + wobble[(unsigned)i % ARRAY_LENGTH(wobble)];
+        int y = MIRROR_TOP + wobble[(unsigned)(i + waver) % ARRAY_LENGTH(wobble)];
 
         graphics_draw_line(ctx, GPoint(x, y), GPoint(x + len - 1, y));
         x += len + 3 + i % 3;
@@ -383,7 +453,7 @@ static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
             // each tick is its own length and its own offset, so what comes back is a column
             // wavering on the water rather than a stack of even bars
             int half = TOWER_HALF - step / 3 - (step + t) % 2;
-            int shift = wobble[(unsigned)(y + t) % ARRAY_LENGTH(wobble)];
+            int shift = wobble[(unsigned)(y + t + waver) % ARRAY_LENGTH(wobble)];
             graphics_draw_line(ctx, GPoint(x - half + shift, y), GPoint(x + half + shift, y));
         }
     }
@@ -395,10 +465,13 @@ static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
 
     graphics_context_set_stroke_color(ctx, ground->lamp);
 
+    // in a burst the missing rows of each streak walk down it twice, so the streaks shimmer
+    int shimmer = anim_loop(anim, 5, 2);
+
     // walked the same way draw_lamps walks the deck, so each streak sits under its own lamp
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
     {
-        if (sketchbook_sky_light_rank(i, 7) >= lit)
+        if (!lamp_on(i, lit, anim))
         {
             continue;
         }
@@ -410,12 +483,12 @@ static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
         {
             // a broken streak: some rows of the reflection are simply missing, and which ones
             // shift with the minute so the water is never quite still between glances
-            if ((y + i * 3 + minute) % 5 == 0)
+            if ((y + i * 3 + minute + shimmer) % 5 == 0)
             {
                 continue;
             }
 
-            int shift = wobble[(unsigned)(y + i) % ARRAY_LENGTH(wobble)];
+            int shift = wobble[(unsigned)(y + i + waver) % ARRAY_LENGTH(wobble)];
             graphics_draw_pixel(ctx, GPoint(x + shift, y));
         }
     }
@@ -481,9 +554,10 @@ void skyline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     // the river goes down before the crossing, not after: the water starts at the far bank the
     // city stands on, so the bridge has to be painted on top of it to be over it
     draw_city(ctx, ground, lit);
-    draw_water(ctx, bounds, pal, ground, lit, frame->minute);
+    draw_water(ctx, bounds, pal, ground, lit, frame->minute, frame->anim);
     draw_bridge(ctx, pal, ground);
-    draw_lamps(ctx, pal, ground, lit);
+    draw_lamps(ctx, pal, ground, lit, frame->anim);
+    draw_traffic(ctx, pal, ground, frame->anim, lit);
 }
 
 #if defined(PBL_ROUND)

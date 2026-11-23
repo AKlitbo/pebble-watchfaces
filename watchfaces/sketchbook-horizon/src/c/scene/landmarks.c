@@ -23,11 +23,11 @@
 #define SIGN_FOOT 164      ///< Where the posts reach the ground
 #endif
 
-void landmarks_draw_water(GContext *ctx, GRect bounds, GColor water, GColor bank, GColor ripple)
+void landmarks_draw_water(GContext *ctx, GRect bounds, GColor water, GColor bank, GColor ripple, AnimPhase anim)
 {
     int top = LM_Y(LM_HORIZON);
 
-    ground_water(ctx, bounds, top, top + 5, LM_Y(LM_SCENE_BOTTOM), water, bank, ripple);
+    ground_water(ctx, bounds, top, top + 5, LM_Y(LM_SCENE_BOTTOM), water, bank, ripple, anim);
 }
 
 #if defined(PBL_ROUND)

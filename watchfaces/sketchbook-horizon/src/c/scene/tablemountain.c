@@ -90,6 +90,9 @@ static const Block s_city[] = {
 #define CAR_H 9            ///< How tall it is
 #endif
 
+/// How much further up the cable a burst carries the car, out of 100, before it rides back to its stop.
+#define CAR_RIDE 30
+
 /**
  * @brief Draw the city along the shore, with whatever of it is awake.
  *
@@ -129,14 +132,17 @@ static void draw_city(GContext *ctx, const CommonPalette *pal, const SkylineGrou
  * @param ground The scene's ground row.
  * @param width How wide the car is.
  * @param height How tall the car is.
+ * @param anim Where the burst has got to. The car rides a stretch up the cable and back down to its
+ * stop.
  * @return The car's body, so a round screen can letter the reading on it.
  */
 static GRect draw_car(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground,
-    int width, int height)
+    int width, int height, AnimPhase anim)
 {
     GPoint foot = CABLE_FOOT;
     GPoint top = CABLE_TOP;
-    GPoint hook = GPoint(foot.x + ((top.x - foot.x) * CAR_ALONG) / 100, foot.y + ((top.y - foot.y) * CAR_ALONG) / 100);
+    int along = CAR_ALONG + anim_swell(anim, CAR_RIDE);
+    GPoint hook = GPoint(foot.x + ((top.x - foot.x) * along) / 100, foot.y + ((top.y - foot.y) * along) / 100);
     GRect car = GRect(hook.x - width / 2, hook.y + CAR_DROP, width, height);
 
     // the grip clamped on the cable, and the arm hanging the car off it
@@ -174,8 +180,10 @@ static GRect draw_car(GContext *ctx, const CommonPalette *pal, const SkylineGrou
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param ground The scene's ground row.
+ * @param anim Where the burst has got to, which carries the car and its reading up the cable.
  */
-static void draw_car_with_reading(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground)
+static void draw_car_with_reading(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground,
+    AnimPhase anim)
 {
     char temp[16];
     int width;
@@ -184,7 +192,7 @@ static void draw_car_with_reading(GContext *ctx, const CommonPalette *pal, const
         return;
     }
 
-    GRect car = draw_car(ctx, pal, ground, width + CAR_PAD * 2, CAR_WINDOWS + CAR_TEXT_H);
+    GRect car = draw_car(ctx, pal, ground, width + CAR_PAD * 2, CAR_WINDOWS + CAR_TEXT_H, anim);
     // the band starts a pixel inside the windows, which sits the digits in the middle of the side
     letter_board(ctx, temp, GRect(car.origin.x, car.origin.y + CAR_WINDOWS - 1, car.size.w, CAR_TEXT_H), pal->ink);
 }
@@ -219,18 +227,18 @@ void table_mountain_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *f
     }
 
     draw_city(ctx, pal, ground, lit);
-    landmarks_draw_water(ctx, bounds, ground->water, pal->ink, pal->dim);
+    landmarks_draw_water(ctx, bounds, ground->water, pal->ink, pal->dim, frame->anim);
 
     // the rectangle's car is scenery, so it rides behind the weather with the rest of the scene
 #if !defined(PBL_ROUND)
-    draw_car(ctx, pal, ground, CAR_W, CAR_H);
+    draw_car(ctx, pal, ground, CAR_W, CAR_H, frame->anim);
 #endif
 }
 
 #if defined(PBL_ROUND)
 void table_mountain_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    draw_car_with_reading(ctx, frame->palette, frame->ground);
+    draw_car_with_reading(ctx, frame->palette, frame->ground, frame->anim);
 }
 #endif
 

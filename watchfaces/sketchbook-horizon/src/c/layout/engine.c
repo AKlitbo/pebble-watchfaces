@@ -8,9 +8,14 @@
  * weather code reads its geometry and its bolts back from here too.
  *
  * The sky and the weather are painted here for every scene, around the scene's own ground. The
- * night, the condition, its sky recipe, the disc and the minute are read once at the top of the
- * frame and handed to the scene. Anything else a scene draws from, such as the tide, the wind or
- * how lit the evening is, it reads for itself.
+ * night, the condition, its sky recipe, the disc, the minute and where a burst has got to are read
+ * once at the top of the frame and handed to the scene. Anything else a scene draws from, such as
+ * the tide, the wind or how lit the evening is, it reads for itself.
+ *
+ * A wet burst under the overcast band, on a scene with nothing of its own moving by day, moves only
+ * the rain, the snow and the lightning. Its first frame copies the sky, the clouds and the ground
+ * out of the framebuffer, and every later frame copies them back and paints only the weather and
+ * the front on top, which cuts those frames down to a fraction of a full paint.
  *
  * @ingroup watchface-sketchbook
  */
@@ -25,6 +30,7 @@
 #include "ui/icon_cache.h"
 #include "sky/sky.h"
 #include "fx/fx.h"
+#include "anim/anim.h"
 #include "widgets/widgets.h"
 #include "theme/palette.h"
 #include "theme/palette_active.h"
@@ -48,6 +54,25 @@ static bool s_night;
 // the theme index the palette was chosen for, so a Shuffle rollover or a day/night/Quiet swap that
 // lands on a different one is noticed and repainted
 static uint8_t s_theme;
+
+/**
+ * @brief The still part of a wet burst's frames, held in the heap while the burst runs.
+ *
+ * It keeps what it was painted under too, so a change that lands mid-burst, such as a Shuffle
+ * rolling over or the weather turning, paints afresh rather than putting back the old picture.
+ */
+typedef struct
+{
+    uint8_t *pixels;        ///< Every visible pixel, row after row, or NULL when nothing is held
+    const SceneDef *scene;  ///< The scene it was painted for
+    const void *ground;     ///< The ground row, which with the theme pins down the palette
+    uint8_t theme;          ///< The theme the palette was put together from
+    WxCond cond;            ///< The condition it was painted in
+    size_t size;            ///< How many bytes the visible pixels take, worked out on the first copy
+    bool no_room;           ///< The heap had no room for the copy, so this burst paints in full
+} StillCache;
+
+static StillCache s_still;
 
 /**
  * @brief Point the palette at the current theme and daylight, and colour the zones from it.
@@ -90,12 +115,147 @@ static void apply_theme_colors(void)
     zones[ZONE_DATE].color = sketchbook_layout() != LAYOUT_STANDARD ? cp->bar_ink : cp->dim;
 }
 
+void sketchbook_still_drop(void)
+{
+    if (s_still.pixels)
+    {
+        free(s_still.pixels);
+        s_still.pixels = NULL;
+    }
+}
+
+/**
+ * @brief Whether nothing behind the weather moves on this frame of a burst.
+ *
+ * The overcast band holds still and hides the disc. With no stars out and a ground marked still by
+ * day, the rain, the snow and the bolts in front are all that move.
+ *
+ * @param frame This frame's reading.
+ * @return True when the sky, the clouds and the ground paint the same as on the burst's other frames.
+ */
+static bool still_behind(const SceneFrame *frame)
+{
+    return frame->anim.tick != 0 && !frame->night && frame->sky.clouds == CLOUDS_OVERCAST && s_scene->still_by_day;
+}
+
+/**
+ * @brief Copy every visible pixel between the framebuffer and the held copy, one way or the other.
+ *
+ * A round screen's framebuffer only stores the pixels inside the circle, so it goes row by row and
+ * takes each row's own span. That keeps the copy at the visible pixels rather than the whole run
+ * from the first to the last.
+ *
+ * @param fb The captured framebuffer.
+ * @param keep True to copy out of the framebuffer, false to put the copy back.
+ */
+static void still_copy(GBitmap *fb, bool keep)
+{
+    GRect bounds = gbitmap_get_bounds(fb);
+    uint8_t *at = s_still.pixels;
+
+    for (int y = 0; y < bounds.size.h; y++)
+    {
+        GBitmapDataRowInfo row = gbitmap_get_data_row_info(fb, y);
+        int width = row.max_x - row.min_x + 1;
+
+        if (keep)
+        {
+            memcpy(at, row.data + row.min_x, width);
+        }
+        else
+        {
+            memcpy(row.data + row.min_x, at, width);
+        }
+
+        at += width;
+    }
+}
+
+/**
+ * @brief Copy the sky, the clouds and the ground just painted out of the framebuffer, for the
+ * burst's later frames.
+ *
+ * With too little heap for the copy it keeps nothing, and every frame to the end of the burst paints
+ * in full rather than asking again.
+ *
+ * @param ctx The graphics context.
+ * @param frame This frame's reading.
+ */
+static void still_keep(GContext *ctx, const SceneFrame *frame)
+{
+    GBitmap *fb = graphics_capture_frame_buffer(ctx);
+    if (!fb)
+    {
+        return;
+    }
+
+    // the framebuffer never changes shape, so its size is only counted once
+    if (!s_still.size)
+    {
+        GRect bounds = gbitmap_get_bounds(fb);
+        for (int y = 0; y < bounds.size.h; y++)
+        {
+            GBitmapDataRowInfo row = gbitmap_get_data_row_info(fb, y);
+            s_still.size += row.max_x - row.min_x + 1;
+        }
+    }
+
+    s_still.pixels = malloc(s_still.size);
+    s_still.no_room = !s_still.pixels;
+    if (s_still.pixels)
+    {
+        still_copy(fb, true);
+        s_still.scene = s_scene;
+        s_still.ground = s_ground;
+        s_still.theme = s_theme;
+        s_still.cond = frame->cond;
+    }
+
+    graphics_release_frame_buffer(ctx, fb);
+}
+
+/**
+ * @brief Put the held sky, clouds and ground back into the framebuffer, if they were painted under
+ * what this frame is.
+ *
+ * @param ctx The graphics context.
+ * @param frame This frame's reading.
+ * @return True when they went back, false when this frame has to paint them itself.
+ */
+static bool still_restore(GContext *ctx, const SceneFrame *frame)
+{
+    if (!s_still.pixels)
+    {
+        return false;
+    }
+
+    if (s_still.scene != s_scene || s_still.ground != s_ground || s_still.theme != s_theme ||
+        s_still.cond != frame->cond)
+    {
+        sketchbook_still_drop();
+        return false;
+    }
+
+    GBitmap *fb = graphics_capture_frame_buffer(ctx);
+    if (!fb)
+    {
+        return false;
+    }
+
+    still_copy(fb, false);
+    graphics_release_frame_buffer(ctx, fb);
+    return true;
+}
+
 /**
  * @brief Scene draw-slot: the whole painted background, from the sky to the scene's front.
  *
  * The sky, the clouds, the scene's ground, the weather and the scene's front, in that order. Night
  * is read fresh here rather than taken from the theme, so the sky always agrees with the clock it
  * is drawn at.
+ *
+ * A lightning strike paints its frame with the sky and the clouds a step lighter, from a copy of
+ * the palette, so the next frame and the chrome still paint with the real one.
  *
  * @param ctx The graphics context.
  * @param bounds The slot bounds (the full window).
@@ -112,17 +272,52 @@ static void draw_scene(GContext *ctx, GRect bounds, const void *data)
         .sky = sketchbook_sky_recipe(cond),
         .disc = sketchbook_sky_arc_point(sketchbook_sky_arc_progress()),
         .minute = time_store_tm()->tm_min,
+        .anim = anim_phase(),
     };
+
+    CommonPalette flash;
+    frame.lit = frame.sky.bolt && sketchbook_fx_flash(frame.anim);
+    if (frame.lit)
+    {
+        flash = s_pal;
+        sketchbook_fx_flash_palette(&flash);
+        frame.palette = &flash;
+    }
+
+    // a strike's frame is a step lighter all over, so it paints in full and keeps nothing
+    bool still = still_behind(&frame) && !frame.lit;
+
+    // the still frame between bursts lets go of what the last burst held, and the next burst asks
+    // the heap afresh
+    if (frame.anim.tick == 0)
+    {
+        sketchbook_still_drop();
+        s_still.no_room = false;
+    }
 
     graphics_context_set_antialiased(ctx, true);
 
-    sketchbook_sky_draw(ctx, bounds, &frame);
+    if (!still || !still_restore(ctx, &frame))
+    {
+        sketchbook_sky_draw(ctx, bounds, &frame);
 
-    // clouds sit in front of the disc but behind the scene's ground, so a low sun still goes down
-    // behind the mountains, the sea, the city or the landmark
-    sketchbook_fx_draw_clouds(ctx, &frame);
+        // clouds sit in front of the disc but behind the scene's ground, so a low sun still goes
+        // down behind the mountains, the sea, the city or the landmark
+        sketchbook_fx_draw_clouds(ctx, &frame);
 
-    s_scene->ground(ctx, bounds, &frame);
+        // the birds fly in front of the clouds and behind the ground, unless the scene has its own
+        if (!s_scene->own_birds)
+        {
+            sketchbook_fx_draw_birds(ctx, &frame);
+        }
+
+        s_scene->ground(ctx, bounds, &frame);
+
+        if (still && !s_still.pixels && !s_still.no_room)
+        {
+            still_keep(ctx, &frame);
+        }
+    }
 
     sketchbook_fx_draw_weather(ctx, &frame);
 
@@ -277,11 +472,17 @@ uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds)
     layout_zones_apply(s_scene->clock_only_y);
 
     // the scene is the background, so it goes down first and the chrome sits on it
-    *next_slot(out, max, &i) = (EngineSlot){.frame = bounds, .draw = draw_scene};
-    *next_slot(out, max, &i) = (EngineSlot){.frame = bounds, .draw = draw_chrome};
+    // the scene carries its own tag, so a burst's frame repaints it alone and leaves the readouts as
+    // they are. the SDK still redraws every layer on the window, so the chrome reads the battery and
+    // Bluetooth again, but the text slots draw the text they hold rather than reading their stores
+    // and fitting it again
+    *next_slot(out, max, &i) = (EngineSlot){.frame = bounds, .draw = draw_scene, .tags = SKETCHBOOK_TAG_SCENE};
+    *next_slot(out, max, &i) = (EngineSlot){.frame = bounds, .draw = draw_chrome, .tags = SKETCHBOOK_TAG_REST};
 
-    *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_TIME], .text = readout_time};
-    *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_DATE], .text = readout_date};
+    *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_TIME], .text = readout_time,
+                                            .tags = SKETCHBOOK_TAG_REST};
+    *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_DATE], .text = readout_date,
+                                            .tags = SKETCHBOOK_TAG_REST};
 
     // dropped rather than blanked in big-clock mode, so they cost nothing: no layer, no store
     // pull, no fit
@@ -291,13 +492,16 @@ uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds)
 #if !defined(PBL_ROUND)
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)
     {
-        *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_WEATHER], .text = readout_weather_temp};
+        *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_WEATHER], .text = readout_weather_temp,
+                                                .tags = SKETCHBOOK_TAG_REST};
 
         if (layout_zones_has_hr())
         {
-            *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_HR], .text = readout_hr};
+            *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_HR], .text = readout_hr,
+                                                    .tags = SKETCHBOOK_TAG_REST};
         }
-        *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_STEPS], .text = readout_steps};
+        *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_STEPS], .text = readout_steps,
+                                                .tags = SKETCHBOOK_TAG_REST};
     }
 #endif
 
@@ -340,8 +544,27 @@ bool sketchbook_scene_reselect(void)
     return true;
 }
 
+uint8_t sketchbook_burst_ticks(void)
+{
+    WxCond cond = sketchbook_cond_parse(weather_store_cond());
+    SketchbookSky sky = sketchbook_sky_recipe(cond);
+
+    // a dry overcast day on a scene with nothing of its own moving has no disc, no stars, nothing
+    // falling and a band that holds still, so a burst there would repaint the same frame over and
+    // over. it gets no burst at all
+    if (sky.clouds == CLOUDS_OVERCAST && sky.precip == PRECIP_NONE && !sky.bolt && !sky.wash &&
+        s_scene->still_by_day && !sketchbook_sky_night())
+    {
+        return 0;
+    }
+
+    // a storm runs longer, so the lightning has room to strike three times
+    return sky.bolt ? ANIM_STORM_TICKS : ANIM_TICKS;
+}
+
 void sketchbook_teardown(void)
 {
+    sketchbook_still_drop();
     icons_cleanup();
     fonts_unload_all();
 }

@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added a Niagara Falls scene, with the falls pouring into the mist. On the Pebble Round 2 the temperature floats on a barrel below the falls.
 - Added a Table Mountain scene, with the city along the bay and cloud pouring over the top on a cloudy day. On the Pebble Round 2 the temperature rides in the cable car.
 - Added a Monument Valley scene, with the Mittens and Merrick Butte over the desert and the highway running in. On the Pebble Round 2 the temperature sits on a roadside sign.
+- Added an Animation setting that plays a short burst of the scene when you open the watchface, and when you flick your wrist or raise it to look, whichever you pick. It is off by default and stays still during Quiet Time or on a low battery.
 
 ### Changed
 

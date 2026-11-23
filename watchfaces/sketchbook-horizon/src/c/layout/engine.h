@@ -35,6 +35,12 @@ enum
     ZONE_COUNT
 };
 
+/// The scene's slot tag, so a burst's frame can repaint the scene alone
+#define SKETCHBOOK_TAG_SCENE (1u << 0)
+
+/// Every other slot's tag. A store change still repaints these, since it repaints every tag
+#define SKETCHBOOK_TAG_REST (1u << 1)
+
 /**
  * @brief Load the fonts, put up the scene the settings name, and theme it. Call once at startup,
  * after the window exists and before engine_init.
@@ -75,6 +81,21 @@ bool sketchbook_palette_changed(void);
  * @return True when the scene changed, so the caller rebuilds the slots.
  */
 bool sketchbook_scene_reselect(void);
+
+/**
+ * @brief How many frames a burst runs for the weather on screen. A storm runs longer, and a dry
+ * overcast day on a scene marked still by day gets none, since nothing there would move.
+ *
+ * @return The burst's length in frames, or 0 for no burst.
+ */
+uint8_t sketchbook_burst_ticks(void);
+
+/**
+ * @brief Let go of the copy of a wet burst's still part, if one is held. Call before a rebuild, so
+ * the heap is not holding it while the slots are made again. A burst that carries on paints in full
+ * until it makes a fresh copy.
+ */
+void sketchbook_still_drop(void);
 
 /**
  * @brief Free the fonts and the icons. Call once at exit.

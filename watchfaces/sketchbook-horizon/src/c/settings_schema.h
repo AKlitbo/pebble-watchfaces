@@ -5,6 +5,7 @@
  * @ingroup watchface-sketchbook
  */
 #pragma once
+#include "anim/anim.h"
 #include "system/settings/settings.h"
 #include "theme/palette_active.h"
 
@@ -71,6 +72,20 @@ uint8_t sketchbook_layout(void);
  * @return True to draw it.
  */
 bool sketchbook_show_meridiem(void);
+
+/**
+ * @brief What plays a short burst of the scene, besides the face opening.
+ *
+ * @return ANIM_OFF, ANIM_ON_FLICK, or ANIM_ON_RAISE.
+ */
+AnimTrigger sketchbook_animation(void);
+
+/**
+ * @brief How long a raise has to settle before the burst starts.
+ *
+ * @return 0 for short, 1 for medium, 2 for long.
+ */
+uint8_t sketchbook_raise_delay(void);
 
 /**
  * @brief Fills a pick from the palette settings, ready for sketchbook_active_theme.

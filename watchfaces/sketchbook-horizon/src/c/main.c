@@ -18,6 +18,7 @@
 #include "io/stores/weather_store.h"
 #include "dev/dev_hooks.h"
 #include "layout/engine.h"
+#include "anim/anim.h"
 #include "persist_keys.h"
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
@@ -52,12 +53,21 @@ static void repaint(bool rebuild)
 
     if (rebuild)
     {
+        // a rebuild makes every slot again, so a burst's copy of its still part goes first rather
+        // than sitting in the heap through it
+        sketchbook_still_drop();
         engine_rebuild();
     }
     else
     {
         engine_mark_dirty();
     }
+}
+
+/** @brief A burst's frame: repaint the scene and leave the readouts alone. */
+static void repaint_scene(void)
+{
+    engine_mark_dirty_tags(SKETCHBOOK_TAG_SCENE);
 }
 
 /** @brief Store callback for the weather and system stores: any change repaints everything. */
@@ -155,6 +165,7 @@ static void apply_settings_change(void)
 static void on_settings_changed(bool time_or_date_changed)
 {
     apply_settings_change();
+    anim_enable(sketchbook_animation(), sketchbook_raise_delay());
     repaint(true);
 
     time_store_reconfigure(time_cfg());  // on every change, since the formats and the buzz both pick it
@@ -225,16 +236,57 @@ static void init(void)
     // dev mode only: paint the fixture, or with a walk picked in paf.dev.config.json show its first
     // screen and step on each tap
     dev_start(apply_settings_change);
+
+    // anim_enable watches for nothing in a dev build, so the dev walk keeps the tap to itself
+    anim_init(repaint_scene, sketchbook_burst_ticks);
+    anim_enable(sketchbook_animation(), sketchbook_raise_delay());
 }
 
 static void deinit(void)
 {
+    anim_deinit();
     dev_stop();
     system_store_deinit();
     engine_deinit();
     sketchbook_teardown();
     window_destroy(s_window);
 }
+
+#if DEV_MODE
+/**
+ * @brief Dev walk hook: pin the burst to one frame, so a walk can shoot a burst a frame at a time.
+ *
+ * The step's layout reads `step/tick/ticks/extras`, such as `40/12/24/1`. The step's place is only
+ * logged, so whatever shoots the walk can tell a tap landed even when two frames look the same. An
+ * extras of 1 brings the birds and the shooting star. A missing part reads as 0, and a ticks of 0
+ * takes the ordinary burst length. Each part stops growing past 999 and is held to 255 before it is
+ * handed on, so a long or mistyped layout cannot wrap.
+ *
+ * @param layout The step's layout string.
+ */
+void dev_show_layout(const char *layout)
+{
+    int part[4] = {0, 0, 0, 0};
+    unsigned k = 0;
+
+    for (const char *p = layout; *p && k < ARRAY_LENGTH(part); p++)
+    {
+        if (*p == '/')
+        {
+            k++;
+        }
+        else if (*p >= '0' && *p <= '9')
+        {
+            part[k] = part[k] < 1000 ? part[k] * 10 + (*p - '0') : part[k];
+        }
+    }
+
+    uint8_t tick = (uint8_t)(part[1] < UINT8_MAX ? part[1] : UINT8_MAX);
+    uint8_t ticks = (uint8_t)(part[2] < UINT8_MAX ? part[2] : UINT8_MAX);
+    anim_pin(tick, ticks, part[3] != 0);
+    APP_LOG(APP_LOG_LEVEL_INFO, "anim step %d", part[0]);
+}
+#endif
 
 int main(void)
 {

@@ -117,6 +117,14 @@ void half_dome_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
         graphics_context_set_fill_color(ctx, pal->disc);
         for (unsigned i = 0; i < ARRAY_LENGTH(s_headlamps); i++)
         {
+            // in a burst each climber looks away now and then, so the lamp goes out for a frame or
+            // two and comes back on where it was
+            int beat = frame->anim.tick ? (frame->anim.tick + (int)i * 5) % 8 : 0;
+            if (beat == 3 || beat == 4)
+            {
+                continue;
+            }
+
             graphics_fill_circle(ctx, s_headlamps[i], 1);
         }
     }

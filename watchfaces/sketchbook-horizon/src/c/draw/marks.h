@@ -1,7 +1,7 @@
 /**
  * @file marks.h
- * @brief Small pen marks more than one scene draws: grass tufts, and a tree drawn as a trunk with
- * its branches hanging off the top.
+ * @brief Small pen marks more than one scene draws: grass tufts, a tree drawn as a trunk with its
+ * branches hanging off the top, and a far-off bird.
  *
  * @ingroup watchface-sketchbook
  */
@@ -42,5 +42,17 @@ void marks_tufts(GContext *ctx, const GPoint *pts, int count, GColor color);
  */
 void marks_tree(GContext *ctx, GPoint foot, GPoint top, const int8_t (*branches)[4], int count,
     GColor color);
+
+/**
+ * @brief Draw a bird as two shallow chevrons meeting at the body, which is all a bird is this far
+ * off. It draws in the stroke colour and width already set.
+ *
+ * @param ctx The graphics context.
+ * @param at Where the body is.
+ * @param span Half the wingspan.
+ * @param lift How far the elbows of the wings rise, or drop when negative. Keep it small, since a
+ * wing that rises as far as it reaches comes out as a mountain.
+ */
+void marks_bird(GContext *ctx, GPoint at, int span, int lift);
 
 /** @} */

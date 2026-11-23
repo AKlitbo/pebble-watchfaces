@@ -68,8 +68,9 @@ extern const BoltSpots monument_valley_bolts;
  * @param water The water's colour.
  * @param bank The colour of the far bank's edge.
  * @param ripple The colour of the broken marks on the water.
+ * @param anim Where the burst has got to, which slides the ripples.
  */
-void landmarks_draw_water(GContext *ctx, GRect bounds, GColor water, GColor bank, GColor ripple);
+void landmarks_draw_water(GContext *ctx, GRect bounds, GColor water, GColor bank, GColor ripple, AnimPhase anim);
 
 #if defined(PBL_ROUND)
 /**

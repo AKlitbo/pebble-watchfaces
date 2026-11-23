@@ -141,8 +141,11 @@ static void draw_pine(GContext *ctx, const CommonPalette *pal, const RidgelineGr
  * @param bounds The window's root bounds.
  * @param pal The palette in use.
  * @param ground The scene's ground row.
+ * @param anim Where the burst has got to. The marks slide one gap along, the rows taking turns
+ * which way.
  */
-static void draw_lake(GContext *ctx, GRect bounds, const CommonPalette *pal, const RidgelineGround *ground)
+static void draw_lake(GContext *ctx, GRect bounds, const CommonPalette *pal, const RidgelineGround *ground,
+    AnimPhase anim)
 {
     int top = LM_Y(LM_HORIZON);
 
@@ -161,7 +164,10 @@ static void draw_lake(GContext *ctx, GRect bounds, const CommonPalette *pal, con
     graphics_context_set_stroke_color(ctx, pal->ink);
     for (int y = top + 3; y < LAKE_BOTTOM - 1; y += 5)
     {
-        for (int x = (y * 11) % 17; x < bounds.size.w; x += 23 + y % 9)
+        int gap = 23 + y % 9;
+        int way = ((y - top) / 5) % 2 ? 1 : -1;
+
+        for (int x = anim_slide(anim, (y * 11) % 17, gap, way); x < bounds.size.w; x += gap)
         {
             graphics_draw_line(ctx, GPoint(x, y), GPoint(x + 3 + y % 4, y));
         }
@@ -182,8 +188,9 @@ static void draw_lake(GContext *ctx, GRect bounds, const CommonPalette *pal, con
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param ground The scene's ground row.
+ * @param anim Where the burst has got to. The whole boat rides the swell, up and down twice.
  */
-static void draw_boat(GContext *ctx, const CommonPalette *pal, const RidgelineGround *ground)
+static void draw_boat(GContext *ctx, const CommonPalette *pal, const RidgelineGround *ground, AnimPhase anim)
 {
     char temp[16];
     int width;
@@ -192,31 +199,34 @@ static void draw_boat(GContext *ctx, const CommonPalette *pal, const RidgelineGr
         return;  // no reading, no boat, rather than a sail lettered "--"
     }
 
-    GRect sail = GRect(BOAT_X - (width + SAIL_PAD * 2) / 2, SAIL_TOP, width + SAIL_PAD * 2, SAIL_H);
+    int bob = anim_sway(anim, 1, 2, 0);
+    GRect sail = GRect(BOAT_X - (width + SAIL_PAD * 2) / 2, SAIL_TOP + bob, width + SAIL_PAD * 2, SAIL_H);
     int hull_half = sail.size.w / 2 + 6;
+    int hull_top = HULL_TOP + bob;
 
     // the hull first, a little wider than the sail and narrowing to the keel
     GPoint hull[] = {
-        {BOAT_X - hull_half, HULL_TOP}, {BOAT_X + hull_half, HULL_TOP},
-        {BOAT_X + hull_half - 5, HULL_TOP + HULL_H}, {BOAT_X - hull_half + 5, HULL_TOP + HULL_H},
+        {BOAT_X - hull_half, hull_top}, {BOAT_X + hull_half, hull_top},
+        {BOAT_X + hull_half - 5, hull_top + HULL_H}, {BOAT_X - hull_half + 5, hull_top + HULL_H},
     };
     shape_fill_outlined(ctx, hull, ARRAY_LENGTH(hull), ground->land_far, pal->ink);
 
     // the mast, then the sail over it, then the yard the sail hangs from
-    graphics_draw_line(ctx, GPoint(BOAT_X, SAIL_TOP - 4), GPoint(BOAT_X, HULL_TOP));
+    graphics_draw_line(ctx, GPoint(BOAT_X, sail.origin.y - 4), GPoint(BOAT_X, hull_top));
 
     graphics_context_set_fill_color(ctx, pal->sky_hi);
     graphics_fill_rect(ctx, sail, 0, GCornerNone);
     graphics_draw_rect(ctx, sail);
 
     graphics_context_set_stroke_width(ctx, 2);
-    graphics_draw_line(ctx, GPoint(sail.origin.x - 2, SAIL_TOP), GPoint(sail.origin.x + sail.size.w + 1, SAIL_TOP));
+    graphics_draw_line(ctx, GPoint(sail.origin.x - 2, sail.origin.y),
+        GPoint(sail.origin.x + sail.size.w + 1, sail.origin.y));
     graphics_context_set_stroke_width(ctx, 1);
 
     letter_board(ctx, temp, sail, pal->ink);
 
     // a wake off either end of the hull, so it sits in the lake rather than on top of it
-    int water = HULL_TOP + HULL_H - 1;
+    int water = hull_top + HULL_H - 1;
     graphics_draw_line(ctx, GPoint(BOAT_X - hull_half - 8, water), GPoint(BOAT_X - hull_half - 2, water));
     graphics_draw_line(ctx, GPoint(BOAT_X + hull_half + 2, water), GPoint(BOAT_X + hull_half + 8, water));
 }
@@ -242,7 +252,7 @@ void fuji_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     line_polyline(ctx, &s_cone[CONE_RIM_FIRST], CONE_RIM_LAST - CONE_RIM_FIRST + 1);
     graphics_context_set_stroke_width(ctx, 1);
 
-    draw_lake(ctx, bounds, pal, ground);
+    draw_lake(ctx, bounds, pal, ground, frame->anim);
 
     for (unsigned i = 0; i < ARRAY_LENGTH(s_pines); i++)
     {
@@ -258,7 +268,7 @@ void fuji_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 #if defined(PBL_ROUND)
 void fuji_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    draw_boat(ctx, frame->palette, frame->ground);
+    draw_boat(ctx, frame->palette, frame->ground, frame->anim);
 }
 #endif
 

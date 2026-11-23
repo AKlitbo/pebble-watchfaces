@@ -55,6 +55,11 @@ typedef enum
  * such as the holder a round screen letters the temperature on, so the reading stays clear in
  * every condition.
  *
+ * A scene whose ground has nothing of its own that moves by day says so with `still_by_day`. Under
+ * an overcast band by day nothing behind the weather moves then, so a burst paints the sky, the
+ * clouds and the ground once and puts them back on every later frame rather than painting them
+ * again. A motion added to such a ground has to clear the flag, or it freezes in the rain.
+ *
  * The ground row is passed as `const void *` because each scene has its own ground type with its
  * own fields. Every one leads with its GroundReadouts, which is all the engine reads from it, and
  * the scene's own draws cast back to the full row.
@@ -67,6 +72,8 @@ typedef struct SceneDef
     SceneDraw front;       ///< Paint what stands in front of the weather, or NULL for nothing
     int16_t clock_only_y;  ///< Top of the Clock Only clock's box on the rectangle
     const BoltSpots *bolts;  ///< Where its storm's bolts strike
+    bool still_by_day;     ///< Nothing in its ground moves in a burst by day, so a wet burst can keep it
+    bool own_birds;        ///< It flies birds of its own, so a burst's pair stays away
 } SceneDef;
 
 /**

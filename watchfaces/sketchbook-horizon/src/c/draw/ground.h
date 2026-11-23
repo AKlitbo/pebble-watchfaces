@@ -8,6 +8,8 @@
 #pragma once
 #include <pebble.h>
 
+#include "anim/motion.h"
+
 /**
  * @addtogroup watchface-sketchbook
  * @{
@@ -33,6 +35,9 @@ void ground_fill(GContext *ctx, GRect bounds, int top, GColor fill, GColor edge)
  * 5px every 31 to 37 columns. That is enough to read as water and sparse enough to keep the clock
  * that sits on it clear.
  *
+ * In a burst each row of ripples slides one gap along, the rows taking turns which way, so the
+ * water moves and lands back where it started.
+ *
  * It leaves the stroke colour on the ripple colour and the width at 1.
  *
  * @param ctx The graphics context.
@@ -43,8 +48,9 @@ void ground_fill(GContext *ctx, GRect bounds, int top, GColor fill, GColor edge)
  * @param water The water's colour.
  * @param bank The colour of the far bank's edge.
  * @param ripple The colour of the broken marks on the water.
+ * @param anim Where the burst has got to.
  */
 void ground_water(GContext *ctx, GRect bounds, int top, int ripple_top, int bottom,
-    GColor water, GColor bank, GColor ripple);
+    GColor water, GColor bank, GColor ripple, AnimPhase anim);
 
 /** @} */

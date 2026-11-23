@@ -49,4 +49,30 @@ void sketchbook_fx_draw_clouds(GContext *ctx, const SceneFrame *frame);
  */
 void sketchbook_fx_draw_weather(GContext *ctx, const SceneFrame *frame);
 
+/**
+ * @brief Send a pair of birds across the sky, right to left under the arc, on a burst that brings
+ * them. By day, with the sun out and nothing falling, only. They are off the screen at both ends of
+ * the burst, so the still frame has an empty sky.
+ *
+ * @param ctx The graphics context.
+ * @param frame This frame's reading.
+ */
+void sketchbook_fx_draw_birds(GContext *ctx, const SceneFrame *frame);
+
+/**
+ * @brief Whether a storm's lightning lights the sky on this frame of a burst.
+ *
+ * @param anim The phase.
+ * @return True on a strike's frame. Never true when still.
+ */
+bool sketchbook_fx_flash(AnimPhase anim);
+
+/**
+ * @brief Light a copy of the palette for a strike's frame. The sky and cloud colours go one step
+ * lighter, and so does every part of the scene painted in them, so the whole scene flashes.
+ *
+ * @param pal The copy to light, changed in place.
+ */
+void sketchbook_fx_flash_palette(CommonPalette *pal);
+
 /** @} */

@@ -27,8 +27,10 @@
 // flat, and a gale and a storm look the same from a chimney
 #define WIND_FULL_KMH 40
 
-#define SMOKE_EDGE 1   ///< how far the smoke's thin outline reaches past the smoke colour
-#define SMOKE_PUFFS 8  ///< the most puffs in the plume, in a dead calm
+#define SMOKE_EDGE 1     ///< how far the smoke's thin outline reaches past the smoke colour
+#define SMOKE_PUFFS 8    ///< the most puffs in the plume, in a dead calm
+#define SMOKE_FIRST 4    ///< how far above the stack the lowest puff sits
+#define SMOKE_SPACING 5  ///< how far apart the puffs sit up the plume
 
 // where the treelines stand and where the clearing floor starts. only what this scene draws for
 // itself lives here. where the sky, the weather and the arc sit is in the geometry below
@@ -350,12 +352,14 @@ static void draw_cabin(GContext *ctx, const CommonPalette *pal, const TreelineGr
 /**
  * @brief How big a puff of smoke is. They swell as the column rises and loses its heat.
  *
- * @param puff Which puff, counting up from the chimney.
+ * @param rise How far above the stack the puff has climbed.
  * @return Its radius in pixels.
  */
-static int smoke_radius(int puff)
+static int smoke_radius(int rise)
 {
-    return 3 + (puff * 2) / 3;
+    // two pixels for every three spacings it climbs, so a puff that climbs one spacing grows into
+    // the size of the one above it
+    return 3 + ((rise - SMOKE_FIRST) * 2) / (SMOKE_SPACING * 3);
 }
 
 /**
@@ -375,9 +379,13 @@ static int smoke_radius(int puff)
  * @param ground The scene's ground row.
  * @param lean Which way and how hard the wind pushes, -100 to 100.
  * @param strength How much of the full bend the wind speed is worth, 0 to 100.
+ * @param anim Where the burst has got to. Every puff climbs one spacing up the plume twice over,
+ * swelling as it goes, so each lands where the one above it started and the column flows up out
+ * of the stack. The top puff shrinks away as it climbs and a new one grows out of the stack, so
+ * none pops in or out.
  */
 static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGround *ground,
-    int lean, int strength)
+    int lean, int strength, AnimPhase anim)
 {
     // a wind blowing straight at you or straight away has no sideways part, so lean alone would
     // draw a gale out of the south exactly like a dead calm. strength gets its own say: it tears
@@ -385,25 +393,67 @@ static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGr
     // from any quarter
     int puffs = clamp_int(SMOKE_PUFFS - (strength * 3) / 100, 0, SMOKE_PUFFS);
 
-    GPoint centres[SMOKE_PUFFS];
+    // room for one more, for the puff a burst grows out of the stack under the rest
+    GPoint centres[SMOKE_PUFFS + 1];
+    int radii[SMOKE_PUFFS + 1];
     int count = 0;
+
+    // in a burst every puff climbs. climb is how far past its own spot a puff has got, and lap how
+    // many whole spacings it has passed, so a puff keeps track of which one it is as it climbs
+    int climbed = anim_loop(anim, SMOKE_SPACING, 2);
+    int climb = climbed % SMOKE_SPACING;
+    int lap = climbed / SMOKE_SPACING;
+
+    // the plume stops short of the first puff that would reach into the status bar at its own spot,
+    // which would clip it flat
+    int top = 0;
+    while (top < puffs)
+    {
+        int rest = SMOKE_FIRST + top * SMOKE_SPACING;
+        if (STACK_TOP - rest - smoke_radius(rest) - SMOKE_EDGE < 20)
+        {
+            break;
+        }
+        top++;
+    }
 
     // spaced closer than their own width so they run together into one plume rather than
     // beading up the sky, and swelling as the column loses its heat
-    for (int puff = 0; puff < puffs; puff++)
+    for (int puff = climb ? -1 : 0; puff < top; puff++)
     {
-        int rise = 4 + puff * 5;
+        int rise = SMOKE_FIRST + puff * SMOKE_SPACING + climb;
         int drift = (lean * strength * rise * rise) / 260000;
-        int shake = ((puff % 2) ? strength : -strength) * puff / 220;
-        int radius = smoke_radius(puff);
         int y = STACK_TOP - rise;
 
-        if (y - radius - SMOKE_EDGE < 20)
+        // each puff shakes to its own side, so its side follows the puff as it climbs rather than
+        // its place in the plume
+        int side = ((puff - lap) & 1) ? strength : -strength;
+        int shake = (side * (rise - SMOKE_FIRST)) / (SMOKE_SPACING * 220);
+
+        // the top puff shrinks away as it climbs to where the next would be, and the one under the
+        // rest grows out of the stack, and neither ever reaches into the status bar
+        int radius = smoke_radius(rise);
+        if (puff == top - 1)
         {
-            break;  // gone into the status bar, which would clip it flat
+            radius = (radius * (SMOKE_SPACING - climb)) / SMOKE_SPACING;
+        }
+        if (puff < 0)
+        {
+            radius = (radius * climb) / SMOKE_SPACING;
+        }
+        int room = y - SMOKE_EDGE - 20;
+        if (radius > room)
+        {
+            radius = room;
+        }
+
+        if (radius < 1)
+        {
+            continue;
         }
 
         centres[count] = GPoint(STACK_X + drift + shake, y);
+        radii[count] = radius;
         count++;
     }
 
@@ -414,7 +464,7 @@ static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGr
 
     for (int i = 0; i < count; i++)
     {
-        graphics_fill_circle(ctx, centres[i], smoke_radius(i) + SMOKE_EDGE);
+        graphics_fill_circle(ctx, centres[i], radii[i] + SMOKE_EDGE);
     }
 
     // the chimney itself, standing proud of the roof
@@ -428,7 +478,7 @@ static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGr
 
     for (int i = 0; i < count; i++)
     {
-        graphics_fill_circle(ctx, centres[i], smoke_radius(i));
+        graphics_fill_circle(ctx, centres[i], radii[i]);
     }
 }
 
@@ -539,7 +589,7 @@ void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     int strength = pct_of(weather_store_wind_kmh(), WIND_FULL_KMH);
 
     // the smoke rises through the sky, so it goes down before the trees it drifts behind
-    draw_smoke(ctx, pal, ground, lean, strength);
+    draw_smoke(ctx, pal, ground, lean, strength, frame->anim);
 
     // snow lies where snow falls, so it rides the firs and the roof only when it is snowing
     bool snow = sketchbook_cond_snows(frame->cond);
