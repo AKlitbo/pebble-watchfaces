@@ -3,14 +3,16 @@
  * @brief The shared layout: palette, chrome, slot list and ticker response, the same for every
  * scene.
  *
- * One scene is up at a time, so the palette it was last themed with and the layout it belongs to
- * are held here between the public calls and the draw-slots the engine fires.
+ * One scene is up at a time. It is held here, with the palette it was last themed with, between
+ * the public calls and the draw-slots the engine fires. The shared sky and weather code reads its
+ * geometry back from here too.
  *
  * @ingroup watchface-sketchbook
  */
 #include "layout/engine.h"
 
 #include "layout/zones.h"
+#include "scene/scene.h"
 
 #include "ui/fonts.h"
 #include "draw/fonts.h"
@@ -32,7 +34,7 @@
 
 // the scene being drawn, and the palette it was themed with. held rather than looked up per draw
 // so the scene, the chrome, and the text can't disagree inside one frame
-static const SceneLayout *s_lay;
+static const SceneDef *s_scene;
 static const void *s_pal;
 static bool s_night;
 // the theme index the palette was chosen for, so a Shuffle rollover or a day/night/Quiet swap that
@@ -59,7 +61,7 @@ static void apply_theme_colors(void)
     const struct tm *now = time_store_tm();
     s_theme = sketchbook_active_theme(&pick, now->tm_year, now->tm_yday, now->tm_hour, now->tm_min);
 
-    s_pal = s_lay->palette_for_theme(s_theme, s_night);
+    s_pal = s_scene->palette_for_theme(s_theme, s_night);
     const CommonPalette *cp = s_pal;
 
     Zone *zones = layout_zones();
@@ -85,7 +87,7 @@ static void apply_theme_colors(void)
  */
 static void draw_scene(GContext *ctx, GRect bounds, const void *data)
 {
-    s_lay->scene_draw(ctx, bounds, s_pal);
+    s_scene->draw(ctx, bounds, s_pal);
 }
 
 /**
@@ -175,15 +177,17 @@ static void load_fonts(void)
     fonts_register(FONT_HAND_16, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_16)));
 }
 
-void layout_setup(const SceneLayout *lay, Window *window)
+const SceneGeometry *sketchbook_scene_geometry(void)
 {
-    s_lay = lay;
+    // nothing is up until sketchbook_setup runs, so a read before then gets Ridgeline's
+    return (s_scene ? s_scene : sketchbook_scene_def(SCENE_RIDGELINE))->geometry;
+}
+
+void sketchbook_setup(Window *window)
+{
+    s_scene = sketchbook_scene_def(sketchbook_scene());
     apply_theme_colors();
     load_fonts();
-    if (lay->scene_init)
-    {
-        lay->scene_init();
-    }
 
     // the scene paints the whole window, so nothing of this ever shows. it just stops a
     // half-built frame flashing white on the way in
@@ -193,13 +197,12 @@ void layout_setup(const SceneLayout *lay, Window *window)
 // a build writes up to seven slots without reading max, so the engine's cap has to hold them
 _Static_assert(ENGINE_SLOTS_MAX >= 7, "a scene build writes up to seven slots");
 
-uint8_t layout_build(const SceneLayout *lay, EngineSlot *out, uint8_t max, GRect bounds)
+uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds)
 {
-    s_lay = lay;
     uint8_t i = 0;
 
     Zone *zones = layout_zones();
-    layout_zones_apply(lay->clock_only_y);
+    layout_zones_apply(s_scene->clock_only_y);
 
     // the scene is the background, so it goes down first and the chrome sits on it
     out[i++] = (EngineSlot){.frame = bounds, .draw = draw_scene};
@@ -229,15 +232,13 @@ uint8_t layout_build(const SceneLayout *lay, EngineSlot *out, uint8_t max, GRect
     return i;
 }
 
-void layout_apply_theme(const SceneLayout *lay)
+void sketchbook_apply_theme(void)
 {
-    s_lay = lay;
     apply_theme_colors();
 }
 
-bool layout_palette_changed(const SceneLayout *lay)
+bool sketchbook_palette_changed(void)
 {
-    s_lay = lay;
     bool was_night = s_night;
     uint8_t was_theme = s_theme;
     apply_theme_colors();
@@ -254,13 +255,22 @@ bool layout_palette_changed(const SceneLayout *lay)
 #endif
 }
 
-void layout_teardown(const SceneLayout *lay)
+bool sketchbook_scene_reselect(void)
+{
+    const SceneDef *next = sketchbook_scene_def(sketchbook_scene());
+    if (next == s_scene)
+    {
+        return false;
+    }
+
+    s_scene = next;
+    apply_theme_colors();
+    return true;
+}
+
+void sketchbook_teardown(void)
 {
     icons_cleanup();
-    if (lay->scene_deinit)
-    {
-        lay->scene_deinit();
-    }
     fonts_unload_all();
 }
 

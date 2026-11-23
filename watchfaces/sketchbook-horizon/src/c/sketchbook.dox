@@ -12,11 +12,11 @@
  * `sketchbook_scene_geometry` (see `scene/geometry.h`). One scene is up at a time, so that geometry
  * and that palette are all the shared code needs.
  *
- * A scene lives in three files: `scene/<name>` draws its landscape and supplies its geometry,
- * `theme/<name>` holds its palette type and the day and night table for every theme, and
- * `layout/<name>` places the clock, the date and the readouts and hands the dispatcher a SceneDef.
- * The dispatcher in `scene/scene` runs whichever one the Scene setting names. Adding a scene is a new
- * SceneId, a row in the dispatcher, and those three files: nothing in the shared engine moves.
+ * A scene lives in two files: `scene/<name>` draws it and supplies its geometry, and `theme/<name>`
+ * holds its palette type and the day and night table for every theme. Every scene is one row of the
+ * table in `scene/scene`, and the layout engine in `layout/engine` runs whichever row the Scene
+ * setting names. Adding a scene is a new SceneId, its row in that table, and its own files: nothing
+ * in the shared engine moves.
  *
  * @{
  * @}

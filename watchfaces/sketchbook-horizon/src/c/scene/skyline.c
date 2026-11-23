@@ -15,6 +15,7 @@
 #include "ui/fonts.h"
 #include "draw/fonts.h"
 #include "clock/solar.h"
+#include "theme/skyline.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -81,7 +82,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{151, 64}, {127, 88}}, {{127, 88}, {148, 86}}, {{148, 86}, {116, 114}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry skyline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 100, .arc_rx = 112, .arc_ry = 55,
     .cloud_drop = 22, .cloud_y_min = 52, .cloud_y_max = 78,
@@ -98,7 +99,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{116, 54}, {98, 72}}, {{98, 72}, {114, 70}}, {{114, 70}, {90, 94}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry skyline_geometry = {
     .sky_band_y = 46, .sky_blend_h = 24,
     .arc_base_y = 82, .arc_rx = 86, .arc_ry = 54,
     .cloud_drop = 18, .cloud_y_min = 42, .cloud_y_max = 54,
@@ -109,11 +110,6 @@ static const SceneGeometry s_geometry = {
     .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
-
-const SceneGeometry *skyline_geometry(void)
-{
-    return &s_geometry;
-}
 
 /** @brief One block in the city standing back behind the bridge. */
 typedef struct
@@ -561,11 +557,13 @@ static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
 }
 #endif
 
-void skyline_scene_draw(GContext *ctx, GRect bounds, const SkylinePalette *pal)
+void skyline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
 {
+    const SkylinePalette *pal = palette;
+
     // the shared sky and weather code paints with the common block, which leads this scene's
     // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = (const CommonPalette *)pal;
+    const CommonPalette *cp = palette;
 
     bool night = sketchbook_sky_night();
     SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());

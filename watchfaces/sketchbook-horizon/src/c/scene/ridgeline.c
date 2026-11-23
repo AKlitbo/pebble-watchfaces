@@ -14,6 +14,8 @@
 #include "ui/readouts.h"
 #include "ui/fonts.h"
 #include "draw/fonts.h"
+#include "draw/shape.h"
+#include "theme/ridgeline.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -44,7 +46,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{151, 64}, {127, 96}}, {{127, 96}, {148, 93}}, {{148, 93}, {116, 124}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry ridgeline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 107, .arc_rx = 112, .arc_ry = 55,
     .cloud_drop = 22, .cloud_y_min = 62, .cloud_y_max = 86,
@@ -61,7 +63,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{116, 58}, {98, 86}}, {{98, 86}, {114, 84}}, {{114, 84}, {88, 120}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry ridgeline_geometry = {
     .sky_band_y = 48, .sky_blend_h = 24,
     .arc_base_y = 124, .arc_rx = 86, .arc_ry = 78,
     .cloud_drop = 20, .cloud_y_min = 57, .cloud_y_max = 82,
@@ -72,11 +74,6 @@ static const SceneGeometry s_geometry = {
     .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
-
-const SceneGeometry *ridgeline_geometry(void)
-{
-    return &s_geometry;
-}
 
 // --- Ridges ---
 // sharp apexes with a steep face one side and a longer run-out the other, which is what makes
@@ -91,39 +88,34 @@ const SceneGeometry *ridgeline_geometry(void)
 // leaves the clock solid ground to sit on
 #define FAR_CREST 14
 #if defined(PBL_ROUND)
-static GPoint s_far_pts[] = {
+static const GPoint s_far_pts[] = {
     {-4, 122}, {18, 104}, {34, 116}, {52, 102}, {75, 114}, {94, 100}, {114, 120},
     {135, 88}, {158, 112}, {177, 98}, {200, 118}, {221, 102}, {244, 110}, {264, 104},
     {264, 264}, {-4, 264},
 };
 #else
-static GPoint s_far_pts[] = {
+static const GPoint s_far_pts[] = {
     {-4, 104}, {14, 86}, {26, 98}, {40, 84}, {58, 96}, {72, 82}, {88, 102},
     {104, 70}, {122, 94}, {136, 80}, {154, 100}, {170, 84}, {188, 92}, {204, 86},
     {204, 232}, {-4, 232},
 };
 #endif
-static GPathInfo s_far_info = {ARRAY_LENGTH(s_far_pts), s_far_pts};
 
 // the near range is bigger and sparser, built around one dominant central ridgeline
 #define NEAR_CREST 11
 #if defined(PBL_ROUND)
-static GPoint s_near_pts[] = {
+static const GPoint s_near_pts[] = {
     {-4, 140}, {23, 126}, {44, 138}, {70, 114}, {99, 132}, {130, 110},
     {161, 130}, {187, 120}, {211, 136}, {237, 124}, {264, 134},
     {264, 264}, {-4, 264},
 };
 #else
-static GPoint s_near_pts[] = {
+static const GPoint s_near_pts[] = {
     {-4, 126}, {18, 112}, {34, 124}, {54, 100}, {76, 118}, {100, 96},
     {124, 116}, {144, 106}, {162, 122}, {182, 110}, {204, 120},
     {204, 232}, {-4, 232},
 };
 #endif
-static GPathInfo s_near_info = {ARRAY_LENGTH(s_near_pts), s_near_pts};
-
-static GPath *s_far_path;
-static GPath *s_near_path;
 
 // a fixed field rather than a random one, so the sky is the same every time you look up at it,
 // which is what a sky does. it starts below the status bar and thins out towards the ridges
@@ -270,24 +262,18 @@ static void draw_snowcaps(GContext *ctx, const GPoint *pts, int crest, int span)
  * @brief Fill one ridge, crease it, cap it, and stroke its crest.
  *
  * @param ctx The graphics context.
- * @param path The closed polygon for the body.
- * @param pts The crest points.
+ * @param pts The ridge's points: the crest left to right, then the two corners that close it.
+ * @param count How many points there are in all.
  * @param crest How many of the points make up the crest.
  * @param body The body fill colour.
  * @param line The outline colour.
  * @param snow True to cap the summits in snow.
  * @param snow_span How far either side of an apex the snow reaches.
  */
-static void draw_ridge(GContext *ctx, GPath *path, const GPoint *pts, int crest,
+static void draw_ridge(GContext *ctx, const GPoint *pts, int count, int crest,
     GColor body, GColor line, bool snow, int snow_span)
 {
-    if (!path)
-    {
-        return;
-    }
-
-    graphics_context_set_fill_color(ctx, body);
-    gpath_draw_filled(ctx, path);
+    shape_fill(ctx, pts, count, body);
 
     graphics_context_set_stroke_color(ctx, line);
     draw_facets(ctx, pts, crest);
@@ -464,17 +450,13 @@ static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
 }
 #endif
 
-void ridgeline_scene_init(void)
+void ridgeline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
 {
-    s_far_path = gpath_create(&s_far_info);
-    s_near_path = gpath_create(&s_near_info);
-}
+    const RidgelinePalette *pal = palette;
 
-void ridgeline_scene_draw(GContext *ctx, GRect bounds, const RidgelinePalette *pal)
-{
     // the shared sky and weather code paints with the common block, which leads this scene's
     // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = (const CommonPalette *)pal;
+    const CommonPalette *cp = palette;
 
     bool night = sketchbook_sky_night();
     SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
@@ -501,8 +483,8 @@ void ridgeline_scene_draw(GContext *ctx, GRect bounds, const RidgelinePalette *p
     // the mountains
     sketchbook_fx_draw_clouds(ctx, cp, &sky, disc);
 
-    draw_ridge(ctx, s_far_path, s_far_pts, FAR_CREST, pal->land_far, pal->ink, snowcap(cond), 12);
-    draw_ridge(ctx, s_near_path, s_near_pts, NEAR_CREST, pal->land, pal->ink, snowcap(cond), 20);
+    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, pal->land_far, pal->ink, snowcap(cond), 12);
+    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snowcap(cond), 20);
 
 #if defined(PBL_ROUND)
     draw_meadow(ctx, pal);
@@ -527,14 +509,6 @@ void ridgeline_scene_draw(GContext *ctx, GRect bounds, const RidgelinePalette *p
 #if defined(PBL_ROUND)
     draw_trail_sign(ctx, pal);
 #endif
-}
-
-void ridgeline_scene_deinit(void)
-{
-    gpath_destroy(s_far_path);
-    s_far_path = NULL;
-    gpath_destroy(s_near_path);
-    s_near_path = NULL;
 }
 
 /** @} */

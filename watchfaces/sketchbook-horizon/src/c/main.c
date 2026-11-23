@@ -17,7 +17,7 @@
 #include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 #include "dev/dev_hooks.h"
-#include "scene/scene.h"
+#include "layout/engine.h"
 #include "persist_keys.h"
 #include "system/settings/settings.h"
 #include "system/settings/setting_values.h"
@@ -50,10 +50,9 @@ static TimeConfig time_cfg(void)
 /**
  * @brief Take up a settings change: switch scene if it moved, otherwise re-theme.
  *
- * A scene change tears the old scene down and sets the new one up, which re-themes on the way in.
- * Any other change only needs the theme read again. A save from the phone runs this, and so does
- * the dev harness, at startup and on every step of a walk, so a walk that picks a scene draws it
- * the way a real save would.
+ * A scene change puts the new scene up and themes it. Any other change only needs the theme read
+ * again. A save from the phone runs this, and so does the dev harness, at startup and on every step
+ * of a walk, so a walk that picks a scene draws it the way a real save would.
  */
 static void apply_settings_change(void)
 {
@@ -123,7 +122,7 @@ static void init(void)
     }
 
     s_window = window_create();
-    sketchbook_setup(s_window);              // fonts + scene paths + palette, for the chosen scene
+    sketchbook_setup(s_window);              // fonts + palette, for the chosen scene
     engine_init(s_window, sketchbook_build); // build the scene, chrome, and text slots
     window_stack_push(s_window, true);
 

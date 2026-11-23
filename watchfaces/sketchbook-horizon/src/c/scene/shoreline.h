@@ -12,7 +12,6 @@
 #pragma once
 #include <pebble.h>
 
-#include "theme/shoreline.h"
 #include "scene/geometry.h"
 
 /**
@@ -26,11 +25,11 @@
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param pal The palette in use.
+ * @param palette The palette in use, a ShorelinePalette.
  */
-void shoreline_scene_draw(GContext *ctx, GRect bounds, const ShorelinePalette *pal);
+void shoreline_scene_draw(GContext *ctx, GRect bounds, const void *palette);
 
-/** @brief Where this scene's sky and weather sit, for the shared drawing code. */
-const SceneGeometry *shoreline_geometry(void);
+/// Where this scene's sky and weather sit, for the shared drawing code
+extern const SceneGeometry shoreline_geometry;
 
 /** @} */

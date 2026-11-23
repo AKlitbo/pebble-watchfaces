@@ -181,7 +181,7 @@ static const ShorelinePalette s_night[THEME_COUNT] = {
     },
 };
 
-const ShorelinePalette *shoreline_palette_for_theme(uint8_t theme, bool night)
+const void *shoreline_palette_for_theme(uint8_t theme, bool night)
 {
     if (theme >= THEME_COUNT)
     {

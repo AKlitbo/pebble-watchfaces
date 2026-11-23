@@ -12,7 +12,6 @@
 #pragma once
 #include <pebble.h>
 
-#include "theme/skyline.h"
 #include "scene/geometry.h"
 
 /**
@@ -25,11 +24,11 @@
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param pal The palette in use.
+ * @param palette The palette in use, a SkylinePalette.
  */
-void skyline_scene_draw(GContext *ctx, GRect bounds, const SkylinePalette *pal);
+void skyline_scene_draw(GContext *ctx, GRect bounds, const void *palette);
 
-/** @brief Where this scene's sky and weather sit, for the shared drawing code. */
-const SceneGeometry *skyline_geometry(void);
+/// Where this scene's sky and weather sit, for the shared drawing code
+extern const SceneGeometry skyline_geometry;
 
 /** @} */

@@ -202,7 +202,7 @@ static const TreelinePalette s_night[THEME_COUNT] = {
     },
 };
 
-const TreelinePalette *treeline_palette_for_theme(uint8_t theme, bool night)
+const void *treeline_palette_for_theme(uint8_t theme, bool night)
 {
     if (theme >= THEME_COUNT)
     {

@@ -178,7 +178,7 @@ static const SkylinePalette s_night[THEME_COUNT] = {
     },
 };
 
-const SkylinePalette *skyline_palette_for_theme(uint8_t theme, bool night)
+const void *skyline_palette_for_theme(uint8_t theme, bool night)
 {
     if (theme >= THEME_COUNT)
     {

@@ -12,7 +12,6 @@
 #pragma once
 #include <pebble.h>
 
-#include "theme/ridgeline.h"
 #include "scene/geometry.h"
 
 /**
@@ -20,22 +19,16 @@
  * @{
  */
 
-/** @brief Allocate the ridge paths. Call once before the first draw. */
-void ridgeline_scene_init(void);
-
 /**
  * @brief Paint the whole scene: sky, stars, arc, disc, ridges, and the weather on top.
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param pal The palette in use.
+ * @param palette The palette in use, a RidgelinePalette.
  */
-void ridgeline_scene_draw(GContext *ctx, GRect bounds, const RidgelinePalette *pal);
+void ridgeline_scene_draw(GContext *ctx, GRect bounds, const void *palette);
 
-/** @brief Free the ridge paths. */
-void ridgeline_scene_deinit(void);
-
-/** @brief Where this scene's sky and weather sit, for the shared drawing code. */
-const SceneGeometry *ridgeline_geometry(void);
+/// Where this scene's sky and weather sit, for the shared drawing code
+extern const SceneGeometry ridgeline_geometry;
 
 /** @} */

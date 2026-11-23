@@ -4,8 +4,8 @@
  *
  * The shared sky and weather code draws the same way for every scene, but not in the same places:
  * each scene puts its horizon somewhere else, so its arc, its clouds, its rain and its wash follow.
- * One scene is up at a time, so it sets itself as the active one and the shared code reads these
- * numbers back through sketchbook_scene_geometry.
+ * One scene is up at a time. The layout engine holds it, and the shared code reads these numbers
+ * back through sketchbook_scene_geometry.
  *
  * A scene fills one of these per platform, since a round screen wants different numbers from a
  * rectangle. The two that never vary (the arc is centred, every disc is the same size) are fixed
@@ -81,8 +81,8 @@ typedef struct SceneGeometry
 /**
  * @brief The active scene's geometry, which the shared sky and weather code reads.
  *
- * The dispatcher sets this to whichever scene is up (see scene.c). It is never null once the face
- * is running, since a scene is always selected.
+ * The layout engine hands back whichever scene is up (see layout/engine.c). It is never null.
+ * Before the first scene is put up it hands back Ridgeline's.
  *
  * @return The geometry of the scene being drawn.
  */

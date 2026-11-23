@@ -158,7 +158,7 @@ static const RidgelinePalette s_night[THEME_COUNT] = {
     },
 };
 
-const RidgelinePalette *ridgeline_palette_for_theme(uint8_t theme, bool night)
+const void *ridgeline_palette_for_theme(uint8_t theme, bool night)
 {
     if (theme >= THEME_COUNT)
     {

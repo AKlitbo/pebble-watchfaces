@@ -15,6 +15,7 @@
 #include "ui/fonts.h"
 #include "draw/fonts.h"
 #include "clock/tide.h"
+#include "theme/shoreline.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -71,7 +72,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{146, 76}, {128, 98}}, {{128, 98}, {144, 95}}, {{144, 95}, {120, 127}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry shoreline_geometry = {
     .sky_band_y = 49, .sky_blend_h = 27,
     .arc_base_y = 93, .arc_rx = 114, .arc_ry = 51,
     .cloud_drop = 22, .cloud_y_min = 66, .cloud_y_max = 81,
@@ -88,7 +89,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{116, 62}, {98, 80}}, {{98, 80}, {114, 78}}, {{114, 78}, {90, 104}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry shoreline_geometry = {
     .sky_band_y = 40, .sky_blend_h = 22,
     .arc_base_y = 76, .arc_rx = 88, .arc_ry = 42,
     .cloud_drop = 18, .cloud_y_min = 54, .cloud_y_max = 66,
@@ -99,11 +100,6 @@ static const SceneGeometry s_geometry = {
     .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
-
-const SceneGeometry *shoreline_geometry(void)
-{
-    return &s_geometry;
-}
 
 // the platform says how wide it is, so the sea and the shore run to whichever screen they are on
 // rather than stopping at 200 and leaving a straight edge partway across a round one
@@ -610,11 +606,13 @@ static void draw_pennant(GContext *ctx, const ShorelinePalette *pal, int base, i
 }
 #endif
 
-void shoreline_scene_draw(GContext *ctx, GRect bounds, const ShorelinePalette *pal)
+void shoreline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
 {
+    const ShorelinePalette *pal = palette;
+
     // the shared sky and weather code paints with the common block, which leads this scene's
     // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = (const CommonPalette *)pal;
+    const CommonPalette *cp = palette;
 
     bool night = sketchbook_sky_night();
     SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());

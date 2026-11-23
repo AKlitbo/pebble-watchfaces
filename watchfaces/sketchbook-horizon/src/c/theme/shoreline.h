@@ -43,8 +43,9 @@ typedef struct ShorelinePalette
  *
  * @param theme The palette on screen, which Shuffle or the night or Quiet Time palette can pick.
  * @param night True for the after-dark palette.
- * @return The palette to paint with.
+ * @return The palette to paint with. It comes back as a const void * so the scene table can hold
+ * every scene's palette lookup alike, and the scene casts it to a ShorelinePalette.
  */
-const ShorelinePalette *shoreline_palette_for_theme(uint8_t theme, bool night);
+const void *shoreline_palette_for_theme(uint8_t theme, bool night);
 
 /** @} */

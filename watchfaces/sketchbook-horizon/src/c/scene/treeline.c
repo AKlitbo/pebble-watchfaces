@@ -15,6 +15,7 @@
 #include "ui/fonts.h"
 #include "draw/fonts.h"
 #include "weather/wind_dir.h"
+#include "theme/treeline.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -92,7 +93,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{151, 66}, {127, 92}}, {{127, 92}, {148, 89}}, {{148, 89}, {116, 120}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry treeline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 118, .arc_rx = 112, .arc_ry = 55,
     .cloud_drop = 22, .cloud_y_min = 62, .cloud_y_max = 86,
@@ -109,7 +110,7 @@ static const Puff s_overcast[] = {
 static const GPoint s_bolt[][2] = {
     {{116, 62}, {98, 80}}, {{98, 80}, {114, 78}}, {{114, 78}, {90, 104}},
 };
-static const SceneGeometry s_geometry = {
+const SceneGeometry treeline_geometry = {
     .sky_band_y = 46, .sky_blend_h = 24,
     .arc_base_y = 108, .arc_rx = 86, .arc_ry = 72,
     .cloud_drop = 18, .cloud_y_min = 54, .cloud_y_max = 66,
@@ -120,11 +121,6 @@ static const SceneGeometry s_geometry = {
     .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
-
-const SceneGeometry *treeline_geometry(void)
-{
-    return &s_geometry;
-}
 
 /** @brief One fir: where it stands, how tall it is, and how wide its skirt spreads. */
 typedef struct
@@ -553,11 +549,13 @@ static void draw_litter(GContext *ctx, const TreelinePalette *pal)
 }
 #endif
 
-void treeline_scene_draw(GContext *ctx, GRect bounds, const TreelinePalette *pal)
+void treeline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
 {
+    const TreelinePalette *pal = palette;
+
     // the shared sky and weather code paints with the common block, which leads this scene's
     // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = (const CommonPalette *)pal;
+    const CommonPalette *cp = palette;
 
     bool night = sketchbook_sky_night();
     SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
