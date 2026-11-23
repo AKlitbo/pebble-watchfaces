@@ -3,8 +3,8 @@
  * @brief The phone's condition token, read into a condition and a sky.
  *
  * Every scene agrees on what each condition does to the sky: how much cloud, how much of the disc
- * it leaves, what falls and how hard, whether a wash goes over the scene and whether a bolt forks
- * out of it. So that table lives here, indexed by the framework's WxCond.
+ * it leaves, what falls and how hard, whether a wash goes over the scene and whether lightning
+ * strikes out of it. So that table lives here, indexed by the framework's WxCond.
  *
  * What a scene does with the condition beyond the sky is its own, and it is not a field on
  * SketchbookSky, which only says what the sky looks like. Ridgeline caps its peaks in snow and
@@ -44,10 +44,10 @@ typedef enum
 typedef enum
 {
     PRECIP_NONE,
-    PRECIP_DROPS,  ///< Fine dots for drizzle
-    PRECIP_DASHES, ///< Slanted strokes for rain
-    PRECIP_FLAKES, ///< Little crosses for snow
-    PRECIP_MIXED   ///< Dots and strokes together for sleet and freezing rain
+    PRECIP_DROPS,  ///< Short ticks for drizzle
+    PRECIP_DASHES, ///< Thin slanted streaks for rain
+    PRECIP_FLAKES, ///< Small flakes for snow
+    PRECIP_MIXED   ///< Ticks and streaks together for sleet and freezing rain
 } PrecipKind;
 
 /**
@@ -63,7 +63,7 @@ typedef struct SketchbookSky
     uint8_t precip;    ///< A PrecipKind
     uint8_t drops;     ///< How many particles fall
     bool    wash;      ///< Lay the scene's wash (its fog, haze or mist) over it
-    bool    bolt;      ///< Fork a bolt out of the cloud
+    bool    bolt;      ///< Strike lightning out of the cloud
 } SketchbookSky;
 
 /**

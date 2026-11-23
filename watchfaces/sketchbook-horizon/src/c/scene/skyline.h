@@ -42,5 +42,7 @@ void skyline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 
 /// Where this scene's sky and weather sit, for the shared drawing code
 extern const SceneGeometry skyline_geometry;
+/// Where this scene's storm strikes its bolts
+extern const BoltSpots skyline_bolts;
 
 /** @} */

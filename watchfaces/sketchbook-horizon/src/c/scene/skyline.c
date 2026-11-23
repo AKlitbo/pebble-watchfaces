@@ -86,14 +86,13 @@ static const SketchbookStar s_stars[] = {
 
 // --- Where this scene's sky and weather sit ---
 // the sky band and the arc sit above the crossing, the overcast band hangs across the sky, and
-// the fork strikes out of it. the round build drops and spreads these with the rest of the scene
+// the storm's bolts strike out of it. the round build drops and spreads these with the rest of the
+// scene
 #if defined(PBL_ROUND)
 static const Puff s_overcast[] = {
     {18, 56, 33, 11}, {75, 52, 30, 12}, {135, 59, 34, 11}, {195, 53, 31, 12}, {238, 60, 28, 10},
 };
-static const GPoint s_bolt[][2] = {
-    {{151, 64}, {127, 88}}, {{127, 88}, {148, 86}}, {{148, 86}, {116, 114}},
-};
+static const BoltSpot s_bolt_spots[] = {{150, 50, 1}, {40, 34, -1}, {228, 26, 1}};
 const SceneGeometry skyline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 100, .arc_rx = 112, .arc_ry = 55,
@@ -103,15 +102,12 @@ const SceneGeometry skyline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 42, .precip_h = 105,
     .wash_top = 82, .wash_bottom = 152, .wash_wisp_hi_y = 104, .wash_wisp_lo_y = 128,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #else
 static const Puff s_overcast[] = {
     {14, 46, 26, 9}, {58, 43, 24, 9}, {104, 49, 27, 9}, {150, 44, 25, 9}, {192, 50, 22, 8},
 };
-static const GPoint s_bolt[][2] = {
-    {{116, 54}, {98, 72}}, {{98, 72}, {114, 70}}, {{114, 70}, {90, 94}},
-};
+static const BoltSpot s_bolt_spots[] = {{112, 42, 1}, {30, 30, -1}, {178, 22, 1}};
 const SceneGeometry skyline_geometry = {
     .sky_band_y = 46, .sky_blend_h = 24,
     .arc_base_y = 82, .arc_rx = 86, .arc_ry = 54,
@@ -121,9 +117,9 @@ const SceneGeometry skyline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 34, .precip_h = 78,
     .wash_top = 66, .wash_bottom = 124, .wash_wisp_hi_y = 84, .wash_wisp_lo_y = 104,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
+SCENE_BOLTS(skyline_bolts, s_bolt_spots);
 
 /** @brief One block in the city standing back behind the bridge. */
 typedef struct

@@ -62,14 +62,12 @@ static const SketchbookStar s_stars[] = {
 // --- Where this scene's sky and weather sit ---
 // the baseline sits on the far crest rather than down behind the ridges, so the arc's ends tuck
 // into the flanks. the overcast band hangs low enough to keep its tops clear of the status bar
-// and high enough to keep the whole band off the ridges, and the fork strikes out of it
+// and high enough to keep the whole band off the ridges, and the storm's bolts strike out of it
 #if defined(PBL_ROUND)
 static const Puff s_overcast[] = {
     {18, 68, 33, 11}, {75, 64, 30, 12}, {135, 71, 34, 11}, {195, 65, 31, 12}, {238, 72, 28, 10},
 };
-static const GPoint s_bolt[][2] = {
-    {{151, 64}, {127, 96}}, {{127, 96}, {148, 93}}, {{148, 93}, {116, 124}},
-};
+static const BoltSpot s_bolt_spots[] = {{153, 58, 1}, {70, 40, -1}, {215, 30, 1}};
 const SceneGeometry ridgeline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 107, .arc_rx = 112, .arc_ry = 55,
@@ -79,15 +77,12 @@ const SceneGeometry ridgeline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 40, .precip_h = 102,
     .wash_top = 88, .wash_bottom = 142, .wash_wisp_hi_y = 122, .wash_wisp_lo_y = 132,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #else
 static const Puff s_overcast[] = {
     {14, 60, 26, 10}, {58, 56, 24, 11}, {104, 63, 27, 10}, {150, 57, 25, 11}, {192, 64, 22, 9},
 };
-static const GPoint s_bolt[][2] = {
-    {{116, 58}, {98, 86}}, {{98, 86}, {114, 84}}, {{114, 84}, {88, 120}},
-};
+static const BoltSpot s_bolt_spots[] = {{118, 60, 1}, {46, 40, -1}, {170, 28, 1}};
 const SceneGeometry ridgeline_geometry = {
     .sky_band_y = 48, .sky_blend_h = 24,
     .arc_base_y = 124, .arc_rx = 86, .arc_ry = 78,
@@ -97,9 +92,9 @@ const SceneGeometry ridgeline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 52, .precip_h = 70,
     .wash_top = 82, .wash_bottom = 126, .wash_wisp_hi_y = 112, .wash_wisp_lo_y = 118,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
+SCENE_BOLTS(ridgeline_bolts, s_bolt_spots);
 
 // --- Ridges ---
 // sharp apexes with a steep face one side and a longer run-out the other, which is what makes

@@ -18,6 +18,17 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// short ones in what sky the mountain leaves: over the saddle to Lion's Head, past Devil's Peak,
+// and above the tablecloth. each table is placed for its own screen, since the round band's base
+// does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{204, 36, -1}, {84, 24, -1}, {46, 18, 1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{160, 26, -1}, {16, 20, 1}, {64, 15, -1}};
+#endif
+SCENE_BOLTS(table_mountain_bolts, s_bolt_spots);
+
 // the mountain: Devil's Peak on the left, the long flat table, then the saddle down to Lion's
 // Head and Signal Hill on the right. its foot is hidden behind the city
 static const GPoint s_mountain[] = {

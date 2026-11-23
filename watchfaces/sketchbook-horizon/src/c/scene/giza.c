@@ -19,6 +19,16 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// one up each side of the big pyramid and one past the second, all in the open sky between the
+// peaks. each table is placed for its own screen, since the round band's base does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{156, 36, 1}, {80, 30, 1}, {210, 24, -1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{52, 40, 1}, {98, 26, -1}, {160, 20, -1}};
+#endif
+SCENE_BOLTS(giza_bolts, s_bolt_spots);
+
 /**
  * @brief One pyramid seen from a corner: its two base corners, its apex, and where the ridge
  * between its two faces meets the ground.

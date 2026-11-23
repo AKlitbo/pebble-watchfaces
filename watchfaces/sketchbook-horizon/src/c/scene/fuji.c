@@ -19,6 +19,16 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// one either side of the cone and a small one at the far left, all in the open sky beside it. each
+// table is placed for its own screen, since the round band's base does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{198, 48, -1}, {80, 34, 1}, {44, 22, 1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{46, 40, 1}, {152, 32, -1}, {16, 20, 1}};
+#endif
+SCENE_BOLTS(fuji_bolts, s_bolt_spots);
+
 // the cone. its slopes curve outwards as they come down, which is what makes it Fuji rather than
 // any mountain, so each side is walked in short legs that flatten towards the foot. the top is the
 // crater rim, a short run of small notches rather than a point

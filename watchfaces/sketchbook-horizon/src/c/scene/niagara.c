@@ -17,6 +17,16 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// short ones in the strip of sky over the falls, so they stop above the crest and the cliffs. each
+// table is placed for its own screen, since the round band's base does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{80, 30, 1}, {194, 26, -1}, {136, 20, 1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{60, 23, 1}, {156, 19, -1}, {108, 15, 1}};
+#endif
+SCENE_BOLTS(niagara_bolts, s_bolt_spots);
+
 // the river above the falls, a band curving back from the brink
 static const GPoint s_upper_river[] = {
     {LM_X(24), LM_Y(70)}, {LM_X(62), LM_Y(67)}, {LM_X(100), LM_Y(65)}, {LM_X(138), LM_Y(67)},

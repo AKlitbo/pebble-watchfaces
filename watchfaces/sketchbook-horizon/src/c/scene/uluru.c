@@ -20,6 +20,16 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// one at either end of the rock and a small one over its middle, clear of its top. each table is
+// placed for its own screen, since the round band's base does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{204, 50, -1}, {80, 40, 1}, {136, 26, -1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{44, 42, 1}, {154, 34, -1}, {104, 22, 1}};
+#endif
+SCENE_BOLTS(uluru_bolts, s_bolt_spots);
+
 // the rock, low and long, rising steeply at both ends to a gently rolling top
 static const GPoint s_rock[] = {
     {LM_X(28), LM_Y(108)}, {LM_X(27), LM_Y(99)}, {LM_X(30), LM_Y(93)}, {LM_X(36), LM_Y(89)},

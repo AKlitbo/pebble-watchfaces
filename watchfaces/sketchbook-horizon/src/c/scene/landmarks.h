@@ -3,10 +3,11 @@
  * @brief The landmark scenes and the pieces they share.
  *
  * A landmark stands a real place on the same horizon Skyline uses, so it shares Skyline's stars,
- * its weather, and where its clock sits. The sky over it is the one every scene shares. Only its
- * ground is borrowed. A landmark on land takes Ridgeline's ground colours and one on water takes
- * Skyline's, so every palette already has a look for it, and the ground or the water under the
- * clock keeps the colours that palette picked for it.
+ * its weather, and where its clock sits. Its storm's bolts are its own, since they strike clear of
+ * its peaks, its falls or its buttes, which stand where Skyline's towers do not. The sky over it is
+ * the one every scene shares. Only its ground is borrowed. A landmark on land takes Ridgeline's
+ * ground colours and one on water takes Skyline's, so every palette already has a look for it, and
+ * the ground or the water under the clock keeps the colours that palette picked for it.
  *
  * A landmark is drawn for the rectangle and carried to the round screen through LM_X and LM_Y,
  * which spread the picture to the wider glass and drop it to the round horizon. A width or a height
@@ -19,6 +20,7 @@
 #include <pebble.h>
 
 #include "scene/frame.h"
+#include "scene/geometry.h"
 #include "theme/ridgeline.h"
 #include "theme/skyline.h"
 
@@ -42,6 +44,21 @@
 
 #define LM_HORIZON 108       ///< The rectangle row the land or the water starts on, as on Skyline
 #define LM_SCENE_BOTTOM 133  ///< The last rectangle row the scene draws into before the clock
+
+/// The Mount Fuji scene's bolts
+extern const BoltSpots fuji_bolts;
+/// The Giza scene's bolts
+extern const BoltSpots giza_bolts;
+/// The Half Dome scene's bolts
+extern const BoltSpots half_dome_bolts;
+/// The Uluru scene's bolts
+extern const BoltSpots uluru_bolts;
+/// The Niagara Falls scene's bolts
+extern const BoltSpots niagara_bolts;
+/// The Table Mountain scene's bolts
+extern const BoltSpots table_mountain_bolts;
+/// The Monument Valley scene's bolts
+extern const BoltSpots monument_valley_bolts;
 
 /**
  * @brief Lay water from the horizon down and ripple it, as a river or a bay reads at rest.

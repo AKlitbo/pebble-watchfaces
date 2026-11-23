@@ -76,15 +76,14 @@ static const SketchbookStar s_stars[] = {
 
 // --- Where this scene's sky and weather sit ---
 // the arc's baseline is the horizon, so the sun and moon rise out of the sea and set back into it.
-// the overcast band hangs low in the sky and the fork strikes out of it, and the sea haze wash
-// sits down over the water
+// the overcast band hangs low in the sky and the storm's bolts strike out of it, and the sea haze
+// wash sits down over the water
+// the bolts strike the open sea, clear of the boat and short of the sand
 #if defined(PBL_ROUND)
 static const Puff s_overcast[] = {
     {18, 68, 34, 11}, {70, 65, 32, 11}, {124, 72, 36, 11}, {178, 66, 33, 11}, {212, 73, 30, 10},
 };
-static const GPoint s_bolt[][2] = {
-    {{146, 76}, {128, 98}}, {{128, 98}, {144, 95}}, {{144, 95}, {120, 127}},
-};
+static const BoltSpot s_bolt_spots[] = {{72, 34, -1}, {168, 30, -1}, {130, 18, 1}};
 const SceneGeometry shoreline_geometry = {
     .sky_band_y = 49, .sky_blend_h = 27,
     .arc_base_y = 93, .arc_rx = 114, .arc_ry = 51,
@@ -94,15 +93,12 @@ const SceneGeometry shoreline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 37, .precip_h = 115,
     .wash_top = 78, .wash_bottom = 148, .wash_wisp_hi_y = 125, .wash_wisp_lo_y = 138,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #else
 static const Puff s_overcast[] = {
     {14, 56, 26, 9}, {58, 53, 24, 9}, {104, 59, 27, 9}, {150, 54, 25, 9}, {192, 60, 22, 8},
 };
-static const GPoint s_bolt[][2] = {
-    {{116, 62}, {98, 80}}, {{98, 80}, {114, 78}}, {{114, 78}, {90, 104}},
-};
+static const BoltSpot s_bolt_spots[] = {{60, 30, 1}, {148, 24, 1}, {108, 18, 1}};
 const SceneGeometry shoreline_geometry = {
     .sky_band_y = 40, .sky_blend_h = 22,
     .arc_base_y = 76, .arc_rx = 88, .arc_ry = 42,
@@ -112,9 +108,9 @@ const SceneGeometry shoreline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 30, .precip_h = 94,
     .wash_top = 64, .wash_bottom = 121, .wash_wisp_hi_y = 102, .wash_wisp_lo_y = 113,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
+SCENE_BOLTS(shoreline_bolts, s_bolt_spots);
 
 #define WAVE_ROWS 4
 #define SEA_SPLIT_PCT 40  ///< How far down the water the far shade gives way to the near one

@@ -17,7 +17,6 @@
 #pragma once
 #include <pebble.h>
 
-#include "draw/line.h"  // LineSegment, for the lightning fork
 #include "fx/fx.h"      // Puff, for the overcast band
 #include "sky/sky.h"    // SketchbookStar, for the star field
 
@@ -26,8 +25,33 @@
  * @{
  */
 
-/// One leg of a lightning fork, a pair of points.
-typedef LineSegment BoltLeg;
+/** @brief Where one of a storm's bolts strikes. */
+typedef struct
+{
+    int16_t x;   ///< The column it leaves the cloud base at
+    int16_t h;   ///< How far it falls
+    int8_t flip; ///< 1 leans it left, -1 leans it right
+} BoltSpot;
+
+/**
+ * @brief A scene's bolts, biggest first.
+ *
+ * Each one leaves the overcast band's base clear of the scene's tall features, such as its towers,
+ * peaks and falls, and stays above the clock's cap line and inside a round screen's glass.
+ */
+typedef struct
+{
+    const BoltSpot *spots;  ///< Where each bolt strikes
+    uint8_t count;
+} BoltSpots;
+
+/// The most bolts a scene strikes at once. The draw lays them all out before it draws any
+#define SCENE_BOLTS_MAX 3
+
+/// Define a scene's bolts from its table of spots, stopping the build on more than SCENE_BOLTS_MAX
+#define SCENE_BOLTS(name, spots)                                                        \
+    _Static_assert(ARRAY_LENGTH(spots) <= SCENE_BOLTS_MAX, #name " has too many bolts"); \
+    const BoltSpots name = {(spots), ARRAY_LENGTH(spots)}
 
 // the platform's width, for the draws that work across the screen column by column with no bounds
 // handed to them: Skyline's bridge, its lamps and their streaks, and Shoreline's shore, gulls,
@@ -44,8 +68,9 @@ typedef LineSegment BoltLeg;
  * @brief The numbers the shared sky and weather code needs, all of a scene's in one place.
  *
  * Every y here is a pixel row on the current platform. The arrays are the scene's own data: the
- * stars it scatters above its horizon, the overcast band it hangs across its sky, and the lightning
- * fork struck over it.
+ * stars it scatters above its horizon and the overcast band it hangs across its sky. A storm's
+ * bolts are not here but in the scene's row, since scenes that share this geometry still strike
+ * clear of their own tall features.
  *
  * A scene's values have to hold together or the weather draws wrong with nothing to flag it:
  * - cloud_y_min <= cloud_y_max, or the drifting cloud's clamp is inverted
@@ -83,10 +108,6 @@ typedef struct SceneGeometry
     int16_t wash_bottom;     ///< Where it stops
     int16_t wash_wisp_hi_y;  ///< The upper solid wisp through the densest part
     int16_t wash_wisp_lo_y;  ///< And the lower one
-
-    // --- the lightning fork ---
-    const BoltLeg *bolt_stroke;  ///< Each leg of the fork, as a pair of points
-    uint8_t bolt_count;
 } SceneGeometry;
 
 /**
@@ -98,5 +119,15 @@ typedef struct SceneGeometry
  * @return The geometry of the scene being drawn.
  */
 const SceneGeometry *sketchbook_scene_geometry(void);
+
+/**
+ * @brief The active scene's bolts, which the shared weather code strikes in a storm.
+ *
+ * Every scene carries its own in its scene row. Before the first scene is put up it hands back
+ * Ridgeline's.
+ *
+ * @return The bolts of the scene being drawn. Never null.
+ */
+const BoltSpots *sketchbook_scene_bolts(void);
 
 /** @} */

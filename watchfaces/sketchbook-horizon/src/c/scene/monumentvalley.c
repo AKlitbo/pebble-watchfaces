@@ -17,6 +17,16 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// the big one down the gap between the Mittens, one past Merrick Butte, and a small one at the far
+// left. each table is placed for its own screen, since the round band's base does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{136, 60, 1}, {210, 44, -1}, {38, 20, 1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{108, 50, 1}, {160, 30, -1}, {16, 22, 1}};
+#endif
+SCENE_BOLTS(monument_valley_bolts, s_bolt_spots);
+
 /** @brief One butte: its outline, sweeping up the scree to the column and over its top, and its cracks. */
 typedef struct
 {

@@ -93,14 +93,13 @@ static const SketchbookStar s_stars[] = {
 // --- Where this scene's sky and weather sit ---
 // the baseline sits in the far treeline rather than below it, so the arc's ends tuck into the
 // trunks the way shoreline's land on its sea horizon, and it stays a long shallow stroke. the
-// overcast band hangs across the sky above the trees, and the fork strikes out of it
+// overcast band hangs across the sky above the trees, and the storm's bolts strike out of it
+// the bolts stay in the sky over the treetops, clear of the firs and the cabin's smoke
 #if defined(PBL_ROUND)
 static const Puff s_overcast[] = {
     {18, 68, 33, 11}, {75, 64, 30, 12}, {135, 71, 34, 11}, {195, 65, 31, 12}, {238, 72, 28, 10},
 };
-static const GPoint s_bolt[][2] = {
-    {{151, 66}, {127, 92}}, {{127, 92}, {148, 89}}, {{148, 89}, {116, 120}},
-};
+static const BoltSpot s_bolt_spots[] = {{204, 30, -1}, {106, 26, -1}, {30, 20, 1}};
 const SceneGeometry treeline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 118, .arc_rx = 112, .arc_ry = 55,
@@ -110,15 +109,12 @@ const SceneGeometry treeline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 40, .precip_h = 105,
     .wash_top = 92, .wash_bottom = 145, .wash_wisp_hi_y = 115, .wash_wisp_lo_y = 128,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #else
 static const Puff s_overcast[] = {
     {14, 56, 26, 9}, {58, 53, 24, 9}, {104, 59, 27, 9}, {150, 54, 25, 9}, {192, 60, 22, 8},
 };
-static const GPoint s_bolt[][2] = {
-    {{116, 62}, {98, 80}}, {{98, 80}, {114, 78}}, {{114, 78}, {90, 104}},
-};
+static const BoltSpot s_bolt_spots[] = {{154, 30, -1}, {100, 24, -1}, {46, 20, 1}};
 const SceneGeometry treeline_geometry = {
     .sky_band_y = 46, .sky_blend_h = 24,
     .arc_base_y = 108, .arc_rx = 86, .arc_ry = 72,
@@ -128,9 +124,9 @@ const SceneGeometry treeline_geometry = {
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
     .precip_top = 30, .precip_h = 94,
     .wash_top = 81, .wash_bottom = 129, .wash_wisp_hi_y = 101, .wash_wisp_lo_y = 111,
-    .bolt_stroke = s_bolt, .bolt_count = ARRAY_LENGTH(s_bolt),
 };
 #endif
+SCENE_BOLTS(treeline_bolts, s_bolt_spots);
 
 /** @brief One fir: where it stands, how tall it is, and how wide its skirt spreads. */
 typedef struct

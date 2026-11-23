@@ -17,6 +17,16 @@
  * @{
  */
 
+// --- The storm's bolts ---
+// one either side of the dome and a small one off by the valley wall. each table is placed for its
+// own screen, since the round band's base does not follow LM_Y
+#if defined(PBL_ROUND)
+static const BoltSpot s_bolt_spots[] = {{200, 52, -1}, {86, 40, 1}, {44, 26, 1}};
+#else
+static const BoltSpot s_bolt_spots[] = {{58, 50, 1}, {150, 38, -1}, {16, 24, 1}};
+#endif
+SCENE_BOLTS(half_dome_bolts, s_bolt_spots);
+
 // the dome: a long rounded back rising from the left, and the sheer face dropping straight down
 // on the right, with a short slope of rubble at its foot
 static const GPoint s_dome[] = {

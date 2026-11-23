@@ -5,7 +5,7 @@
  *
  * One scene is up at a time. It is held here, with the palette and the ground row it was last
  * themed with, between the public calls and the draw-slots the engine fires. The shared sky and
- * weather code reads its geometry back from here too.
+ * weather code reads its geometry and its bolts back from here too.
  *
  * The sky and the weather are painted here for every scene, around the scene's own ground. The
  * night, the condition, its sky recipe, the disc and the minute are read once at the top of the
@@ -221,6 +221,12 @@ const SceneGeometry *sketchbook_scene_geometry(void)
 {
     // nothing is up until sketchbook_setup runs, so a read before then gets Ridgeline's
     return (s_scene ? s_scene : sketchbook_scene_def(SCENE_RIDGELINE))->geometry;
+}
+
+const BoltSpots *sketchbook_scene_bolts(void)
+{
+    // a read before sketchbook_setup gets Ridgeline's, as the geometry does
+    return (s_scene ? s_scene : sketchbook_scene_def(SCENE_RIDGELINE))->bolts;
 }
 
 void sketchbook_setup(Window *window)

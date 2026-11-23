@@ -43,14 +43,14 @@ typedef enum
 } SceneId;
 
 /**
- * @brief One scene, as data: where its sky and weather sit, its ground colours, its own draws, and
- * the row its Clock Only clock sits on.
+ * @brief One scene, as data: where its sky and weather sit, where its storm's bolts strike, its
+ * ground colours, its own draws, and the row its Clock Only clock sits on.
  *
  * The geometry is read by the shared sky and weather code, and the rest by the layout engine (see
  * layout/engine.h), both while this scene is up.
  *
  * The engine paints a frame in one order. The sky goes down first, then the clouds, then the
- * scene's ground, then the rain, the wash and the fork, and last the scene's front. The ground is
+ * scene's ground, then the rain, the wash and the bolts, and last the scene's front. The ground is
  * everything the weather falls in front of. The front is whatever stands in front of the weather,
  * such as the holder a round screen letters the temperature on, so the reading stays clear in
  * every condition.
@@ -66,13 +66,15 @@ typedef struct SceneDef
     SceneDraw ground;      ///< Paint its ground and props, between the clouds and the weather
     SceneDraw front;       ///< Paint what stands in front of the weather, or NULL for nothing
     int16_t clock_only_y;  ///< Top of the Clock Only clock's box on the rectangle
+    const BoltSpots *bolts;  ///< Where its storm's bolts strike
 } SceneDef;
 
 /**
  * @brief The scene for a Scene setting value.
  *
  * A value past the last scene, from a damaged save, gets Ridgeline rather than a read off the end
- * of the table. So does a scene whose row was left out of the table.
+ * of the table. So does a scene whose row was left out of the table or has no bolts, and the log
+ * names it.
  *
  * @param id The Scene setting's value.
  * @return The scene. Never NULL.
