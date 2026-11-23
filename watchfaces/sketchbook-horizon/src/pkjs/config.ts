@@ -32,6 +32,7 @@ export const sceneOptions = [
   { label: 'Half Dome', value: 6 },
   { label: 'Uluru', value: 7 },
   { label: 'Niagara Falls', value: 8 },
+  { label: 'Table Mountain', value: 9 },
 ];
 
 export default buildConfig({

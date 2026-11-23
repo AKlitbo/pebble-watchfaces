@@ -182,4 +182,26 @@ void half_dome_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 void half_dome_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif
 
+/**
+ * @brief Paint the Table Mountain scene's ground: the mountain, the cable, the tablecloth when
+ * there is cloud about, the city, the bay, and on the rectangle the cable car.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a SkylineGround.
+ */
+void table_mountain_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather in the Table Mountain scene: the cable car with
+ * the temperature on its side.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a SkylineGround.
+ */
+void table_mountain_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
+
 /** @} */

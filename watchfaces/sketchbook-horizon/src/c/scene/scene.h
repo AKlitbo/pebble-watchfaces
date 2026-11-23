@@ -1,13 +1,13 @@
 /**
  * @file scene.h
- * @brief One face, nine scenes, picked at runtime. The wearer chooses a scene in settings and the
+ * @brief One face, ten scenes, picked at runtime. The wearer chooses a scene in settings and the
  * face draws that one.
  *
  * Every scene is its own ground under a shared sky: ridgeline's mountains, shoreline's sea,
- * skyline's bridge, treeline's forest, and the landmarks, Mount Fuji, Giza, Half Dome, Uluru, and
- * Niagara Falls. They all share the sky, the weather and the chrome, and differ in what stands
- * under it and where the clock and readouts sit. Each scene is one row of the table in scene.c, and
- * the layout engine runs whichever row the Scene setting names.
+ * skyline's bridge, treeline's forest, and the landmarks, Mount Fuji, Giza, Half Dome, Uluru,
+ * Niagara Falls, and Table Mountain. They all share the sky, the weather and the chrome, and differ
+ * in what stands under it and where the clock and readouts sit. Each scene is one row of the table
+ * in scene.c, and the layout engine runs whichever row the Scene setting names.
  *
  * @ingroup watchface-sketchbook
  */
@@ -36,6 +36,7 @@ typedef enum
     SCENE_HALF_DOME,
     SCENE_ULURU,
     SCENE_NIAGARA,
+    SCENE_TABLE_MOUNTAIN,
     SCENE_COUNT
 } SceneId;
 
