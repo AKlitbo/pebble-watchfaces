@@ -2,15 +2,15 @@
  * @file conditions.h
  * @brief The phone's condition token, read into a row and a sky.
  *
- * Every face in the family agrees on what each condition does to the sky: how much cloud, how
- * much of the disc it leaves, what falls and how hard, whether a wash goes over the scene and
- * whether a bolt forks out of it. So that table lives here.
+ * Every scene agrees on what each condition does to the sky: how much cloud, how much of the disc
+ * it leaves, what falls and how hard, whether a wash goes over the scene and whether a bolt forks
+ * out of it. So that table lives here.
  *
- * What a face does with the row *beyond* the sky is its own. Ridgeline caps its peaks in snow,
+ * What a scene does with the row *beyond* the sky is its own. Ridgeline caps its peaks in snow,
  * Shoreline roughens its water, Treeline lies snow along the firs, and those are not the same
  * rows: chop follows wind and snow follows cold. That is exactly why there is no seventh field
- * on SketchbookSky to hold it. A face keeps its own rule as a mask over SketchbookCond and asserts it, so a
- * table copied between faces cannot quietly bring the wrong meaning with it.
+ * on SketchbookSky to hold it. A scene keeps its own rule as a mask over SketchbookCond and asserts
+ * it, so a table copied between scenes cannot quietly bring the wrong meaning with it.
  *
  * @ingroup watchface-sketchbook
  */
@@ -25,7 +25,7 @@
 /**
  * @brief The condition vocabulary, in the order paf/ts/weather/conditions.ts lists it.
  *
- * A face indexes its own per-condition rules off these, so the values are the shared contract.
+ * A scene indexes its own per-condition rules off these, so the values are the shared contract.
  */
 typedef enum
 {
@@ -73,8 +73,8 @@ typedef enum
 /**
  * @brief What one condition does to the sky.
  *
- * Six fields, and every face in the family agrees on all six. There is deliberately no seventh:
- * see the file's header for why.
+ * Six fields, and every scene agrees on all six. There is deliberately no seventh: see the
+ * file's header for why.
  */
 typedef struct SketchbookSky
 {
@@ -82,7 +82,7 @@ typedef struct SketchbookSky
     uint8_t celestial; ///< A CelestialVis
     uint8_t precip;    ///< A PrecipKind
     uint8_t drops;     ///< How many particles fall
-    bool    wash;      ///< Lay the face's wash (its fog, haze or mist) over the scene
+    bool    wash;      ///< Lay the scene's wash (its fog, haze or mist) over it
     bool    bolt;      ///< Fork a bolt out of the cloud
 } SketchbookSky;
 

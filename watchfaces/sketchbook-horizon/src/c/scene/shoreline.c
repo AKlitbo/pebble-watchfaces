@@ -32,8 +32,6 @@
 #define BOAT_MAST_H 25     ///< Mast height above the hull
 #define BOAT_FLAG_W 39     ///< Four characters with margin: "120F" and "-12C" both sit clear of the edge
 #define BOAT_FLAG_H 15
-#define BOAT_HULL_HALF 16  ///< Half the hull's widest row, sized so the boat carries its pennant
-#define BOAT_HULL_ROWS 8  ///< Deep enough to read as a hull rather than a waterline
 // how far in from each edge the boat's run stops. it has to clear its own pennant, which flies
 // off one side, so this is wider than the hull alone would need
 #define BOAT_MARGIN PBL_IF_ROUND_ELSE(56, 20)

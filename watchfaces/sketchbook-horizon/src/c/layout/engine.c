@@ -16,14 +16,12 @@
 #include "ui/icon_cache.h"
 #include "sky/sky.h"
 #include "widgets/widgets.h"
-#include "layout/chrome.h"
 #include "theme/palette.h"
 #include "theme/palette_active.h"
 #include "settings_schema.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
 #include "system/settings/settings.h"
-#include "system/settings/setting_values.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -102,20 +100,17 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
 
     widgets_draw_top_bar(ctx, bounds);
 
-    // the date only earns its own strip on the layouts that move it up there
-    if (sketchbook_layout() != LAYOUT_STANDARD)
-    {
-        widgets_draw_date_bar(ctx, bounds);
-    }
     // Mono keeps the gauge grey whenever it is the palette on screen, Shuffle and the night and
     // Quiet Time palettes included
     widgets_draw_battery(ctx, cp->bar_ink, s_theme, system_store_battery());
 
-    // the row's marks go with the row, and only the big clock drops it
+    // the row's marks go with the row, and only the big clock drops it. a round screen has no row
+#if !defined(PBL_ROUND)
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)
     {
         widgets_draw_stat_glyphs(ctx, cp, &s_lay->zones[ZONE_WEATHER], &s_lay->zones[ZONE_STEPS]);
     }
+#endif
 
     // measured onto the live clock, so it takes the same slot and font. a 24-hour clock has no
     // marker anyway, and the setting drops it on a 12-hour one
@@ -167,7 +162,10 @@ static void load_fonts(void)
     fonts_register(FONT_HAND_92, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_92)));
 #endif
     fonts_register(FONT_HAND_72, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_72)));
+    // 64 is the fallback under the rectangle's Hand 72 clock. the circle falls back from 82 to 72
+#if !defined(PBL_ROUND)
     fonts_register(FONT_HAND_64, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_64)));
+#endif
     fonts_register(FONT_HAND_22, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_22)));
     fonts_register(FONT_HAND_18, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_18)));
     fonts_register(FONT_HAND_16, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_16)));
@@ -207,22 +205,21 @@ uint8_t layout_build(const SceneLayout *lay, EngineSlot *out, uint8_t max, GRect
 
     // dropped rather than blanked in big-clock mode, so they cost nothing: no layer, no store
     // pull, no fit
+    //
+    // a round screen has no row down here at all. its temperature is written into the scene, its
+    // steps have no room, and it has no heart rate sensor
+#if !defined(PBL_ROUND)
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)
     {
-        // on a round screen the temperature is written into the scene, so it takes no slot here
-#if !defined(PBL_ROUND)
         out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_WEATHER], .text = readout_weather_temp};
-#endif
 
         if (sketchbook_has_hr())
         {
             out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_HR], .text = readout_hr};
         }
-        // a round screen shows the temperature alone, so the steps never get a slot
-#if !defined(PBL_ROUND)
         out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_STEPS], .text = readout_steps};
-#endif
     }
+#endif
 
     return i;
 }

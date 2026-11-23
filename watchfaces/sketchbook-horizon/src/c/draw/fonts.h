@@ -1,16 +1,14 @@
 /**
  * @file fonts.h
- * @brief The -line family's font slots, one per Patrick Hand size the face loads.
+ * @brief The face's font slots, one per Patrick Hand size it loads.
  *
  * Named for the resource each one holds rather than the job it does, so a slot maps one to one
  * onto the manifest and two roles at the same size share a slot instead of loading it twice.
  *
- * These are the ids passed to the framework's font registry (ui/fonts.h): each face's layout.c
- * load_fonts registers a handle under each and its zone table names the slot from here. Listed
- * in registration order.
- *
- * Shared because every face in the family sets its clock in Patrick Hand at the same sizes. A
- * face that wanted its own type would keep its own slots instead.
+ * These are the ids passed to the framework's font registry (ui/fonts.h), and every scene's zone
+ * table names its slots from here. load_fonts in layout/engine.c registers only the sizes each
+ * watch draws, so the rectangle skips Hand 82 and the round screen skips Hand 92 and Hand 64.
+ * Listed in registration order.
  *
  * @ingroup watchface-sketchbook
  */

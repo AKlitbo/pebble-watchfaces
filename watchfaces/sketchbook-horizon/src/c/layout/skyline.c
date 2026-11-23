@@ -47,14 +47,14 @@
 // --- Date Top ---
 // the date moves onto the strip but the readouts stay, so the clock only grows into the band the
 // date left. same Hand 92 as the big clock, just lower and with less room under it
-#if defined(PBL_ROUND)
-#define SLOT_TIME_DATETOP GRect(20, 99, 220, 100)
-#define SLOT_TIME_DATETOP_SM GRect(20, 115, 220, 100)
-#else
+//
+// this and the big clock are the rectangle's alone, since a round screen only ships the standard
+// layout
+#if !defined(PBL_ROUND)
 #define SLOT_TIME_DATETOP GRect(0, 109, 200, 100)     // digits land at y 140..200, 4px clear of the readouts
 #define SLOT_TIME_DATETOP_SM GRect(0, 125, 200, 100)
+#define MERIDIEM_TOP_DATETOP 140  ///< The colon channel, on this layout's digits
 #endif
-#define MERIDIEM_TOP_DATETOP PBL_IF_ROUND_ELSE(130, 140)  ///< The colon channel, on this layout's digits
 
 // --- Big Clock ---
 // the readouts go entirely and the clock takes everything they leave. same scene underneath
@@ -64,24 +64,17 @@
 // full-screen width is the fit budget, not the position: the text centres either way, so the
 // extra room only buys headroom against the tier dropping. the widest clock any format makes is
 // 190px against 198, so the fallback never fires and the size never changes
-#if defined(PBL_ROUND)
-#define SLOT_TIME_BIG GRect(20, 117, 220, 100)   // the clock, filling the water (Hand 82)
-#define SLOT_TIME_BIG_SM GRect(20, 133, 220, 100) // the tier this size never reaches
-#else
+#if !defined(PBL_ROUND)
 #define SLOT_TIME_BIG GRect(0, 113, 200, 100)   // the clock, filling the water (Hand 92)
 #define SLOT_TIME_BIG_SM GRect(0, 129, 200, 100) // the tier this size never reaches
-#endif
 
 // centred on the screen rather than on what is left of the strip, so it lines up with the clock.
 // Hand 18 hangs 5px below its box and the strip is 20 tall, so the box starts above the screen to
 // land the lettering on the strip's middle. it spans the clear run between the battery and the
 // status glyphs, which is room enough for a long format
-#if defined(PBL_ROUND)
-#define SLOT_DATE_TOP GRect(45, 29, 170, 20)  // on the second strip, where the screen is 170 wide
-#else
 #define SLOT_DATE_TOP GRect(34, -2, 132, 20)
+#define MERIDIEM_TOP_BIG 145  ///< The colon channel, on the big clock's digits
 #endif
-#define MERIDIEM_TOP_BIG PBL_IF_ROUND_ELSE(149, 145)  ///< The colon channel, on the big clock's digits
 
 // --- Temperature Slot ---
 #define SLOT_TEMP GRect(19, 204, 47, 26)      // temperature, right of its thermometer (Hand 18)
@@ -122,10 +115,17 @@ static Zone s_zones[ZONE_COUNT] = {
  *
  * The three differ only in where these two sit and how big the clock is, so the zone table
  * carries the standard one and this moves them for the other two. Called before every rebuild,
- * so a settings change lands without duplicating the table.
+ * so a settings change lands without duplicating the table. A round screen only ships the
+ * standard layout, so there it just sets the clock's font.
  */
 static void apply_layout(void)
 {
+#if defined(PBL_ROUND)
+    // 82 on the circle rather than 92: at 92 the widest time runs 197px and the glass down there is
+    // only 172 wide, so the outer digits ran into the bezel
+    s_zones[ZONE_TIME].font_id = FONT_HAND_82;
+    s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
+#else
     uint8_t layout = sketchbook_layout();
 
     // both date-up layouts share a date: on the strip, small, centred
@@ -145,9 +145,7 @@ static void apply_layout(void)
     }
 
     // with no heart rate to show, the row is two readouts rather than three, so both move to the
-    // centred boxes that keep each glyph and its number together as a pair. a round screen has
-    // neither reading left down here to place
-#if !defined(PBL_ROUND)
+    // centred boxes that keep each glyph and its number together as a pair
     if (!sketchbook_has_hr())
     {
         s_zones[ZONE_WEATHER].rect = SLOT_TEMP_PAIR;
@@ -158,7 +156,6 @@ static void apply_layout(void)
         s_zones[ZONE_STEPS].rect_fallback = SLOT_STEPS_PAIR_SM;
         s_zones[ZONE_STEPS].align = GTextAlignmentCenter;
     }
-#endif
 
     // the clock is what actually differs: same Hand 92 for both roomier layouts, sitting higher
     // when the readouts are still under it
@@ -166,44 +163,46 @@ static void apply_layout(void)
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME_BIG;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_BIG_SM;
-        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_92);
+        s_zones[ZONE_TIME].font_id = FONT_HAND_92;
         s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
     }
     else if (layout == LAYOUT_DATE_TOP)
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME_DATETOP;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_DATETOP_SM;
-        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_92);
+        s_zones[ZONE_TIME].font_id = FONT_HAND_92;
         s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_72;
     }
     else
     {
         s_zones[ZONE_TIME].rect = SLOT_TIME;
         s_zones[ZONE_TIME].rect_fallback = SLOT_TIME_SM;
-        // 82 on the circle rather than 92: at 92 the widest time runs 197px and the glass down
-        // there is only 172 wide, so the outer digits ran into the bezel
-        s_zones[ZONE_TIME].font_id = PBL_IF_ROUND_ELSE(FONT_HAND_82, FONT_HAND_72);
-        s_zones[ZONE_TIME].font_id_fallback = PBL_IF_ROUND_ELSE(FONT_HAND_72, FONT_HAND_64);
+        s_zones[ZONE_TIME].font_id = FONT_HAND_72;
+        s_zones[ZONE_TIME].font_id_fallback = FONT_HAND_64;
     }
+#endif
 }
 
 /**
  * @brief The cap line an above-the-colon marker sits on.
  *
- * Only the two Hand 92 layouts put it there, and their digits sit at different heights.
+ * Only the two Hand 92 layouts put it there on the rectangle, and their digits sit at different
+ * heights. The round standard layout draws Hand 82 at its own height, so it gets its own channel.
+ *
+ * @return The marker's cap line.
  */
 static int meridiem_above_top(void)
 {
+#if defined(PBL_ROUND)
+    return MERIDIEM_TOP;
+#else
     if (sketchbook_layout() == LAYOUT_BIG_CLOCK)
     {
         return MERIDIEM_TOP_BIG;
     }
 
-    // the round standard layout draws Hand 82 too, at its own height, so it gets its own channel
-    // rather than borrowing the date-top one
-    return PBL_IF_ROUND_ELSE(
-        sketchbook_layout() == LAYOUT_STANDARD ? MERIDIEM_TOP : MERIDIEM_TOP_DATETOP,
-        MERIDIEM_TOP_DATETOP);
+    return MERIDIEM_TOP_DATETOP;
+#endif
 }
 
 /** @brief The scene's palette for the hour, as the engine's opaque pointer. */

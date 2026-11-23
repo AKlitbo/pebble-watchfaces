@@ -6,10 +6,9 @@
  * All stateless draws the scene's overlay slot calls. The bluetooth glyph comes from the
  * shared icon cache and the engine owns the layer.
  *
- * Shared by the family, so it reads the face's own layout.h for where the chrome sits:
- * BATT_RECT, BT_ICON, QT_ICON, the MERIDIEM_* boxes and the stats-row anchors. Every face in
- * the family agrees on those. A face that moves one moves only its own chrome, which is the
- * point of them being there rather than here.
+ * Where the chrome sits comes from chrome.h: BATT_RECT, BT_ICON, QT_ICON, the MERIDIEM_* boxes
+ * and the stats-row anchors. Every scene puts its chrome in the same place, so those live there
+ * once and the scene layouts read the same ones.
  *
  * @ingroup watchface-sketchbook
  */
@@ -17,7 +16,6 @@
 #include <pebble.h>
 
 #include "theme/palette.h"
-#include "theme/battery.h"
 #include "ui/fonts.h"  // FontId, for the clock font the marker is measured against
 #include "ui/zone.h"   // Zone, for the boxes the stats row landed in
 
@@ -55,17 +53,8 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds);
  */
 void widgets_draw_bt(GContext *ctx, bool connected);
 
-/**
- * @brief Draw the second status strip, the one the date sits on.
- *
- * Only a round screen needs it, and only for a layout that moves the date up top. Everywhere else
- * this is a no-op, since the single strip already has the room.
- *
- * @param ctx The graphics context.
- * @param bounds The window's root bounds.
- */
-void widgets_draw_date_bar(GContext *ctx, GRect bounds);
-
+// a round screen has no stats row, so these two are the rectangle's alone
+#if !defined(PBL_ROUND)
 /**
  * @brief Whether this watch can report a heart rate, so the stats row knows how many to place.
  *
@@ -83,9 +72,9 @@ bool sketchbook_has_hr(void);
  * The bundled glyphs are white masters, so each is recoloured to the palette on the way out
  * and reads in the same ink as the number beside it.
  *
- * The two zones come in rather than being read off the face's macros, because a round layout can
- * move that row: the standard one flanks the clock and the wider ones keep it along the bottom.
- * Taking the boxes the numbers actually drew in is what keeps each mark with its own number.
+ * The two zones come in rather than being read off the chrome macros, because with no heart rate
+ * each scene moves its temperature and steps into centred boxes of its own. Taking the boxes the
+ * numbers actually drew in is what keeps each mark with its own number.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
@@ -93,6 +82,7 @@ bool sketchbook_has_hr(void);
  * @param steps The steps zone.
  */
 void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zone *weather, const Zone *steps);
+#endif
 
 /**
  * @brief Draw the AM/PM marker beside the clock: AM on its left, PM on its right.

@@ -1,8 +1,8 @@
 /**
  * @file palette_active.h
- * @brief Which palette a Sketchbook face should paint with right now.
+ * @brief Which palette the face should paint with right now.
  *
- * A face holds one palette setting and three ways to use it. Fixed keeps the chosen one. Shuffle
+ * The face holds one palette setting and three ways to use it. Fixed keeps the chosen one. Shuffle
  * rotates through them all on a cadence. Day/Night/Quiet keeps the chosen one by day and swaps to a
  * different one after dark or during Quiet Time, each of those an override the wearer can turn off.
  *

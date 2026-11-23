@@ -1,15 +1,15 @@
 /**
  * @file sky.h
- * @brief The sky every Sketchbook face draws above its own ground.
+ * @brief The sky every scene draws above its own ground.
  *
  * Two bands blended into each other, a field of stars after dark, the dashed arc the day runs
  * along, and the sun or moon somewhere on it. All of it comes from the clock and from the
- * sunrise and sunset the phone sends, so a face gets a sky that agrees with the hour without
+ * sunrise and sunset the phone sends, so a scene gets a sky that agrees with the hour without
  * doing any of this itself.
  *
- * Where it all sits comes from the face's sketchbook_config.h. The star field does not: those
- * are hand-placed per face to sit above its own horizon, so the face keeps the table and hands
- * it over.
+ * Where it all sits comes from the scene's SceneGeometry in scene/geometry.h. The star field does
+ * not: those are hand-placed per scene to sit above its own horizon, so the scene keeps the table
+ * and hands it over.
  *
  * @ingroup watchface-sketchbook
  */
@@ -74,7 +74,7 @@ void sketchbook_sky_draw_bands(GContext *ctx, GRect bounds, const CommonPalette 
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
- * @param stars The face's own field.
+ * @param stars The scene's own field.
  * @param count How many there are.
  */
 void sketchbook_sky_draw_stars(GContext *ctx, const CommonPalette *pal, const SketchbookStar *stars, int count);

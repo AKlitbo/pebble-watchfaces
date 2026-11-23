@@ -84,8 +84,9 @@ void sketchbook_fx_draw_clouds(GContext *ctx, const CommonPalette *pal, const Sk
         x = 146;
     }
 
-    // the low end of the clamp is what keeps the taller lobe out from under the status bar when
-    // the disc is high; the high end keeps the cloud off the face's ground when it is low
+    // the low end of the clamp keeps the taller lobe out from under the status bar when the disc
+    // is high
+    // the high end keeps the cloud off the scene's ground when it is low
     int y = disc.y + g->cloud_drop;
     if (y < g->cloud_y_min)
     {

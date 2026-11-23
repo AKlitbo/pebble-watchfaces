@@ -19,8 +19,8 @@ static const char *const s_tokens[SKETCHBOOK_COND_COUNT] = {
     "RAIN", "FZRN", "SNOW", "SHWR", "SNSH", "STRM",
 };
 
-// one row per condition, in the same order. every face in the family draws the same sky for a
-// given condition, which is the whole reason this is here rather than in each of them
+// one row per condition, in the same order. every scene draws the same sky for a given
+// condition, which is the whole reason this is here rather than in each of them
 static const SketchbookSky s_skies[SKETCHBOOK_COND_COUNT] = {
     [SKETCHBOOK_COND_CLEAR] = {.clouds = CLOUDS_NONE,     .celestial = CEL_FULL,   .precip = PRECIP_NONE},
     [SKETCHBOOK_COND_PCLDY] = {.clouds = CLOUDS_DRIFTING, .celestial = CEL_PEEK,   .precip = PRECIP_NONE},

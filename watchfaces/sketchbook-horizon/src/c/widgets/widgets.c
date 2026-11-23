@@ -10,6 +10,7 @@
 #include <time.h>
 
 #include "layout/chrome.h"
+#include "theme/battery.h"
 #include "draw/fonts.h"
 #include "ui/fonts.h"
 #include "ui/icon_cache.h"
@@ -74,17 +75,6 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds)
     graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, TOP_BAR_H), 0, GCornerNone);
 }
 
-void widgets_draw_date_bar(GContext *ctx, GRect bounds)
-{
-#if defined(PBL_ROUND)
-    graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_rect(ctx, GRect(0, TOP_BAR2_Y, bounds.size.w, TOP_BAR2_H), 0, GCornerNone);
-#else
-    (void)ctx;
-    (void)bounds;
-#endif
-}
-
 void widgets_draw_bt(GContext *ctx, bool connected)
 {
     GBitmap *bmp = icon_get(connected ? RESOURCE_ID_ICON_BLUETOOTH : RESOURCE_ID_ICON_BLUETOOTH_SLASH);
@@ -117,6 +107,9 @@ static void draw_glyph(GContext *ctx, uint32_t res, GRect box, GColor color)
     graphics_draw_bitmap_in_rect(ctx, bmp, box);
 }
 
+// a round screen has no stats row, so the row's marks and the helpers that place them are the
+// rectangle's alone
+#if !defined(PBL_ROUND)
 /**
  * @brief How wide a stat reads on screen, and which of its two boxes it lands in.
  *
@@ -187,19 +180,9 @@ static GRect glyph_before(uint32_t res, int text_left)
     return glyph_on_baseline(res, text_left - STAT_GLYPH_GAP - glyph_art_width(res));
 }
 
-/** @brief The same, on a row that sits somewhere other than the face's default line. */
-static GRect glyph_before_on(uint32_t res, int text_left, int baseline)
-{
-    return glyph_on_line(res, text_left - STAT_GLYPH_GAP - glyph_art_width(res), baseline);
-}
-
 bool sketchbook_has_hr(void)
 {
-#if defined(PBL_PLATFORM_GABBRO)
-    // this watch has no sensor to ask. the health service still reports the metric as accessible
-    // on the emulator, so taking its word for it would leave a slot that can only say "--"
-    return false;
-#elif defined(PBL_HEALTH)
+#if defined(PBL_HEALTH)
     time_t now = time(NULL);
     HealthServiceAccessibilityMask access =
         health_service_metric_accessible(HealthMetricHeartRateBPM, now, now);
@@ -218,18 +201,8 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
     GRect slot;
     bool has_hr = sketchbook_has_hr();
 
-#if defined(PBL_ROUND)
-    // the round faces carry a single unlabelled reading, so there is nothing to mark
-    if (!has_hr)
-    {
-        (void)slot;
-        (void)text;
-        return;
-    }
-#endif
-
-    // every mark reads its number's box back off the zone, so it follows both a font fallback and
-    // a layout that moved the whole row somewhere else
+    // every mark follows the box its number landed in, so it keeps up with a font fallback. with
+    // no heart rate that box comes back off the zone, which the scene moved to its centred pair
     readout_weather_temp(text, sizeof(text));
     if (has_hr)
     {
@@ -242,9 +215,8 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
     {
         int temp_w = stat_metrics(text, weather->rect, weather->rect_fallback, &slot);
         int temp_mid = slot.origin.x + slot.size.w / 2;
-        int temp_base = STAT_ROW_BASELINE(weather->rect);
         draw_glyph(ctx, RESOURCE_ID_ICON_THERMOMETER,
-            glyph_before_on(RESOURCE_ID_ICON_THERMOMETER, temp_mid - temp_w / 2, temp_base), pal->dim);
+            glyph_before(RESOURCE_ID_ICON_THERMOMETER, temp_mid - temp_w / 2), pal->dim);
     }
 
     if (has_hr)
@@ -266,11 +238,11 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
     {
         int steps_w = stat_metrics(text, steps->rect, steps->rect_fallback, &slot);
         int steps_mid = slot.origin.x + slot.size.w / 2;
-        int steps_base = STAT_ROW_BASELINE(steps->rect);
         draw_glyph(ctx, RESOURCE_ID_ICON_FEET,
-            glyph_before_on(RESOURCE_ID_ICON_FEET, steps_mid - steps_w / 2, steps_base), pal->dim);
+            glyph_before(RESOURCE_ID_ICON_FEET, steps_mid - steps_w / 2), pal->dim);
     }
 }
+#endif
 
 /** @brief How wide @p text renders in @p font. */
 static int text_width(const char *text, GFont font)

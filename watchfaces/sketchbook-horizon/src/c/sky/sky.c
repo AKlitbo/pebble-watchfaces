@@ -1,6 +1,6 @@
 /**
  * @file sky.c
- * @brief The sky every Sketchbook face draws: its bands, its stars, and the sun or moon on its arc.
+ * @brief The sky every scene draws: its bands, its stars, and the sun or moon on its arc.
  *
  * @ingroup watchface-sketchbook
  */

@@ -23,7 +23,7 @@
 /**
  * @brief Every colour the Skyline scene paints with.
  *
- * The nine the family shares, plus what a river crossing is made of. There is one water colour
+ * The nine every scene shares, plus what a river crossing is made of. There is one water colour
  * rather than a near and a far: this river is a mirror, not a shore, and the only thing that
  * gives it depth is what it reflects.
  */

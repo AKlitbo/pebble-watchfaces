@@ -58,9 +58,9 @@
       { "type": "bitmap", "name": "ICON_BLUETOOTH_SLASH", "file": "icons/bluetooth-slash.png" },
       { "type": "bitmap", "name": "ICON_QUIET_ON", "file": "icons/quiet-on.png" },
       { "type": "bitmap", "name": "ICON_QUIET_OFF", "file": "icons/quiet-off.png" },
-      { "type": "bitmap", "name": "ICON_HEART", "file": "icons/heart.png" },
-      { "type": "bitmap", "name": "ICON_FEET", "file": "icons/feet.png" },
-      { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png" },
+      { "type": "bitmap", "name": "ICON_HEART", "file": "icons/heart.png", "targetPlatforms": ["emery"] },
+      { "type": "bitmap", "name": "ICON_FEET", "file": "icons/feet.png", "targetPlatforms": ["emery"] },
+      { "type": "bitmap", "name": "ICON_THERMOMETER", "file": "icons/thermometer.png", "targetPlatforms": ["emery"] },
       {
         "type": "font",
         "name": "FONT_HAND_72",
@@ -71,7 +71,10 @@
         "type": "font",
         "name": "FONT_HAND_64",
         "file": "fonts/PatrickHand-Regular.ttf",
-        "characterRegex": "[0-9:@]"
+        "characterRegex": "[0-9:@]",
+        "targetPlatforms": [
+          "emery"
+        ]
       },
       {
         "type": "font",
@@ -86,7 +89,10 @@
         "type": "font",
         "name": "FONT_HAND_92",
         "file": "fonts/PatrickHand-Regular.ttf",
-        "characterRegex": "[0-9:@]"
+        "characterRegex": "[0-9:@]",
+        "targetPlatforms": [
+          "emery"
+        ]
       },
       {
         "type": "font",

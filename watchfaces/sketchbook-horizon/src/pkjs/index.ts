@@ -13,7 +13,7 @@ import clayConfig from './config';
 
 app.startPebbleApp({
   clayConfig,
-  // the paper-and-ink restyle of the settings page, shared by every Sketchbook face
+  // the paper-and-ink restyle of the settings page
   components: [sketchbookChrome],
   // weather with no coordinates, since this face never displays them
   features: [weather],

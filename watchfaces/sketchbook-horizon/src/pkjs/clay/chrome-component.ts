@@ -1,9 +1,9 @@
 /**
- * The Sketchbook page chrome: a warm paper-and-ink restyle of the stock Clay settings page, shared
- * by every Sketchbook face.
+ * The Sketchbook Horizon page chrome: a warm paper-and-ink restyle of the stock Clay settings
+ * page.
  *
  * It is a style-only Clay component. Clay drops a registered component's style into the page head
- * whether or not any item uses it, so a face registers this once in its components list and the whole
+ * whether or not any item uses it, so the face registers this once in its components list and the whole
  * page takes the look. Nothing references it as an item, so its template and manipulator never run.
  * The manipulator is only here because Clay refuses to register a component without one.
  *
@@ -13,7 +13,7 @@
  * page-font.g.js, so it draws offline and asks the wearer to allow no font site.
  *
  * It also repaints two things the framework ships neutral on purpose: the theme preview's frame and
- * the location search dropdown. Those stay skin-agnostic in the framework, so a face paints them
+ * the location search dropdown. Those stay skin-agnostic in the framework, so the face paints them
  * from here. This sheet loads after their own styles, so plain declarations win where they need to.
  */
 
@@ -84,7 +84,7 @@ export default {
     '  border-radius: 6px !important;',
     '}',
 
-    // the toggle's on state takes the warm sun the faces paint their disc with, not Clay's orange
+    // the toggle's on state takes the warm sun the scenes paint their disc with, not Clay's orange
     '.component-toggle input:checked + .graphic .slide { background: #e8b84b !important; }',
     '.component-toggle input:checked + .graphic .marker { background: #b98a22 !important; }',
 
@@ -122,9 +122,9 @@ export default {
     '.pf-loc-search .pf-loc-note { background: rgba(232, 184, 75, 0.18) !important; border-left-color: #e8b84b !important; }',
     '.pf-loc-search .pf-loc-note:before { border-color: #b98a22 !important; color: #8a6714 !important; }',
 
-    // the page has a day and a night the way the faces do. when the phone is set to dark, the warm
+    // the page has a day and a night the way the scenes do. when the phone is set to dark, the warm
     // paper turns to a deep night blue, the ink turns to a cool off-white, and the accent cools from
-    // the daytime sun to a moonlit blue, matching the faces' blue night sky
+    // the daytime sun to a moonlit blue, matching the scenes' blue night sky
     ':root { color-scheme: light dark; }',
 
     // the framework's own rows, such as the plugin notes and the supported plugins list, read their

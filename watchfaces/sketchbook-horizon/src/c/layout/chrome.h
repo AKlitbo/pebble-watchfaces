@@ -22,13 +22,10 @@
 // have to read against whatever the scene is doing, which on a white-paper palette means white
 // on white. the strip costs 20px of sky and makes every theme legible up there
 //
-// a round screen is 64px wide at y=4 and does not reach 138 until y=20, so one strip cannot hold
-// the icons and the date the way the rectangle does. it takes two: the icons drop to where there
-// is room for them, and the date gets a second strip below with nearly twice the width
+// a round screen is 64px wide at y=4 and does not reach 138 until y=20, so its icons drop to
+// where there is room for them and the strip runs deeper to hold them
 #if defined(PBL_ROUND)
 #define TOP_BAR_H 24
-#define TOP_BAR2_Y 28         ///< Top of the date strip, with a slice of sky showing between
-#define TOP_BAR2_H 26
 #else
 #define TOP_BAR_H 20
 #endif
@@ -73,9 +70,5 @@
 #define STAT_GLYPH_GAP 5     ///< Air between a glyph and the number it labels
 #define STAT_TEMP_GLYPH_X 4  ///< Left edge of the thermometer, the one glyph pinned to the bezel
 #define STAT_BASELINE 224    ///< The line every glyph and digit in the row sits on
-// a round layout can put the row at the sides or along the bottom, so a mark works its baseline
-// out from the box its number draws in rather than from one fixed line. 20px below the big tier's
-// box is where that tier's text lands
-#define STAT_ROW_BASELINE(big) ((big).origin.y + 20)
 
 /** @} */

@@ -31,7 +31,7 @@
 #define DECK_Y 124       ///< The bridge deck, crossing in front of the bank and over the river
 #define TOWER_TOP 56     ///< How high the two bridge towers reach
 #define PIER_DROP 14     ///< How far each tower carries on below the deck, into the river
-#define SCENE_BOTTOM 162 ///< The last row the reflections reach, matching the rest of the family
+#define SCENE_BOTTOM 162 ///< The last row the reflections reach, matching the other scenes
 // --- Channel buoy ---
 // the marker floating mid-river below the crossing, carrying the reading on its side the way a
 // real channel buoy carries its number
@@ -44,7 +44,7 @@
 #define DECK_Y 102       ///< The bridge deck, crossing in front of the bank and over the river
 #define TOWER_TOP 46     ///< How high the two bridge towers reach
 #define PIER_DROP 10     ///< How far each tower carries on below the deck, into the river
-#define SCENE_BOTTOM 133 ///< The last row the reflections reach, matching the rest of the family
+#define SCENE_BOTTOM 133 ///< The last row the reflections reach, matching the other scenes
 #endif
 
 // the platform says how wide it is, so the city, the deck and the water run to whichever

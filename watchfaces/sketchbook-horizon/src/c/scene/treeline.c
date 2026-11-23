@@ -29,7 +29,7 @@
 // flat, and a gale and a storm look the same from a chimney
 #define WIND_FULL_KMH 40
 
-// where the treelines stand and where the clearing floor starts. only what this face draws for
+// where the treelines stand and where the clearing floor starts. only what this scene draws for
 // itself lives here. where the sky, the weather and the arc sit is in the geometry below
 //
 // the round screen is 30% wider and only 14% taller, so the forest is not a straight scale of the
@@ -60,7 +60,7 @@
 #define CABIN_WIN_W 20
 #define CABIN_WIN_H 14
 // the board the temperature is lettered on, nailed across the front above the door and window.
-// the cabin is this face's one built thing, so the reading rides it the way shoreline's rides
+// the cabin is this scene's one built thing, so the reading rides it the way shoreline's rides
 // the boat rather than standing on a post of its own
 #define CABIN_BOARD_INSET 4
 #define CABIN_BOARD_H 17
