@@ -9,6 +9,8 @@
     "gabbro"
   ],
   "defines": {
+    "ENGINE_SLOTS_MAX": 7,
+    "ICON_CACHE_MAX": 8,
     "PLUGIN_WEATHER": 1
   },
   "providers": {

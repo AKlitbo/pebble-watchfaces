@@ -228,11 +228,11 @@ static void draw_fir(GContext *ctx, const Fir *fir, int base, GColor body, GColo
 
     graphics_context_set_stroke_width(ctx, 1);
 
-    graphics_context_set_stroke_color(ctx, body);
+    graphics_context_set_fill_color(ctx, body);
     for (int row = 0; row <= height; row++)
     {
         int half = fir_half(row, height, fir->half_w);
-        graphics_draw_line(ctx, GPoint(fir->x - half, top + row), GPoint(fir->x + half, top + row));
+        graphics_fill_rect(ctx, GRect(fir->x - half, top + row, half * 2 + 1, 1), 0, GCornerNone);
     }
 
     graphics_context_set_stroke_color(ctx, line);

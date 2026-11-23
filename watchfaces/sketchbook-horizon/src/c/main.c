@@ -26,6 +26,89 @@
 
 static Window *s_window;
 
+// only the rectangle has a stats row, so only it reads the health store
+#if !defined(PBL_ROUND)
+// a heart rate reading can land every second during a workout, and each one would repaint the
+// whole scene. a reading paints straight away and then holds the next ones off for this long
+#define HEALTH_HOLD_MS 10000
+
+static AppTimer *s_health_hold;  ///< Running while health readings are held off, NULL otherwise
+static bool s_health_owed;       ///< A reading landed during the hold and is not on screen yet
+#endif
+
+/**
+ * @brief Repaint everything, or rebuild it when the palette baked into the slots has moved.
+ *
+ * Every full repaint comes through here. It puts the latest health readings up with everything
+ * else, so a reading held off until the end of the hold has nothing left to paint.
+ *
+ * @param rebuild True to rebuild the slots rather than repaint them.
+ */
+static void repaint(bool rebuild)
+{
+#if !defined(PBL_ROUND)
+    s_health_owed = false;
+#endif
+
+    if (rebuild)
+    {
+        engine_rebuild();
+    }
+    else
+    {
+        engine_mark_dirty();
+    }
+}
+
+/** @brief Store callback for the weather and system stores: any change repaints everything. */
+static void on_store_changed(void)
+{
+    repaint(false);
+}
+
+#if !defined(PBL_ROUND)
+static void on_health_hold_end(void *data);
+
+/** @brief Paint the latest health readings and hold the next ones off for HEALTH_HOLD_MS. */
+static void paint_health(void)
+{
+    repaint(false);
+    s_health_hold = app_timer_register(HEALTH_HOLD_MS, on_health_hold_end, NULL);
+}
+
+/**
+ * @brief The hold is over. A reading that landed during it goes up now and starts another hold.
+ *
+ * @param data Unused.
+ */
+static void on_health_hold_end(void *data)
+{
+    s_health_hold = NULL;
+
+    if (s_health_owed)
+    {
+        paint_health();
+    }
+}
+
+/**
+ * @brief Health store callback: paint a reading straight away, or owe it to the end of the hold.
+ *
+ * A single change after a quiet spell shows at once, and a workout's stream of them paints at most
+ * once every HEALTH_HOLD_MS.
+ */
+static void on_health_changed(void)
+{
+    if (s_health_hold)
+    {
+        s_health_owed = true;
+        return;
+    }
+
+    paint_health();
+}
+#endif
+
 /**
  * @brief The time-store rules from the current settings (cadence follows what is on screen).
  *
@@ -72,7 +155,7 @@ static void apply_settings_change(void)
 static void on_settings_changed(bool time_or_date_changed)
 {
     apply_settings_change();
-    engine_rebuild();
+    repaint(true);
 
     time_store_reconfigure(time_cfg());  // on every change, since the formats and the buzz both pick it
 }
@@ -92,14 +175,7 @@ static void on_settings_changed(bool time_or_date_changed)
  */
 static void on_time_tick(void)
 {
-    if (sketchbook_palette_changed())
-    {
-        engine_rebuild();
-    }
-    else
-    {
-        engine_mark_dirty();
-    }
+    repaint(sketchbook_palette_changed());
 
     vibe_hourly(time_store_tm(), settings_u8(SETTING_HOURLY_VIBE));
 }
@@ -115,7 +191,13 @@ static void init(void)
     if (!dev_seed_stores())
     {
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
+#if !defined(PBL_ROUND)
+        // heart rate, steps and distance only show in the stats row, and a round screen has none
+        // so a round build leaves the health service alone. the health capability still covers
+        // the round watch, since an appinfo lists its capabilities once for every platform
+        // a dev build on round still seeds the store through the dev plugin, and nothing reads it
         health_store_init((HealthConfig){.live = true, .distance = true, .persist_key = HEALTH_STORE_KEY}, NULL);
+#endif
         time_store_init(time_cfg(), NULL);
         weather_store_init((WeatherConfig){.live = true, .poll_min = 30,
                                            .persist_key = WEATHER_STORE_KEY}, NULL);
@@ -127,11 +209,14 @@ static void init(void)
     window_stack_push(s_window, true);
 
     // any store change repaints everything: the scene reads the weather and the clock, so a
-    // reading landing changes the picture and not just the numbers
+    // reading landing changes the picture and not just the numbers. health readings are held off
+    // between paints, since during a workout they come every second
     time_store_subscribe(on_time_tick);
-    health_store_subscribe(engine_mark_dirty);
-    weather_store_subscribe(engine_mark_dirty);
-    system_store_subscribe(engine_mark_dirty);
+#if !defined(PBL_ROUND)
+    health_store_subscribe(on_health_changed);
+#endif
+    weather_store_subscribe(on_store_changed);
+    system_store_subscribe(on_store_changed);
 
     // weather_store owns its channels. main only wires settings
     appmessage_on_settings_changed(on_settings_changed);

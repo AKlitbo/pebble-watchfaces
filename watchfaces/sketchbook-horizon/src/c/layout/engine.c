@@ -234,8 +234,34 @@ void sketchbook_setup(Window *window)
     window_set_background_color(window, GColorBlack);
 }
 
-// a build writes up to seven slots without reading max, so the engine's cap has to hold them
+// a build writes up to seven slots, and the appinfo sets ENGINE_SLOTS_MAX to exactly seven. this
+// stops the build if the cap ever drops below them. a new slot past seven is caught by next_slot
 _Static_assert(ENGINE_SLOTS_MAX >= 7, "a scene build writes up to seven slots");
+
+/**
+ * @brief Where the build writes its next slot, or a spare when the engine has no room left.
+ *
+ * The engine hands over room for max slots. Writing one more would run off the end of its arrays,
+ * so a slot past the cap goes into the spare, which nothing reads, and is named in the log.
+ *
+ * @param out The engine's slot list.
+ * @param max How many slots it has room for.
+ * @param count How many are taken so far, moved on when this one fits.
+ * @return The slot to write.
+ */
+static EngineSlot *next_slot(EngineSlot *out, uint8_t max, uint8_t *count)
+{
+    static EngineSlot s_spare;
+
+    if (*count >= max)
+    {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "slot %d is past the engine's %d. Raise ENGINE_SLOTS_MAX in the appinfo",
+            *count + 1, max);
+        return &s_spare;
+    }
+
+    return &out[(*count)++];
+}
 
 uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds)
 {
@@ -245,11 +271,11 @@ uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds)
     layout_zones_apply(s_scene->clock_only_y);
 
     // the scene is the background, so it goes down first and the chrome sits on it
-    out[i++] = (EngineSlot){.frame = bounds, .draw = draw_scene};
-    out[i++] = (EngineSlot){.frame = bounds, .draw = draw_chrome};
+    *next_slot(out, max, &i) = (EngineSlot){.frame = bounds, .draw = draw_scene};
+    *next_slot(out, max, &i) = (EngineSlot){.frame = bounds, .draw = draw_chrome};
 
-    out[i++] = (EngineSlot){.zone = &zones[ZONE_TIME], .text = readout_time};
-    out[i++] = (EngineSlot){.zone = &zones[ZONE_DATE], .text = readout_date};
+    *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_TIME], .text = readout_time};
+    *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_DATE], .text = readout_date};
 
     // dropped rather than blanked in big-clock mode, so they cost nothing: no layer, no store
     // pull, no fit
@@ -259,13 +285,13 @@ uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds)
 #if !defined(PBL_ROUND)
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)
     {
-        out[i++] = (EngineSlot){.zone = &zones[ZONE_WEATHER], .text = readout_weather_temp};
+        *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_WEATHER], .text = readout_weather_temp};
 
         if (layout_zones_has_hr())
         {
-            out[i++] = (EngineSlot){.zone = &zones[ZONE_HR], .text = readout_hr};
+            *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_HR], .text = readout_hr};
         }
-        out[i++] = (EngineSlot){.zone = &zones[ZONE_STEPS], .text = readout_steps};
+        *next_slot(out, max, &i) = (EngineSlot){.zone = &zones[ZONE_STEPS], .text = readout_steps};
     }
 #endif
 

@@ -8,6 +8,7 @@
 
 #include "ui/fonts.h"
 #include "draw/fonts.h"
+#include "draw/measure.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -16,9 +17,10 @@
 
 int letter_width(const char *text)
 {
-    GSize size = graphics_text_layout_get_content_size(text, fonts_get(FONT_HAND_16),
-        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
-    return size.w;
+    // the one thing measured here is the temperature, which holds for half an hour at a time
+    static MeasureMemo s_memo;
+
+    return measure_width(&s_memo, text, fonts_get(FONT_HAND_16), GRect(0, 0, 120, 26), GTextAlignmentCenter);
 }
 
 void letter_board(GContext *ctx, const char *text, GRect board, GColor color)

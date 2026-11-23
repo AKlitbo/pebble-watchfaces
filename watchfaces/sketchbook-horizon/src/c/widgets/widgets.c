@@ -12,6 +12,7 @@
 #include "layout/chrome.h"
 #include "theme/battery.h"
 #include "draw/fonts.h"
+#include "draw/measure.h"
 #include "ui/fonts.h"
 #include "ui/icon_cache.h"
 #include "ui/readouts.h"
@@ -73,6 +74,11 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds)
 /**
  * @brief Draw one white master glyph recoloured to the palette.
  *
+ * Every icon the face draws comes through here. The rectangle draws seven: the bluetooth pair, the
+ * Quiet Time pair, and the stats row's thermometer, heart, and feet. The round screen draws the two
+ * pairs. The appinfo's ICON_CACHE_MAX of 8 holds all seven with one to spare, so raise it with any
+ * new icon or the cache starts reloading on every repaint.
+ *
  * @param ctx The graphics context.
  * @param res The icon resource.
  * @param box Where to put it.
@@ -116,13 +122,13 @@ void widgets_draw_bt(GContext *ctx, GColor color, bool connected)
  * @param big The slot the big font draws in.
  * @param small The slot the small font draws in.
  * @param used Receives whichever of the two it settled on.
+ * @param memo The stat's own memos, the big font's first and then the small one's.
  * @return The rendered width in pixels.
  */
-static int stat_metrics(const char *text, GRect big, GRect small, GRect *used)
+static int stat_metrics(const char *text, GRect big, GRect small, GRect *used, MeasureMemo memo[2])
 {
     GRect measure = GRect(0, 0, 1000, 100);
-    int width = graphics_text_layout_get_content_size(text, fonts_get(FONT_HAND_18), measure,
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft).w;
+    int width = measure_width(&memo[0], text, fonts_get(FONT_HAND_18), measure, GTextAlignmentLeft);
 
     if (width <= big.size.w - 2)
     {
@@ -131,8 +137,7 @@ static int stat_metrics(const char *text, GRect big, GRect small, GRect *used)
     }
 
     *used = small;
-    return graphics_text_layout_get_content_size(text, fonts_get(FONT_HAND_16), measure,
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft).w;
+    return measure_width(&memo[1], text, fonts_get(FONT_HAND_16), measure, GTextAlignmentLeft);
 }
 
 /** @brief The width of a glyph's visible art, with its transparent padding backed out. */
@@ -189,6 +194,12 @@ bool sketchbook_has_hr(void)
 void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zone *weather, const Zone *steps,
     bool has_hr)
 {
+    // each reading keeps its last measurement in both fonts, so a repaint that leaves the number
+    // alone skips the text layout
+    static MeasureMemo s_temp_memo[2];
+    static MeasureMemo s_hr_memo[2];
+    static MeasureMemo s_steps_memo[2];
+
     char text[16];
 
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
@@ -207,7 +218,7 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
     }
     else
     {
-        int temp_w = stat_metrics(text, weather->rect, weather->rect_fallback, &slot);
+        int temp_w = stat_metrics(text, weather->rect, weather->rect_fallback, &slot, s_temp_memo);
         int temp_mid = slot.origin.x + slot.size.w / 2;
         draw_glyph(ctx, RESOURCE_ID_ICON_THERMOMETER,
             glyph_before(RESOURCE_ID_ICON_THERMOMETER, temp_mid - temp_w / 2), pal->dim);
@@ -216,7 +227,7 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
     if (has_hr)
     {
         readout_hr(text, sizeof(text));
-        int hr_w = stat_metrics(text, SLOT_HR, SLOT_HR_SM, &slot);
+        int hr_w = stat_metrics(text, SLOT_HR, SLOT_HR_SM, &slot, s_hr_memo);
         int hr_left = slot.origin.x + slot.size.w / 2 - hr_w / 2;  // centred
         draw_glyph(ctx, RESOURCE_ID_ICON_HEART, glyph_before(RESOURCE_ID_ICON_HEART, hr_left), pal->dim);
     }
@@ -224,13 +235,13 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
     readout_steps(text, sizeof(text));
     if (has_hr)
     {
-        int steps_w = stat_metrics(text, SLOT_STEPS, SLOT_STEPS_SM, &slot);
+        int steps_w = stat_metrics(text, SLOT_STEPS, SLOT_STEPS_SM, &slot, s_steps_memo);
         int steps_left = slot.origin.x + slot.size.w - steps_w;  // right-aligned
         draw_glyph(ctx, RESOURCE_ID_ICON_FEET, glyph_before(RESOURCE_ID_ICON_FEET, steps_left), pal->dim);
     }
     else
     {
-        int steps_w = stat_metrics(text, steps->rect, steps->rect_fallback, &slot);
+        int steps_w = stat_metrics(text, steps->rect, steps->rect_fallback, &slot, s_steps_memo);
         int steps_mid = slot.origin.x + slot.size.w / 2;
         draw_glyph(ctx, RESOURCE_ID_ICON_FEET,
             glyph_before(RESOURCE_ID_ICON_FEET, steps_mid - steps_w / 2), pal->dim);
@@ -238,11 +249,16 @@ void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zon
 }
 #endif
 
-/** @brief How wide @p text renders in @p font. */
-static int text_width(const char *text, GFont font)
+// the clock as a whole, its hours, and its colon, each remembered from the last repaint. the colon
+// is measured once per clock font, and the hours once an hour
+static MeasureMemo s_clock_memo;
+static MeasureMemo s_hours_memo;
+static MeasureMemo s_colon_memo;
+
+/** @brief How wide @p text renders in @p font, kept in @p memo between repaints. */
+static int text_width(MeasureMemo *memo, const char *text, GFont font)
 {
-    return graphics_text_layout_get_content_size(text, font, GRect(0, 0, 1000, 200),
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft).w;
+    return measure_width(memo, text, font, GRect(0, 0, 1000, 200), GTextAlignmentLeft);
 }
 
 /**
@@ -277,7 +293,7 @@ void widgets_draw_meridiem_beside(GContext *ctx, GColor color, GRect clock_slot,
 
     // the clock is centred, so where its edges land moves with the format. measuring it is what
     // keeps the marker tucked against the digits instead of floating off to one side
-    int clock_w = text_width(clock, fonts_get(clock_font));
+    int clock_w = text_width(&s_clock_memo, clock, fonts_get(clock_font));
     int centre = clock_slot.origin.x + clock_slot.size.w / 2;
 
     graphics_context_set_text_color(ctx, color);
@@ -325,8 +341,9 @@ void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, 
     hours[len] = '\0';
 
     GFont font = fonts_get(clock_font);
-    int left = clock_slot.origin.x + clock_slot.size.w / 2 - text_width(clock, font) / 2;
-    int colon_cx = left + text_width(hours, font) + text_width(":", font) / 2;
+    int left = clock_slot.origin.x + clock_slot.size.w / 2 - text_width(&s_clock_memo, clock, font) / 2;
+    int colon_cx = left + text_width(&s_hours_memo, hours, font)
+        + text_width(&s_colon_memo, ":", font) / 2;
 
     graphics_context_set_text_color(ctx, color);
     graphics_draw_text(ctx, marker, fonts_get(FONT_HAND_16),

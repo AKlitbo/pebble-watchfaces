@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed the battery gauge, the Bluetooth and Quiet Time icons, and the date when it sits in the status bar to light grey under the Mono palette by day on the Ridgeline scene. They now match the other scenes.
 - Changed the trail sign's post on the Ridgeline scene to the colour of the other marks on the ground on the Pebble Round 2.
 - Changed the wake around the buoy on the Skyline scene to the colour of the ripples on the river on the Pebble Round 2.
+- Changed the heart rate on the Pebble Time 2 to update at most every ten seconds during a workout, which saves battery. A new reading after a quiet spell still shows straight away.
 
 ### Fixed
 
