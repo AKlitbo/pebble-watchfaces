@@ -25,11 +25,13 @@
 // clock's whole band under it
 #if defined(PBL_ROUND)
 #define CITY_BASE 132    ///< The far bank, which the city stands on and the river starts at
-#define WATER_TOP 132    ///< Same row: everything below the far bank is water
 #define DECK_Y 124       ///< The bridge deck, crossing in front of the bank and over the river
 #define TOWER_TOP 56     ///< How high the two bridge towers reach
 #define PIER_DROP 14     ///< How far each tower carries on below the deck, into the river
 #define SCENE_BOTTOM 162 ///< The last row the reflections reach, matching the other scenes
+#define TOWER_L 70       ///< The left bridge tower's centre line
+#define TOWER_R 190      ///< The right bridge tower's centre line
+#define TOWER_HALF 5     ///< Half a tower's width
 // --- Channel buoy ---
 // the marker floating mid-river below the crossing, carrying the reading on its side the way a
 // real channel buoy carries its number
@@ -38,23 +40,16 @@
 #define BUOY_MAST 7      ///< How far the topmark stands above it
 #else
 #define CITY_BASE 108    ///< The far bank, which the city stands on and the river starts at
-#define WATER_TOP 108    ///< Same row: everything below the far bank is water
 #define DECK_Y 102       ///< The bridge deck, crossing in front of the bank and over the river
 #define TOWER_TOP 46     ///< How high the two bridge towers reach
 #define PIER_DROP 10     ///< How far each tower carries on below the deck, into the river
 #define SCENE_BOTTOM 133 ///< The last row the reflections reach, matching the other scenes
+#define TOWER_L 54       ///< The left bridge tower's centre line
+#define TOWER_R 146      ///< The right bridge tower's centre line
+#define TOWER_HALF 4     ///< Half a tower's width
 #endif
 
-// the two bridge towers, and how far the deck runs past them to the bank each side
-#if defined(PBL_ROUND)
-#define TOWER_L 70
-#define TOWER_R 190
-#define TOWER_HALF 5
-#else
-#define TOWER_L 54
-#define TOWER_R 146
-#define TOWER_HALF 4
-#endif
+#define WATER_TOP CITY_BASE  ///< Everything below the far bank is water
 
 // lamps stand along the deck at this spacing, starting half a step in from the left bank
 #define LAMP_STEP 22
@@ -312,13 +307,15 @@ static void draw_bridge(GContext *ctx, const SkylinePalette *pal)
  */
 static void draw_lamps(GContext *ctx, const SkylinePalette *pal, int lit)
 {
+    // each lamp is a short post off the deck with the lamp on top of it. the post and an unlit
+    // lamp's outline take the linework colour for the same reason the cables do: they have to hold
+    // against a dark sky
+    graphics_context_set_stroke_color(ctx, pal->ink);
+
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
     {
         bool on = sketchbook_sky_light_rank(i, 7) < lit;
 
-        // a short post off the deck with the lamp on top of it. the post takes the linework
-        // colour for the same reason the cables do: it has to hold against a dark sky
-        graphics_context_set_stroke_color(ctx, pal->ink);
         graphics_draw_line(ctx, GPoint(x, DECK_Y - 1), GPoint(x, DECK_Y - 6));
 
         graphics_context_set_fill_color(ctx, on ? pal->lamp : pal->bridge);

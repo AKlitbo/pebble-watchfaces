@@ -31,8 +31,8 @@ typedef struct SceneFrame
 {
     const void *palette;  ///< The scene's palette for this hour
     bool night;           ///< After dark, by the sunrise and sunset the sky follows
-    SketchbookCond cond;  ///< The condition row, for a scene with its own rule over it
-    SketchbookSky sky;    ///< What that row does to the sky
+    WxCond cond;          ///< The condition, for a scene with its own rule over it
+    SketchbookSky sky;    ///< What that condition does to the sky
     GPoint disc;          ///< Where the sun or moon sits on its arc
     int minute;           ///< The clock minute, which shuffles the falling weather
 } SceneFrame;

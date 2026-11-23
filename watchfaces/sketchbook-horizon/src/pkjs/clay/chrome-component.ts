@@ -31,14 +31,84 @@ export default {
   style: [
     pageFont.rule,
 
-    // warm paper with a faint dot grid, the way a sketchbook or bullet journal is ruled, and the
-    // hand font across the whole page
+    // the page has a day and a night the way the scenes do. when the phone is set to dark, the warm
+    // paper turns to a deep night blue, the ink turns to a cool off-white, and the accent cools from
+    // the daytime sun to a moonlit blue, matching the scenes' blue night sky
+    ':root { color-scheme: light dark; }',
+
+    // every colour on the page is one of these, so each rule below is written once and the night only
+    // swaps the values. the framework's own rows, such as the plugin notes and the supported plugins
+    // list, read the --pf- ones. the day takes the deep gold for links and the sun for a warning. the
+    // face's ink and card are the framework's, so the night swaps them there
+    ':root {',
+    '  --pf-accent: #8a6714;',
+    '  --pf-on-accent: #fcf7ea;',
+    '  --pf-note-accent: #e8b84b;',
+    '  --pf-note-info-accent: #8a8070;',
+    '  --pf-surface: #fcf7ea;',
+    '  --pf-ink: #2c2a24;',
+    '  --pf-line: #e6dcc1;',
+    '  --sb-paper: #f1e8d4;',
+    '  --sb-dots: rgba(120, 108, 84, 0.18);',
+    '  --sb-ink: var(--pf-ink);',
+    '  --sb-muted: #6f6757;',
+    '  --sb-card: var(--pf-surface);',
+    '  --sb-edge: #35322b;',
+    '  --sb-shadow: rgba(53, 50, 43, 0.16);',
+    '  --sb-band: #ece0c6;',
+    '  --sb-band-edge: #d3c49f;',
+    '  --sb-field: #fffdf5;',
+    '  --sb-sun: #e8b84b;',
+    '  --sb-sun-deep: #b98a22;',
+    '  --sb-on-sun: #2c2a24;',
+    '  --sb-stamp-hover: #46413a;',
+    '  --sb-stamp-press: #22201b;',
+    '  --sb-rule: #e6dcc1;',
+    '  --sb-note: rgba(232, 184, 75, 0.18);',
+    '  --sb-note-mark: #b98a22;',
+    '  --sb-note-ink: #8a6714;',
+    '}',
+    '@media (prefers-color-scheme: dark) {',
+    '  :root {',
+    '    --pf-accent: #8fb3e4;',
+    '    --pf-on-accent: #0f1521;',
+    '    --pf-note-accent: #5c8fd4;',
+    '    --pf-note-info-accent: #93a2bd;',
+    '    --pf-surface: #182234;',
+    '    --pf-ink: #dde5f2;',
+    '    --pf-line: #30405c;',
+    '    --sb-paper: #0f1521;',
+    '    --sb-dots: rgba(150, 170, 205, 0.14);',
+    '    --sb-muted: #93a2bd;',
+    '    --sb-edge: #30405c;',
+    '    --sb-shadow: rgba(0, 0, 0, 0.4);',
+    '    --sb-band: #1f2c43;',
+    '    --sb-band-edge: #30405c;',
+    '    --sb-field: #0e1522;',
+    '    --sb-sun: #5c8fd4;',
+    '    --sb-sun-deep: #35598f;',
+    '    --sb-on-sun: #0f1521;',
+    // the ink stamp inverts to a pale one so it still reads on the dark paper
+    '    --sb-stamp-hover: #eef3fb;',
+    '    --sb-stamp-press: #c3cfe2;',
+    '    --sb-rule: #273449;',
+    '    --sb-note: rgba(92, 143, 212, 0.15);',
+    '    --sb-note-mark: #5c8fd4;',
+    '    --sb-note-ink: #8fb3e4;',
+    '  }',
+    // the one rule the night restates rather than swapping a value, since only the night's dot grid
+    // is !important
+    '  body { background-image: radial-gradient(var(--sb-dots) 1.3px, transparent 1.4px) !important; }',
+    '}',
+
+    // paper with a faint dot grid, the way a sketchbook or bullet journal is ruled, and the hand font
+    // across the whole page
     'body {',
-    '  background-color: #f1e8d4 !important;',
-    '  background-image: radial-gradient(rgba(120, 108, 84, 0.18) 1.3px, transparent 1.4px);',
+    '  background-color: var(--sb-paper) !important;',
+    '  background-image: radial-gradient(var(--sb-dots) 1.3px, transparent 1.4px);',
     '  background-size: 20px 20px;',
     '  background-position: -6px -6px;',
-    '  color: #2c2a24 !important;',
+    '  color: var(--sb-ink) !important;',
     '  padding-top: 0.8rem !important;',
     '  padding-bottom: 40px !important;',
     '}',
@@ -50,45 +120,46 @@ export default {
     // a top margin on every section opens a gap after the intro and between the cards, and leaves
     // none after the last one, so the submit still sits close under it
     '.section {',
-    '  background: #fcf7ea !important;',
-    '  border: 2px solid #35322b !important;',
+    '  background: var(--sb-card) !important;',
+    '  border: 2px solid var(--sb-edge) !important;',
     '  border-radius: 8px !important;',
-    '  box-shadow: 2px 3px 0 rgba(53, 50, 43, 0.16) !important;',
+    '  box-shadow: 2px 3px 0 var(--sb-shadow) !important;',
     '  margin-top: 0.9rem !important;',
     '}',
     '.section > .component:first-child { margin-top: 0 !important; }',
 
-    // headings in ink, a touch larger, the section title ruled off underneath
+    // every heading, the page title included, in ink and a touch larger, the section title ruled off
+    // underneath
     '.component-heading {',
-    '  color: #2c2a24 !important;',
+    '  color: var(--sb-ink) !important;',
     '  letter-spacing: 0.5px !important;',
     '  font-size: 1.35rem !important;',
     '}',
-    // a section opens with a title bar that Clay paints dark. make it a warm tan band with ink
-    // lettering, rounded to sit on top of the paper card
+    // a section opens with a title bar that Clay paints dark. make it a band with ink lettering,
+    // rounded to sit on top of the paper card
     '.section .component-heading:first-child {',
-    '  background: #ece0c6 !important;',
-    '  color: #2c2a24 !important;',
-    '  border-bottom: 2px solid #d3c49f !important;',
+    '  background: var(--sb-band) !important;',
+    '  color: var(--sb-ink) !important;',
+    '  border-bottom: 2px solid var(--sb-band-edge) !important;',
     '  border-radius: 6px 6px 0 0 !important;',
     '}',
-    '.component .label { color: #2c2a24 !important; font-size: 1.08rem !important; }',
-    '.component .description { color: #6f6757 !important; }',
+    '.component .label { color: var(--sb-ink) !important; font-size: 1.08rem !important; }',
+    '.component .description { color: var(--sb-muted) !important; }',
 
     // form controls on bright paper with an ink edge. Clay's text inputs carry no type attribute, so
     // they are reached through their component wrapper rather than by input type
     'select, .component-input input {',
-    '  background: #fffdf5 !important;',
-    '  color: #2c2a24 !important;',
-    '  border: 2px solid #35322b !important;',
+    '  background: var(--sb-field) !important;',
+    '  color: var(--sb-ink) !important;',
+    '  border: 2px solid var(--sb-edge) !important;',
     '  border-radius: 6px !important;',
     '}',
 
-    // the toggle's on state takes the warm sun the scenes paint their disc with, not Clay's orange
-    '.component-toggle input:checked + .graphic .slide { background: #e8b84b !important; }',
-    '.component-toggle input:checked + .graphic .marker { background: #b98a22 !important; }',
+    // the toggle's on state takes the sun the scenes paint their disc with, not Clay's orange
+    '.component-toggle input:checked + .graphic .slide { background: var(--sb-sun) !important; }',
+    '.component-toggle input:checked + .graphic .marker { background: var(--sb-sun-deep) !important; }',
 
-    // submit: an ink stamp with cream lettering, full width with a gap under it
+    // submit: an ink stamp lettered in the paper colour, full width with a gap under it
     ".component-submit button, button[type='submit'] {",
     '  display: block !important;',
     '  width: 100% !important;',
@@ -96,9 +167,9 @@ export default {
     '  box-sizing: border-box !important;',
     '  margin: 0 !important;',
     '  padding: 13px !important;',
-    '  background: #2c2a24 !important;',
-    '  color: #f1e8d4 !important;',
-    '  border: 2px solid #2c2a24 !important;',
+    '  background: var(--sb-ink) !important;',
+    '  color: var(--sb-paper) !important;',
+    '  border: 2px solid var(--sb-ink) !important;',
     '  border-radius: 8px !important;',
     '  font-size: 1.25rem !important;',
     '  letter-spacing: 0.5px !important;',
@@ -109,86 +180,18 @@ export default {
     '  -webkit-tap-highlight-color: transparent !important;',
     '}',
     '.component-submit { padding-bottom: 0.8rem !important; }',
-    ".component-submit button:hover, button[type='submit']:hover { background: #46413a !important; }",
-    ".component-submit button:active, button[type='submit']:active { background: #22201b !important; }",
+    ".component-submit button:hover, button[type='submit']:hover { background: var(--sb-stamp-hover) !important; }",
+    ".component-submit button:active, button[type='submit']:active { background: var(--sb-stamp-press) !important; }",
 
     // the theme preview frames take the ink edge rather than the framework's neutral grey
-    '.pf-theme .pf-theme-img { border-color: #35322b !important; }',
+    '.pf-theme .pf-theme-img { border-color: var(--sb-edge) !important; }',
 
-    // the location search dropdown, painted onto the paper
-    '.pf-loc-search .pf-loc-list { background: #fcf7ea; color: #2c2a24; border: 2px solid #35322b; border-radius: 6px; }',
-    '.pf-loc-search .pf-loc-item { border-bottom: 1px solid #e6dcc1; }',
-    '.pf-loc-search .pf-loc-item:hover, .pf-loc-search .pf-loc-item:active { background: #e8b84b; color: #2c2a24; }',
-    '.pf-loc-search .pf-loc-note { background: rgba(232, 184, 75, 0.18) !important; border-left-color: #e8b84b !important; }',
-    '.pf-loc-search .pf-loc-note:before { border-color: #b98a22 !important; color: #8a6714 !important; }',
-
-    // the page has a day and a night the way the scenes do. when the phone is set to dark, the warm
-    // paper turns to a deep night blue, the ink turns to a cool off-white, and the accent cools from
-    // the daytime sun to a moonlit blue, matching the scenes' blue night sky
-    ':root { color-scheme: light dark; }',
-
-    // the framework's own rows, such as the plugin notes and the supported plugins list, read their
-    // colours from these. the day takes the deep gold for links and the sun for a warning
-    ':root {',
-    '  --pf-accent: #8a6714;',
-    '  --pf-on-accent: #fcf7ea;',
-    '  --pf-note-accent: #e8b84b;',
-    '  --pf-note-info-accent: #8a8070;',
-    '  --pf-surface: #fcf7ea;',
-    '  --pf-ink: #2c2a24;',
-    '  --pf-line: #e6dcc1;',
-    '}',
-
-    '@media (prefers-color-scheme: dark) {',
-    '  :root {',
-    '    --pf-accent: #8fb3e4;',
-    '    --pf-on-accent: #0f1521;',
-    '    --pf-note-accent: #5c8fd4;',
-    '    --pf-note-info-accent: #93a2bd;',
-    '    --pf-surface: #182234;',
-    '    --pf-ink: #dde5f2;',
-    '    --pf-line: #30405c;',
-    '  }',
-    '  body {',
-    '    background-color: #0f1521 !important;',
-    '    background-image: radial-gradient(rgba(150, 170, 205, 0.14) 1.3px, transparent 1.4px) !important;',
-    '    color: #dde5f2 !important;',
-    '  }',
-    // every heading, the page title included, takes the cool ink so the top title stays readable
-    '  .component-heading { color: #dde5f2 !important; }',
-    '  .section {',
-    '    background: #182234 !important;',
-    '    border-color: #30405c !important;',
-    '    box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.4) !important;',
-    '  }',
-    '  .section .component-heading:first-child {',
-    '    background: #1f2c43 !important;',
-    '    color: #dde5f2 !important;',
-    '    border-bottom-color: #30405c !important;',
-    '  }',
-    '  .component .label { color: #dde5f2 !important; }',
-    '  .component .description { color: #93a2bd !important; }',
-    '  select, .component-input input {',
-    '    background: #0e1522 !important;',
-    '    color: #dde5f2 !important;',
-    '    border-color: #30405c !important;',
-    '  }',
-    '  .component-toggle input:checked + .graphic .slide { background: #5c8fd4 !important; }',
-    '  .component-toggle input:checked + .graphic .marker { background: #35598f !important; }',
-    // the ink stamp inverts to a pale one so it still reads on the dark paper
-    "  .component-submit button, button[type='submit'] {",
-    '    background: #dde5f2 !important;',
-    '    color: #0f1521 !important;',
-    '    border-color: #dde5f2 !important;',
-    '  }',
-    "  .component-submit button:hover, button[type='submit']:hover { background: #eef3fb !important; }",
-    "  .component-submit button:active, button[type='submit']:active { background: #c3cfe2 !important; }",
-    '  .pf-theme .pf-theme-img { border-color: #30405c !important; }',
-    '  .pf-loc-search .pf-loc-list { background: #182234; color: #dde5f2; border-color: #30405c; }',
-    '  .pf-loc-search .pf-loc-item { border-bottom-color: #273449; }',
-    '  .pf-loc-search .pf-loc-item:hover, .pf-loc-search .pf-loc-item:active { background: #5c8fd4; color: #0f1521; }',
-    '  .pf-loc-search .pf-loc-note { background: rgba(92, 143, 212, 0.15) !important; border-left-color: #5c8fd4 !important; }',
-    '  .pf-loc-search .pf-loc-note:before { border-color: #5c8fd4 !important; color: #8fb3e4 !important; }',
-    '}',
+    // the location search dropdown, painted onto the paper. the framework already fills it from
+    // --pf-surface and letters it in --pf-ink, so only the edge is the face's own
+    '.pf-loc-search .pf-loc-list { border: 2px solid var(--sb-edge); border-radius: 6px; }',
+    '.pf-loc-search .pf-loc-item { border-bottom: 1px solid var(--sb-rule); }',
+    '.pf-loc-search .pf-loc-item:hover, .pf-loc-search .pf-loc-item:active { background: var(--sb-sun); color: var(--sb-on-sun); }',
+    '.pf-loc-search .pf-loc-note { background: var(--sb-note) !important; border-left-color: var(--sb-sun) !important; }',
+    '.pf-loc-search .pf-loc-note:before { border-color: var(--sb-note-mark) !important; color: var(--sb-note-ink) !important; }',
   ].join('\n'),
 };

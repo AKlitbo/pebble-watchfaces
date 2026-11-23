@@ -143,18 +143,6 @@ static const GPoint s_near_pts[] = {
 };
 #endif
 
-// snow lies where snow falls, so it caps the peaks on the two snow rows and nothing else
-#define RIDGELINE_SNOWCAP_ROWS ((1u << SKETCHBOOK_COND_SNOW) | (1u << SKETCHBOOK_COND_SNSH))
-
-_Static_assert(RIDGELINE_SNOWCAP_ROWS == ((1u << SKETCHBOOK_COND_SNOW) | (1u << SKETCHBOOK_COND_SNSH)),
-    "snow caps a peak where snow falls: exactly the two snow rows, no more and no fewer");
-
-/** @brief Whether this condition caps the peaks in snow. */
-static bool snowcap(SketchbookCond cond)
-{
-    return (RIDGELINE_SNOWCAP_ROWS >> cond) & 1u;
-}
-
 /**
  * @brief Where the crest sits at a given x, interpolated along the polyline.
  *
@@ -383,8 +371,11 @@ void ridgeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
     const RidgelinePalette *pal = frame->palette;
 
-    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, pal->land_far, pal->ink, snowcap(frame->cond), 12);
-    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snowcap(frame->cond), 20);
+    // snow lies where snow falls, so it caps the peaks only when it is snowing
+    bool snow = sketchbook_cond_snows(frame->cond);
+
+    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, pal->land_far, pal->ink, snow, 12);
+    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snow, 20);
 
 #if defined(PBL_ROUND)
     // grass on the ground the trail crosses, in the colour the palette guarantees down there

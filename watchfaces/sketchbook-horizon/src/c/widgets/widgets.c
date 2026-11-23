@@ -15,6 +15,7 @@
 #include "ui/fonts.h"
 #include "ui/icon_cache.h"
 #include "ui/readouts.h"
+#include "math/scale.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -23,15 +24,7 @@
 
 void widgets_draw_battery(GContext *ctx, GColor ink, uint8_t theme, int level)
 {
-    if (level < 0)
-    {
-        level = 0;
-    }
-
-    if (level > 100)
-    {
-        level = 100;
-    }
+    level = clamp_int(level, 0, 100);
 
     GRect body = BATT_RECT;
 
@@ -47,7 +40,7 @@ void widgets_draw_battery(GContext *ctx, GColor ink, uint8_t theme, int level)
     const int segments = 5;
     const int gap = 1;
     GRect inner = GRect(body.origin.x + 2, body.origin.y + 1, body.size.w - 4, body.size.h - 2);
-    int seg_w = (inner.size.w - (segments - 1) * gap) / segments;
+    int seg_w = segment_width(inner.size.w, gap, segments);
     if (seg_w < 1)
     {
         seg_w = 1;
@@ -75,18 +68,6 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds)
     graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, TOP_BAR_H), 0, GCornerNone);
 }
 
-void widgets_draw_bt(GContext *ctx, bool connected)
-{
-    GBitmap *bmp = icon_get(connected ? RESOURCE_ID_ICON_BLUETOOTH : RESOURCE_ID_ICON_BLUETOOTH_SLASH);
-    if (!bmp)
-    {
-        return;
-    }
-
-    graphics_context_set_compositing_mode(ctx, GCompOpSet);
-    graphics_draw_bitmap_in_rect(ctx, bmp, BT_ICON);
-}
-
 /**
  * @brief Draw one white master glyph recoloured to the palette.
  *
@@ -105,6 +86,17 @@ static void draw_glyph(GContext *ctx, uint32_t res, GRect box, GColor color)
 
     icon_tint(bmp, color);
     graphics_draw_bitmap_in_rect(ctx, bmp, box);
+}
+
+void widgets_draw_bt(GContext *ctx, GColor color, bool connected)
+{
+    // both states load on the first draw, so a disconnect hours later never has to find room for the
+    // slashed one on a fragmented heap and leave the slot blank when it matters most
+    icon_get(RESOURCE_ID_ICON_BLUETOOTH);
+    icon_get(RESOURCE_ID_ICON_BLUETOOTH_SLASH);
+
+    graphics_context_set_compositing_mode(ctx, GCompOpSet);
+    draw_glyph(ctx, connected ? RESOURCE_ID_ICON_BLUETOOTH : RESOURCE_ID_ICON_BLUETOOTH_SLASH, BT_ICON, color);
 }
 
 // a round screen has no stats row, so the row's marks and the helpers that place them are the
@@ -342,12 +334,10 @@ void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, 
 
 void widgets_draw_qt_state(GContext *ctx, GColor color, bool active)
 {
-#if defined(HAS_QUIET_PAIR)
     // a matched pair, the way bluetooth has one: the slot is filled either way so the strip keeps
     // its shape instead of going lopsided whenever Quiet Time is off
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
     draw_glyph(ctx, active ? RESOURCE_ID_ICON_QUIET_ON : RESOURCE_ID_ICON_QUIET_OFF, QT_ICON, color);
-#endif
 }
 
 /** @} */

@@ -10,8 +10,6 @@
  */
 #include "theme/palette_active.h"
 
-#include <stddef.h>
-
 #include "theme/palette.h"
 #include "clock/rotate.h"
 #include "role/role.h"
@@ -33,11 +31,6 @@ static int interval_minutes(uint8_t choice)
 
 uint8_t sketchbook_active_theme(const PalettePick *pick, int year, int yday, int hour, int minute)
 {
-    if (pick == NULL)
-    {
-        return 0;
-    }
-
     if (pick->mode == PALETTE_MODE_SHUFFLE)
     {
         return (uint8_t)rotate_index(year, yday, hour, minute, interval_minutes(pick->shuffle_interval), THEME_COUNT);

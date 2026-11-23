@@ -46,9 +46,22 @@ uint8_t sketchbook_scene(void);
 /**
  * @brief Which of the three arrangements is in force.
  *
+ * A round screen ships one layout. The settings store lives on the phone per app, so a value set on
+ * emery follows the wearer across to a gabbro, and the other two layouts exist in the code without
+ * ever having been laid out for a circle. Hiding the picker in the config page is cosmetic, and this
+ * is the part that holds. On a round screen it is inline, so the compiler drops every branch the
+ * other two layouts take.
+ *
  * @return A LAYOUT_* value.
  */
+#if defined(PBL_ROUND)
+static inline uint8_t sketchbook_layout(void)
+{
+    return LAYOUT_STANDARD;
+}
+#else
 uint8_t sketchbook_layout(void);
+#endif
 
 /**
  * @brief Whether the AM/PM marker is drawn at all.

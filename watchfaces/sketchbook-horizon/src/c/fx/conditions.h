@@ -1,48 +1,28 @@
 /**
  * @file conditions.h
- * @brief The phone's condition token, read into a row and a sky.
+ * @brief The phone's condition token, read into a condition and a sky.
  *
  * Every scene agrees on what each condition does to the sky: how much cloud, how much of the disc
  * it leaves, what falls and how hard, whether a wash goes over the scene and whether a bolt forks
- * out of it. So that table lives here.
+ * out of it. So that table lives here, indexed by the framework's WxCond.
  *
- * What a scene does with the row *beyond* the sky is its own. Ridgeline caps its peaks in snow,
- * Shoreline roughens its water, Treeline lies snow along the firs, and those are not the same
- * rows: chop follows wind and snow follows cold. That is exactly why there is no seventh field
- * on SketchbookSky to hold it. A scene keeps its own rule as a mask over SketchbookCond and asserts
- * it, so a table copied between scenes cannot quietly bring the wrong meaning with it.
+ * What a scene does with the condition beyond the sky is its own, and it is not a field on
+ * SketchbookSky, which only says what the sky looks like. Ridgeline caps its peaks in snow and
+ * Treeline lies snow along its firs, and both ask sketchbook_cond_snows, so the two always agree on
+ * when snow is lying. Shoreline roughens its water on the wet and stormy conditions and keeps that
+ * rule in its own file, since chop follows wind where snow follows cold.
  *
  * @ingroup watchface-sketchbook
  */
 #pragma once
 #include <pebble.h>
 
+#include "weather/wx_cond.h"
+
 /**
  * @addtogroup watchface-sketchbook
  * @{
  */
-
-/**
- * @brief The condition vocabulary, in the order paf/ts/weather/conditions.ts lists it.
- *
- * A scene indexes its own per-condition rules off these, so the values are the shared contract.
- */
-typedef enum
-{
-    SKETCHBOOK_COND_CLEAR = 0,
-    SKETCHBOOK_COND_PCLDY,
-    SKETCHBOOK_COND_CLDY,
-    SKETCHBOOK_COND_FOGGY,
-    SKETCHBOOK_COND_DRZL,
-    SKETCHBOOK_COND_FZDZ,
-    SKETCHBOOK_COND_RAIN,
-    SKETCHBOOK_COND_FZRN,
-    SKETCHBOOK_COND_SNOW,
-    SKETCHBOOK_COND_SHWR,
-    SKETCHBOOK_COND_SNSH,
-    SKETCHBOOK_COND_STRM,
-    SKETCHBOOK_COND_COUNT
-} SketchbookCond;
 
 /** @brief How much cloud is in the sky. */
 typedef enum
@@ -73,8 +53,8 @@ typedef enum
 /**
  * @brief What one condition does to the sky.
  *
- * Six fields, and every scene agrees on all six. There is deliberately no seventh: see the
- * file's header for why.
+ * Every scene agrees on all six fields. Anything a scene does with the condition beyond the sky
+ * stays out of here, as the file's header says.
  */
 typedef struct SketchbookSky
 {
@@ -87,22 +67,32 @@ typedef struct SketchbookSky
 } SketchbookSky;
 
 /**
- * @brief Read the phone's condition token into a row.
+ * @brief Read the phone's condition token.
  *
  * The trailing "_NIGHT" marker is ignored: night is decided from sunrise and sunset, so the
  * same sky reads the same either way.
  *
  * @param condition The condition abbreviation, e.g. "RAIN" or "PCLDY_NIGHT".
- * @return The row, or SKETCHBOOK_COND_CLEAR for an empty or unrecognised token.
+ * @return The condition, or WX_COND_CLEAR for an empty or unrecognized token. Never WX_COND_UNKNOWN.
  */
-SketchbookCond sketchbook_cond_parse(const char *condition);
+WxCond sketchbook_cond_parse(const char *condition);
 
 /**
- * @brief What that row does to the sky.
+ * @brief What that condition does to the sky.
  *
- * @param cond The row.
+ * @param cond The condition.
  * @return The sky to draw. Out of range reads as open sky.
  */
-SketchbookSky sketchbook_sky_recipe(SketchbookCond cond);
+SketchbookSky sketchbook_sky_recipe(WxCond cond);
+
+/**
+ * @brief Whether snow is lying on the ground in this condition.
+ *
+ * Only snow and snow showers. Sleet and freezing rain are left off, since they do not settle.
+ *
+ * @param cond The condition.
+ * @return True to lay snow on the scene.
+ */
+bool sketchbook_cond_snows(WxCond cond);
 
 /** @} */

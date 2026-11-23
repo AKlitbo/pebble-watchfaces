@@ -8,6 +8,7 @@
 
 #include "scene/geometry.h"
 #include "theme/palette.h"
+#include "math/scale.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -78,28 +79,12 @@ void sketchbook_fx_draw_clouds(GContext *ctx, const SceneFrame *frame)
     // a single drifting cloud, parked on the disc so a peeking sun always reads as
     // half-covered, and kept clear of the edges wherever the disc has got to. two puffs so
     // even the lone cloud has some fluff to it
-    int x = disc.x + 14;
-    if (x < 52)
-    {
-        x = 52;
-    }
-    if (x > 146)
-    {
-        x = 146;
-    }
+    int x = clamp_int(disc.x + 14, 52, 146);
 
     // the low end of the clamp keeps the taller lobe out from under the status bar when the disc
     // is high
     // the high end keeps the cloud off the scene's ground when it is low
-    int y = disc.y + g->cloud_drop;
-    if (y < g->cloud_y_min)
-    {
-        y = g->cloud_y_min;
-    }
-    if (y > g->cloud_y_max)
-    {
-        y = g->cloud_y_max;
-    }
+    int y = clamp_int(disc.y + g->cloud_drop, g->cloud_y_min, g->cloud_y_max);
 
     const Puff drifting[] = {
         {x - 16, y, 18, g->drift_lobe_a},
@@ -201,11 +186,7 @@ static void draw_wash(GContext *ctx, const CommonPalette *pal)
 
     for (int y = g->wash_top; y < g->wash_bottom; y += 2)
     {
-        int step = 9 - (y - g->wash_top) / 6;
-        if (step < 2)
-        {
-            step = 2;
-        }
+        int step = clamp_int(9 - (y - g->wash_top) / 6, 2, 9);
 
         // the row's start shifts with y so the dots never stack into vertical stripes
         for (int x = (y / 2) % step; x < PBL_DISPLAY_WIDTH; x += step)

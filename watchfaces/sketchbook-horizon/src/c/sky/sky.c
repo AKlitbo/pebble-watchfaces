@@ -24,7 +24,6 @@
 #define FALLBACK_RISE (6 * 60)
 #define FALLBACK_SET (18 * 60)
 
-
 /**
  * @brief Today's sunrise and sunset in minutes past midnight, falling back to a plain
  * twelve-hour day for whichever the phone has not sent.
@@ -59,12 +58,6 @@ bool sketchbook_sky_night(void)
     return solar_day_progress(rise, set, now_minutes()) < 0;
 }
 
-/**
- * @brief How far the sun (or the moon, after dark) has got along its arc, from 0 at the left
- * horizon to 100 at the right.
- *
- * @return The progress from 0 to 100.
- */
 int sketchbook_sky_arc_progress(void)
 {
     int rise, set;
@@ -81,15 +74,6 @@ int sketchbook_sky_arc_progress(void)
     return night >= 0 ? night : 50;
 }
 
-/**
- * @brief Where on the arc a given progress lands.
- *
- * A half-ellipse over the horizon: progress 0 puts the disc on the left horizon, 50 at the
- * apex, and 100 on the right.
- *
- * @param progress How far along, 0 to 100.
- * @return The disc's centre.
- */
 GPoint sketchbook_sky_arc_point(int progress)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();

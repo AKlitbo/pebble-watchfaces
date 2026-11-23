@@ -49,9 +49,10 @@ void widgets_draw_top_bar(GContext *ctx, GRect bounds);
  * @brief Draw the bluetooth glyph for the link state (connected vs slashed).
  *
  * @param ctx The graphics context.
+ * @param color The colour to paint it.
  * @param connected True when the phone link is up.
  */
-void widgets_draw_bt(GContext *ctx, bool connected);
+void widgets_draw_bt(GContext *ctx, GColor color, bool connected);
 
 // a round screen has no stats row, so these two are the rectangle's alone
 #if !defined(PBL_ROUND)
@@ -120,10 +121,10 @@ void widgets_draw_meridiem_beside(GContext *ctx, GColor color, GRect clock_slot,
 void widgets_draw_meridiem_above(GContext *ctx, GColor color, GRect clock_slot, FontId clock_font, int top);
 
 /**
- * @brief Draw the Quiet Time mark for either state, where the face bundles a pair for it.
+ * @brief Draw the Quiet Time mark for either state.
  *
  * Bluetooth already works this way, and an always-filled slot is what stops the strip looking
- * lopsided half the time. A face that bundles no pair draws nothing here.
+ * lopsided half the time.
  *
  * @param ctx The graphics context.
  * @param color The colour to paint it.

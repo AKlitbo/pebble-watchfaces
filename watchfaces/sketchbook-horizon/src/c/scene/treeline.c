@@ -13,6 +13,8 @@
 #include "io/stores/weather_store.h"
 #include "draw/line.h"
 #include "draw/letter.h"
+#include "math/pct.h"
+#include "math/scale.h"
 #include "weather/wind_dir.h"
 #include "theme/treeline.h"
 
@@ -170,19 +172,6 @@ static const Fir s_near[] = {
 };
 #endif
 
-// snow lies where snow falls, so it rides the two snow rows and nothing else. sleet is
-// left off: it does not settle on a fir
-#define TREELINE_SNOWY_ROWS ((1u << SKETCHBOOK_COND_SNOW) | (1u << SKETCHBOOK_COND_SNSH))
-
-_Static_assert(TREELINE_SNOWY_ROWS == ((1u << SKETCHBOOK_COND_SNOW) | (1u << SKETCHBOOK_COND_SNSH)),
-    "snow lies where snow falls: exactly the two snow rows, no more and no fewer");
-
-/** @brief Whether this condition lies snow along the firs. */
-static bool snowy(SketchbookCond cond)
-{
-    return (TREELINE_SNOWY_ROWS >> cond) & 1u;
-}
-
 /**
  * @brief How wide a fir is, a given number of rows down from its tip.
  *
@@ -301,56 +290,53 @@ static void draw_treeline(GContext *ctx, const Fir *firs, int count, int base,
  */
 static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bool snow)
 {
-    const int left = CABIN_LEFT, right = CABIN_RIGHT, base = NEAR_BASE;
-    const int wall_top = CABIN_WALL_TOP, ridge = CABIN_RIDGE;
-
     graphics_context_set_stroke_width(ctx, 1);
 
     // walls
+    GRect walls = GRect(CABIN_LEFT, CABIN_WALL_TOP, CABIN_RIGHT - CABIN_LEFT, NEAR_BASE - CABIN_WALL_TOP);
     graphics_context_set_fill_color(ctx, pal->cabin);
-    graphics_fill_rect(ctx, GRect(left, wall_top, right - left, base - wall_top), 0, GCornerNone);
+    graphics_fill_rect(ctx, walls, 0, GCornerNone);
 
     // the logs, a few lines across the wall rather than a drawn stack of them
     graphics_context_set_stroke_color(ctx, pal->ink);
-    for (int y = wall_top + 5; y < base; y += 5)
+    for (int y = CABIN_WALL_TOP + 5; y < NEAR_BASE; y += 5)
     {
-        graphics_draw_line(ctx, GPoint(left + 1, y), GPoint(right - 2, y));
+        graphics_draw_line(ctx, GPoint(CABIN_LEFT + 1, y), GPoint(CABIN_RIGHT - 2, y));
     }
-    graphics_draw_rect(ctx, GRect(left, wall_top, right - left, base - wall_top));
+    graphics_draw_rect(ctx, walls);
 
     // the roof, overhanging both walls. filled row by row so the eaves stay square
     graphics_context_set_stroke_color(ctx, pal->roof);
-    int span = right - left + 10;
-    for (int y = ridge; y <= wall_top; y++)
+    int span = CABIN_RIGHT - CABIN_LEFT + 10;
+    for (int y = CABIN_RIDGE; y <= CABIN_WALL_TOP; y++)
     {
-        int half = (span * (y - ridge)) / (2 * (wall_top - ridge));
-        graphics_draw_line(ctx, GPoint(left + (right - left) / 2 - half, y),
-                                GPoint(left + (right - left) / 2 + half, y));
+        int half = (span * (y - CABIN_RIDGE)) / (2 * (CABIN_WALL_TOP - CABIN_RIDGE));
+        graphics_draw_line(ctx, GPoint(CABIN_MID - half, y), GPoint(CABIN_MID + half, y));
     }
 
     graphics_context_set_stroke_color(ctx, pal->ink);
-    graphics_draw_line(ctx, GPoint(left + (right - left) / 2, ridge), GPoint(left - 5, wall_top));
-    graphics_draw_line(ctx, GPoint(left + (right - left) / 2, ridge), GPoint(right + 5, wall_top));
-    graphics_draw_line(ctx, GPoint(left - 5, wall_top), GPoint(right + 5, wall_top));
+    graphics_draw_line(ctx, GPoint(CABIN_MID, CABIN_RIDGE), GPoint(CABIN_LEFT - 5, CABIN_WALL_TOP));
+    graphics_draw_line(ctx, GPoint(CABIN_MID, CABIN_RIDGE), GPoint(CABIN_RIGHT + 5, CABIN_WALL_TOP));
+    graphics_draw_line(ctx, GPoint(CABIN_LEFT - 5, CABIN_WALL_TOP), GPoint(CABIN_RIGHT + 5, CABIN_WALL_TOP));
 
     if (snow)
     {
         graphics_context_set_stroke_color(ctx, GColorWhite);
         graphics_context_set_stroke_width(ctx, 3);
-        graphics_draw_line(ctx, GPoint(left + (right - left) / 2 - 2, ridge + 2), GPoint(left - 3, wall_top - 1));
-        graphics_draw_line(ctx, GPoint(left + (right - left) / 2 + 2, ridge + 2), GPoint(right + 3, wall_top - 1));
+        graphics_draw_line(ctx, GPoint(CABIN_MID - 2, CABIN_RIDGE + 2), GPoint(CABIN_LEFT - 3, CABIN_WALL_TOP - 1));
+        graphics_draw_line(ctx, GPoint(CABIN_MID + 2, CABIN_RIDGE + 2), GPoint(CABIN_RIGHT + 3, CABIN_WALL_TOP - 1));
         graphics_context_set_stroke_width(ctx, 1);
     }
 
     // the door
     graphics_context_set_fill_color(ctx, pal->roof);
-    GRect door = GRect(left + CABIN_DOOR_DX, base - CABIN_DOOR_H, CABIN_DOOR_W, CABIN_DOOR_H);
+    GRect door = GRect(CABIN_LEFT + CABIN_DOOR_DX, NEAR_BASE - CABIN_DOOR_H, CABIN_DOOR_W, CABIN_DOOR_H);
     graphics_fill_rect(ctx, door, 0, GCornerNone);
     graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_draw_rect(ctx, door);
 
     // and the window, which is the whole point of the cabin after dark
-    GRect pane = GRect(left + CABIN_WIN_DX, base - CABIN_WIN_H - 4, CABIN_WIN_W, CABIN_WIN_H);
+    GRect pane = GRect(CABIN_LEFT + CABIN_WIN_DX, NEAR_BASE - CABIN_WIN_H - 4, CABIN_WIN_W, CABIN_WIN_H);
     graphics_context_set_fill_color(ctx, night ? pal->glow : pal->roof);
     graphics_fill_rect(ctx, pane, 0, GCornerNone);
     graphics_draw_rect(ctx, pane);
@@ -358,7 +344,6 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
                             GPoint(pane.origin.x + pane.size.w / 2, pane.origin.y + pane.size.h - 1));
     graphics_draw_line(ctx, GPoint(pane.origin.x, pane.origin.y + pane.size.h / 2),
                             GPoint(pane.origin.x + pane.size.w - 1, pane.origin.y + pane.size.h / 2));
-
 }
 
 /**
@@ -376,14 +361,12 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
  */
 static void draw_smoke(GContext *ctx, const TreelinePalette *pal, int lean, int strength)
 {
-    const int stack_x = STACK_X, stack_top = STACK_TOP, stack_bottom = STACK_BOTTOM;
-
     // the chimney itself, standing proud of the roof
     graphics_context_set_fill_color(ctx, pal->roof);
-    graphics_fill_rect(ctx, GRect(stack_x - 4, stack_top, 8, stack_bottom - stack_top), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(STACK_X - 4, STACK_TOP, 8, STACK_BOTTOM - STACK_TOP), 0, GCornerNone);
     graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_context_set_stroke_width(ctx, 1);
-    graphics_draw_rect(ctx, GRect(stack_x - 4, stack_top, 8, stack_bottom - stack_top));
+    graphics_draw_rect(ctx, GRect(STACK_X - 4, STACK_TOP, 8, STACK_BOTTOM - STACK_TOP));
 
     graphics_context_set_fill_color(ctx, pal->smoke);
 
@@ -401,14 +384,14 @@ static void draw_smoke(GContext *ctx, const TreelinePalette *pal, int lean, int 
         int drift = (lean * strength * rise * rise) / 260000;
         int shake = ((puff % 2) ? strength : -strength) * puff / 220;
         int radius = 3 + (puff * 2) / 3;
-        int y = stack_top - rise;
+        int y = STACK_TOP - rise;
 
         if (y - radius < 20)
         {
             break;  // gone into the status bar, which would clip it flat
         }
 
-        graphics_fill_circle(ctx, GPoint(stack_x + drift + shake, y), radius);
+        graphics_fill_circle(ctx, GPoint(STACK_X + drift + shake, y), radius);
     }
 }
 
@@ -434,23 +417,12 @@ static void draw_temp_board(GContext *ctx, const TreelinePalette *pal)
         return;
     }
 
-    const int left = CABIN_LEFT, right = CABIN_RIGHT;
-    const int wall_top = CABIN_WALL_TOP;
-
     // sized to the reading rather than the wall, so it reads as a plaque over the door and leaves
     // the logs either side of it showing. a floor keeps a short reading from looking like a chip,
     // and a ceiling keeps "120F" from running into the eaves
-    int board_w = reading + 14;
-    if (board_w < 44)
-    {
-        board_w = 44;
-    }
-    if (board_w > (right - left) - CABIN_BOARD_INSET * 2)
-    {
-        board_w = (right - left) - CABIN_BOARD_INSET * 2;
-    }
+    int board_w = clamp_int(reading + 14, 44, CABIN_RIGHT - CABIN_LEFT - CABIN_BOARD_INSET * 2);
 
-    GRect board = GRect(CABIN_MID - board_w / 2, wall_top + 2, board_w, CABIN_BOARD_H);
+    GRect board = GRect(CABIN_MID - board_w / 2, CABIN_WALL_TOP + 2, board_w, CABIN_BOARD_H);
 
     // filled with the sky and lettered in ink, because ink over sky is the one pairing the palette
     // guarantees. filling it with the wall instead would rest on cabin-against-ink holding up in
@@ -526,18 +498,20 @@ void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     // the wind as the plume sees it: which way it pushes, and how much of the full bend the
     // speed is worth. no reading leaves the column standing straight up
     int lean = wind_lean(wind_bearing(weather_store_wind_dir()));
-    int kmh = weather_store_wind_kmh();
-    int strength = kmh < 0 ? 0 : (kmh >= WIND_FULL_KMH ? 100 : (kmh * 100) / WIND_FULL_KMH);
+    int strength = pct_of(weather_store_wind_kmh(), WIND_FULL_KMH);
 
     // the smoke rises through the sky, so it goes down before the trees it drifts behind
     draw_smoke(ctx, pal, lean, strength);
 
-    draw_treeline(ctx, s_far, ARRAY_LENGTH(s_far), FAR_BASE, pal->tree_far, pal->ink, snowy(frame->cond));
+    // snow lies where snow falls, so it rides the firs and the roof only when it is snowing
+    bool snow = sketchbook_cond_snows(frame->cond);
+
+    draw_treeline(ctx, s_far, ARRAY_LENGTH(s_far), FAR_BASE, pal->tree_far, pal->ink, snow);
     draw_ground(ctx, bounds, pal);
 
-    draw_cabin(ctx, pal, frame->night, snowy(frame->cond));
+    draw_cabin(ctx, pal, frame->night, snow);
 
-    draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, pal->tree, pal->ink, snowy(frame->cond));
+    draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, pal->tree, pal->ink, snow);
 
 #if defined(PBL_ROUND)
     draw_litter(ctx, pal);

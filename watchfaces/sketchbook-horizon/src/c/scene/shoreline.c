@@ -43,24 +43,24 @@
 // the swing is worth more than the tide range is: a shore that sweeps across the beach reads as
 // a coastline, and one that runs straight reads as a ruled line whatever the water is doing
 #if defined(PBL_ROUND)
-#define TIDE_LO_Y 131    ///< The curve's baseline at dead low, with the sea at its narrowest
+#define TIDE_LO_Y 131      ///< The curve's baseline at dead low, with the sea at its narrowest
+#define TIDE_HI_Y 150      ///< The curve's baseline at high water
+#define DRY_SAND_MARGIN 3  ///< Rows of wet sand still showing below the curve at the top of a full tide
 #else
-#define TIDE_LO_Y 107    ///< The curve's baseline at dead low, with the sea at its narrowest
+#define TIDE_LO_Y 107      ///< The curve's baseline at dead low, with the sea at its narrowest
+#define TIDE_HI_Y 123      ///< The curve's baseline at high water
+#define DRY_SAND_MARGIN 0  ///< Rows of wet sand still showing below the curve at the top of a full tide
 #endif
-#if defined(PBL_ROUND)
-#define TIDE_HI_Y 150   ///< The curve's baseline at high water
-#else
-#define TIDE_HI_Y 123   ///< The curve's baseline at high water
-#endif
-#if defined(PBL_ROUND)
-#define SHORE_SWING 13  ///< How far the curve wanders either side of its baseline
-#else
-#define SHORE_SWING 10  ///< How far the curve wanders either side of its baseline
-#endif
+
+// the curve is one long sweep with a gentler roll laid over it, and the two together are how far
+// it wanders either side of its baseline
+#define SHORE_SWEEP 7
+#define SHORE_ROLL 3
+#define SHORE_SWING (SHORE_SWEEP + SHORE_ROLL)
 
 // the dry sand starts here whatever the sea is doing, which is what gives the clock one home
 // while the water comes and goes. it has to clear the curve at its lowest reach on a full tide
-#define DRY_SAND_Y (TIDE_HI_Y + SHORE_SWING)
+#define DRY_SAND_Y (TIDE_HI_Y + SHORE_SWING + DRY_SAND_MARGIN)
 
 // a fixed field rather than a random one, so the sky is the same every time you look up at it,
 // which is what a sky does. it starts below the status bar and thins out towards the water
@@ -132,15 +132,15 @@ typedef struct
 
 // chop goes with wind rather than with cold, so it rides the rain rows and the storm
 // rather than the snow: a snowy sea can be dead flat, and a wet one usually is not
-#define SHORELINE_CHOPPY_ROWS ((1u << SKETCHBOOK_COND_RAIN) | (1u << SKETCHBOOK_COND_FZRN) | (1u << SKETCHBOOK_COND_SHWR) | (1u << SKETCHBOOK_COND_STRM))
+#define SHORELINE_CHOPPY_ROWS ((1u << WX_COND_RAIN) | (1u << WX_COND_FZRN) | (1u << WX_COND_SHWR) | (1u << WX_COND_STRM))
 
-_Static_assert((SHORELINE_CHOPPY_ROWS & ((1u << SKETCHBOOK_COND_SNOW) | (1u << SKETCHBOOK_COND_SNSH))) == 0,
+_Static_assert((SHORELINE_CHOPPY_ROWS & ((1u << WX_COND_SNOW) | (1u << WX_COND_SNSH))) == 0,
     "chop is a wind flag, not a cold one: it must never ride the snow rows");
 
 /** @brief Whether this condition roughens the water. */
-static bool choppy(SketchbookCond cond)
+static bool choppy(WxCond cond)
 {
-    return (SHORELINE_CHOPPY_ROWS >> cond) & 1u;
+    return cond < WX_COND_COUNT && ((SHORELINE_CHOPPY_ROWS >> cond) & 1u);
 }
 
 /**
@@ -213,7 +213,7 @@ static int shore_offset(int x)
     int32_t sweep = sin_lookup(DEG_TO_TRIGANGLE((x * 260) / SCREEN_W + 30));
     int32_t roll = sin_lookup(DEG_TO_TRIGANGLE((x * 540) / SCREEN_W + 200));
 
-    return (int)((sweep * 7 + roll * 3) / TRIG_MAX_RATIO);
+    return (int)((sweep * SHORE_SWEEP + roll * SHORE_ROLL) / TRIG_MAX_RATIO);
 }
 
 /** @brief Where the water's edge sits at a given column. */
@@ -469,8 +469,8 @@ static GPoint boat_anchor(int base, int level, int minute)
  * so it always faces the way it is going. Since the tide eases at the top and bottom of its
  * cycle, the boat slows and turns there too, without any of that being written twice.
  *
- * This is the hull and, on the rectangle, its sail. The round face's mast and pennant are drawn
- * separately in draw_pennant, after the weather, so the reading stays legible in the rain.
+ * This is the hull and, on the rectangle, its sail. On the round screen the mast and pennant are
+ * drawn separately in draw_pennant, after the weather, so the reading stays legible in the rain.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
@@ -483,9 +483,10 @@ static void draw_boat(GContext *ctx, const ShorelinePalette *pal, int base, int 
 {
     GPoint at = boat_anchor(base, level, minute);
     int x = at.x, y = at.y;
-    (void)rising;  // only the rectangle's sail leans with the tide
 
 #if defined(PBL_ROUND)
+    (void)rising;  // only the rectangle's sail leans with the tide
+
     // and a solid hull under it. the profile is held nearly straight down from the deck and only
     // drawn in near the keel: tapering evenly from the widest row makes a triangle, and a triangle
     // floating on water reads as a diamond rather than as a boat

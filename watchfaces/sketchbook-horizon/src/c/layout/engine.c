@@ -73,16 +73,12 @@ static void apply_theme_colors(void)
 
     Zone *zones = layout_zones();
     zones[ZONE_TIME].color = cp->text;
-    zones[ZONE_DATE].color = cp->dim;
     zones[ZONE_WEATHER].color = cp->dim;
     zones[ZONE_HR].color = cp->dim;
     zones[ZONE_STEPS].color = cp->dim;
 
     // the date-up layouts move it off the ground onto the strip, so it takes the strip's ink
-    if (sketchbook_layout() != LAYOUT_STANDARD)
-    {
-        zones[ZONE_DATE].color = cp->bar_ink;
-    }
+    zones[ZONE_DATE].color = sketchbook_layout() != LAYOUT_STANDARD ? cp->bar_ink : cp->dim;
 }
 
 /**
@@ -98,7 +94,7 @@ static void apply_theme_colors(void)
  */
 static void draw_scene(GContext *ctx, GRect bounds, const void *data)
 {
-    SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
+    WxCond cond = sketchbook_cond_parse(weather_store_cond());
     SceneFrame frame = {
         .palette = s_pal,
         .night = sketchbook_sky_night(),
@@ -178,13 +174,11 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
     // honour the show/hide setting. the store owns the connect/disconnect vibe
     if (settings_u8(SETTING_BLUETOOTH_ICON))
     {
-        icon_tint(icon_get(RESOURCE_ID_ICON_BLUETOOTH), cp->bar_ink);
-        icon_tint(icon_get(RESOURCE_ID_ICON_BLUETOOTH_SLASH), cp->bar_ink);
-        widgets_draw_bt(ctx, system_store_bluetooth());
+        widgets_draw_bt(ctx, cp->bar_ink, system_store_bluetooth());
     }
 
-    // the mark is drawn either way where the face bundles both states, so the strip keeps its
-    // shape whether or not Quiet Time is holding. the setting still decides if it shows at all
+    // the mark is drawn either way, so the strip keeps its shape whether or not Quiet Time is
+    // holding. the setting still decides if it shows at all
     if (settings_u8(SETTING_QUIET_TIME_ICON))
     {
         widgets_draw_qt_state(ctx, cp->bar_ink, quiet_time_is_active());
@@ -199,18 +193,18 @@ static void load_fonts(void)
     // one clock size per platform: the rectangle draws 92 on its roomier layouts, the circle
     // draws 82 on its only one, and loading both would hold a font in heap that never renders
 #if defined(PBL_ROUND)
-    fonts_register(FONT_HAND_82, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_82)));
+    fonts_load(FONT_HAND_82, RESOURCE_ID_FONT_HAND_82);
 #else
-    fonts_register(FONT_HAND_92, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_92)));
+    fonts_load(FONT_HAND_92, RESOURCE_ID_FONT_HAND_92);
 #endif
-    fonts_register(FONT_HAND_72, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_72)));
+    fonts_load(FONT_HAND_72, RESOURCE_ID_FONT_HAND_72);
     // 64 is the fallback under the rectangle's Hand 72 clock. the circle falls back from 82 to 72
 #if !defined(PBL_ROUND)
-    fonts_register(FONT_HAND_64, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_64)));
+    fonts_load(FONT_HAND_64, RESOURCE_ID_FONT_HAND_64);
 #endif
-    fonts_register(FONT_HAND_22, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_22)));
-    fonts_register(FONT_HAND_18, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_18)));
-    fonts_register(FONT_HAND_16, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HAND_16)));
+    fonts_load(FONT_HAND_22, RESOURCE_ID_FONT_HAND_22);
+    fonts_load(FONT_HAND_18, RESOURCE_ID_FONT_HAND_18);
+    fonts_load(FONT_HAND_16, RESOURCE_ID_FONT_HAND_16);
 }
 
 const SceneGeometry *sketchbook_scene_geometry(void)
