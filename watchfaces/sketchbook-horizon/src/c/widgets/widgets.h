@@ -31,7 +31,7 @@
  *
  * @param ctx The graphics context.
  * @param ink The colour to draw it in when the charge is healthy.
- * @param theme The theme setting value, which decides whether the low-charge warning colours apply.
+ * @param theme The palette on screen, which decides whether the low-charge warning colours apply.
  * @param level Battery charge level percentage.
  */
 void widgets_draw_battery(GContext *ctx, GColor ink, uint8_t theme, int level);

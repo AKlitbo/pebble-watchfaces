@@ -18,7 +18,7 @@
  * Colour themes warn with red (critical) and amber (low). Mono stays greyscale, leaving the
  * lit-segment count to signal charge.
  *
- * @param theme The theme setting value.
+ * @param theme The palette on screen, which Shuffle or the night or Quiet Time palette can pick.
  * @param ink The colour the gauge is drawn in when the charge is healthy.
  * @param level Battery charge level percentage.
  * @return The fill colour for lit segments.

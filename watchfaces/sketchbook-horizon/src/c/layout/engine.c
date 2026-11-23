@@ -99,7 +99,6 @@ static void draw_scene(GContext *ctx, GRect bounds, const void *data)
 static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
 {
     const CommonPalette *cp = s_pal;
-    uint8_t theme = settings_u8(SETTING_THEME);
 
     widgets_draw_top_bar(ctx, bounds);
 
@@ -108,7 +107,9 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
     {
         widgets_draw_date_bar(ctx, bounds);
     }
-    widgets_draw_battery(ctx, cp->bar_ink, theme, system_store_battery());
+    // Mono keeps the gauge grey whenever it is the palette on screen, Shuffle and the night and
+    // Quiet Time palettes included
+    widgets_draw_battery(ctx, cp->bar_ink, s_theme, system_store_battery());
 
     // the row's marks go with the row, and only the big clock drops it
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)

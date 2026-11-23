@@ -41,7 +41,7 @@ typedef struct ShorelinePalette
  *
  * An out-of-range theme falls back to Sketchbook, matching how the settings parser clamps.
  *
- * @param theme The theme setting value.
+ * @param theme The palette on screen, which Shuffle or the night or Quiet Time palette can pick.
  * @param night True for the after-dark palette.
  * @return The palette to paint with.
  */

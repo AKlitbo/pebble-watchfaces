@@ -4,6 +4,12 @@ All notable changes to the Sketchbook Horizon watchface are documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed the battery gauge following the Scene Palette rather than the palette on screen. When Shuffle, the Night Palette, or the Quiet Time Palette landed on Mono the gauge still turned red or amber, and a Mono Scene Palette kept it grey under a colour palette.
+
 ## [1.1.2] - 2026-11-20
 
 ### Changed
