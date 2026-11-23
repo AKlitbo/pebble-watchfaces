@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added an Uluru scene, with the rock across the desert and a water tank on its stand. On the Pebble Round 2 the temperature is painted on the tank.
 - Added a Niagara Falls scene, with the falls pouring into the mist. On the Pebble Round 2 the temperature floats on a barrel below the falls.
 - Added a Table Mountain scene, with the city along the bay and cloud pouring over the top on a cloudy day. On the Pebble Round 2 the temperature rides in the cable car.
+- Added a Monument Valley scene, with the Mittens and Merrick Butte over the desert and the highway running in. On the Pebble Round 2 the temperature sits on a roadside sign.
 
 ### Changed
 

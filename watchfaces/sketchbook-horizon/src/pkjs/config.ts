@@ -33,6 +33,7 @@ export const sceneOptions = [
   { label: 'Uluru', value: 7 },
   { label: 'Niagara Falls', value: 8 },
   { label: 'Table Mountain', value: 9 },
+  { label: 'Monument Valley', value: 10 },
 ];
 
 export default buildConfig({

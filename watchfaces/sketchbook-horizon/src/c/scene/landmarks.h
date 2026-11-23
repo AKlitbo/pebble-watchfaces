@@ -204,4 +204,25 @@ void table_mountain_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *f
 void table_mountain_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif
 
+/**
+ * @brief Paint the Monument Valley scene's ground: the buttes, the desert, the road and the scrub.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void monument_valley_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather in the Monument Valley scene: the sign with the
+ * temperature on it.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void monument_valley_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
+
 /** @} */

@@ -84,6 +84,11 @@ static const SceneDef s_scenes[] = {
         .ground = table_mountain_draw_ground, .front = PBL_IF_ROUND_ELSE(table_mountain_draw_front, NULL),
         .clock_only_y = 113,
     },
+    [SCENE_MONUMENT_VALLEY] = {
+        .geometry = &skyline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
+        .ground = monument_valley_draw_ground, .front = PBL_IF_ROUND_ELSE(monument_valley_draw_front, NULL),
+        .clock_only_y = 113,
+    },
 };
 
 // a missing last row makes the table short and fails here. a row left out in the middle comes up
