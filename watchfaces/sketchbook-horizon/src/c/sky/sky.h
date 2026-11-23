@@ -1,22 +1,24 @@
 /**
  * @file sky.h
- * @brief The sky every scene draws above its own ground.
+ * @brief The sky the layout engine paints over every scene's ground.
  *
  * Two bands blended into each other, a field of stars after dark, the dashed arc the day runs
  * along, and the sun or moon somewhere on it. All of it comes from the clock and from the
- * sunrise and sunset the phone sends, so a scene gets a sky that agrees with the hour without
+ * sunrise and sunset the phone sends, so every scene gets a sky that agrees with the hour without
  * doing any of this itself.
  *
- * Where it all sits comes from the scene's SceneGeometry in scene/geometry.h. The star field does
- * not: those are hand-placed per scene to sit above its own horizon, so the scene keeps the table
- * and hands it over.
+ * Where it all sits comes from the scene's SceneGeometry in scene/geometry.h, star field and all.
+ * Each scene places its stars by hand to sit above its own horizon, and the geometry carries them.
+ *
+ * The lights a scene switches on at dusk follow the same sunrise and sunset, so how lit the evening
+ * is lives here too.
  *
  * @ingroup watchface-sketchbook
  */
 #pragma once
 #include <pebble.h>
 
-#include "theme/palette.h"
+#include "scene/frame.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -61,40 +63,36 @@ int sketchbook_sky_arc_progress(void);
 GPoint sketchbook_sky_arc_point(int progress);
 
 /**
- * @brief Fill the sky: the upper band, the lower band, and a stippled blend between them.
+ * @brief Paint the sky: the two bands and their blend, the stars after dark, the arc, and the sun
+ * or moon unless the cloud hides it.
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param pal The palette in use.
+ * @param frame This frame's reading.
  */
-void sketchbook_sky_draw_bands(GContext *ctx, GRect bounds, const CommonPalette *pal);
+void sketchbook_sky_draw(GContext *ctx, GRect bounds, const SceneFrame *frame);
 
 /**
- * @brief Scatter a star field. Night only.
+ * @brief How lit a place is: 0 by day, up to 100 early in the evening, then thinning to about 55
+ * by dawn.
  *
- * @param ctx The graphics context.
- * @param pal The palette in use.
- * @param stars The scene's own field.
- * @param count How many there are.
+ * The lights come on quickly at dusk, hold through the evening, and thin out as the night wears
+ * on, which is what makes a scene read as a place with people in it rather than a light sensor.
+ *
+ * @return 0 to 100.
  */
-void sketchbook_sky_draw_stars(GContext *ctx, const CommonPalette *pal, const SketchbookStar *stars, int count);
+int sketchbook_sky_lit(void);
 
 /**
- * @brief Draw the arc the disc travels, as a broken guide line.
+ * @brief A steady place in the queue of lights coming on, 0 to 99.
  *
- * @param ctx The graphics context.
- * @param pal The palette in use.
- */
-void sketchbook_sky_draw_arc(GContext *ctx, const CommonPalette *pal);
-
-/**
- * @brief Draw the sun, or the moon at tonight's phase.
+ * Every window and lamp keeps its own place, so a city fills up the same way each evening rather
+ * than flickering from minute to minute.
  *
- * @param ctx The graphics context.
- * @param pal The palette in use.
- * @param at The disc's centre.
- * @param night True to draw the moon rather than the sun.
+ * @param a First coordinate of the light, such as its block.
+ * @param b Second, such as which window of that block.
+ * @return The light's place in the queue.
  */
-void sketchbook_sky_draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at, bool night);
+int sketchbook_sky_light_rank(int a, int b);
 
 /** @} */

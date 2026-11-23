@@ -3,7 +3,8 @@
  * @brief Where a scene's sky, weather and ground sit, handed to the shared drawing code at runtime.
  *
  * The shared sky and weather code draws the same way for every scene, but not in the same places:
- * each scene puts its horizon somewhere else, so its arc, its clouds, its rain and its wash follow.
+ * each scene puts its horizon somewhere else, so its arc, its stars, its clouds, its rain and its
+ * wash follow.
  * One scene is up at a time. The layout engine holds it, and the shared code reads these numbers
  * back through sketchbook_scene_geometry.
  *
@@ -16,7 +17,8 @@
 #pragma once
 #include <pebble.h>
 
-#include "fx/fx.h"  // Puff, for the overcast band
+#include "fx/fx.h"    // Puff, for the overcast band
+#include "sky/sky.h"  // SketchbookStar, for the star field
 
 /**
  * @addtogroup watchface-sketchbook
@@ -35,8 +37,9 @@ typedef GPoint BoltLeg[2];
 /**
  * @brief The numbers the shared sky and weather code needs, all of a scene's in one place.
  *
- * Every y here is a pixel row on the current platform. The two arrays are the scene's own data:
- * the overcast band it hangs across its sky, and the lightning fork struck over it.
+ * Every y here is a pixel row on the current platform. The arrays are the scene's own data: the
+ * stars it scatters above its horizon, the overcast band it hangs across its sky, and the lightning
+ * fork struck over it.
  *
  * A scene's values have to hold together or the weather draws wrong with nothing to flag it:
  * - cloud_y_min <= cloud_y_max, or the drifting cloud's clamp is inverted
@@ -53,6 +56,8 @@ typedef struct SceneGeometry
     int16_t arc_base_y;   ///< The baseline the disc rises off and sets into
     int16_t arc_rx;       ///< How far the arc reaches either side of centre
     int16_t arc_ry;       ///< How high it climbs above that baseline
+    const SketchbookStar *stars;  ///< The star field after dark, placed by hand above the horizon
+    uint8_t star_count;
 
     // --- clouds ---
     int16_t cloud_drop;   ///< How far under the disc a drifting cloud parks

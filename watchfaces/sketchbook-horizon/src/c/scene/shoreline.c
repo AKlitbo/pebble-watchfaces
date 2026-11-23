@@ -1,7 +1,8 @@
 /**
  * @file shoreline.c
- * @brief The drawn seascape: sky bands, stars, the sun or moon and its glitter on the water,
- * the sea and its waves, the boat, the surf line, and the beach.
+ * @brief The drawn seascape: the gulls, the sun or moon's glitter on the water, the sea and its
+ * waves, the boat, the surf line, and the beach. Its stars and where its sky and weather sit are
+ * here too.
  *
  * @ingroup watchface-sketchbook
  */
@@ -61,6 +62,17 @@
 // while the water comes and goes. it has to clear the curve at its lowest reach on a full tide
 #define DRY_SAND_Y (TIDE_HI_Y + SHORE_SWING)
 
+// a fixed field rather than a random one, so the sky is the same every time you look up at it,
+// which is what a sky does. it starts below the status bar and thins out towards the water
+static const SketchbookStar s_stars[] = {
+    {10, 28, 1}, {24, 38, 0}, {36, 25, 0}, {45, 33, 2}, {58, 27, 0}, {66, 42, 1},
+    {78, 31, 0}, {88, 24, 1}, {97, 37, 0}, {108, 29, 2}, {119, 43, 0}, {129, 26, 1},
+    {140, 35, 0}, {150, 23, 0}, {161, 40, 1}, {172, 30, 0}, {184, 43, 2}, {194, 27, 0},
+    {16, 52, 0}, {31, 62, 1}, {50, 55, 0}, {63, 66, 0}, {83, 57, 1}, {94, 65, 0},
+    {112, 54, 0}, {127, 63, 1}, {141, 52, 0}, {156, 66, 0}, {176, 56, 1}, {190, 64, 0},
+    {6, 35, 0}, {71, 50, 0}, {103, 46, 0}, {167, 49, 0},
+};
+
 // --- Where this scene's sky and weather sit ---
 // the arc's baseline is the horizon, so the sun and moon rise out of the sea and set back into it.
 // the overcast band hangs low in the sky and the fork strikes out of it, and the sea haze wash
@@ -75,6 +87,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry shoreline_geometry = {
     .sky_band_y = 49, .sky_blend_h = 27,
     .arc_base_y = 93, .arc_rx = 114, .arc_ry = 51,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 22, .cloud_y_min = 66, .cloud_y_max = 81,
     .drift_lobe_a = 8, .drift_lobe_b = 9,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -92,6 +105,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry shoreline_geometry = {
     .sky_band_y = 40, .sky_blend_h = 22,
     .arc_base_y = 76, .arc_rx = 88, .arc_ry = 42,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 18, .cloud_y_min = 54, .cloud_y_max = 66,
     .drift_lobe_a = 8, .drift_lobe_b = 9,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -118,17 +132,6 @@ typedef struct
     int8_t  dy;
     uint8_t span;
 } Gull;
-
-// a fixed field rather than a random one, so the sky is the same every time you look up at it,
-// which is what a sky does. it starts below the status bar and thins out towards the water
-static const SketchbookStar s_stars[] = {
-    {10, 28, 1}, {24, 38, 0}, {36, 25, 0}, {45, 33, 2}, {58, 27, 0}, {66, 42, 1},
-    {78, 31, 0}, {88, 24, 1}, {97, 37, 0}, {108, 29, 2}, {119, 43, 0}, {129, 26, 1},
-    {140, 35, 0}, {150, 23, 0}, {161, 40, 1}, {172, 30, 0}, {184, 43, 2}, {194, 27, 0},
-    {16, 52, 0}, {31, 62, 1}, {50, 55, 0}, {63, 66, 0}, {83, 57, 1}, {94, 65, 0},
-    {112, 54, 0}, {127, 63, 1}, {141, 52, 0}, {156, 66, 0}, {176, 56, 1}, {190, 64, 0},
-    {6, 35, 0}, {71, 50, 0}, {103, 46, 0}, {167, 49, 0},
-};
 
 // chop goes with wind rather than with cold, so it rides the rain rows and the storm
 // rather than the snow: a snowy sea can be dead flat, and a wet one usually is not
@@ -166,6 +169,33 @@ static int32_t tide_minutes(void)
 static int waterline_base(int level)
 {
     return TIDE_LO_Y + ((TIDE_HI_Y - TIDE_LO_Y) * level + 50) / 100;
+}
+
+/** @brief Where the tide stands on the clock the face is showing. */
+typedef struct
+{
+    int32_t minutes;  ///< The running minute count, which the gulls ride on too
+    int level;        ///< How far in the tide has come, 0 to 100
+    int base;         ///< The waterline's baseline, before the shore curve bends it
+    bool rising;      ///< True while the tide is flooding
+} TideNow;
+
+/**
+ * @brief Read the tide off the clock.
+ *
+ * The ground and the front both read it here, so the hull and the mast it carries always ride the
+ * same water.
+ *
+ * @return Where the tide stands.
+ */
+static TideNow tide_now(void)
+{
+    int32_t minutes = tide_minutes();
+    int level = tide_level(minutes);
+
+    return (TideNow){
+        .minutes = minutes, .level = level, .base = waterline_base(level), .rising = tide_rising(minutes),
+    };
 }
 
 /**
@@ -606,82 +636,43 @@ static void draw_pennant(GContext *ctx, const ShorelinePalette *pal, int base, i
 }
 #endif
 
-void shoreline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
+void shoreline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const ShorelinePalette *pal = palette;
+    const ShorelinePalette *pal = frame->palette;
 
-    // the shared sky and weather code paints with the common block, which leads this scene's
-    // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = palette;
-
-    bool night = sketchbook_sky_night();
-    SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
-    SketchbookSky sky = sketchbook_sky_recipe(cond);
-    GPoint disc = sketchbook_sky_arc_point(sketchbook_sky_arc_progress());
-    int32_t minutes = tide_minutes();
-    int level = tide_level(minutes);
-    int base = waterline_base(level);
-    int minute = time_store_tm()->tm_min;
-
-    graphics_context_set_antialiased(ctx, true);
-
-    sketchbook_sky_draw_bands(ctx, bounds, cp);
-
-    if (night)
-    {
-        sketchbook_sky_draw_stars(ctx, cp, s_stars, ARRAY_LENGTH(s_stars));
-    }
-
-    sketchbook_sky_draw_arc(ctx, cp);
-
-    if (sky.celestial != CEL_HIDDEN)
-    {
-        sketchbook_sky_draw_disc(ctx, cp, disc, night);
-    }
-
-    // clouds sit in front of the disc but behind the water, so a low sun still goes down into
-    // the sea rather than in front of it
-    sketchbook_fx_draw_clouds(ctx, cp, &sky, disc);
+    TideNow tide = tide_now();
 
     // gulls fly nearer than the cloud they pass under, and they keep the daytime sky occupied
     // the way the stars do at night
-    if (!night)
+    if (!frame->night)
     {
-        draw_birds(ctx, pal, minutes);
+        draw_birds(ctx, pal, tide.minutes);
     }
 
-    draw_water(ctx, bounds, pal, base);
+    draw_water(ctx, bounds, pal, tide.base);
 
     // the reflection only exists while there is something up there to cast it
-    if (sky.celestial != CEL_HIDDEN && disc.y < HORIZON_Y)
+    if (frame->sky.celestial != CEL_HIDDEN && frame->disc.y < HORIZON_Y)
     {
-        draw_glitter(ctx, pal, disc, base);
+        draw_glitter(ctx, pal, frame->disc, tide.base);
     }
 
-    draw_waves(ctx, pal, base, minute, choppy(cond));
+    draw_waves(ctx, pal, tide.base, frame->minute, choppy(frame->cond));
 
-    draw_boat(ctx, pal, base, level, tide_rising(minutes), minute);
+    draw_boat(ctx, pal, tide.base, tide.level, tide.rising, frame->minute);
 
-    draw_surf(ctx, pal, base);
-
-    // rain falls in front of everything: it is the nearest thing to you
-    sketchbook_fx_draw_precip(ctx, cp, &sky, minute);
-
-    if (sky.wash)
-    {
-        sketchbook_fx_draw_wash(ctx, cp);
-    }
-
-    if (sky.bolt)
-    {
-        sketchbook_fx_draw_bolt(ctx, cp);
-    }
-
-    // the pennant goes last, after the weather. the reading is the one thing on the face that has
-    // to stay readable in every condition, and painted with the hull it sits behind the rain
-#if defined(PBL_ROUND)
-    draw_pennant(ctx, pal, base, level, tide_rising(minutes), minute);
-#endif
+    draw_surf(ctx, pal, tide.base);
 }
+
+#if defined(PBL_ROUND)
+void shoreline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
+{
+    TideNow tide = tide_now();
+
+    // the pennant goes in front of the weather. the reading is the one thing on the face that has
+    // to stay readable in every condition, and painted with the hull it sits behind the rain
+    draw_pennant(ctx, frame->palette, tide.base, tide.level, tide.rising, frame->minute);
+}
+#endif
 
 /** @} */

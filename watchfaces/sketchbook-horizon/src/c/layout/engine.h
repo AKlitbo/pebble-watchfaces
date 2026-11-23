@@ -4,9 +4,10 @@
  * response, run for whichever scene the Scene setting names.
  *
  * The scenes draw different landscapes but wear the same clock, date, readouts and chrome, picked
- * the same way from the same palette. That part lives here once, with the slots in zones.c. A
- * scene is one row of the table in scene/scene.c: its geometry, its palette, its landscape, and the
- * row its Clock Only clock sits on. The engine holds the scene that is up.
+ * the same way from the same palette. That part lives here once, with the slots in zones.c, and so
+ * does painting the sky and the weather around each scene's ground. A scene is one row of the
+ * table in scene/scene.c: its geometry, its palette, its ground and front draws, and the row its
+ * Clock Only clock sits on. The engine holds the scene that is up.
  *
  * @ingroup watchface-sketchbook
  */

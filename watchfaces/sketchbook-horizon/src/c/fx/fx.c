@@ -7,6 +7,7 @@
 #include "fx/fx.h"
 
 #include "scene/geometry.h"
+#include "theme/palette.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -52,9 +53,12 @@ static void draw_puffs(GContext *ctx, const CommonPalette *pal, const Puff *puff
     }
 }
 
-void sketchbook_fx_draw_clouds(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, GPoint disc)
+void sketchbook_fx_draw_clouds(GContext *ctx, const SceneFrame *frame)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();
+    const CommonPalette *pal = frame->palette;
+    const SketchbookSky *sky = &frame->sky;
+    GPoint disc = frame->disc;
 
     if (sky->clouds == CLOUDS_NONE)
     {
@@ -135,7 +139,18 @@ static void draw_particle(GContext *ctx, uint8_t kind, GPoint at, int index)
     graphics_fill_circle(ctx, at, 1);
 }
 
-void sketchbook_fx_draw_precip(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, int minute)
+/**
+ * @brief Draw the falling precipitation as a curtain over the scene.
+ *
+ * Particle positions come from the minute rather than a random number, so the scene shifts
+ * once a minute on the tick that is already happening and never costs a timer.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ * @param sky What the condition is doing.
+ * @param minute The clock minute, which shuffles the particles.
+ */
+static void draw_precip(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, int minute)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();
 
@@ -169,7 +184,13 @@ void sketchbook_fx_draw_precip(GContext *ctx, const CommonPalette *pal, const Sk
     graphics_context_set_stroke_width(ctx, 1);
 }
 
-void sketchbook_fx_draw_wash(GContext *ctx, const CommonPalette *pal)
+/**
+ * @brief Draw the wash lying over the ground: the scene's fog, haze or mist.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ */
+static void draw_wash(GContext *ctx, const CommonPalette *pal)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();
 
@@ -201,7 +222,13 @@ void sketchbook_fx_draw_wash(GContext *ctx, const CommonPalette *pal)
     graphics_context_set_stroke_width(ctx, 1);
 }
 
-void sketchbook_fx_draw_bolt(GContext *ctx, const CommonPalette *pal)
+/**
+ * @brief Draw a lightning fork out of the cloud.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ */
+static void draw_bolt(GContext *ctx, const CommonPalette *pal)
 {
     // a zigzag out of the cloud base, the scene's own legs, drawn as lines rather than a path so
     // it needs no allocation and keeps the same hand-drawn weight as the rest of the linework
@@ -221,6 +248,25 @@ void sketchbook_fx_draw_bolt(GContext *ctx, const CommonPalette *pal)
     }
 
     graphics_context_set_stroke_width(ctx, 1);
+}
+
+void sketchbook_fx_draw_weather(GContext *ctx, const SceneFrame *frame)
+{
+    const CommonPalette *pal = frame->palette;
+
+    // rain falls in front of the scene's ground, since it is the nearest thing to you
+    // only a round screen's temperature holder goes over it
+    draw_precip(ctx, pal, &frame->sky, frame->minute);
+
+    if (frame->sky.wash)
+    {
+        draw_wash(ctx, pal);
+    }
+
+    if (frame->sky.bolt)
+    {
+        draw_bolt(ctx, pal);
+    }
 }
 
 /** @} */

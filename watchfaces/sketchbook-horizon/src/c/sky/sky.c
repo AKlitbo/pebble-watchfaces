@@ -1,12 +1,14 @@
 /**
  * @file sky.c
- * @brief The sky every scene draws: its bands, its stars, and the sun or moon on its arc.
+ * @brief The sky the layout engine paints over every scene's ground: its bands, its stars, and the
+ * sun or moon on its arc, plus how lit the evening is.
  *
  * @ingroup watchface-sketchbook
  */
 #include "sky/sky.h"
 
 #include "scene/geometry.h"
+#include "theme/palette.h"
 #include "clock/moon.h"
 #include "clock/solar.h"
 #include "io/stores/time_store.h"
@@ -25,7 +27,10 @@
 
 /**
  * @brief Today's sunrise and sunset in minutes past midnight, falling back to a plain
- * twelve-hour day when the phone has not sent them.
+ * twelve-hour day for whichever the phone has not sent.
+ *
+ * Each one falls back on its own, so a real sunrise still places the morning when the sunset is
+ * missing.
  *
  * @param rise_out Receives the sunrise.
  * @param set_out Receives the sunset.
@@ -143,7 +148,7 @@ static GColor sky_colour_at(const CommonPalette *pal, int x, int y)
  * @param bounds The window's root bounds.
  * @param pal The palette in use.
  */
-void sketchbook_sky_draw_bands(GContext *ctx, GRect bounds, const CommonPalette *pal)
+static void draw_bands(GContext *ctx, GRect bounds, const CommonPalette *pal)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();
 
@@ -175,8 +180,10 @@ void sketchbook_sky_draw_bands(GContext *ctx, GRect bounds, const CommonPalette 
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param stars The scene's own field.
+ * @param count How many there are.
  */
-void sketchbook_sky_draw_stars(GContext *ctx, const CommonPalette *pal, const SketchbookStar *stars, int count)
+static void draw_stars(GContext *ctx, const CommonPalette *pal, const SketchbookStar *stars, int count)
 {
     graphics_context_set_stroke_width(ctx, 1);
 
@@ -209,7 +216,7 @@ void sketchbook_sky_draw_stars(GContext *ctx, const CommonPalette *pal, const Sk
  * @param ctx The graphics context.
  * @param pal The palette in use.
  */
-void sketchbook_sky_draw_arc(GContext *ctx, const CommonPalette *pal)
+static void draw_arc(GContext *ctx, const CommonPalette *pal)
 {
     graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_context_set_stroke_width(ctx, 1);
@@ -341,7 +348,15 @@ static void draw_moon(GContext *ctx, const CommonPalette *pal, GPoint at)
     graphics_context_set_stroke_width(ctx, 1);
 }
 
-void sketchbook_sky_draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at, bool night)
+/**
+ * @brief Draw the sun, or the moon at tonight's phase.
+ *
+ * @param ctx The graphics context.
+ * @param pal The palette in use.
+ * @param at The disc's centre.
+ * @param night True to draw the moon rather than the sun.
+ */
+static void draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at, bool night)
 {
     if (night)
     {
@@ -351,6 +366,64 @@ void sketchbook_sky_draw_disc(GContext *ctx, const CommonPalette *pal, GPoint at
     {
         draw_sun(ctx, pal, at);
     }
+}
+
+void sketchbook_sky_draw(GContext *ctx, GRect bounds, const SceneFrame *frame)
+{
+    const SceneGeometry *g = sketchbook_scene_geometry();
+
+    // the shared sky paints with the common block, which leads every scene's palette
+    const CommonPalette *pal = frame->palette;
+
+    draw_bands(ctx, bounds, pal);
+
+    if (frame->night)
+    {
+        draw_stars(ctx, pal, g->stars, g->star_count);
+    }
+
+    draw_arc(ctx, pal);
+
+    if (frame->sky.celestial != CEL_HIDDEN)
+    {
+        draw_disc(ctx, pal, frame->disc, frame->night);
+    }
+}
+
+int sketchbook_sky_lit(void)
+{
+    // the lights take the two times as a pair. one missing sends both back to the plain day
+    int rise = weather_store_sunrise();
+    int set = weather_store_sunset();
+    if (rise < 0 || set < 0)
+    {
+        rise = FALLBACK_RISE;
+        set = FALLBACK_SET;
+    }
+
+    // solar_night_progress already handles the night wrapping past midnight and how short a
+    // summer night is. all that is added here is the shape over it
+    int night = solar_night_progress(rise, set, now_minutes());
+    if (night < 0)
+    {
+        return 0;  // broad daylight
+    }
+
+    // up fast over the first fifth of the night, then a slow decline as the place turns in
+    if (night < 20)
+    {
+        return (night * 100) / 20;
+    }
+
+    return 100 - ((night - 20) * 45) / 80;
+}
+
+int sketchbook_sky_light_rank(int a, int b)
+{
+    // the multiply and shift scatters neighbours that would otherwise light in a row
+    // the multiplies are done unsigned, so a large coordinate wraps rather than overflowing
+    unsigned mixed = ((unsigned)a * 73856093u) ^ ((unsigned)b * 19349663u);
+    return (int)((mixed >> 13) % 100);
 }
 
 /** @} */

@@ -7,6 +7,11 @@
  * the public calls and the draw-slots the engine fires. The shared sky and weather code reads its
  * geometry back from here too.
  *
+ * The sky and the weather are painted here for every scene, around the scene's own ground. The
+ * night, the condition, its sky recipe, the disc and the minute are read once at the top of the
+ * frame and handed to the scene. Anything else a scene draws from, such as the tide, the wind or
+ * how lit the evening is, it reads for itself.
+ *
  * @ingroup watchface-sketchbook
  */
 #include "layout/engine.h"
@@ -19,12 +24,14 @@
 #include "ui/readouts.h"
 #include "ui/icon_cache.h"
 #include "sky/sky.h"
+#include "fx/fx.h"
 #include "widgets/widgets.h"
 #include "theme/palette.h"
 #include "theme/palette_active.h"
 #include "settings_schema.h"
 #include "io/stores/system_store.h"
 #include "io/stores/time_store.h"
+#include "io/stores/weather_store.h"
 #include "system/settings/settings.h"
 
 /**
@@ -79,7 +86,11 @@ static void apply_theme_colors(void)
 }
 
 /**
- * @brief Scene draw-slot: the whole painted background, from sky to weather.
+ * @brief Scene draw-slot: the whole painted background, from the sky to the scene's front.
+ *
+ * The sky, the clouds, the scene's ground, the weather and the scene's front, in that order. Night
+ * is read fresh here rather than taken from the theme, so the sky always agrees with the clock it
+ * is drawn at.
  *
  * @param ctx The graphics context.
  * @param bounds The slot bounds (the full window).
@@ -87,7 +98,32 @@ static void apply_theme_colors(void)
  */
 static void draw_scene(GContext *ctx, GRect bounds, const void *data)
 {
-    s_scene->draw(ctx, bounds, s_pal);
+    SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
+    SceneFrame frame = {
+        .palette = s_pal,
+        .night = sketchbook_sky_night(),
+        .cond = cond,
+        .sky = sketchbook_sky_recipe(cond),
+        .disc = sketchbook_sky_arc_point(sketchbook_sky_arc_progress()),
+        .minute = time_store_tm()->tm_min,
+    };
+
+    graphics_context_set_antialiased(ctx, true);
+
+    sketchbook_sky_draw(ctx, bounds, &frame);
+
+    // clouds sit in front of the disc but behind the scene's ground, so a low sun still goes down
+    // behind the mountains, the sea or the city
+    sketchbook_fx_draw_clouds(ctx, &frame);
+
+    s_scene->ground(ctx, bounds, &frame);
+
+    sketchbook_fx_draw_weather(ctx, &frame);
+
+    if (s_scene->front)
+    {
+        s_scene->front(ctx, bounds, &frame);
+    }
 }
 
 /**

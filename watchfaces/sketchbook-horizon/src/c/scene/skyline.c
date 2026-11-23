@@ -9,12 +9,10 @@
 
 #include "fx/fx.h"
 #include "sky/sky.h"
-#include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 #include "ui/readouts.h"
 #include "ui/fonts.h"
 #include "draw/fonts.h"
-#include "clock/solar.h"
 #include "theme/skyline.h"
 
 /**
@@ -72,6 +70,30 @@
 // the water once the bank dropped, which put the crossing's mirror image on dry land
 #define MIRROR_TOP (WATER_TOP + 4)
 
+// a fixed field rather than a random one, so the sky is the same every time you look up at it
+#if defined(PBL_ROUND)
+// the same field spread to the wider sky. a circle cuts the corners hardest where this field is
+// thickest, so the few stars that scaling put outside the glass were moved inwards to where
+// there is sky rather than left to clip away
+static const SketchbookStar s_stars[] = {
+    {30, 62, 1}, {31, 54, 0}, {47, 34, 0}, {59, 46, 2}, {75, 36, 0}, {86, 59, 1},
+    {101, 43, 0}, {114, 32, 1}, {126, 51, 0}, {140, 39, 2}, {155, 61, 0}, {168, 35, 1},
+    {182, 49, 0}, {195, 31, 0}, {209, 55, 1}, {224, 41, 0}, {239, 59, 2}, {236, 66, 0},
+    {21, 74, 0}, {40, 89, 1}, {65, 78, 0}, {82, 96, 0}, {108, 81, 1}, {122, 95, 0},
+    {146, 77, 0}, {165, 92, 1}, {183, 74, 0}, {203, 95, 0}, {229, 80, 1}, {247, 93, 0},
+    {24, 57, 0}, {92, 72, 0}, {134, 65, 0}, {217, 70, 0},
+};
+#else
+static const SketchbookStar s_stars[] = {
+    {10, 30, 1}, {24, 42, 0}, {36, 27, 0}, {45, 36, 2}, {58, 29, 0}, {66, 46, 1},
+    {78, 34, 0}, {88, 26, 1}, {97, 40, 0}, {108, 31, 2}, {119, 43, 0}, {129, 26, 1},
+    {140, 38, 0}, {150, 23, 0}, {161, 43, 1}, {172, 30, 0}, {184, 46, 2}, {194, 27, 0},
+    {16, 52, 0}, {31, 62, 1}, {50, 55, 0}, {63, 66, 0}, {83, 57, 1}, {94, 65, 0},
+    {112, 54, 0}, {127, 63, 1}, {141, 52, 0}, {156, 66, 0}, {176, 56, 1}, {190, 64, 0},
+    {6, 35, 0}, {71, 50, 0}, {103, 46, 0}, {167, 49, 0},
+};
+#endif
+
 // --- Where this scene's sky and weather sit ---
 // the sky band and the arc sit above the crossing, the overcast band hangs across the sky, and
 // the fork strikes out of it. the round build drops and spreads these with the rest of the scene
@@ -85,6 +107,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry skyline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 100, .arc_rx = 112, .arc_ry = 55,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 22, .cloud_y_min = 52, .cloud_y_max = 78,
     .drift_lobe_a = 10, .drift_lobe_b = 11,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -102,6 +125,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry skyline_geometry = {
     .sky_band_y = 46, .sky_blend_h = 24,
     .arc_base_y = 82, .arc_rx = 86, .arc_ry = 54,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 18, .cloud_y_min = 42, .cloud_y_max = 54,
     .drift_lobe_a = 8, .drift_lobe_b = 9,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -137,87 +161,6 @@ static const Block s_city[] = {
     {173, 14, 32}, {189, 11, 14},
 };
 #endif
-
-// a fixed field rather than a random one, so the sky is the same every time you look up at it
-#if defined(PBL_ROUND)
-// the same field spread to the wider sky. a circle cuts the corners hardest where this field is
-// thickest, so the few stars that scaling put outside the glass were moved inwards to where
-// there is sky rather than left to clip away
-static const SketchbookStar s_stars[] = {
-    {30, 62, 1}, {31, 54, 0}, {47, 34, 0}, {59, 46, 2}, {75, 36, 0}, {86, 59, 1},
-    {101, 43, 0}, {114, 32, 1}, {126, 51, 0}, {140, 39, 2}, {155, 61, 0}, {168, 35, 1},
-    {182, 49, 0}, {195, 31, 0}, {209, 55, 1}, {224, 41, 0}, {239, 59, 2}, {236, 66, 0},
-    {21, 74, 0}, {40, 89, 1}, {65, 78, 0}, {82, 96, 0}, {108, 81, 1}, {122, 95, 0},
-    {146, 77, 0}, {165, 92, 1}, {183, 74, 0}, {203, 95, 0}, {229, 80, 1}, {247, 93, 0},
-    {24, 57, 0}, {92, 72, 0}, {134, 65, 0}, {217, 70, 0},
-};
-#else
-static const SketchbookStar s_stars[] = {
-    {10, 30, 1}, {24, 42, 0}, {36, 27, 0}, {45, 36, 2}, {58, 29, 0}, {66, 46, 1},
-    {78, 34, 0}, {88, 26, 1}, {97, 40, 0}, {108, 31, 2}, {119, 43, 0}, {129, 26, 1},
-    {140, 38, 0}, {150, 23, 0}, {161, 43, 1}, {172, 30, 0}, {184, 46, 2}, {194, 27, 0},
-    {16, 52, 0}, {31, 62, 1}, {50, 55, 0}, {63, 66, 0}, {83, 57, 1}, {94, 65, 0},
-    {112, 54, 0}, {127, 63, 1}, {141, 52, 0}, {156, 66, 0}, {176, 56, 1}, {190, 64, 0},
-    {6, 35, 0}, {71, 50, 0}, {103, 46, 0}, {167, 49, 0},
-};
-#endif
-
-/**
- * @brief How lit the crossing is, from 0 by day to 100 in the small hours.
- *
- * The lamps do not simply follow darkness. They come on quickly at dusk, hold through the
- * evening, and the city behind them thins out as the night wears on, which is what makes the
- * scene read as a place with people in it rather than a light sensor.
- *
- * Built on solar_night_progress, which already handles the awkward parts: the night wrapping
- * past midnight, a missing reading, and how short a summer night is. All that is added here is
- * the shape over it.
- *
- * @return 0 to 100.
- */
-static int lamps_lit(void)
-{
-    const struct tm *now = time_store_tm();
-    int minutes = now->tm_hour * 60 + now->tm_min;
-
-    int rise = weather_store_sunrise();
-    int set = weather_store_sunset();
-    if (rise < 0 || set < 0)
-    {
-        rise = 6 * 60;
-        set = 18 * 60;
-    }
-
-    int night = solar_night_progress(rise, set, minutes);
-    if (night < 0)
-    {
-        return 0;  // broad daylight, so only the handful that never go off
-    }
-
-    // up fast over the first fifth of the night, then a slow decline as the city turns in
-    if (night < 20)
-    {
-        return (night * 100) / 20;
-    }
-
-    return 100 - ((night - 20) * 45) / 80;
-}
-
-/**
- * @brief A stable pseudo-random rank for one light, 0 to 99.
- *
- * Every lamp and window keeps its own place in the order things switch on, so the city fills up
- * the same way each evening instead of flickering at random from minute to minute. Cheap integer
- * hash: the multiply-and-shift scatters neighbours that would otherwise light in a row.
- *
- * @param a First coordinate of the light, e.g. its block.
- * @param b Second, e.g. which window of that block.
- */
-static int light_rank(int a, int b)
-{
-    unsigned mixed = (unsigned)(a * 73856093) ^ (unsigned)(b * 19349663);
-    return (int)((mixed >> 13) % 100);
-}
 
 /**
  * @brief Draw the city standing back behind the bridge, with whatever of it is awake.
@@ -261,7 +204,7 @@ static void draw_city(GContext *ctx, const SkylinePalette *pal, int lit)
                     continue;
                 }
 
-                if (light_rank((int)i, row * 2 + col) < lit)
+                if (sketchbook_sky_light_rank((int)i, row * 2 + col) < lit)
                 {
                     graphics_fill_rect(ctx, GRect(x, y, 2, 2), 0, GCornerNone);
                 }
@@ -376,7 +319,7 @@ static void draw_lamps(GContext *ctx, const SkylinePalette *pal, int lit)
 {
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
     {
-        bool on = light_rank(i, 7) < lit;
+        bool on = sketchbook_sky_light_rank(i, 7) < lit;
 
         // a short post off the deck with the lamp on top of it. the post takes the linework
         // colour for the same reason the cables do: it has to hold against a dark sky
@@ -475,7 +418,7 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
 
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
     {
-        if (light_rank(i, 7) >= lit)
+        if (sketchbook_sky_light_rank(i, 7) >= lit)
         {
             continue;
         }
@@ -557,64 +500,24 @@ static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
 }
 #endif
 
-void skyline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
+void skyline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const SkylinePalette *pal = palette;
-
-    // the shared sky and weather code paints with the common block, which leads this scene's
-    // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = palette;
-
-    bool night = sketchbook_sky_night();
-    SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
-    SketchbookSky sky = sketchbook_sky_recipe(cond);
-    GPoint disc = sketchbook_sky_arc_point(sketchbook_sky_arc_progress());
-    int minute = time_store_tm()->tm_min;
-    int lit = lamps_lit();
-
-    graphics_context_set_antialiased(ctx, true);
-
-    sketchbook_sky_draw_bands(ctx, bounds, cp);
-
-    if (night)
-    {
-        sketchbook_sky_draw_stars(ctx, cp, s_stars, ARRAY_LENGTH(s_stars));
-    }
-
-    sketchbook_sky_draw_arc(ctx, cp);
-
-    if (sky.celestial != CEL_HIDDEN)
-    {
-        sketchbook_sky_draw_disc(ctx, cp, disc, night);
-    }
-
-    // clouds sit in front of the disc but behind the city, so a low sun still goes down behind
-    // the far bank rather than in front of it
-    sketchbook_fx_draw_clouds(ctx, cp, &sky, disc);
+    const SkylinePalette *pal = frame->palette;
+    int lit = sketchbook_sky_lit();
 
     // the river goes down before the crossing, not after: the water starts at the far bank the
     // city stands on, so the bridge has to be painted on top of it to be over it
     draw_city(ctx, pal, lit);
-    draw_water(ctx, bounds, pal, lit, minute);
+    draw_water(ctx, bounds, pal, lit, frame->minute);
     draw_bridge(ctx, pal);
     draw_lamps(ctx, pal, lit);
-
-    // rain falls in front of everything: it is the nearest thing to you
-    sketchbook_fx_draw_precip(ctx, cp, &sky, minute);
-
-    if (sky.wash)
-    {
-        sketchbook_fx_draw_wash(ctx, cp);
-    }
-
-    if (sky.bolt)
-    {
-        sketchbook_fx_draw_bolt(ctx, cp);
-    }
+}
 
 #if defined(PBL_ROUND)
-    draw_buoy(ctx, pal);
-#endif
+void skyline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
+{
+    draw_buoy(ctx, frame->palette);
 }
+#endif
 
 /** @} */

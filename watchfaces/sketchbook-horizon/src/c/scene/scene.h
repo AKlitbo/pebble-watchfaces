@@ -3,16 +3,17 @@
  * @brief One face, four scenes, picked at runtime. The wearer chooses a scene in settings and the
  * face draws that one.
  *
- * Every scene is a self-contained drawing: ridgeline's mountains, shoreline's sea, skyline's
- * bridge, treeline's forest. They all share the sky, the weather and the chrome, and differ in what
- * stands under it and where the clock and readouts sit. Each scene is one row of the table in
- * scene.c, and the layout engine runs whichever row the Scene setting names.
+ * Every scene is its own ground under a shared sky: ridgeline's mountains, shoreline's sea,
+ * skyline's bridge, treeline's forest. They all share the sky, the weather and the chrome, and
+ * differ in what stands under it and where the clock and readouts sit. Each scene is one row of the
+ * table in scene.c, and the layout engine runs whichever row the Scene setting names.
  *
  * @ingroup watchface-sketchbook
  */
 #pragma once
 #include <pebble.h>
 
+#include "scene/frame.h"
 #include "scene/geometry.h"
 
 /**
@@ -33,21 +34,28 @@ typedef enum
 } SceneId;
 
 /**
- * @brief One scene, as data: where its sky and weather sit, its palette, its landscape, and the row
+ * @brief One scene, as data: where its sky and weather sit, its palette, its own draws, and the row
  * its Clock Only clock sits on.
  *
  * The geometry is read by the shared sky and weather code, and the rest by the layout engine (see
  * layout/engine.h), both while this scene is up.
  *
- * The palette and the landscape pass it as `const void *` because each scene has its own palette
- * type with its own extra fields. The engine only ever reads the shared block, so it casts to
- * CommonPalette, and the scene's own draw casts back to its full palette.
+ * The engine paints a frame in one order. The sky goes down first, then the clouds, then the
+ * scene's ground, then the rain, the wash and the fork, and last the scene's front. The ground is
+ * everything the weather falls in front of. The front is whatever stands in front of the weather,
+ * such as the holder a round screen letters the temperature on, so the reading stays clear in
+ * every condition.
+ *
+ * The palette is passed as `const void *` because each scene has its own palette type with its own
+ * extra fields. The engine only ever reads the shared block, so it casts to CommonPalette, and the
+ * scene's own draws cast back to its full palette.
  */
 typedef struct SceneDef
 {
     const SceneGeometry *geometry;                                 ///< Where its sky and weather sit
     const void *(*palette_for_theme)(uint8_t theme, bool night);  ///< Its palette for the hour
-    void (*draw)(GContext *ctx, GRect bounds, const void *pal);    ///< Paint the landscape
+    SceneDraw ground;      ///< Paint its ground and props, between the clouds and the weather
+    SceneDraw front;       ///< Paint what stands in front of the weather, or NULL for nothing
     int16_t clock_only_y;  ///< Top of the Clock Only clock's box on the rectangle
 } SceneDef;
 

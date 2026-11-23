@@ -3,10 +3,10 @@
  * @brief What the weather adds to a Sketchbook scene: clouds, falling precipitation, a wash over the
  * ground, and a lightning fork.
  *
- * The scene reads the phone's condition into a SketchbookSky (see conditions.h) and draws these in
- * its own z-order, since only it knows where its landscape sits: clouds go behind the ground, rain
- * falls in front of it. Where each part lands comes from the scene's SceneGeometry in
- * scene/geometry.h.
+ * The layout engine reads the phone's condition into a SketchbookSky (see conditions.h) once a
+ * frame and draws these around the scene's ground. Clouds go behind the ground, and the rain, the
+ * wash and the fork fall in front of it. Where each part lands comes from the scene's SceneGeometry
+ * in scene/geometry.h.
  *
  * The wash is one thing with many names across the scenes, such as Ridgeline's fog, Shoreline's
  * sea haze, and Treeline's mist. It draws the same in every scene, so it is drawn once here and
@@ -17,8 +17,7 @@
 #pragma once
 #include <pebble.h>
 
-#include "fx/conditions.h"
-#include "theme/palette.h"
+#include "scene/frame.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -38,39 +37,16 @@ typedef struct
  * @brief Draw the sky's clouds. One cloud parks over the disc, a band sits across the sky.
  *
  * @param ctx The graphics context.
- * @param pal The palette in use.
- * @param sky What the condition is doing.
- * @param disc Where the sun or moon is, so a peeking cloud lands on it.
+ * @param frame This frame's reading, whose disc a peeking cloud lands on.
  */
-void sketchbook_fx_draw_clouds(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, GPoint disc);
+void sketchbook_fx_draw_clouds(GContext *ctx, const SceneFrame *frame);
 
 /**
- * @brief Draw the falling precipitation as a curtain over the scene.
- *
- * Particle positions come from the minute rather than a random number, so the scene shifts
- * once a minute on the tick that is already happening and never costs a timer.
+ * @brief Draw the weather in front of the scene: the rain or snow, then the wash, then the fork.
  *
  * @param ctx The graphics context.
- * @param pal The palette in use.
- * @param sky What the condition is doing.
- * @param minute The clock minute, which shuffles the particles.
+ * @param frame This frame's reading.
  */
-void sketchbook_fx_draw_precip(GContext *ctx, const CommonPalette *pal, const SketchbookSky *sky, int minute);
-
-/**
- * @brief Draw the wash lying over the ground: the scene's fog, haze or mist.
- *
- * @param ctx The graphics context.
- * @param pal The palette in use.
- */
-void sketchbook_fx_draw_wash(GContext *ctx, const CommonPalette *pal);
-
-/**
- * @brief Draw a lightning fork out of the cloud.
- *
- * @param ctx The graphics context.
- * @param pal The palette in use.
- */
-void sketchbook_fx_draw_bolt(GContext *ctx, const CommonPalette *pal);
+void sketchbook_fx_draw_weather(GContext *ctx, const SceneFrame *frame);
 
 /** @} */

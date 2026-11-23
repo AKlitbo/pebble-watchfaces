@@ -1,7 +1,7 @@
 /**
  * @file treeline.c
- * @brief The drawn forest: sky bands, stars, the sun or moon on its arc, the two treelines,
- * the cabin, and the smoke the wind leans over.
+ * @brief The drawn forest: the two treelines, the cabin, and the smoke the wind leans over. Its
+ * stars and where its sky and weather sit are here too.
  *
  * @ingroup watchface-sketchbook
  */
@@ -9,7 +9,6 @@
 
 #include "fx/fx.h"
 #include "sky/sky.h"
-#include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 #include "ui/readouts.h"
 #include "ui/fonts.h"
@@ -82,6 +81,17 @@
 #define STACK_TOP (CABIN_RIDGE - 5)
 #define STACK_BOTTOM (CABIN_WALL_TOP - 1)
 
+// a fixed field rather than a random one, so the sky is the same every time you look up at it,
+// which is what a sky does. it starts below the status bar and thins out towards the trees
+static const SketchbookStar s_stars[] = {
+    {10, 30, 1}, {24, 42, 0}, {36, 27, 0}, {45, 36, 2}, {58, 29, 0}, {66, 46, 1},
+    {78, 34, 0}, {88, 26, 1}, {97, 40, 0}, {108, 31, 2}, {119, 47, 0}, {129, 28, 1},
+    {140, 38, 0}, {150, 25, 0}, {161, 43, 1}, {172, 32, 0}, {184, 46, 2}, {194, 29, 0},
+    {16, 57, 0}, {31, 68, 1}, {50, 60, 0}, {63, 73, 0}, {83, 62, 1}, {94, 72, 0},
+    {112, 59, 0}, {127, 70, 1}, {141, 57, 0}, {156, 72, 0}, {176, 61, 1}, {190, 71, 0},
+    {6, 38, 0}, {71, 55, 0}, {103, 50, 0}, {167, 54, 0},
+};
+
 // --- Where this scene's sky and weather sit ---
 // the baseline sits in the far treeline rather than below it, so the arc's ends tuck into the
 // trunks the way shoreline's land on its sea horizon, and it stays a long shallow stroke. the
@@ -96,6 +106,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry treeline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 118, .arc_rx = 112, .arc_ry = 55,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 22, .cloud_y_min = 62, .cloud_y_max = 86,
     .drift_lobe_a = 10, .drift_lobe_b = 11,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -113,6 +124,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry treeline_geometry = {
     .sky_band_y = 46, .sky_blend_h = 24,
     .arc_base_y = 108, .arc_rx = 86, .arc_ry = 72,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 18, .cloud_y_min = 54, .cloud_y_max = 66,
     .drift_lobe_a = 8, .drift_lobe_b = 9,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -130,17 +142,6 @@ typedef struct
     uint8_t half_w;
     int8_t  drop; ///< Rows below its treeline's base, so the row is not stood on a ruled line
 } Fir;
-
-// a fixed field rather than a random one, so the sky is the same every time you look up at it,
-// which is what a sky does. it starts below the status bar and thins out towards the trees
-static const SketchbookStar s_stars[] = {
-    {10, 30, 1}, {24, 42, 0}, {36, 27, 0}, {45, 36, 2}, {58, 29, 0}, {66, 46, 1},
-    {78, 34, 0}, {88, 26, 1}, {97, 40, 0}, {108, 31, 2}, {119, 47, 0}, {129, 28, 1},
-    {140, 38, 0}, {150, 25, 0}, {161, 43, 1}, {172, 32, 0}, {184, 46, 2}, {194, 29, 0},
-    {16, 57, 0}, {31, 68, 1}, {50, 60, 0}, {63, 73, 0}, {83, 62, 1}, {94, 72, 0},
-    {112, 59, 0}, {127, 70, 1}, {141, 57, 0}, {156, 72, 0}, {176, 61, 1}, {190, 71, 0},
-    {6, 38, 0}, {71, 55, 0}, {103, 50, 0}, {167, 54, 0},
-};
 
 // the back treeline: small, crowded and even, which is what makes it read as distance
 #if defined(PBL_ROUND)
@@ -549,19 +550,9 @@ static void draw_litter(GContext *ctx, const TreelinePalette *pal)
 }
 #endif
 
-void treeline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
+void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const TreelinePalette *pal = palette;
-
-    // the shared sky and weather code paints with the common block, which leads this scene's
-    // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = palette;
-
-    bool night = sketchbook_sky_night();
-    SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
-    SketchbookSky sky = sketchbook_sky_recipe(cond);
-    GPoint disc = sketchbook_sky_arc_point(sketchbook_sky_arc_progress());
-    int minute = time_store_tm()->tm_min;
+    const TreelinePalette *pal = frame->palette;
 
     // the wind as the plume sees it: which way it pushes, and how much of the full bend the
     // speed is worth. no reading leaves the column standing straight up
@@ -569,56 +560,26 @@ void treeline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
     int kmh = weather_store_wind_kmh();
     int strength = kmh < 0 ? 0 : (kmh >= WIND_FULL_KMH ? 100 : (kmh * 100) / WIND_FULL_KMH);
 
-    graphics_context_set_antialiased(ctx, true);
-
-    sketchbook_sky_draw_bands(ctx, bounds, cp);
-
-    if (night)
-    {
-        sketchbook_sky_draw_stars(ctx, cp, s_stars, ARRAY_LENGTH(s_stars));
-    }
-
-    sketchbook_sky_draw_arc(ctx, cp);
-
-    if (sky.celestial != CEL_HIDDEN)
-    {
-        sketchbook_sky_draw_disc(ctx, cp, disc, night);
-    }
-
-    // clouds sit in front of the disc but behind the trees, so a low sun still goes down into
-    // the forest rather than in front of it
-    sketchbook_fx_draw_clouds(ctx, cp, &sky, disc);
-
     // the smoke rises through the sky, so it goes down before the trees it drifts behind
     draw_smoke(ctx, pal, lean, strength);
 
-    draw_treeline(ctx, s_far, ARRAY_LENGTH(s_far), FAR_BASE, pal->tree_far, pal->ink, snowy(cond));
+    draw_treeline(ctx, s_far, ARRAY_LENGTH(s_far), FAR_BASE, pal->tree_far, pal->ink, snowy(frame->cond));
     draw_ground(ctx, bounds, pal);
 
-    draw_cabin(ctx, pal, night, snowy(cond));
+    draw_cabin(ctx, pal, frame->night, snowy(frame->cond));
 
-    draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, pal->tree, pal->ink, snowy(cond));
+    draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, pal->tree, pal->ink, snowy(frame->cond));
 
 #if defined(PBL_ROUND)
     draw_litter(ctx, pal);
 #endif
-
-    // rain falls in front of everything: it is the nearest thing to you
-    sketchbook_fx_draw_precip(ctx, cp, &sky, minute);
-
-    if (sky.wash)
-    {
-        sketchbook_fx_draw_wash(ctx, cp);
-    }
-
-    if (sky.bolt)
-    {
-        sketchbook_fx_draw_bolt(ctx, cp);
-    }
+}
 
 #if defined(PBL_ROUND)
-    draw_temp_board(ctx, pal);
-#endif
+void treeline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
+{
+    draw_temp_board(ctx, frame->palette);
 }
+#endif
 
 /** @} */

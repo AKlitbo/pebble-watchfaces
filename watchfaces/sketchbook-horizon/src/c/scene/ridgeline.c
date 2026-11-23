@@ -1,7 +1,7 @@
 /**
  * @file ridgeline.c
- * @brief The drawn landscape: sky bands, stars, the sun or moon on its arc, the two ridges,
- * and the weather layered in between.
+ * @brief The drawn landscape: the two ridges and their snow, and on a round screen the meadow,
+ * the trail and its sign. Its stars and where its sky and weather sit are here too.
  *
  * @ingroup watchface-sketchbook
  */
@@ -9,7 +9,6 @@
 
 #include "fx/fx.h"
 #include "sky/sky.h"
-#include "io/stores/time_store.h"
 #include "io/stores/weather_store.h"
 #include "ui/readouts.h"
 #include "ui/fonts.h"
@@ -35,6 +34,31 @@
 #define SIGN_PAD 6         ///< Air either side of the reading, inside the board
 #endif
 
+// a fixed field rather than a random one, so the sky is the same every time you look up at it,
+// which is what a sky does. it starts below the status bar and thins out towards the ridges
+#if defined(PBL_ROUND)
+// the same field spread to the wider sky. a circle cuts the corners hardest where this field is
+// thickest, so the few stars that scaling put outside the glass were moved down and inwards to
+// where there is sky rather than left to clip away
+static const SketchbookStar s_stars[] = {
+    {30, 62, 1}, {31, 54, 0}, {47, 34, 0}, {59, 46, 2}, {75, 36, 0}, {86, 59, 1},
+    {101, 43, 0}, {114, 32, 1}, {126, 51, 0}, {140, 39, 2}, {155, 61, 0}, {168, 35, 1},
+    {182, 49, 0}, {195, 31, 0}, {209, 55, 1}, {224, 41, 0}, {239, 59, 2}, {236, 66, 0},
+    {21, 74, 0}, {40, 89, 1}, {65, 78, 0}, {82, 96, 0}, {108, 81, 1}, {122, 95, 0},
+    {146, 77, 0}, {165, 92, 1}, {183, 74, 0}, {203, 95, 0}, {229, 80, 1}, {247, 93, 0},
+    {24, 57, 0}, {92, 72, 0}, {134, 65, 0}, {217, 70, 0},
+};
+#else
+static const SketchbookStar s_stars[] = {
+    {10, 28, 1}, {24, 40, 0}, {36, 25, 0}, {45, 34, 2}, {58, 27, 0}, {66, 44, 1},
+    {78, 32, 0}, {88, 24, 1}, {97, 38, 0}, {108, 29, 2}, {119, 45, 0}, {129, 26, 1},
+    {140, 36, 0}, {150, 23, 0}, {161, 41, 1}, {172, 30, 0}, {184, 44, 2}, {194, 27, 0},
+    {16, 55, 0}, {31, 66, 1}, {50, 58, 0}, {63, 71, 0}, {83, 60, 1}, {94, 70, 0},
+    {112, 57, 0}, {127, 68, 1}, {141, 55, 0}, {156, 70, 0}, {176, 59, 1}, {190, 69, 0},
+    {6, 36, 0}, {71, 53, 0}, {103, 48, 0}, {167, 52, 0},
+};
+#endif
+
 // --- Where this scene's sky and weather sit ---
 // the baseline sits on the far crest rather than down behind the ridges, so the arc's ends tuck
 // into the flanks. the overcast band hangs low enough to keep its tops clear of the status bar
@@ -49,6 +73,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry ridgeline_geometry = {
     .sky_band_y = 56, .sky_blend_h = 28,
     .arc_base_y = 107, .arc_rx = 112, .arc_ry = 55,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 22, .cloud_y_min = 62, .cloud_y_max = 86,
     .drift_lobe_a = 10, .drift_lobe_b = 11,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -66,6 +91,7 @@ static const GPoint s_bolt[][2] = {
 const SceneGeometry ridgeline_geometry = {
     .sky_band_y = 48, .sky_blend_h = 24,
     .arc_base_y = 124, .arc_rx = 86, .arc_ry = 78,
+    .stars = s_stars, .star_count = ARRAY_LENGTH(s_stars),
     .cloud_drop = 20, .cloud_y_min = 57, .cloud_y_max = 82,
     .drift_lobe_a = 9, .drift_lobe_b = 10,
     .overcast = s_overcast, .overcast_count = ARRAY_LENGTH(s_overcast),
@@ -114,31 +140,6 @@ static const GPoint s_near_pts[] = {
     {-4, 126}, {18, 112}, {34, 124}, {54, 100}, {76, 118}, {100, 96},
     {124, 116}, {144, 106}, {162, 122}, {182, 110}, {204, 120},
     {204, 232}, {-4, 232},
-};
-#endif
-
-// a fixed field rather than a random one, so the sky is the same every time you look up at it,
-// which is what a sky does. it starts below the status bar and thins out towards the ridges
-#if defined(PBL_ROUND)
-// the same field spread to the wider sky. a circle cuts the corners hardest where this field is
-// thickest, so the few stars that scaling put outside the glass were moved down and inwards to
-// where there is sky rather than left to clip away
-static const SketchbookStar s_stars[] = {
-    {30, 62, 1}, {31, 54, 0}, {47, 34, 0}, {59, 46, 2}, {75, 36, 0}, {86, 59, 1},
-    {101, 43, 0}, {114, 32, 1}, {126, 51, 0}, {140, 39, 2}, {155, 61, 0}, {168, 35, 1},
-    {182, 49, 0}, {195, 31, 0}, {209, 55, 1}, {224, 41, 0}, {239, 59, 2}, {236, 66, 0},
-    {21, 74, 0}, {40, 89, 1}, {65, 78, 0}, {82, 96, 0}, {108, 81, 1}, {122, 95, 0},
-    {146, 77, 0}, {165, 92, 1}, {183, 74, 0}, {203, 95, 0}, {229, 80, 1}, {247, 93, 0},
-    {24, 57, 0}, {92, 72, 0}, {134, 65, 0}, {217, 70, 0},
-};
-#else
-static const SketchbookStar s_stars[] = {
-    {10, 28, 1}, {24, 40, 0}, {36, 25, 0}, {45, 34, 2}, {58, 27, 0}, {66, 44, 1},
-    {78, 32, 0}, {88, 24, 1}, {97, 38, 0}, {108, 29, 2}, {119, 45, 0}, {129, 26, 1},
-    {140, 36, 0}, {150, 23, 0}, {161, 41, 1}, {172, 30, 0}, {184, 44, 2}, {194, 27, 0},
-    {16, 55, 0}, {31, 66, 1}, {50, 58, 0}, {63, 71, 0}, {83, 60, 1}, {94, 70, 0},
-    {112, 57, 0}, {127, 68, 1}, {141, 55, 0}, {156, 70, 0}, {176, 59, 1}, {190, 69, 0},
-    {6, 36, 0}, {71, 53, 0}, {103, 48, 0}, {167, 52, 0},
 };
 #endif
 
@@ -450,65 +451,26 @@ static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
 }
 #endif
 
-void ridgeline_scene_draw(GContext *ctx, GRect bounds, const void *palette)
+void ridgeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const RidgelinePalette *pal = palette;
+    const RidgelinePalette *pal = frame->palette;
 
-    // the shared sky and weather code paints with the common block, which leads this scene's
-    // palette, so it reads the same colours through a CommonPalette
-    const CommonPalette *cp = palette;
-
-    bool night = sketchbook_sky_night();
-    SketchbookCond cond = sketchbook_cond_parse(weather_store_cond());
-    SketchbookSky sky = sketchbook_sky_recipe(cond);
-    GPoint disc = sketchbook_sky_arc_point(sketchbook_sky_arc_progress());
-
-    graphics_context_set_antialiased(ctx, true);
-
-    sketchbook_sky_draw_bands(ctx, bounds, cp);
-
-    if (night)
-    {
-        sketchbook_sky_draw_stars(ctx, cp, s_stars, ARRAY_LENGTH(s_stars));
-    }
-
-    sketchbook_sky_draw_arc(ctx, cp);
-
-    if (sky.celestial != CEL_HIDDEN)
-    {
-        sketchbook_sky_draw_disc(ctx, cp, disc, night);
-    }
-
-    // clouds sit in front of the disc but behind the ridges, so a low sun still sets behind
-    // the mountains
-    sketchbook_fx_draw_clouds(ctx, cp, &sky, disc);
-
-    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, pal->land_far, pal->ink, snowcap(cond), 12);
-    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snowcap(cond), 20);
+    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, pal->land_far, pal->ink, snowcap(frame->cond), 12);
+    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snowcap(frame->cond), 20);
 
 #if defined(PBL_ROUND)
     draw_meadow(ctx, pal);
     draw_trail(ctx, pal);
 #endif
-
-    // rain falls in front of everything: it is the nearest thing to you
-    sketchbook_fx_draw_precip(ctx, cp, &sky, time_store_tm()->tm_min);
-
-    if (sky.wash)
-    {
-        sketchbook_fx_draw_wash(ctx, cp);
-    }
-
-    if (sky.bolt)
-    {
-        sketchbook_fx_draw_bolt(ctx, cp);
-    }
-
-    // the sign goes last, after the weather. the reading is the one thing on the face that has to
-    // stay readable in every condition, and painted with the ridges it sits behind the rain
-#if defined(PBL_ROUND)
-    draw_trail_sign(ctx, pal);
-#endif
 }
+
+#if defined(PBL_ROUND)
+void ridgeline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
+{
+    // the sign goes in front of the weather. the reading is the one thing on the face that has to
+    // stay readable in every condition, and painted with the ridges it sits behind the rain
+    draw_trail_sign(ctx, frame->palette);
+}
+#endif
 
 /** @} */

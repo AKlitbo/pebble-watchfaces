@@ -12,6 +12,7 @@
 #pragma once
 #include <pebble.h>
 
+#include "scene/frame.h"
 #include "scene/geometry.h"
 
 /**
@@ -20,13 +21,25 @@
  */
 
 /**
- * @brief Paint the whole scene: sky, stars, arc, disc, ridges, and the weather on top.
+ * @brief Paint the ground under the sky: the two ridges, capped in snow when it snows, and on a
+ * round screen the meadow and the trail.
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param palette The palette in use, a RidgelinePalette.
+ * @param frame This frame's reading. Its palette is a RidgelinePalette.
  */
-void ridgeline_scene_draw(GContext *ctx, GRect bounds, const void *palette);
+void ridgeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather: the trail sign with the temperature on it.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its palette is a RidgelinePalette.
+ */
+void ridgeline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
 
 /// Where this scene's sky and weather sit, for the shared drawing code
 extern const SceneGeometry ridgeline_geometry;
