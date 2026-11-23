@@ -48,6 +48,22 @@ static TimeConfig time_cfg(void)
 }
 
 /**
+ * @brief Take up a settings change: switch scene if it moved, otherwise re-theme.
+ *
+ * A scene change tears the old scene down and sets the new one up, which re-themes on the way in.
+ * Any other change only needs the theme read again. A save from the phone runs this, and so does
+ * the dev harness, at startup and on every step of a walk, so a walk that picks a scene draws it
+ * the way a real save would.
+ */
+static void apply_settings_change(void)
+{
+    if (!sketchbook_scene_reselect())
+    {
+        sketchbook_apply_theme();
+    }
+}
+
+/**
  * @brief Redraw after a settings change: switch scene if it moved, re-theme, rebuild, re-arm.
  *
  * @param time_or_date_changed True if a time or date format changed (unused: a rebuild re-pulls
@@ -56,12 +72,7 @@ static TimeConfig time_cfg(void)
  */
 static void on_settings_changed(bool time_or_date_changed)
 {
-    // a scene change tears the old scene down and sets the new one up, which re-themes on the way
-    // in, so the rebuild below draws the new scene. any other change just re-themes first
-    if (!sketchbook_scene_reselect())
-    {
-        sketchbook_apply_theme();
-    }
+    apply_settings_change();
     engine_rebuild();
 
     time_store_reconfigure(time_cfg());  // on every change, since the formats and the buzz both pick it
@@ -99,8 +110,9 @@ static void init(void)
     // one schema for the whole face, with the scene choice alongside the palette and layout
     settings_init(sketchbook_settings_schema());
 
-    // each store owns its own source. init starts it (live) or seeds it. dev mode seeds
-    // every store from a fixed fixture (live=false) for deterministic screenshots
+    // each store owns its own source. init starts it (live) or seeds it
+    // dev mode seeds every store (live=false) from paf.dev.config.json, or the fixture where it
+    // names none, so screenshots come out the same every time
     if (!dev_seed_stores())
     {
         system_store_init((SystemConfig){.live = true, .vibe = vibe_bt_transition}, NULL);
@@ -126,8 +138,9 @@ static void init(void)
     appmessage_on_settings_changed(on_settings_changed);
     appmessage_open(2048);
 
-    // dev mode only: force the theme then paint the fixture then subscribe the tap walk
-    dev_start(sketchbook_apply_theme);
+    // dev mode only: paint the fixture, or with a walk picked in paf.dev.config.json show its first
+    // screen and step on each tap
+    dev_start(apply_settings_change);
 }
 
 static void deinit(void)

@@ -1,1 +1,454 @@
-{ "clock": "10:42" }
+{
+  "clock": "10:42",
+  "date": "2026-07-29",
+  "walks": {
+    "previews": {
+      "settings": {
+        "APPEARANCE_PALETTE_MODE": 0
+      },
+      "each": {
+        "APPEARANCE_SCENE": [0, 1, 2, 3]
+      },
+      "steps": [
+        {
+          "clock": "08:05",
+          "settings": {
+            "APPEARANCE_THEME": 0,
+            "CLOCK_TIME_FORMAT": 1,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%a %d %b",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 14,
+              "cond": "CLEAR",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 68,
+              "steps": 2140
+            },
+            "system": {
+              "battery": 80,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "10:42",
+          "settings": {
+            "APPEARANCE_THEME": 1,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 1,
+            "CLOCK_DATE_FORMAT": "%d %b %Y",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 21,
+              "cond": "PCLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 72,
+              "steps": 8431
+            },
+            "system": {
+              "battery": 64,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "18:50",
+          "settings": {
+            "APPEARANCE_THEME": 2,
+            "CLOCK_TIME_FORMAT": 1,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%b %d",
+            "HEALTH_STEPS_MODE": 1,
+            "APPEARANCE_QUIET_TIME_ICON": true
+          },
+          "stores": {
+            "weather": {
+              "temp": 26,
+              "cond": "CLEAR",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 61,
+              "steps": 11587,
+              "distanceM": 8690
+            },
+            "system": {
+              "battery": 80,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "14:20",
+          "settings": {
+            "APPEARANCE_THEME": 3,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 2,
+            "CLOCK_DATE_FORMAT": "%Y-%m-%d",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 18,
+              "cond": "RAIN",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 76,
+              "steps": 10220
+            },
+            "system": {
+              "battery": 15,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "09:15",
+          "settings": {
+            "APPEARANCE_THEME": 4,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%d.%m.%Y",
+            "HEALTH_STEPS_MODE": 2,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 11,
+              "cond": "PCLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 57,
+              "steps": 1333,
+              "distanceM": 1000
+            },
+            "system": {
+              "battery": 60,
+              "bluetooth": false
+            }
+          }
+        },
+        {
+          "clock": "13:05",
+          "settings": {
+            "APPEARANCE_THEME": 5,
+            "CLOCK_TIME_FORMAT": 1,
+            "APPEARANCE_LAYOUT": 1,
+            "CLOCK_DATE_FORMAT": "%a %b %d",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": -2,
+              "cond": "SNOW",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 71,
+              "steps": 8912
+            },
+            "system": {
+              "battery": 35,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "16:35",
+          "settings": {
+            "APPEARANCE_THEME": 6,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 2,
+            "CLOCK_DATE_FORMAT": "%m/%d/%Y",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 24,
+              "cond": "STRM",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 88,
+              "steps": 6120
+            },
+            "system": {
+              "battery": 100,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "12:00",
+          "settings": {
+            "APPEARANCE_THEME": 7,
+            "CLOCK_TIME_FORMAT": 1,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%Y.%j",
+            "HEALTH_STEPS_MODE": 1,
+            "APPEARANCE_QUIET_TIME_ICON": true
+          },
+          "stores": {
+            "weather": {
+              "temp": 17,
+              "cond": "PCLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 65,
+              "steps": 5149,
+              "distanceM": 3862
+            },
+            "system": {
+              "battery": 20,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "23:10",
+          "settings": {
+            "APPEARANCE_THEME": 0,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 1,
+            "CLOCK_DATE_FORMAT": "%a %d %b",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": true
+          },
+          "stores": {
+            "weather": {
+              "temp": 12,
+              "cond": "CLEAR",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 58,
+              "steps": 9640
+            },
+            "system": {
+              "battery": 60,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "02:25",
+          "settings": {
+            "APPEARANCE_THEME": 1,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%b %d %Y",
+            "HEALTH_STEPS_MODE": 2,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 6,
+              "cond": "CLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 52,
+              "steps": 267,
+              "distanceM": 200
+            },
+            "system": {
+              "battery": 25,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "21:45",
+          "settings": {
+            "APPEARANCE_THEME": 2,
+            "CLOCK_TIME_FORMAT": 1,
+            "APPEARANCE_LAYOUT": 2,
+            "CLOCK_DATE_FORMAT": "%d/%m/%Y",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 15,
+              "cond": "PCLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 63,
+              "steps": 7420
+            },
+            "system": {
+              "battery": 30,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "04:30",
+          "settings": {
+            "APPEARANCE_THEME": 3,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%Y.%m.%d",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": -5,
+              "cond": "SNOW",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 49,
+              "steps": 120
+            },
+            "system": {
+              "battery": 85,
+              "bluetooth": false
+            }
+          }
+        },
+        {
+          "clock": "22:35",
+          "settings": {
+            "APPEARANCE_THEME": 4,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 1,
+            "CLOCK_DATE_FORMAT": "%b %d",
+            "HEALTH_STEPS_MODE": 2,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 10,
+              "cond": "CLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 60,
+              "steps": 7467,
+              "distanceM": 5600
+            },
+            "system": {
+              "battery": 60,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "01:15",
+          "settings": {
+            "APPEARANCE_THEME": 5,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 2,
+            "CLOCK_DATE_FORMAT": "%d-%m-%Y",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 13,
+              "cond": "STRM",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 70,
+              "steps": 3300
+            },
+            "system": {
+              "battery": 10,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "20:55",
+          "settings": {
+            "APPEARANCE_THEME": 6,
+            "CLOCK_TIME_FORMAT": 1,
+            "APPEARANCE_LAYOUT": 0,
+            "CLOCK_DATE_FORMAT": "%a %b %d",
+            "HEALTH_STEPS_MODE": 0,
+            "APPEARANCE_QUIET_TIME_ICON": true
+          },
+          "stores": {
+            "weather": {
+              "temp": 21,
+              "cond": "CLEAR",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 104,
+              "steps": 12680
+            },
+            "system": {
+              "battery": 100,
+              "bluetooth": true
+            }
+          }
+        },
+        {
+          "clock": "03:40",
+          "settings": {
+            "APPEARANCE_THEME": 7,
+            "CLOCK_TIME_FORMAT": 2,
+            "APPEARANCE_LAYOUT": 2,
+            "CLOCK_DATE_FORMAT": "%Y.%m%d",
+            "HEALTH_STEPS_MODE": 2,
+            "APPEARANCE_QUIET_TIME_ICON": false
+          },
+          "stores": {
+            "weather": {
+              "temp": 8,
+              "cond": "CLDY",
+              "sunrise": "05:50",
+              "sunset": "20:30"
+            },
+            "health": {
+              "hr": 51,
+              "steps": 133,
+              "distanceM": 100
+            },
+            "system": {
+              "battery": 20,
+              "bluetooth": true
+            }
+          }
+        }
+      ]
+    }
+  }
+}

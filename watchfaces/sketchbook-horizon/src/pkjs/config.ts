@@ -6,7 +6,6 @@
  * than on most faces, since the condition is what the picture is drawn from.
  */
 import buildConfig from '../../paf/ts/pkjs/config-builder';
-import scenePreviews from './clay/scene-previews.g';
 
 // the eight palettes, shared by the Scene Palette picker and the night and Quiet Time pickers
 const paletteOptions = [
@@ -20,22 +19,15 @@ const paletteOptions = [
   { label: 'Mono (Black & White)', value: 5 },
 ];
 
-// the scenes, in the Scene picker's order. the palette previews under the picker are of the chosen
-// scene, so each one keeps its own set, filed here by the value the Scene setting saves
-const sceneOptions = [
-  { label: 'Ridgeline', value: 0, previews: scenePreviews.ridgeline },
-  { label: 'Shoreline', value: 1, previews: scenePreviews.shoreline },
-  { label: 'Skyline', value: 2, previews: scenePreviews.skyline },
-  { label: 'Treeline', value: 3, previews: scenePreviews.treeline },
+// the scenes, in the Scene picker's order. a new scene also needs a key in
+// resources/theme-previews.json naming its folder of shots under .github/images/sketchbook-horizon,
+// and config.spec.ts checks the keys match this list
+export const sceneOptions = [
+  { label: 'Ridgeline', value: 0 },
+  { label: 'Shoreline', value: 1 },
+  { label: 'Skyline', value: 2 },
+  { label: 'Treeline', value: 3 },
 ];
-
-// the palette previews filed by the value the Scene setting saves as a string, so the single picker
-// below draws the shots for whichever scene is chosen
-const scenePreviewsByScene: Record<string, typeof scenePreviews.ridgeline> = {};
-
-sceneOptions.forEach((scene) => {
-  scenePreviewsByScene[String(scene.value)] = scene.previews;
-});
 
 export default buildConfig({
   heading: 'Sketchbook Horizon',
@@ -49,7 +41,7 @@ export default buildConfig({
       'label': 'Scene',
       'description': 'What the face draws under the clock: a mountain range, a shoreline, a city bridge, or a forest. They all share the same sky, weather, and palettes.',
       'defaultValue': 0,
-      'options': sceneOptions.map(({ label, value }) => ({ label, value })),
+      'options': sceneOptions,
     },
     // one palette picker, owning APPEARANCE_THEME. its previews are filed by scene and previewsByKey
     // points it at the Scene control, so the shots under it follow whichever scene is chosen
@@ -60,7 +52,10 @@ export default buildConfig({
       'description': 'Colours for the sky, the ground, and the linework. Each one has a day and a night version, and the face swaps between them at sunrise and sunset.',
       'defaultValue': 0,
       'options': paletteOptions,
-      'previews': scenePreviewsByScene,
+      // required inside the function, so the pictures are only built into a map once the settings
+      // page opens. the bundle still carries them
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      'previews': () => require('./clay/theme-previews-scene-palette.g'),
       'previewsByKey': 'APPEARANCE_SCENE',
     },
     {

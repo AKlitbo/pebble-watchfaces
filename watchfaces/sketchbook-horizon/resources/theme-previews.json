@@ -1,0 +1,94 @@
+{
+  "mapsByKey": {
+    "scene-palette": {
+      "keys": {
+        "0": "ridgeline",
+        "1": "shoreline",
+        "2": "skyline",
+        "3": "treeline"
+      },
+      "previews": {
+        "0": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_sketchbook.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_sketchbook_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_sketchbook.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_sketchbook_night.png"
+          ]
+        },
+        "1": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_daybreak.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_daybreak_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_daybreak.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_daybreak_night.png"
+          ]
+        },
+        "2": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_alpenglow.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_alpenglow_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_alpenglow.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_alpenglow_night.png"
+          ]
+        },
+        "3": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_blueprint.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_blueprint_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_blueprint.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_blueprint_night.png"
+          ]
+        },
+        "4": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_forest.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_forest_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_forest.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_forest_night.png"
+          ]
+        },
+        "5": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_mono.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_mono_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_mono.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_mono_night.png"
+          ]
+        },
+        "6": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_cyberpunk.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_cyberpunk_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_cyberpunk.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_cyberpunk_night.png"
+          ]
+        },
+        "7": {
+          "emery": [
+            "../../.github/images/sketchbook-horizon/{key}/emery_neo-tokyo.png",
+            "../../.github/images/sketchbook-horizon/{key}/emery_neo-tokyo_night.png"
+          ],
+          "gabbro": [
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_neo-tokyo.png",
+            "../../.github/images/sketchbook-horizon/{key}/gabbro_neo-tokyo_night.png"
+          ]
+        }
+      }
+    }
+  }
+}

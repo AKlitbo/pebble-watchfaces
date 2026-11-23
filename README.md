@@ -64,7 +64,7 @@ paf check              # the Clay components, icons, thumbnails, and theme previ
 
 `paf pin <unit> <tag>` moves a unit to another framework release. It prints the breaking changes between the two tags first.
 
-Never edit a file with `.g.` in its name by hand. Rerun the matching `paf gen <face> <kind>`, and `paf check` says which one is out of date. Mosaic's vibrant tables are checked by a spec in `paf test` instead, and `mosaic/core/c/draw/value_bearing.g.h` comes from Gridlock's `src/tools/fonts/generate-bearing.py`. Sketchbook Horizon's scene previews and page font come from its `gen:scene-previews` and `gen:page-font` scripts, run with `paf run sketchbook-horizon <script>`, and nothing checks them.
+Never edit a file with `.g.` in its name by hand. Rerun the matching `paf gen <face> <kind>`, and `paf check` says which one is out of date. Mosaic's vibrant tables are checked by a spec in `paf test` instead, and `mosaic/core/c/draw/value_bearing.g.h` comes from Gridlock's `src/tools/fonts/generate-bearing.py`. Sketchbook Horizon's page font comes from its `gen:page-font` script, run with `paf run sketchbook-horizon gen:page-font`, and nothing checks it.
 
 ### Project Structure
 
