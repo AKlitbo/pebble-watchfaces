@@ -7,12 +7,12 @@
  */
 #include "scene/ridgeline.h"
 
+#include "scene/reading.h"
 #include "fx/fx.h"
 #include "sky/sky.h"
-#include "io/stores/weather_store.h"
-#include "ui/readouts.h"
-#include "ui/fonts.h"
-#include "draw/fonts.h"
+#include "draw/line.h"
+#include "draw/marks.h"
+#include "draw/letter.h"
 #include "draw/shape.h"
 #include "theme/ridgeline.h"
 
@@ -287,11 +287,7 @@ static void draw_ridge(GContext *ctx, const GPoint *pts, int count, int crest,
     // the crest goes on last so it sits cleanly over both the creases and the snow
     graphics_context_set_stroke_color(ctx, line);
     graphics_context_set_stroke_width(ctx, 3);
-    for (int i = 0; i < crest - 1; i++)
-    {
-        graphics_draw_line(ctx, pts[i], pts[i + 1]);
-    }
-
+    line_polyline(ctx, pts, crest);
     graphics_context_set_stroke_width(ctx, 1);
 }
 
@@ -304,34 +300,6 @@ static void draw_ridge(GContext *ctx, const GPoint *pts, int count, int crest,
 static const GPoint s_trail[] = {
     {66, 152}, {98, 146}, {126, 150}, {152, 145}, {176, 150}, {200, 145}, {218, 148},
 };
-
-/**
- * @brief Draw one leg of the trail as dashes, so it reads as a path rather than another crease.
- *
- * @param ctx The graphics context.
- * @param from Start of the leg.
- * @param to End of the leg.
- */
-static void draw_dashed(GContext *ctx, GPoint from, GPoint to)
-{
-    int dx = to.x - from.x;
-    int dy = to.y - from.y;
-    int span = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-    if (span <= 0)
-    {
-        return;
-    }
-
-    // 3 on, 6 off, walked in whole pixels so the dashes stay even up a shallow slope. sparse
-    // enough that it reads as a path rather than a drawn line
-    for (int at = 0; at < span; at += 9)
-    {
-        int end = at + 3 < span ? at + 3 : span;
-        graphics_draw_line(ctx,
-            GPoint(from.x + (dx * at) / span, from.y + (dy * at) / span),
-            GPoint(from.x + (dx * end) / span, from.y + (dy * end) / span));
-    }
-}
 
 // grass on the flat ground in front of the range. a fixed scatter rather than a random one, so
 // the field is the same every time you look at it
@@ -347,29 +315,6 @@ static const GPoint s_tufts[] = {
 };
 
 /**
- * @brief Tuft the ground the trail crosses, so it reads as meadow rather than blank paper.
- *
- * Three short strokes fanning up off a point, which is how the rest of the face draws: an
- * ordered dot fill covers the same ground but reads as a printing screen rather than as grass.
- *
- * @param ctx The graphics context.
- * @param pal The palette in use.
- */
-static void draw_meadow(GContext *ctx, const RidgelinePalette *pal)
-{
-    graphics_context_set_stroke_color(ctx, pal->dim);
-    graphics_context_set_stroke_width(ctx, 1);
-
-    for (unsigned i = 0; i < ARRAY_LENGTH(s_tufts); i++)
-    {
-        GPoint at = s_tufts[i];
-        graphics_draw_line(ctx, at, GPoint(at.x - 2, at.y - 4));
-        graphics_draw_line(ctx, at, GPoint(at.x + 1, at.y - 5));
-        graphics_draw_line(ctx, at, GPoint(at.x + 3, at.y - 3));
-    }
-}
-
-/**
  * @brief Draw the trail up the lower slope.
  *
  * @param ctx The graphics context.
@@ -382,19 +327,14 @@ static void draw_trail(GContext *ctx, const RidgelinePalette *pal)
     // stops being a path through a field and becomes a road
     graphics_context_set_stroke_color(ctx, pal->land);
     graphics_context_set_stroke_width(ctx, 5);
-    for (unsigned i = 0; i + 1 < ARRAY_LENGTH(s_trail); i++)
-    {
-        graphics_draw_line(ctx, s_trail[i], s_trail[i + 1]);
-    }
+    line_polyline(ctx, s_trail, ARRAY_LENGTH(s_trail));
 
     // the dashes are on the ground, not against the sky, so they take a colour the palette
-    // guarantees there rather than the ink the rest of the linework uses
+    // guarantees there rather than the ink the rest of the linework uses. 3 on and 6 off, sparse
+    // enough that it reads as a path rather than another crease
     graphics_context_set_stroke_color(ctx, pal->dim);
     graphics_context_set_stroke_width(ctx, 1);
-    for (unsigned i = 0; i + 1 < ARRAY_LENGTH(s_trail); i++)
-    {
-        draw_dashed(ctx, s_trail[i], s_trail[i + 1]);
-    }
+    line_dashed(ctx, s_trail, ARRAY_LENGTH(s_trail), 3, 9);
 }
 
 /**
@@ -416,20 +356,14 @@ static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
 {
     // no location and no reading means no sign at all, post included, rather than a board
     // lettered "--". a trail with nothing to say carries no sign
-    if (weather_store_temp() == WEATHER_NO_TEMP)
+    char temp[16];
+    int width;
+    if (!reading_temp(temp, sizeof(temp), &width))
     {
         return;
     }
 
-    char temp[16];
-    readout_weather_temp(temp, sizeof(temp));
-
-    GFont font = fonts_get(FONT_HAND_16);
-    GSize reading = graphics_text_layout_get_content_size(temp, font,
-        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
-
-    GRect board = GRect(SIGN_X - (reading.w + SIGN_PAD * 2) / 2, SIGN_BOARD_Y,
-        reading.w + SIGN_PAD * 2, SIGN_BOARD_H);
+    GRect board = GRect(SIGN_X - (width + SIGN_PAD * 2) / 2, SIGN_BOARD_Y, width + SIGN_PAD * 2, SIGN_BOARD_H);
 
     // the post first, so the board's own outline closes over the top of it
     graphics_context_set_stroke_color(ctx, pal->text);
@@ -441,13 +375,7 @@ static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
     graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_fill_rect(ctx, board, 0, GCornerNone);
     graphics_draw_rect(ctx, board);
-
-    // the hand font hangs low in its line box, so the text starts above the board to land the
-    // lettering in the middle of it
-    graphics_context_set_text_color(ctx, pal->ink);
-    graphics_draw_text(ctx, temp, font,
-        GRect(board.origin.x, board.origin.y - 2, board.size.w, SIGN_BOARD_H + 8),
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+    letter_board(ctx, temp, board, pal->ink);
 }
 #endif
 
@@ -459,7 +387,8 @@ void ridgeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snowcap(frame->cond), 20);
 
 #if defined(PBL_ROUND)
-    draw_meadow(ctx, pal);
+    // grass on the ground the trail crosses, in the colour the palette guarantees down there
+    marks_tufts(ctx, s_tufts, ARRAY_LENGTH(s_tufts), pal->dim);
     draw_trail(ctx, pal);
 #endif
 }

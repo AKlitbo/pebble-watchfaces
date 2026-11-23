@@ -115,9 +115,6 @@ const SceneGeometry shoreline_geometry = {
 };
 #endif
 
-// the platform says how wide it is, so the sea and the shore run to whichever screen they are on
-// rather than stopping at 200 and leaving a straight edge partway across a round one
-#define SCREEN_W PBL_DISPLAY_WIDTH
 #define WAVE_ROWS 4
 #define SEA_SPLIT_PCT 40  ///< How far down the water the far shade gives way to the near one
 #define WET_FADE_H 10     ///< How many rows the wet sand dries out over

@@ -17,17 +17,23 @@
 #pragma once
 #include <pebble.h>
 
-#include "fx/fx.h"    // Puff, for the overcast band
-#include "sky/sky.h"  // SketchbookStar, for the star field
+#include "draw/line.h"  // LineSegment, for the lightning fork
+#include "fx/fx.h"      // Puff, for the overcast band
+#include "sky/sky.h"    // SketchbookStar, for the star field
 
 /**
  * @addtogroup watchface-sketchbook
  * @{
  */
 
-/// One leg of a lightning fork, a pair of points. A typedef rather than GPoint(*)[2] written out,
-/// since GPoint is a function-like macro and the parenthesis beside it would be taken for a call.
-typedef GPoint BoltLeg[2];
+/// One leg of a lightning fork, a pair of points.
+typedef LineSegment BoltLeg;
+
+// the platform's width, for the draws that work across the screen column by column with no bounds
+// handed to them: Skyline's bridge, its lamps and their streaks, and Shoreline's shore, gulls,
+// waves, boat and surf. they run to whichever screen they are on rather than stopping at 200
+// partway across a round one. ground and water laid from the bounds take bounds.size.w instead
+#define SCREEN_W PBL_DISPLAY_WIDTH
 
 // the arc is centred on the screen and every scene's sun and moon are the same size, so these do
 // not vary from one scene to the next

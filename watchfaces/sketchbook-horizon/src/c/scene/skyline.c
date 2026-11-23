@@ -7,12 +7,11 @@
  */
 #include "scene/skyline.h"
 
+#include "scene/reading.h"
 #include "fx/fx.h"
 #include "sky/sky.h"
-#include "io/stores/weather_store.h"
-#include "ui/readouts.h"
-#include "ui/fonts.h"
-#include "draw/fonts.h"
+#include "draw/ground.h"
+#include "draw/letter.h"
 #include "theme/skyline.h"
 
 /**
@@ -45,10 +44,6 @@
 #define PIER_DROP 10     ///< How far each tower carries on below the deck, into the river
 #define SCENE_BOTTOM 133 ///< The last row the reflections reach, matching the other scenes
 #endif
-
-// the platform says how wide it is, so the city, the deck and the water run to whichever
-// screen they are on rather than stopping at 200 partway across a round one
-#define SCREEN_W PBL_DISPLAY_WIDTH
 
 // the two bridge towers, and how far the deck runs past them to the bank each side
 #if defined(PBL_ROUND)
@@ -355,36 +350,23 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
 {
     static const int8_t wobble[] = {0, 1, -1, 0, 1, 0, -1, 1, 0, -1, 0, 1};
 
-    graphics_context_set_fill_color(ctx, pal->water);
-    graphics_fill_rect(ctx, GRect(0, WATER_TOP, bounds.size.w, bounds.size.h - WATER_TOP), 0, GCornerNone);
+    // the river and its far bank, and the open water past the mirror ticking over now and then.
+    // the ripples start well under the deck's reflection, so the two never share a row
+    ground_water(ctx, bounds, WATER_TOP, MIRROR_TOP + 8, SCENE_BOTTOM, pal->water, pal->ink, pal->dim);
 
-    // the far bank, which is the only hard edge the river has
-    graphics_context_set_stroke_width(ctx, 1);
-    graphics_context_set_stroke_color(ctx, pal->ink);
-    graphics_draw_line(ctx, GPoint(0, WATER_TOP), GPoint(bounds.size.w - 1, WATER_TOP));
-
-    // the deck coming back up at you. the dashes and the gaps between them both vary, because an
-    // even one would read as a ruled line rather than as something floating on water
+    // the deck coming back up at you, in the ripples' colour. the dashes and the gaps between them
+    // both vary, because an even one would read as a ruled line rather than as something floating
+    // on water
     static const uint8_t dash[] = {3, 6, 2, 5, 3, 7, 2, 4, 6, 3, 5, 2};
 
-    graphics_context_set_stroke_color(ctx, pal->dim);
-    for (int x = 0, i = 0; x < SCREEN_W; i++)
+    // across the same width the water and its ripples were laid to
+    for (int x = 0, i = 0; x < bounds.size.w; i++)
     {
         int len = dash[(unsigned)i % ARRAY_LENGTH(dash)];
         int y = MIRROR_TOP + wobble[(unsigned)i % ARRAY_LENGTH(wobble)];
 
         graphics_draw_line(ctx, GPoint(x, y), GPoint(x + len - 1, y));
         x += len + 3 + i % 3;
-    }
-
-    // and the open river past it, ticking over now and then. sparse on purpose: this is the half
-    // the clock sits on, so it wants enough to read as water and no more
-    for (int y = MIRROR_TOP + 8; y < SCENE_BOTTOM; y += 7)
-    {
-        for (int x = (y * 7) % 13; x < SCREEN_W; x += 31 + y % 7)
-        {
-            graphics_draw_line(ctx, GPoint(x, y), GPoint(x + 2 + y % 3, y));
-        }
     }
 
     // and the towers under it, breaking up and narrowing the further down they go, which is
@@ -416,6 +398,7 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
 
     graphics_context_set_stroke_color(ctx, pal->lamp);
 
+    // walked the same way draw_lamps walks the deck, so each streak sits under its own lamp
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
     {
         if (sketchbook_sky_light_rank(i, 7) >= lit)
@@ -458,20 +441,15 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
 static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
 {
     // no location and no reading means no buoy, rather than one lettered "--"
-    if (weather_store_temp() == WEATHER_NO_TEMP)
+    char temp[16];
+    int reading;
+    if (!reading_temp(temp, sizeof(temp), &reading))
     {
         return;
     }
 
-    char temp[16];
-    readout_weather_temp(temp, sizeof(temp));
-
-    GFont font = fonts_get(FONT_HAND_16);
-    GSize reading = graphics_text_layout_get_content_size(temp, font,
-        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
-
     int mid = SCREEN_W / 2;
-    int width = reading.w + 12;
+    int width = reading + 12;
     GRect body = GRect(mid - width / 2, BUOY_TOP, width, BUOY_H);
 
     // the mast and its topmark first, so the body's outline closes over the foot of the mast
@@ -486,14 +464,9 @@ static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
     graphics_context_set_fill_color(ctx, pal->sky_hi);
     graphics_fill_rect(ctx, body, 2, GCornersAll);
     graphics_draw_round_rect(ctx, body, 2);
-
-    graphics_context_set_text_color(ctx, pal->ink);
-    graphics_draw_text(ctx, temp, font,
-        GRect(body.origin.x, body.origin.y - 2, body.size.w, BUOY_H + 8),
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+    letter_board(ctx, temp, body, pal->ink);
 
     // a wake either side of the waterline, so it sits in the river rather than on top of it
-    graphics_context_set_stroke_color(ctx, pal->ink);
     int water = BUOY_TOP + BUOY_H - 3;
     graphics_draw_line(ctx, GPoint(body.origin.x - 7, water), GPoint(body.origin.x - 2, water));
     graphics_draw_line(ctx, GPoint(body.origin.x + width + 1, water), GPoint(body.origin.x + width + 6, water));

@@ -7,12 +7,12 @@
  */
 #include "scene/treeline.h"
 
+#include "scene/reading.h"
 #include "fx/fx.h"
 #include "sky/sky.h"
 #include "io/stores/weather_store.h"
-#include "ui/readouts.h"
-#include "ui/fonts.h"
-#include "draw/fonts.h"
+#include "draw/line.h"
+#include "draw/letter.h"
 #include "weather/wind_dir.h"
 #include "theme/treeline.h"
 
@@ -20,10 +20,6 @@
  * @addtogroup watchface-sketchbook
  * @{
  */
-
-// the platform says how wide it is, so the treelines and the clearing run to whichever screen
-// they are on rather than stopping at 200 and leaving a straight edge partway across a round one
-#define SCREEN_W PBL_DISPLAY_WIDTH
 
 // the wind speed at which the plume is bent as far over as it goes. past this it is already
 // flat, and a gale and a storm look the same from a chimney
@@ -357,7 +353,6 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
     GRect pane = GRect(left + CABIN_WIN_DX, base - CABIN_WIN_H - 4, CABIN_WIN_W, CABIN_WIN_H);
     graphics_context_set_fill_color(ctx, night ? pal->glow : pal->roof);
     graphics_fill_rect(ctx, pane, 0, GCornerNone);
-    graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_draw_rect(ctx, pane);
     graphics_draw_line(ctx, GPoint(pane.origin.x + pane.size.w / 2, pane.origin.y),
                             GPoint(pane.origin.x + pane.size.w / 2, pane.origin.y + pane.size.h - 1));
@@ -432,7 +427,9 @@ static void draw_temp_board(GContext *ctx, const TreelinePalette *pal)
 {
     // no location and no reading means no board at all, rather than a plaque lettered "--".
     // a blank cabin front is a cabin, an empty sign is a fault
-    if (weather_store_temp() == WEATHER_NO_TEMP)
+    char temp[16];
+    int reading;
+    if (!reading_temp(temp, sizeof(temp), &reading))
     {
         return;
     }
@@ -440,20 +437,10 @@ static void draw_temp_board(GContext *ctx, const TreelinePalette *pal)
     const int left = CABIN_LEFT, right = CABIN_RIGHT;
     const int wall_top = CABIN_WALL_TOP;
 
-    // filled with the sky and lettered in ink, because ink over sky is the one pairing the palette
-    // guarantees. filling it with the wall instead would rest on cabin-against-ink holding up in
-    // every theme, which is the sort of assumption that leaves a reading invisible on half of them
-    char temp[16];
-    readout_weather_temp(temp, sizeof(temp));
-
     // sized to the reading rather than the wall, so it reads as a plaque over the door and leaves
     // the logs either side of it showing. a floor keeps a short reading from looking like a chip,
     // and a ceiling keeps "120F" from running into the eaves
-    GFont font = fonts_get(FONT_HAND_16);
-    GSize reading = graphics_text_layout_get_content_size(temp, font,
-        GRect(0, 0, 120, 26), GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
-
-    int board_w = reading.w + 14;
+    int board_w = reading + 14;
     if (board_w < 44)
     {
         board_w = 44;
@@ -465,17 +452,14 @@ static void draw_temp_board(GContext *ctx, const TreelinePalette *pal)
 
     GRect board = GRect(CABIN_MID - board_w / 2, wall_top + 2, board_w, CABIN_BOARD_H);
 
+    // filled with the sky and lettered in ink, because ink over sky is the one pairing the palette
+    // guarantees. filling it with the wall instead would rest on cabin-against-ink holding up in
+    // every theme, which is the sort of assumption that leaves a reading invisible on half of them
     graphics_context_set_fill_color(ctx, pal->sky_hi);
     graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_fill_rect(ctx, board, 0, GCornerNone);
     graphics_draw_rect(ctx, board);
-
-    // the hand font hangs low in its line box, so the text starts above the board to land the
-    // lettering in the middle of it
-    graphics_context_set_text_color(ctx, pal->ink);
-    graphics_draw_text(ctx, temp, font,
-        GRect(board.origin.x, board.origin.y - 2, board.size.w, CABIN_BOARD_H + 8),
-        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+    letter_board(ctx, temp, board, pal->ink);
 }
 #endif
 
@@ -530,23 +514,8 @@ static void draw_litter(GContext *ctx, const TreelinePalette *pal)
         graphics_draw_line(ctx, GPoint(at.x + 1, at.y + 3), GPoint(at.x + 5, at.y + 1));
     }
 
-    // the path, dashed along each leg so it reads as trodden ground rather than a drawn line
-    for (unsigned i = 0; i + 1 < ARRAY_LENGTH(s_path); i++)
-    {
-        GPoint from = s_path[i];
-        GPoint to = s_path[i + 1];
-        int dx = to.x - from.x;
-        int dy = to.y - from.y;
-        int span = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-
-        for (int at = 0; at < span; at += 6)
-        {
-            int end = at + 3 < span ? at + 3 : span;
-            graphics_draw_line(ctx,
-                GPoint(from.x + (dx * at) / span, from.y + (dy * at) / span),
-                GPoint(from.x + (dx * end) / span, from.y + (dy * end) / span));
-        }
-    }
+    // the path, dashed 3 on and 3 off so it reads as trodden ground rather than a drawn line
+    line_dashed(ctx, s_path, ARRAY_LENGTH(s_path), 3, 6);
 }
 #endif
 
