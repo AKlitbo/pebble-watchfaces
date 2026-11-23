@@ -5,10 +5,10 @@
  * Named for the resource each one holds rather than the job it does, so a slot maps one to one
  * onto the manifest and two roles at the same size share a slot instead of loading it twice.
  *
- * These are the ids passed to the framework's font registry (ui/fonts.h), and every scene's zone
- * table names its slots from here. load_fonts in layout/engine.c registers only the sizes each
- * watch draws, so the rectangle skips Hand 82 and the round screen skips Hand 92 and Hand 64.
- * Listed in registration order.
+ * These are the ids passed to the framework's font registry (ui/fonts.h), and the shared slot
+ * table in layout/zones.c names its fonts from here. load_fonts in layout/engine.c registers only
+ * the sizes each watch draws, so the rectangle skips Hand 82 and the round screen skips Hand 92
+ * and Hand 64. Listed in registration order.
  *
  * @ingroup watchface-sketchbook
  */

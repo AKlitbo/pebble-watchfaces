@@ -3,9 +3,9 @@
  * @brief Where the chrome and the stats row sit, the same for every scene.
  *
  * The battery gauge, the bluetooth and Quiet Time glyphs, the AM/PM marker, and the stats row all
- * land in the same place whichever scene is drawn, so the shared chrome code (widgets.c) and each
- * scene's own layout read these from here rather than each keeping its own copy. A scene's clock
- * and date move from one scene to the next, so those stay with the scene.
+ * land in the same place whichever scene is drawn, so the shared chrome code (widgets.c) and the
+ * shared slots (zones.c) read these from here. The clock and date slots live in zones.c, and the
+ * one thing a scene changes about them is the row its Clock Only clock sits on.
  *
  * @ingroup watchface-sketchbook
  */

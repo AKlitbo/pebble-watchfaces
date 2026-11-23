@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Fixed the stats row's icons and numbers coming apart when the heart rate came or went, and the temperature and steps staying in the middle of the row after the heart rate came back on the Ridgeline, Shoreline, Skyline, and Treeline scenes.
 - Fixed the battery gauge following the Scene Palette rather than the palette on screen. When Shuffle, the Night Palette, or the Quiet Time Palette landed on Mono the gauge still turned red or amber, and a Mono Scene Palette kept it grey under a colour palette.
 
 ## [1.1.2] - 2026-11-20

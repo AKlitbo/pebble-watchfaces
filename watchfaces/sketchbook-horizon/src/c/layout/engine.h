@@ -4,10 +4,9 @@
  * response, run from a small per-scene description.
  *
  * The scenes draw different landscapes but wear the same clock, date, readouts and chrome, picked
- * the same way from the same palette. That part lives here once. A scene hands over a SceneLayout:
- * its own slot table, the two things that genuinely move from scene to scene (where the clock sits
- * for each layout mode, and where the AM/PM marker lands), and the hooks to draw its landscape and
- * read its palette.
+ * the same way from the same palette. That part lives here once, with the slots in zones.c. A
+ * scene hands over a SceneLayout: the hooks to draw its landscape and read its palette, and the row
+ * its Clock Only clock sits on.
  *
  * @ingroup watchface-sketchbook
  */
@@ -44,12 +43,9 @@ enum
  */
 typedef struct SceneLayout
 {
-    Zone *zones;                                            ///< The scene's ZONE_COUNT slot table
     const void *(*palette_for_theme)(uint8_t theme, bool night);  ///< The scene's palette for the hour
     void (*scene_draw)(GContext *ctx, GRect bounds, const void *pal);  ///< Paint the landscape
-    void (*apply_layout)(void);                             ///< Move the zones for the current layout mode
-    int (*meridiem_above_top)(void);                        ///< Colon-channel cap line for the current mode
-    int meridiem_beside_top;                                ///< Cap line for a marker beside the digits
+    int16_t clock_only_y;                                   ///< Top of the Clock Only clock's box on the rectangle
     void (*scene_init)(void);                               ///< Allocate the scene's paths, or NULL
     void (*scene_deinit)(void);                             ///< Free them, or NULL
 } SceneLayout;
@@ -82,10 +78,11 @@ uint8_t layout_build(const SceneLayout *lay, EngineSlot *out, uint8_t max, GRect
 void layout_apply_theme(const SceneLayout *lay);
 
 /**
- * @brief Re-pick the palette for this tick, re-colouring the zones, and say whether it moved.
+ * @brief Re-pick the palette for this tick, re-colouring the zones, and say whether the slots need
+ * rebuilding.
  *
  * @param lay The scene's layout.
- * @return True when the palette moved and the slots need rebuilding.
+ * @return True when the palette moved, or a heart rate came or went since the row was laid out.
  */
 bool layout_palette_changed(const SceneLayout *lay);
 

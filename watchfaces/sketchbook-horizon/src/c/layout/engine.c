@@ -10,6 +10,8 @@
  */
 #include "layout/engine.h"
 
+#include "layout/zones.h"
+
 #include "ui/fonts.h"
 #include "draw/fonts.h"
 #include "ui/readouts.h"
@@ -60,7 +62,7 @@ static void apply_theme_colors(void)
     s_pal = s_lay->palette_for_theme(s_theme, s_night);
     const CommonPalette *cp = s_pal;
 
-    Zone *zones = s_lay->zones;
+    Zone *zones = layout_zones();
     zones[ZONE_TIME].color = cp->text;
     zones[ZONE_DATE].color = cp->dim;
     zones[ZONE_WEATHER].color = cp->dim;
@@ -108,7 +110,8 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
 #if !defined(PBL_ROUND)
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)
     {
-        widgets_draw_stat_glyphs(ctx, cp, &s_lay->zones[ZONE_WEATHER], &s_lay->zones[ZONE_STEPS]);
+        widgets_draw_stat_glyphs(ctx, cp, &layout_zones()[ZONE_WEATHER], &layout_zones()[ZONE_STEPS],
+            layout_zones_has_hr());
     }
 #endif
 
@@ -116,8 +119,9 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
     // marker anyway, and the setting drops it on a 12-hour one
     if (sketchbook_show_meridiem())
     {
-        GRect slot = s_lay->zones[ZONE_TIME].rect;
-        FontId font = s_lay->zones[ZONE_TIME].font_id;
+        const Zone *clock_zone = &layout_zones()[ZONE_TIME];
+        GRect slot = clock_zone->rect;
+        FontId font = clock_zone->font_id;
 
         // the standard clock has room either side, so the marker goes beside the digits. the
         // bigger two have none and drop it into the channel above the colon. on a round screen the
@@ -125,11 +129,11 @@ static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
         // it joins the other two
         if (PBL_IF_ROUND_ELSE(false, sketchbook_layout() == LAYOUT_STANDARD))
         {
-            widgets_draw_meridiem_beside(ctx, cp->dim, slot, font, s_lay->meridiem_beside_top);
+            widgets_draw_meridiem_beside(ctx, cp->dim, slot, font, LAYOUT_MERIDIEM_BESIDE_TOP);
         }
         else
         {
-            widgets_draw_meridiem_above(ctx, cp->dim, slot, font, s_lay->meridiem_above_top());
+            widgets_draw_meridiem_above(ctx, cp->dim, slot, font, layout_meridiem_above_top());
         }
     }
 
@@ -194,14 +198,15 @@ uint8_t layout_build(const SceneLayout *lay, EngineSlot *out, uint8_t max, GRect
     s_lay = lay;
     uint8_t i = 0;
 
-    lay->apply_layout();
+    Zone *zones = layout_zones();
+    layout_zones_apply(lay->clock_only_y);
 
     // the scene is the background, so it goes down first and the chrome sits on it
     out[i++] = (EngineSlot){.frame = bounds, .draw = draw_scene};
     out[i++] = (EngineSlot){.frame = bounds, .draw = draw_chrome};
 
-    out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_TIME], .text = readout_time};
-    out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_DATE], .text = readout_date};
+    out[i++] = (EngineSlot){.zone = &zones[ZONE_TIME], .text = readout_time};
+    out[i++] = (EngineSlot){.zone = &zones[ZONE_DATE], .text = readout_date};
 
     // dropped rather than blanked in big-clock mode, so they cost nothing: no layer, no store
     // pull, no fit
@@ -211,13 +216,13 @@ uint8_t layout_build(const SceneLayout *lay, EngineSlot *out, uint8_t max, GRect
 #if !defined(PBL_ROUND)
     if (sketchbook_layout() != LAYOUT_BIG_CLOCK)
     {
-        out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_WEATHER], .text = readout_weather_temp};
+        out[i++] = (EngineSlot){.zone = &zones[ZONE_WEATHER], .text = readout_weather_temp};
 
-        if (sketchbook_has_hr())
+        if (layout_zones_has_hr())
         {
-            out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_HR], .text = readout_hr};
+            out[i++] = (EngineSlot){.zone = &zones[ZONE_HR], .text = readout_hr};
         }
-        out[i++] = (EngineSlot){.zone = &lay->zones[ZONE_STEPS], .text = readout_steps};
+        out[i++] = (EngineSlot){.zone = &zones[ZONE_STEPS], .text = readout_steps};
     }
 #endif
 
@@ -239,7 +244,14 @@ bool layout_palette_changed(const SceneLayout *lay)
 
     // a repaint is enough unless the palette really moved, which is the sun coming up or going down,
     // a Shuffle rolling to the next theme, or a day/night/Quiet swap landing on a different one
-    return s_night != was_night || s_theme != was_theme;
+    bool palette_moved = s_night != was_night || s_theme != was_theme;
+
+#if defined(PBL_ROUND)
+    return palette_moved;
+#else
+    // a sensor that came or went since the row was laid out means three readouts or two
+    return palette_moved || sketchbook_has_hr() != layout_zones_has_hr();
+#endif
 }
 
 void layout_teardown(const SceneLayout *lay)

@@ -60,7 +60,8 @@ void widgets_draw_bt(GContext *ctx, bool connected);
  *
  * False on hardware with no sensor and on a watch whose wearer has turned theirs off. Either way
  * the row drops to two readouts and re-centres rather than keeping a slot that can only ever say
- * "--". Asked per draw, since a sensor can come and go while the face is up.
+ * "--". The layout asks at each rebuild, and the clock's tick rebuilds when the answer changes,
+ * since a sensor can come and go while the face is up.
  *
  * @return True when a reading is obtainable.
  */
@@ -73,15 +74,17 @@ bool sketchbook_has_hr(void);
  * and reads in the same ink as the number beside it.
  *
  * The two zones come in rather than being read off the chrome macros, because with no heart rate
- * each scene moves its temperature and steps into centred boxes of its own. Taking the boxes the
- * numbers actually drew in is what keeps each mark with its own number.
+ * the layout moves the temperature and steps into centred boxes. Taking the boxes the numbers
+ * actually drew in is what keeps each mark with its own number.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  * @param weather The temperature's zone.
  * @param steps The steps zone.
+ * @param has_hr Whether the row was laid out with a heart rate, so the marks match the numbers.
  */
-void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zone *weather, const Zone *steps);
+void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zone *weather, const Zone *steps,
+    bool has_hr);
 #endif
 
 /**

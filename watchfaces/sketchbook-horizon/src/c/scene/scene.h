@@ -37,13 +37,13 @@ typedef enum
  * @brief One scene, as data: where its sky and weather sit, and how it lays out.
  *
  * The geometry is read by the shared sky and weather code, and the layout by the shared layout
- * engine (see layout/engine.h), both while this scene is up. A scene is two tables and the handful
- * of hooks the layout engine calls back into, nothing more.
+ * engine (see layout/engine.h), both while this scene is up. A scene is its geometry and the
+ * handful of hooks the layout engine calls back into, nothing more.
  */
 typedef struct SceneDef
 {
     const SceneGeometry *geometry;  ///< Where this scene's sky and weather sit
-    const SceneLayout *layout;      ///< Its slots, and the hooks the layout engine runs
+    const SceneLayout *layout;      ///< The hooks the layout engine runs, and its Clock Only row
 } SceneDef;
 
 // each scene assembles its own, in its own file
@@ -71,7 +71,7 @@ void sketchbook_setup(Window *window);
 uint8_t sketchbook_build(EngineSlot *out, uint8_t max, GRect bounds);
 
 /**
- * @brief Re-read the theme and daylight and re-colour the active scene's zones.
+ * @brief Re-read the theme and daylight and re-colour the slots for the active scene.
  */
 void sketchbook_apply_theme(void);
 

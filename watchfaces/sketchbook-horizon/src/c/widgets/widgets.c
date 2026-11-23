@@ -192,17 +192,17 @@ bool sketchbook_has_hr(void)
 #endif
 }
 
-void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zone *weather, const Zone *steps)
+void widgets_draw_stat_glyphs(GContext *ctx, const CommonPalette *pal, const Zone *weather, const Zone *steps,
+    bool has_hr)
 {
     char text[16];
 
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
 
     GRect slot;
-    bool has_hr = sketchbook_has_hr();
 
     // every mark follows the box its number landed in, so it keeps up with a font fallback. with
-    // no heart rate that box comes back off the zone, which the scene moved to its centred pair
+    // no heart rate that box comes back off the zone, which the layout moved to its centred pair
     readout_weather_temp(text, sizeof(text));
     if (has_hr)
     {
