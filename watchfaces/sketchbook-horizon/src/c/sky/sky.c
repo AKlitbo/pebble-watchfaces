@@ -175,9 +175,9 @@ static void draw_stars(GContext *ctx, const CommonPalette *pal, const Sketchbook
     {
         GPoint at = GPoint(stars[i].x, stars[i].y);
 
-        // the faint ones sit back in the dim colour and the bright ones come forward in the
+        // the faint ones sit back in the star colour and the bright ones come forward in the
         // disc colour, which is what stops the field reading as one flat spray of dots
-        GColor color = stars[i].size == 0 ? pal->dim : pal->disc;
+        GColor color = stars[i].size == 0 ? pal->star : pal->disc;
         graphics_context_set_fill_color(ctx, color);
         graphics_context_set_stroke_color(ctx, color);
 
@@ -356,7 +356,6 @@ void sketchbook_sky_draw(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
     const SceneGeometry *g = sketchbook_scene_geometry();
 
-    // the shared sky paints with the common block, which leads every scene's palette
     const CommonPalette *pal = frame->palette;
 
     draw_bands(ctx, bounds, pal);

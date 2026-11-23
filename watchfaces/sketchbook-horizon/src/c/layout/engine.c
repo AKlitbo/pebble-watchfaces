@@ -3,9 +3,9 @@
  * @brief The shared layout: palette, chrome, slot list and ticker response, the same for every
  * scene.
  *
- * One scene is up at a time. It is held here, with the palette it was last themed with, between
- * the public calls and the draw-slots the engine fires. The shared sky and weather code reads its
- * geometry back from here too.
+ * One scene is up at a time. It is held here, with the palette and the ground row it was last
+ * themed with, between the public calls and the draw-slots the engine fires. The shared sky and
+ * weather code reads its geometry back from here too.
  *
  * The sky and the weather are painted here for every scene, around the scene's own ground. The
  * night, the condition, its sky recipe, the disc and the minute are read once at the top of the
@@ -39,10 +39,11 @@
  * @{
  */
 
-// the scene being drawn, and the palette it was themed with. held rather than looked up per draw
-// so the scene, the chrome, and the text can't disagree inside one frame
+// the scene being drawn, and the palette and ground row it was themed with. held rather than looked
+// up per draw so the scene, the chrome, and the text can't disagree inside one frame
 static const SceneDef *s_scene;
-static const void *s_pal;
+static CommonPalette s_pal;
+static const void *s_ground;
 static bool s_night;
 // the theme index the palette was chosen for, so a Shuffle rollover or a day/night/Quiet swap that
 // lands on a different one is noticed and repainted
@@ -53,8 +54,9 @@ static uint8_t s_theme;
  *
  * Which theme is up depends on the palette mode: the fixed one, a Shuffle that rotates with the
  * clock, or a day/night/Quiet Time swap. Whichever it lands on still takes its day or night colours
- * from the actual daylight. The clock sits on the scene's ground and everything else sits over the
- * sky, which is why the clock takes `text` and the rest take `dim`.
+ * from the actual daylight. The sky comes from the shared table and the readouts from the scene's
+ * ground row, and the two go together into the palette the frame paints with. The clock sits on the
+ * scene's ground, which is why it takes `text` and the readouts beside it take `dim`.
  */
 static void apply_theme_colors(void)
 {
@@ -68,8 +70,15 @@ static void apply_theme_colors(void)
     const struct tm *now = time_store_tm();
     s_theme = sketchbook_active_theme(&pick, now->tm_year, now->tm_yday, now->tm_hour, now->tm_min);
 
-    s_pal = s_scene->palette_for_theme(s_theme, s_night);
-    const CommonPalette *cp = s_pal;
+    // an out-of-range theme falls back to Sketchbook, matching how the settings parser clamps
+    if (s_theme >= THEME_COUNT)
+    {
+        s_theme = THEME_SKETCHBOOK;
+    }
+
+    s_ground = s_scene->ground_for_theme(s_theme, s_night);
+    sketchbook_palette_assemble(&s_pal, s_theme, s_night, s_ground);
+    const CommonPalette *cp = &s_pal;
 
     Zone *zones = layout_zones();
     zones[ZONE_TIME].color = cp->text;
@@ -96,7 +105,8 @@ static void draw_scene(GContext *ctx, GRect bounds, const void *data)
 {
     WxCond cond = sketchbook_cond_parse(weather_store_cond());
     SceneFrame frame = {
-        .palette = s_pal,
+        .palette = &s_pal,
+        .ground = s_ground,
         .night = sketchbook_sky_night(),
         .cond = cond,
         .sky = sketchbook_sky_recipe(cond),
@@ -132,13 +142,13 @@ static void draw_scene(GContext *ctx, GRect bounds, const void *data)
  */
 static void draw_chrome(GContext *ctx, GRect bounds, const void *data)
 {
-    const CommonPalette *cp = s_pal;
+    const CommonPalette *cp = &s_pal;
 
     widgets_draw_top_bar(ctx, bounds);
 
-    // Mono keeps the gauge grey whenever it is the palette on screen, Shuffle and the night and
-    // Quiet Time palettes included
-    widgets_draw_battery(ctx, cp->bar_ink, s_theme, system_store_battery());
+    // the gauge warns in whichever palette is on screen, Shuffle and the night and Quiet Time
+    // palettes included
+    widgets_draw_battery(ctx, cp, system_store_battery());
 
     // the row's marks go with the row, and only the big clock drops it. a round screen has no row
 #if !defined(PBL_ROUND)

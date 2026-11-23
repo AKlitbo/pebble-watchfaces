@@ -14,6 +14,7 @@
 #include <pebble.h>
 
 #include "fx/conditions.h"
+#include "theme/palette.h"
 
 /**
  * @addtogroup watchface-sketchbook
@@ -23,18 +24,19 @@
 /**
  * @brief One frame's reading of the clock, the sun and the weather.
  *
- * The palette is the scene's own, passed as `const void *` since each scene has its own palette
- * type. The shared sky and weather code reads it through its leading CommonPalette block, and a
- * scene's own draws cast it back to the full palette.
+ * The palette is the shared sky put together with the scene's readouts, and is all the shared sky
+ * and weather code reads. The ground is the scene's own row, passed as `const void *` since each
+ * scene has its own ground type, and the scene's draws cast it back.
  */
 typedef struct SceneFrame
 {
-    const void *palette;  ///< The scene's palette for this hour
-    bool night;           ///< After dark, by the sunrise and sunset the sky follows
-    WxCond cond;          ///< The condition, for a scene with its own rule over it
-    SketchbookSky sky;    ///< What that condition does to the sky
-    GPoint disc;          ///< Where the sun or moon sits on its arc
-    int minute;           ///< The clock minute, which shuffles the falling weather
+    const CommonPalette *palette;  ///< The palette for this hour
+    const void *ground;            ///< The scene's ground row for this hour
+    bool night;                    ///< After dark, by the sunrise and sunset the sky follows
+    WxCond cond;                   ///< The condition, for a scene with its own rule over it
+    SketchbookSky sky;             ///< What that condition does to the sky
+    GPoint disc;                   ///< Where the sun or moon sits on its arc
+    int minute;                    ///< The clock minute, which shuffles the falling weather
 } SceneFrame;
 
 /**

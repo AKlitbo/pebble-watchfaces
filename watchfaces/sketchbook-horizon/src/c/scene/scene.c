@@ -31,22 +31,22 @@
 // or the mast that carries it. the rectangle has none
 static const SceneDef s_scenes[] = {
     [SCENE_RIDGELINE] = {
-        .geometry = &ridgeline_geometry, .palette_for_theme = ridgeline_palette_for_theme,
+        .geometry = &ridgeline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
         .ground = ridgeline_draw_ground, .front = PBL_IF_ROUND_ELSE(ridgeline_draw_front, NULL),
         .clock_only_y = 119,
     },
     [SCENE_SHORELINE] = {
-        .geometry = &shoreline_geometry, .palette_for_theme = shoreline_palette_for_theme,
+        .geometry = &shoreline_geometry, .ground_for_theme = shoreline_ground_for_theme,
         .ground = shoreline_draw_ground, .front = PBL_IF_ROUND_ELSE(shoreline_draw_front, NULL),
         .clock_only_y = 113,
     },
     [SCENE_SKYLINE] = {
-        .geometry = &skyline_geometry, .palette_for_theme = skyline_palette_for_theme,
+        .geometry = &skyline_geometry, .ground_for_theme = skyline_ground_for_theme,
         .ground = skyline_draw_ground, .front = PBL_IF_ROUND_ELSE(skyline_draw_front, NULL),
         .clock_only_y = 113,
     },
     [SCENE_TREELINE] = {
-        .geometry = &treeline_geometry, .palette_for_theme = treeline_palette_for_theme,
+        .geometry = &treeline_geometry, .ground_for_theme = treeline_ground_for_theme,
         .ground = treeline_draw_ground, .front = PBL_IF_ROUND_ELSE(treeline_draw_front, NULL),
         .clock_only_y = 113,
     },

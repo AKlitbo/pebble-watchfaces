@@ -1,11 +1,11 @@
 /**
  * @file shoreline.h
- * @brief The Shoreline scene's palette: one set of colours per theme, in a day and a night variant.
+ * @brief The Shoreline scene's ground: what the sea and the sand are painted with, per theme, by
+ * day and by night.
  *
- * Shoreline draws its whole background, so a theme is a palette rather than a baked bitmap. Each
- * theme carries two of them and the scene swaps between them as the sun goes down, which is what
- * makes the same beach read as morning or midnight. The common block at the top is what the shared
- * sky and weather code paints with, and the fields below are the sea and sand this scene adds.
+ * Shoreline draws its whole background, so a theme is a palette rather than a baked bitmap. The sky
+ * over it is the shared one in palette.h. This is the beach under it, which the scene swaps along
+ * with the sky as the sun goes down.
  *
  * @ingroup watchface-sketchbook
  */
@@ -20,32 +20,31 @@
  */
 
 /**
- * @brief Every colour the Shoreline scene paints with.
+ * @brief The colours of Shoreline's sea and sand.
  *
- * Split by what a colour sits *on* rather than by what draws it: `ink` is linework over the sky
- * and the water, `text` is the clock down on the sand, and the two are rarely the same once the
- * beach is dark.
+ * Linework goes over the water in the sky's `ink`, and the clock sits down on the sand in `text`.
+ * The two are rarely the same once the beach is dark.
  */
-typedef struct ShorelinePalette
+typedef struct ShorelineGround
 {
-    SKETCHBOOK_PALETTE_COMMON
-    GColor sea_far;  ///< Water out at the horizon
-    GColor sea;      ///< Water in close, where the waves are breaking
-    GColor sand;     ///< The dry beach, the field the clock sits on
-    GColor wet;      ///< Sand the tide has just come off, in the strip below the waterline
-    GColor foam;     ///< The surf line and the wave crests
-} ShorelinePalette;
+    GroundReadouts readouts; ///< The clock and the marks on the sand
+    GColor sea_far;          ///< Water out at the horizon
+    GColor sea;              ///< Water in close, where the waves are breaking
+    GColor sand;             ///< The dry beach, the field the clock sits on
+    GColor wet;              ///< Sand the tide has just come off, in the strip below the waterline
+    GColor foam;             ///< The surf line and the wave crests
+} ShorelineGround;
 
 /**
- * @brief The palette for a theme at this hour of the day.
+ * @brief The ground for a theme at this hour of the day.
  *
  * An out-of-range theme falls back to Sketchbook, matching how the settings parser clamps.
  *
  * @param theme The palette on screen, which Shuffle or the night or Quiet Time palette can pick.
- * @param night True for the after-dark palette.
- * @return The palette to paint with. It comes back as a const void * so the scene table can hold
- * every scene's palette lookup alike, and the scene casts it to a ShorelinePalette.
+ * @param night True for the after-dark ground.
+ * @return The ground row. It comes back as a const void * so the scene table can hold every scene's
+ * ground lookup alike, and the scene casts it to a ShorelineGround.
  */
-const void *shoreline_palette_for_theme(uint8_t theme, bool night);
+const void *shoreline_ground_for_theme(uint8_t theme, bool night);
 
 /** @} */

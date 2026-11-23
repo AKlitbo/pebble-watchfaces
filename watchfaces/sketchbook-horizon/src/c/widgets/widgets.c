@@ -22,8 +22,10 @@
  * @{
  */
 
-void widgets_draw_battery(GContext *ctx, GColor ink, uint8_t theme, int level)
+void widgets_draw_battery(GContext *ctx, const CommonPalette *pal, int level)
 {
+    GColor ink = pal->bar_ink;
+
     level = clamp_int(level, 0, 100);
 
     GRect body = BATT_RECT;
@@ -52,7 +54,7 @@ void widgets_draw_battery(GContext *ctx, GColor ink, uint8_t theme, int level)
         lit = 1;  // never read empty while there's still charge
     }
 
-    graphics_context_set_fill_color(ctx, sketchbook_battery_fill(theme, ink, level));
+    graphics_context_set_fill_color(ctx, sketchbook_battery_fill(pal, level));
 
     for (int i = 0; i < lit; i++)
     {

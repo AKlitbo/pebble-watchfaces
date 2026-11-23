@@ -156,12 +156,12 @@ static const Block s_city[] = {
  * @brief Draw the city standing back behind the bridge, with whatever of it is awake.
  *
  * @param ctx The graphics context.
- * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param lit How lit the city is, 0 to 100.
  */
-static void draw_city(GContext *ctx, const SkylinePalette *pal, int lit)
+static void draw_city(GContext *ctx, const SkylineGround *ground, int lit)
 {
-    graphics_context_set_fill_color(ctx, pal->city);
+    graphics_context_set_fill_color(ctx, ground->city);
 
     for (unsigned i = 0; i < ARRAY_LENGTH(s_city); i++)
     {
@@ -171,7 +171,7 @@ static void draw_city(GContext *ctx, const SkylinePalette *pal, int lit)
 
     // windows on a two by five grid inside each block, only where the block is tall enough to
     // hold them. a window is on once the city is lit past that window's own place in the queue
-    graphics_context_set_fill_color(ctx, pal->lamp);
+    graphics_context_set_fill_color(ctx, ground->lamp);
 
     for (unsigned i = 0; i < ARRAY_LENGTH(s_city); i++)
     {
@@ -245,8 +245,9 @@ static int cable_y(int x)
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  */
-static void draw_bridge(GContext *ctx, const SkylinePalette *pal)
+static void draw_bridge(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground)
 {
     graphics_context_set_stroke_width(ctx, 1);
 
@@ -281,7 +282,7 @@ static void draw_bridge(GContext *ctx, const SkylinePalette *pal)
     // the two towers, carrying on below the deck into the river rather than stopping on it. cut
     // off at the roadway they read as a bridge floating on the water instead of standing in it,
     // and a suspension tower is a pier that happens to rise above the deck
-    graphics_context_set_fill_color(ctx, pal->bridge);
+    graphics_context_set_fill_color(ctx, ground->bridge);
     for (int t = 0; t < 2; t++)
     {
         int x = t == 0 ? TOWER_L : TOWER_R;
@@ -303,9 +304,10 @@ static void draw_bridge(GContext *ctx, const SkylinePalette *pal)
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param lit How lit the crossing is, 0 to 100.
  */
-static void draw_lamps(GContext *ctx, const SkylinePalette *pal, int lit)
+static void draw_lamps(GContext *ctx, const CommonPalette *pal, const SkylineGround *ground, int lit)
 {
     // each lamp is a short post off the deck with the lamp on top of it. the post and an unlit
     // lamp's outline take the linework colour for the same reason the cables do: they have to hold
@@ -318,7 +320,7 @@ static void draw_lamps(GContext *ctx, const SkylinePalette *pal, int lit)
 
         graphics_draw_line(ctx, GPoint(x, DECK_Y - 1), GPoint(x, DECK_Y - 6));
 
-        graphics_context_set_fill_color(ctx, on ? pal->lamp : pal->bridge);
+        graphics_context_set_fill_color(ctx, on ? ground->lamp : ground->bridge);
         graphics_fill_circle(ctx, GPoint(x, DECK_Y - 7), 2);
 
         // an unlit lamp is the same shape, just not glowing, so it needs its outline back
@@ -340,16 +342,18 @@ static void draw_lamps(GContext *ctx, const SkylinePalette *pal, int lit)
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param lit How lit the crossing is, 0 to 100.
  * @param minute The clock minute, which shifts the break pattern.
  */
-static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, int lit, int minute)
+static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
+    const SkylineGround *ground, int lit, int minute)
 {
     static const int8_t wobble[] = {0, 1, -1, 0, 1, 0, -1, 1, 0, -1, 0, 1};
 
     // the river and its far bank, and the open water past the mirror ticking over now and then.
     // the ripples start well under the deck's reflection, so the two never share a row
-    ground_water(ctx, bounds, WATER_TOP, MIRROR_TOP + 8, SCENE_BOTTOM, pal->water, pal->ink, pal->dim);
+    ground_water(ctx, bounds, WATER_TOP, MIRROR_TOP + 8, SCENE_BOTTOM, ground->water, pal->ink, pal->dim);
 
     // the deck coming back up at you, in the ripples' colour. the dashes and the gaps between them
     // both vary, because an even one would read as a ruled line rather than as something floating
@@ -368,7 +372,7 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
 
     // and the towers under it, breaking up and narrowing the further down they go, which is
     // what stops a stack of even bars reading as a barcode
-    graphics_context_set_stroke_color(ctx, pal->bridge);
+    graphics_context_set_stroke_color(ctx, ground->bridge);
     for (int t = 0; t < 2; t++)
     {
         int x = t == 0 ? TOWER_L : TOWER_R;
@@ -393,7 +397,7 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
         return;
     }
 
-    graphics_context_set_stroke_color(ctx, pal->lamp);
+    graphics_context_set_stroke_color(ctx, ground->lamp);
 
     // walked the same way draw_lamps walks the deck, so each streak sits under its own lamp
     for (int x = LAMP_FIRST, i = 0; x < SCREEN_W; x += LAMP_STEP, i++)
@@ -435,7 +439,7 @@ static void draw_water(GContext *ctx, GRect bounds, const SkylinePalette *pal, i
  * @param ctx The graphics context.
  * @param pal The palette in use.
  */
-static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
+static void draw_buoy(GContext *ctx, const CommonPalette *pal)
 {
     // no location and no reading means no buoy, rather than one lettered "--"
     char temp[16];
@@ -463,8 +467,10 @@ static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
     graphics_draw_round_rect(ctx, body, 2);
     letter_board(ctx, temp, body, pal->ink);
 
-    // a wake either side of the waterline, so it sits in the river rather than on top of it
+    // a wake either side of the waterline, so it sits in the river rather than on top of it. it is
+    // a mark on the water, so it takes the dim the ripples do
     int water = BUOY_TOP + BUOY_H - 3;
+    graphics_context_set_stroke_color(ctx, pal->dim);
     graphics_draw_line(ctx, GPoint(body.origin.x - 7, water), GPoint(body.origin.x - 2, water));
     graphics_draw_line(ctx, GPoint(body.origin.x + width + 1, water), GPoint(body.origin.x + width + 6, water));
 }
@@ -472,15 +478,16 @@ static void draw_buoy(GContext *ctx, const SkylinePalette *pal)
 
 void skyline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const SkylinePalette *pal = frame->palette;
+    const CommonPalette *pal = frame->palette;
+    const SkylineGround *ground = frame->ground;
     int lit = sketchbook_sky_lit();
 
     // the river goes down before the crossing, not after: the water starts at the far bank the
     // city stands on, so the bridge has to be painted on top of it to be over it
-    draw_city(ctx, pal, lit);
-    draw_water(ctx, bounds, pal, lit, frame->minute);
-    draw_bridge(ctx, pal);
-    draw_lamps(ctx, pal, lit);
+    draw_city(ctx, ground, lit);
+    draw_water(ctx, bounds, pal, ground, lit, frame->minute);
+    draw_bridge(ctx, pal, ground);
+    draw_lamps(ctx, pal, ground, lit);
 }
 
 #if defined(PBL_ROUND)

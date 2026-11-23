@@ -6,33 +6,24 @@
  */
 #include "theme/battery.h"
 
-#include "theme/palette.h"
-
 /**
  * @addtogroup watchface-sketchbook
  * @{
  */
 
-GColor sketchbook_battery_fill(uint8_t theme, GColor ink, int level)
+GColor sketchbook_battery_fill(const CommonPalette *pal, int level)
 {
-    // Mono keeps the gauge greyscale. the lit-segment count already shows the charge, so a
-    // red or amber warning would only break the look
-    if (theme == THEME_MONO)
-    {
-        return ink;
-    }
-
     if (level <= 20)
     {
-        return GColorRed;
+        return pal->batt_critical;
     }
 
     if (level <= 40)
     {
-        return GColorChromeYellow;
+        return pal->batt_low;
     }
 
-    return ink;
+    return pal->bar_ink;
 }
 
 /** @} */

@@ -264,7 +264,7 @@ static bool dither_keeps(int x, int y, int level)
  * @param pal The palette in use.
  * @param minutes The running minute count, which carries the flock across.
  */
-static void draw_birds(GContext *ctx, const ShorelinePalette *pal, int32_t minutes)
+static void draw_birds(GContext *ctx, const CommonPalette *pal, int32_t minutes)
 {
     // a loose flock rather than a row, since birds evenly spaced read as a border print
     static const Gull flock[] = {
@@ -308,19 +308,21 @@ static void draw_birds(GContext *ctx, const ShorelinePalette *pal, int32_t minut
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param base The waterline's baseline, before the shore curve bends it.
  */
-static void draw_water(GContext *ctx, GRect bounds, const ShorelinePalette *pal, int base)
+static void draw_water(GContext *ctx, GRect bounds, const CommonPalette *pal,
+    const ShorelineGround *ground, int base)
 {
     int width = bounds.size.w;
 
-    graphics_context_set_fill_color(ctx, pal->sand);
+    graphics_context_set_fill_color(ctx, ground->sand);
     graphics_fill_rect(ctx, GRect(0, DRY_SAND_Y, width, bounds.size.h - DRY_SAND_Y), 0, GCornerNone);
 
     graphics_context_set_stroke_width(ctx, 1);
 
     // the far water, from the horizon down to wherever this column's depth changes
-    graphics_context_set_stroke_color(ctx, pal->sea_far);
+    graphics_context_set_stroke_color(ctx, ground->sea_far);
     for (int x = 0; x < width; x++)
     {
         graphics_draw_line(ctx, GPoint(x, HORIZON_Y), GPoint(x, sea_split_at(x, base)));
@@ -328,7 +330,7 @@ static void draw_water(GContext *ctx, GRect bounds, const ShorelinePalette *pal,
 
     // then the near water on down to the edge. the join needs no dither: it follows the same
     // curve as the shore, so it already reads as water rather than as a rule across the sea
-    graphics_context_set_stroke_color(ctx, pal->sea);
+    graphics_context_set_stroke_color(ctx, ground->sea);
     for (int x = 0; x < width; x++)
     {
         graphics_draw_line(ctx, GPoint(x, sea_split_at(x, base)), GPoint(x, waterline_at(x, base)));
@@ -336,7 +338,7 @@ static void draw_water(GContext *ctx, GRect bounds, const ShorelinePalette *pal,
 
     // and the sand the sea has just come off, between the edge and the high-water mark. it closes
     // up to nothing where a full tide reaches DRY_SAND_Y and is widest at dead low
-    graphics_context_set_stroke_color(ctx, pal->wet);
+    graphics_context_set_stroke_color(ctx, ground->wet);
     for (int x = 0; x < width; x++)
     {
         graphics_draw_line(ctx, GPoint(x, waterline_at(x, base) + 1), GPoint(x, DRY_SAND_Y - 1));
@@ -344,7 +346,7 @@ static void draw_water(GContext *ctx, GRect bounds, const ShorelinePalette *pal,
 
     // the wet strip is dried out from the bottom up rather than cut off, because a hard edge
     // along its foot is a line ruled across the beach and reads as exactly that
-    graphics_context_set_stroke_color(ctx, pal->sand);
+    graphics_context_set_stroke_color(ctx, ground->sand);
     for (int y = DRY_SAND_Y - WET_FADE_H; y < DRY_SAND_Y; y++)
     {
         int level = 8 - ((DRY_SAND_Y - y) * 8) / WET_FADE_H;
@@ -375,7 +377,7 @@ static void draw_water(GContext *ctx, GRect bounds, const ShorelinePalette *pal,
  * @param disc Where the sun or moon is.
  * @param base The waterline's baseline.
  */
-static void draw_glitter(GContext *ctx, const ShorelinePalette *pal, GPoint disc, int base)
+static void draw_glitter(GContext *ctx, const CommonPalette *pal, GPoint disc, int base)
 {
     static const int8_t wobble[] = {0, 2, -1, 1, -2, 0, 1, -1, 2, -2, 1, 0};
 
@@ -404,14 +406,14 @@ static void draw_glitter(GContext *ctx, const ShorelinePalette *pal, GPoint disc
  * happening and never costs a timer.
  *
  * @param ctx The graphics context.
- * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param base The waterline's baseline.
  * @param minute The clock minute, which slides the rows along.
  * @param choppy True to break the ranks up into rougher water.
  */
-static void draw_waves(GContext *ctx, const ShorelinePalette *pal, int base, int minute, bool choppy)
+static void draw_waves(GContext *ctx, const ShorelineGround *ground, int base, int minute, bool choppy)
 {
-    graphics_context_set_stroke_color(ctx, pal->foam);
+    graphics_context_set_stroke_color(ctx, ground->foam);
     graphics_context_set_stroke_width(ctx, 1);
 
     for (int row = 0; row < WAVE_ROWS; row++)
@@ -474,12 +476,14 @@ static GPoint boat_anchor(int base, int level, int minute)
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param base The waterline's baseline.
  * @param level How far in the tide is, 0 to 100.
  * @param rising True while the tide is flooding, which leans the rectangle's sail.
  * @param minute The clock minute, which bobs it a pixel.
  */
-static void draw_boat(GContext *ctx, const ShorelinePalette *pal, int base, int level, bool rising, int minute)
+static void draw_boat(GContext *ctx, const CommonPalette *pal, const ShorelineGround *ground,
+    int base, int level, bool rising, int minute)
 {
     GPoint at = boat_anchor(base, level, minute);
     int x = at.x, y = at.y;
@@ -503,7 +507,7 @@ static void draw_boat(GContext *ctx, const ShorelinePalette *pal, int base, int 
     // the sail first, filled row by row so it needs no path and no allocation. a right triangle
     // hung off the mast, leaning whichever way the boat is pointed
     int lean = rising ? 1 : -1;
-    graphics_context_set_stroke_color(ctx, pal->foam);
+    graphics_context_set_stroke_color(ctx, ground->foam);
     for (int row = 1; row <= 10; row++)
     {
         int width = (row * 7) / 10;
@@ -531,15 +535,15 @@ static void draw_boat(GContext *ctx, const ShorelinePalette *pal, int base, int 
  * above it is what breaks the line up instead.
  *
  * @param ctx The graphics context.
- * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param base The waterline's baseline.
  */
-static void draw_surf(GContext *ctx, const ShorelinePalette *pal, int base)
+static void draw_surf(GContext *ctx, const ShorelineGround *ground, int base)
 {
     // mostly nothing, so the flecks land in clumps rather than at a steady interval
     static const int8_t spray[] = {0, 0, 3, 0, 0, 0, 5, 0, 2, 0, 0, 4, 0, 0, 0, 3, 0, 0, 6, 0, 0, 2, 0};
 
-    graphics_context_set_stroke_color(ctx, pal->foam);
+    graphics_context_set_stroke_color(ctx, ground->foam);
     graphics_context_set_stroke_width(ctx, 1);
 
     for (int x = 0; x < SCREEN_W; x++)
@@ -565,12 +569,14 @@ static void draw_surf(GContext *ctx, const ShorelinePalette *pal, int base)
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param base The tide base.
  * @param level How far in the tide has come, 0 to 100.
  * @param rising True while the tide is flooding, which is the way the sail leans.
  * @param minute The current minute.
  */
-static void draw_pennant(GContext *ctx, const ShorelinePalette *pal, int base, int level, bool rising, int minute)
+static void draw_pennant(GContext *ctx, const CommonPalette *pal, const ShorelineGround *ground,
+    int base, int level, bool rising, int minute)
 {
     GPoint at = boat_anchor(base, level, minute);
     int x = at.x, y = at.y;
@@ -594,7 +600,7 @@ static void draw_pennant(GContext *ctx, const ShorelinePalette *pal, int base, i
         int lean = rising ? 1 : -1;
         int rows = BOAT_MAST_H - 7;
 
-        graphics_context_set_stroke_color(ctx, pal->foam);
+        graphics_context_set_stroke_color(ctx, ground->foam);
         for (int row = 1; row <= rows; row++)
         {
             int width = (row * 13) / rows;
@@ -636,7 +642,8 @@ static void draw_pennant(GContext *ctx, const ShorelinePalette *pal, int base, i
 
 void shoreline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const ShorelinePalette *pal = frame->palette;
+    const CommonPalette *pal = frame->palette;
+    const ShorelineGround *ground = frame->ground;
 
     TideNow tide = tide_now();
 
@@ -647,7 +654,7 @@ void shoreline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
         draw_birds(ctx, pal, tide.minutes);
     }
 
-    draw_water(ctx, bounds, pal, tide.base);
+    draw_water(ctx, bounds, pal, ground, tide.base);
 
     // the reflection only exists while there is something up there to cast it
     if (frame->sky.celestial != CEL_HIDDEN && frame->disc.y < HORIZON_Y)
@@ -655,11 +662,11 @@ void shoreline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
         draw_glitter(ctx, pal, frame->disc, tide.base);
     }
 
-    draw_waves(ctx, pal, tide.base, frame->minute, choppy(frame->cond));
+    draw_waves(ctx, ground, tide.base, frame->minute, choppy(frame->cond));
 
-    draw_boat(ctx, pal, tide.base, tide.level, tide.rising, frame->minute);
+    draw_boat(ctx, pal, ground, tide.base, tide.level, tide.rising, frame->minute);
 
-    draw_surf(ctx, pal, tide.base);
+    draw_surf(ctx, ground, tide.base);
 }
 
 #if defined(PBL_ROUND)
@@ -669,7 +676,7 @@ void shoreline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame)
 
     // the pennant goes in front of the weather. the reading is the one thing on the face that has
     // to stay readable in every condition, and painted with the hull it sits behind the rain
-    draw_pennant(ctx, frame->palette, tide.base, tide.level, tide.rising, frame->minute);
+    draw_pennant(ctx, frame->palette, frame->ground, tide.base, tide.level, tide.rising, frame->minute);
 }
 #endif
 

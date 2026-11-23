@@ -307,13 +307,14 @@ static const GPoint s_tufts[] = {
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  */
-static void draw_trail(GContext *ctx, const RidgelinePalette *pal)
+static void draw_trail(GContext *ctx, const CommonPalette *pal, const RidgelineGround *ground)
 {
     // a path is bare ground, so it clears a margin through the speckle and the dashes are laid in
     // that. drawn straight onto the meadow a hairline disappears into it, and anything bolder
     // stops being a path through a field and becomes a road
-    graphics_context_set_stroke_color(ctx, pal->land);
+    graphics_context_set_stroke_color(ctx, ground->land);
     graphics_context_set_stroke_width(ctx, 5);
     line_polyline(ctx, s_trail, ARRAY_LENGTH(s_trail));
 
@@ -334,13 +335,13 @@ static void draw_trail(GContext *ctx, const RidgelinePalette *pal)
  * The board is filled with the sky and lettered in ink, because ink over sky is the one pairing
  * the palette guarantees: every line in this scene is drawn that way. Filling with the land
  * instead leaves the reading nearly invisible wherever a theme pairs dark ground with dark
- * linework, which several of them do by day. The post is ground rather than sky, so it takes the
- * clock's colour, which is the pairing guaranteed over the ground.
+ * linework, which several of them do by day. The post stands on the ground rather than against the
+ * sky, so it takes the dim every other mark on the ground does.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
  */
-static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
+static void draw_trail_sign(GContext *ctx, const CommonPalette *pal)
 {
     // no location and no reading means no sign at all, post included, rather than a board
     // lettered "--". a trail with nothing to say carries no sign
@@ -354,7 +355,7 @@ static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
     GRect board = GRect(SIGN_X - (width + SIGN_PAD * 2) / 2, SIGN_BOARD_Y, width + SIGN_PAD * 2, SIGN_BOARD_H);
 
     // the post first, so the board's own outline closes over the top of it
-    graphics_context_set_stroke_color(ctx, pal->text);
+    graphics_context_set_stroke_color(ctx, pal->dim);
     graphics_context_set_stroke_width(ctx, 3);
     graphics_draw_line(ctx, GPoint(SIGN_X, board.origin.y + board.size.h), GPoint(SIGN_X, SIGN_BASE_Y));
     graphics_context_set_stroke_width(ctx, 1);
@@ -369,18 +370,19 @@ static void draw_trail_sign(GContext *ctx, const RidgelinePalette *pal)
 
 void ridgeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const RidgelinePalette *pal = frame->palette;
+    const CommonPalette *pal = frame->palette;
+    const RidgelineGround *ground = frame->ground;
 
     // snow lies where snow falls, so it caps the peaks only when it is snowing
     bool snow = sketchbook_cond_snows(frame->cond);
 
-    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, pal->land_far, pal->ink, snow, 12);
-    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, pal->land, pal->ink, snow, 20);
+    draw_ridge(ctx, s_far_pts, ARRAY_LENGTH(s_far_pts), FAR_CREST, ground->land_far, pal->ink, snow, 12);
+    draw_ridge(ctx, s_near_pts, ARRAY_LENGTH(s_near_pts), NEAR_CREST, ground->land, pal->ink, snow, 20);
 
 #if defined(PBL_ROUND)
     // grass on the ground the trail crosses, in the colour the palette guarantees down there
     marks_tufts(ctx, s_tufts, ARRAY_LENGTH(s_tufts), pal->dim);
-    draw_trail(ctx, pal);
+    draw_trail(ctx, pal, ground);
 #endif
 }
 

@@ -1,12 +1,11 @@
 /**
  * @file treeline.h
- * @brief The Treeline scene's palette: one set of colours per theme, in a day and a night variant.
+ * @brief The Treeline scene's ground: what the firs, the cabin, and the clearing are painted with,
+ * per theme, by day and by night.
  *
- * Treeline draws its whole background, so a theme is a palette rather than a baked bitmap. Each
- * theme carries two of them and the scene swaps between them as the sun goes down, which is what
- * makes the same clearing read as morning or midnight. The common block at the top is what the
- * shared sky and weather code paints with, and the fields below are the forest and cabin this
- * scene adds.
+ * Treeline draws its whole background, so a theme is a palette rather than a baked bitmap. The sky
+ * over it is the shared one in palette.h. This is the forest under it, which the scene swaps along
+ * with the sky as the sun goes down.
  *
  * @ingroup watchface-sketchbook
  */
@@ -21,34 +20,33 @@
  */
 
 /**
- * @brief Every colour the Treeline scene paints with.
+ * @brief The colours of Treeline's forest and clearing.
  *
- * Split by what a colour sits *on* rather than by what draws it: `ink` is linework over the
- * sky, `text` is the clock down on the ground, and the two are rarely the same once the forest
- * floor is dark.
+ * Linework goes over the sky in `ink`, and the clock sits down on the clearing floor in `text`. The
+ * two are rarely the same once the forest floor is dark.
  */
-typedef struct TreelinePalette
+typedef struct TreelineGround
 {
-    SKETCHBOOK_PALETTE_COMMON
-    GColor tree_far; ///< The back treeline, small and crowded
-    GColor tree;     ///< The near treeline, the big firs at the clearing's edge
-    GColor ground;   ///< The clearing floor, the field the clock sits on
-    GColor cabin;    ///< The cabin's log walls
-    GColor roof;     ///< Its roof, and the chimney
-    GColor glow;     ///< The lit window after dark
-    GColor smoke;    ///< The plume off the chimney
-} TreelinePalette;
+    GroundReadouts readouts; ///< The clock and the marks on the clearing floor
+    GColor tree_far;         ///< The back treeline, small and crowded
+    GColor tree;             ///< The near treeline, the big firs at the clearing's edge
+    GColor ground;           ///< The clearing floor, the field the clock sits on
+    GColor cabin;            ///< The cabin's log walls
+    GColor roof;             ///< Its roof, and the chimney
+    GColor glow;             ///< The lit window after dark
+    GColor smoke;            ///< The plume off the chimney
+} TreelineGround;
 
 /**
- * @brief The palette for a theme at this hour of the day.
+ * @brief The ground for a theme at this hour of the day.
  *
  * An out-of-range theme falls back to Sketchbook, matching how the settings parser clamps.
  *
  * @param theme The palette on screen, which Shuffle or the night or Quiet Time palette can pick.
- * @param night True for the after-dark palette.
- * @return The palette to paint with. It comes back as a const void * so the scene table can hold
- * every scene's palette lookup alike, and the scene casts it to a TreelinePalette.
+ * @param night True for the after-dark ground.
+ * @return The ground row. It comes back as a const void * so the scene table can hold every scene's
+ * ground lookup alike, and the scene casts it to a TreelineGround.
  */
-const void *treeline_palette_for_theme(uint8_t theme, bool night);
+const void *treeline_ground_for_theme(uint8_t theme, bool night);
 
 /** @} */

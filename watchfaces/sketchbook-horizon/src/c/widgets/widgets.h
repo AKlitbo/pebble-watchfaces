@@ -27,12 +27,14 @@
 /**
  * @brief Draw the battery gauge: an outline with five level-coloured segments.
  *
+ * The outline goes in the bar's ink, and the segments warn in the palette's battery colours as the
+ * charge runs down.
+ *
  * @param ctx The graphics context.
- * @param ink The colour to draw it in when the charge is healthy.
- * @param theme The palette on screen, which decides whether the low-charge warning colours apply.
+ * @param pal The palette on screen.
  * @param level Battery charge level percentage.
  */
-void widgets_draw_battery(GContext *ctx, GColor ink, uint8_t theme, int level);
+void widgets_draw_battery(GContext *ctx, const CommonPalette *pal, int level);
 
 /**
  * @brief Paint the dark strip the chrome sits on, across the top of the screen.

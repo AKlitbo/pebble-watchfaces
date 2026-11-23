@@ -285,16 +285,18 @@ static void draw_treeline(GContext *ctx, const Fir *firs, int count, int base,
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param night True once the sun is down, which lights the window.
  * @param snow True to lay snow along the roof.
  */
-static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bool snow)
+static void draw_cabin(GContext *ctx, const CommonPalette *pal, const TreelineGround *ground,
+    bool night, bool snow)
 {
     graphics_context_set_stroke_width(ctx, 1);
 
     // walls
     GRect walls = GRect(CABIN_LEFT, CABIN_WALL_TOP, CABIN_RIGHT - CABIN_LEFT, NEAR_BASE - CABIN_WALL_TOP);
-    graphics_context_set_fill_color(ctx, pal->cabin);
+    graphics_context_set_fill_color(ctx, ground->cabin);
     graphics_fill_rect(ctx, walls, 0, GCornerNone);
 
     // the logs, a few lines across the wall rather than a drawn stack of them
@@ -306,7 +308,7 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
     graphics_draw_rect(ctx, walls);
 
     // the roof, overhanging both walls. filled row by row so the eaves stay square
-    graphics_context_set_stroke_color(ctx, pal->roof);
+    graphics_context_set_stroke_color(ctx, ground->roof);
     int span = CABIN_RIGHT - CABIN_LEFT + 10;
     for (int y = CABIN_RIDGE; y <= CABIN_WALL_TOP; y++)
     {
@@ -329,7 +331,7 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
     }
 
     // the door
-    graphics_context_set_fill_color(ctx, pal->roof);
+    graphics_context_set_fill_color(ctx, ground->roof);
     GRect door = GRect(CABIN_LEFT + CABIN_DOOR_DX, NEAR_BASE - CABIN_DOOR_H, CABIN_DOOR_W, CABIN_DOOR_H);
     graphics_fill_rect(ctx, door, 0, GCornerNone);
     graphics_context_set_stroke_color(ctx, pal->ink);
@@ -337,7 +339,7 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
 
     // and the window, which is the whole point of the cabin after dark
     GRect pane = GRect(CABIN_LEFT + CABIN_WIN_DX, NEAR_BASE - CABIN_WIN_H - 4, CABIN_WIN_W, CABIN_WIN_H);
-    graphics_context_set_fill_color(ctx, night ? pal->glow : pal->roof);
+    graphics_context_set_fill_color(ctx, night ? ground->glow : ground->roof);
     graphics_fill_rect(ctx, pane, 0, GCornerNone);
     graphics_draw_rect(ctx, pane);
     graphics_draw_line(ctx, GPoint(pane.origin.x + pane.size.w / 2, pane.origin.y),
@@ -356,19 +358,21 @@ static void draw_cabin(GContext *ctx, const TreelinePalette *pal, bool night, bo
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
+ * @param ground The scene's ground row.
  * @param lean Which way and how hard the wind pushes, -100 to 100.
  * @param strength How much of the full bend the wind speed is worth, 0 to 100.
  */
-static void draw_smoke(GContext *ctx, const TreelinePalette *pal, int lean, int strength)
+static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGround *ground,
+    int lean, int strength)
 {
     // the chimney itself, standing proud of the roof
-    graphics_context_set_fill_color(ctx, pal->roof);
+    graphics_context_set_fill_color(ctx, ground->roof);
     graphics_fill_rect(ctx, GRect(STACK_X - 4, STACK_TOP, 8, STACK_BOTTOM - STACK_TOP), 0, GCornerNone);
     graphics_context_set_stroke_color(ctx, pal->ink);
     graphics_context_set_stroke_width(ctx, 1);
     graphics_draw_rect(ctx, GRect(STACK_X - 4, STACK_TOP, 8, STACK_BOTTOM - STACK_TOP));
 
-    graphics_context_set_fill_color(ctx, pal->smoke);
+    graphics_context_set_fill_color(ctx, ground->smoke);
 
     // a wind blowing straight at you or straight away has no sideways part, so lean alone would
     // draw a gale out of the south exactly like a dead calm. strength gets its own say: it tears
@@ -406,7 +410,7 @@ static void draw_smoke(GContext *ctx, const TreelinePalette *pal, int lean, int 
  * @param ctx The graphics context.
  * @param pal The palette in use.
  */
-static void draw_temp_board(GContext *ctx, const TreelinePalette *pal)
+static void draw_temp_board(GContext *ctx, const CommonPalette *pal)
 {
     // no location and no reading means no board at all, rather than a plaque lettered "--".
     // a blank cabin front is a cabin, an empty sign is a fault
@@ -436,9 +440,9 @@ static void draw_temp_board(GContext *ctx, const TreelinePalette *pal)
 #endif
 
 /** @brief Lay down the clearing floor the clock sits on. */
-static void draw_ground(GContext *ctx, GRect bounds, const TreelinePalette *pal)
+static void draw_ground(GContext *ctx, GRect bounds, const TreelineGround *ground)
 {
-    graphics_context_set_fill_color(ctx, pal->ground);
+    graphics_context_set_fill_color(ctx, ground->ground);
     graphics_fill_rect(ctx, GRect(0, GROUND_Y, bounds.size.w, bounds.size.h - GROUND_Y), 0, GCornerNone);
 }
 
@@ -471,7 +475,7 @@ static const GPoint s_path[] = {
  * @param ctx The graphics context.
  * @param pal The palette in use.
  */
-static void draw_litter(GContext *ctx, const TreelinePalette *pal)
+static void draw_litter(GContext *ctx, const CommonPalette *pal)
 {
     graphics_context_set_stroke_color(ctx, pal->dim);
     graphics_context_set_stroke_width(ctx, 1);
@@ -493,7 +497,8 @@ static void draw_litter(GContext *ctx, const TreelinePalette *pal)
 
 void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
 {
-    const TreelinePalette *pal = frame->palette;
+    const CommonPalette *pal = frame->palette;
+    const TreelineGround *ground = frame->ground;
 
     // the wind as the plume sees it: which way it pushes, and how much of the full bend the
     // speed is worth. no reading leaves the column standing straight up
@@ -501,17 +506,17 @@ void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame)
     int strength = pct_of(weather_store_wind_kmh(), WIND_FULL_KMH);
 
     // the smoke rises through the sky, so it goes down before the trees it drifts behind
-    draw_smoke(ctx, pal, lean, strength);
+    draw_smoke(ctx, pal, ground, lean, strength);
 
     // snow lies where snow falls, so it rides the firs and the roof only when it is snowing
     bool snow = sketchbook_cond_snows(frame->cond);
 
-    draw_treeline(ctx, s_far, ARRAY_LENGTH(s_far), FAR_BASE, pal->tree_far, pal->ink, snow);
-    draw_ground(ctx, bounds, pal);
+    draw_treeline(ctx, s_far, ARRAY_LENGTH(s_far), FAR_BASE, ground->tree_far, pal->ink, snow);
+    draw_ground(ctx, bounds, ground);
 
-    draw_cabin(ctx, pal, frame->night, snow);
+    draw_cabin(ctx, pal, ground, frame->night, snow);
 
-    draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, pal->tree, pal->ink, snow);
+    draw_treeline(ctx, s_near, ARRAY_LENGTH(s_near), NEAR_BASE, ground->tree, pal->ink, snow);
 
 #if defined(PBL_ROUND)
     draw_litter(ctx, pal);

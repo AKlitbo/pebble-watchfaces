@@ -7,10 +7,11 @@
  * differ in what stands under it and where the clock and readouts sit.
  *
  * The shared engine is in `sky/`, `fx/`, `widgets/`, `theme/palette*` and `fx/conditions`. It paints
- * with a `CommonPalette`, the nine fields every scene's palette leads with, and reads where a scene's
- * sky and weather sit from a `SceneGeometry` the active scene hands over through
- * `sketchbook_scene_geometry` (see `scene/geometry.h`). One scene is up at a time, so that geometry
- * and that palette are all the shared code needs.
+ * with a `CommonPalette`, the shared sky for the theme put together with the clock and readout
+ * colours from the scene's ground, and reads where a scene's sky and weather sit from a
+ * `SceneGeometry` the active scene hands over through `sketchbook_scene_geometry` (see
+ * `scene/geometry.h`). One scene is up at a time, so that geometry and that palette are all the
+ * shared code needs.
  *
  * The layout engine in `layout/engine` paints every frame the same way. It reads the clock, the
  * sun and the condition once into a `SceneFrame` (see `scene/frame.h`), paints the sky and the
@@ -18,10 +19,10 @@
  * it back for anything the scene stands in front of the weather.
  *
  * A scene lives in two files: `scene/<name>` draws its ground and supplies its geometry and stars,
- * and `theme/<name>` holds its palette type and the day and night table for every theme. Every
- * scene is one row of the table in `scene/scene`, and the engine runs whichever row the Scene
- * setting names. Adding a scene is a new SceneId, its row in that table, and its own files: nothing
- * in the shared engine moves.
+ * and `theme/<name>` holds its ground type and the day and night table for every theme. The sky
+ * over every scene is one table in `theme/palette`. Every scene is one row of the table in
+ * `scene/scene`, and the engine runs whichever row the Scene setting names. Adding a scene is a new
+ * SceneId, its row in that table, and its own files: nothing in the shared engine moves.
  *
  * @{
  * @}

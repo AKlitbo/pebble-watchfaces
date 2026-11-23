@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Changed the Forest palette's daytime outlines from dark green to black on the Ridgeline and Shoreline scenes. They now stand out against the pale sky, as they do on the other scenes.
+- Changed the battery gauge, the Bluetooth and Quiet Time icons, and the date when it sits in the status bar to light grey under the Mono palette by day on the Ridgeline scene. They now match the other scenes.
+- Changed the trail sign's post on the Ridgeline scene to the colour of the other marks on the ground on the Pebble Round 2.
+- Changed the wake around the buoy on the Skyline scene to the colour of the ripples on the river on the Pebble Round 2.
+
 ### Fixed
 
 - Fixed the stats row's icons and numbers coming apart when the heart rate came or went, and the temperature and steps staying in the middle of the row after the heart rate came back on the Ridgeline, Shoreline, Skyline, and Treeline scenes.

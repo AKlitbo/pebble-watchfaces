@@ -27,7 +27,7 @@
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param frame This frame's reading. Its palette is a TreelinePalette.
+ * @param frame This frame's reading. Its ground row is a TreelineGround.
  */
 void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
 
@@ -37,7 +37,7 @@ void treeline_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
  *
  * @param ctx The graphics context.
  * @param bounds The window's root bounds.
- * @param frame This frame's reading. Its palette is a TreelinePalette.
+ * @param frame This frame's reading. Its ground row is a TreelineGround.
  */
 void treeline_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif

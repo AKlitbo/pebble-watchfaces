@@ -34,8 +34,8 @@ typedef enum
 } SceneId;
 
 /**
- * @brief One scene, as data: where its sky and weather sit, its palette, its own draws, and the row
- * its Clock Only clock sits on.
+ * @brief One scene, as data: where its sky and weather sit, its ground colours, its own draws, and
+ * the row its Clock Only clock sits on.
  *
  * The geometry is read by the shared sky and weather code, and the rest by the layout engine (see
  * layout/engine.h), both while this scene is up.
@@ -46,14 +46,14 @@ typedef enum
  * such as the holder a round screen letters the temperature on, so the reading stays clear in
  * every condition.
  *
- * The palette is passed as `const void *` because each scene has its own palette type with its own
- * extra fields. The engine only ever reads the shared block, so it casts to CommonPalette, and the
- * scene's own draws cast back to its full palette.
+ * The ground row is passed as `const void *` because each scene has its own ground type with its
+ * own fields. Every one leads with its GroundReadouts, which is all the engine reads from it, and
+ * the scene's own draws cast back to the full row.
  */
 typedef struct SceneDef
 {
-    const SceneGeometry *geometry;                                 ///< Where its sky and weather sit
-    const void *(*palette_for_theme)(uint8_t theme, bool night);  ///< Its palette for the hour
+    const SceneGeometry *geometry;                                ///< Where its sky and weather sit
+    const void *(*ground_for_theme)(uint8_t theme, bool night);  ///< Its ground row for the hour
     SceneDraw ground;      ///< Paint its ground and props, between the clouds and the weather
     SceneDraw front;       ///< Paint what stands in front of the weather, or NULL for nothing
     int16_t clock_only_y;  ///< Top of the Clock Only clock's box on the rectangle

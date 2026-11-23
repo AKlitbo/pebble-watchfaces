@@ -6,8 +6,8 @@
  * rotates through them all on a cadence. Day/Night/Quiet keeps the chosen one by day and swaps to a
  * different one after dark or during Quiet Time, each of those an override the wearer can turn off.
  *
- * This works out the theme index. The face still passes that index through `palette_for_theme` with
- * the daylight, so whichever theme is up still shows its own day or night colours.
+ * This works out the theme index. The face still pairs that index with the daylight when it puts the
+ * palette together, so whichever theme is up still shows its own day or night colours.
  *
  * @ingroup watchface-sketchbook
  */
@@ -66,7 +66,7 @@ typedef struct
  * @param yday Days into the year, 0 to 365, as tm_yday.
  * @param hour The hour, 0 to 23, as tm_hour.
  * @param minute The minute, 0 to 59, as tm_min.
- * @return The theme index, which the face still pairs with the daylight in palette_for_theme.
+ * @return The theme index, which the face still pairs with the daylight in sketchbook_palette_assemble.
  */
 uint8_t sketchbook_active_theme(const PalettePick *pick, int year, int yday, int hour, int minute);
 

@@ -1,164 +1,99 @@
 /**
  * @file ridgeline.c
- * @brief The Ridgeline palette table: a day and a night set of colours for every theme.
+ * @brief The Ridgeline ground table: the land under the shared sky, by day and by night, for every
+ * theme.
  *
  * @ingroup watchface-sketchbook
  */
 #include "theme/ridgeline.h"
+
+#include <stddef.h>
 
 /**
  * @addtogroup watchface-sketchbook
  * @{
  */
 
-// day palettes. the sky is light, so the linework goes dark and the clock goes light against
-// the land it sits on
-static const RidgelinePalette s_day[THEME_COUNT] = {
+// the engine reads the readouts through a GroundReadouts pointer, so they have to lead the row
+_Static_assert(offsetof(RidgelineGround, readouts) == 0, "the readouts lead the ground row");
+
+// by day the clock goes light against the land it sits on
+static const RidgelineGround s_day[THEME_COUNT] = {
     [THEME_SKETCHBOOK] = {
-        .sky_hi = GColorWhite,        .sky_lo = GColorWhite,
-        .land_far = GColorLightGray,  .land   = GColorWhite,
-        .ink    = GColorBlack,        .text   = GColorBlack,
-        .dim    = GColorDarkGray,     .disc   = GColorYellow,
-        .cloud  = GColorWhite,        .precip = GColorBlue,
-        .bar_ink = GColorWhite,
+        .readouts = {.text = GColorBlack, .dim = GColorDarkGray},
+        .land_far = GColorLightGray,    .land     = GColorWhite,
     },
     [THEME_DAYBREAK] = {
-        .sky_hi = GColorVividCerulean, .sky_lo = GColorCeleste,
-        .land_far = GColorJaegerGreen, .land   = GColorDarkGreen,
-        .ink    = GColorBlack,         .text   = GColorWhite,
-        .dim    = GColorMintGreen,     .disc   = GColorYellow,
-        .cloud  = GColorWhite,         .precip = GColorBlueMoon,
-        .bar_ink = GColorMintGreen,
+        .readouts = {.text = GColorWhite, .dim = GColorMintGreen},
+        .land_far = GColorJaegerGreen,  .land     = GColorDarkGreen,
     },
     [THEME_ALPENGLOW] = {
-        .sky_hi = GColorOrange,        .sky_lo = GColorRajah,
-        .land_far = GColorRoseVale,    .land   = GColorBulgarianRose,
-        .ink    = GColorBlack,         .text   = GColorRajah,
-        .dim    = GColorMelon,         .disc   = GColorYellow,
-        .cloud  = GColorMelon,         .precip = GColorElectricBlue,
-        .bar_ink = GColorMelon,
+        .readouts = {.text = GColorRajah, .dim = GColorMelon},
+        .land_far = GColorRoseVale,     .land     = GColorBulgarianRose,
     },
     [THEME_BLUEPRINT] = {
-        .sky_hi = GColorDukeBlue,      .sky_lo = GColorCobaltBlue,
-        .land_far = GColorCobaltBlue,  .land   = GColorOxfordBlue,
-        .ink    = GColorWhite,         .text   = GColorWhite,
-        .dim    = GColorBabyBlueEyes,  .disc   = GColorWhite,
-        .cloud  = GColorCobaltBlue,    .precip = GColorBabyBlueEyes,
-        .bar_ink = GColorBabyBlueEyes,
+        .readouts = {.text = GColorWhite, .dim = GColorBabyBlueEyes},
+        .land_far = GColorCobaltBlue,   .land     = GColorOxfordBlue,
     },
     [THEME_FOREST] = {
-        .sky_hi = GColorCeleste,       .sky_lo = GColorMintGreen,
-        .land_far = GColorArmyGreen,   .land   = GColorMidnightGreen,
-        .ink    = GColorDarkGreen,     .text   = GColorSpringBud,
-        .dim    = GColorInchworm,      .disc   = GColorIcterine,
-        .cloud  = GColorWhite,         .precip = GColorTiffanyBlue,
-        .bar_ink = GColorInchworm,
+        .readouts = {.text = GColorSpringBud, .dim = GColorInchworm},
+        .land_far = GColorArmyGreen,    .land     = GColorMidnightGreen,
     },
     [THEME_MONO] = {
-        // the sun goes solid black here rather than pale: a white disc on white paper would
-        // leave nothing but its outline, and the rays are drawn in the disc colour
-        .sky_hi = GColorWhite,         .sky_lo = GColorWhite,
-        .land_far = GColorLightGray,   .land   = GColorDarkGray,
-        .ink    = GColorBlack,         .text   = GColorWhite,
-        .dim    = GColorWhite,         .disc   = GColorBlack,
-        .cloud  = GColorLightGray,     .precip = GColorBlack,
-        .bar_ink = GColorWhite,
+        .readouts = {.text = GColorWhite, .dim = GColorWhite},
+        .land_far = GColorLightGray,    .land     = GColorDarkGray,
     },
     [THEME_CYBERPUNK] = {
-        // daylight here is smog, not weather: a sick yellow sky over a city that never
-        // switches its signage off, so the readouts stay on neon rather than going dark
-        .sky_hi = GColorYellow,        .sky_lo = GColorChromeYellow,
-        .land_far = GColorImperialPurple, .land = GColorBlack,
-        .ink    = GColorBlack,         .text   = GColorCyan,
-        .dim    = GColorMagenta,       .disc   = GColorWhite,
-        .cloud  = GColorRajah,         .precip = GColorCyan,
-        .bar_ink = GColorMagenta,
+        // a city that never switches its signage off, so the readouts stay on neon
+        .readouts = {.text = GColorCyan, .dim = GColorMagenta},
+        .land_far = GColorImperialPurple, .land     = GColorBlack,
     },
     [THEME_NEO_TOKYO] = {
-        // a pale hazy sky with a flat red sun over slate ridges
-        .sky_hi = GColorLightGray,     .sky_lo = GColorWhite,
-        .land_far = GColorCadetBlue,   .land   = GColorOxfordBlue,
-        .ink    = GColorBlack,         .text   = GColorWhite,
-        .dim    = GColorSunsetOrange,  .disc   = GColorRed,
-        .cloud  = GColorWhite,         .precip = GColorCobaltBlue,
-        .bar_ink = GColorSunsetOrange,
+        // slate ridges under the haze
+        .readouts = {.text = GColorWhite, .dim = GColorSunsetOrange},
+        .land_far = GColorCadetBlue,    .land     = GColorOxfordBlue,
     },
 };
 
-// night palettes. the sky drops to near-black, so the linework turns pale and the land goes
-// dark enough for a light clock to sit straight on it
-static const RidgelinePalette s_night[THEME_COUNT] = {
+// after dark the land goes dark enough for a light clock to sit straight on it
+static const RidgelineGround s_night[THEME_COUNT] = {
     [THEME_SKETCHBOOK] = {
-        .sky_hi = GColorBlack,         .sky_lo = GColorOxfordBlue,
-        .land_far = GColorOxfordBlue,  .land   = GColorBlack,
-        .ink    = GColorWhite,         .text   = GColorWhite,
-        .dim    = GColorLightGray,     .disc   = GColorPastelYellow,
-        .cloud  = GColorDarkGray,      .precip = GColorElectricBlue,
-        .bar_ink = GColorLightGray,
+        .readouts = {.text = GColorWhite, .dim = GColorLightGray},
+        .land_far = GColorOxfordBlue,   .land     = GColorBlack,
     },
     [THEME_DAYBREAK] = {
-        .sky_hi = GColorBlack,         .sky_lo = GColorOxfordBlue,
-        .land_far = GColorDukeBlue,    .land   = GColorBlack,
-        .ink    = GColorCobaltBlue,    .text   = GColorWhite,
-        .dim    = GColorBabyBlueEyes,  .disc   = GColorWhite,
-        .cloud  = GColorDarkGray,      .precip = GColorElectricBlue,
-        .bar_ink = GColorBabyBlueEyes,
+        .readouts = {.text = GColorWhite, .dim = GColorBabyBlueEyes},
+        .land_far = GColorDukeBlue,     .land     = GColorBlack,
     },
     [THEME_ALPENGLOW] = {
-        .sky_hi = GColorBlack,             .sky_lo = GColorIndigo,
-        .land_far = GColorImperialPurple,  .land   = GColorBlack,
-        .ink    = GColorPurpureus,         .text   = GColorMelon,
-        .dim    = GColorRichBrilliantLavender, .disc = GColorPastelYellow,
-        .cloud  = GColorImperialPurple,    .precip = GColorLavenderIndigo,
-        .bar_ink = GColorRichBrilliantLavender,
+        .readouts = {.text = GColorMelon, .dim = GColorRichBrilliantLavender},
+        .land_far = GColorImperialPurple, .land     = GColorBlack,
     },
     [THEME_BLUEPRINT] = {
-        .sky_hi = GColorBlack,         .sky_lo = GColorOxfordBlue,
-        .land_far = GColorOxfordBlue,  .land   = GColorBlack,
-        .ink    = GColorBabyBlueEyes,  .text   = GColorWhite,
-        .dim    = GColorPictonBlue,    .disc   = GColorWhite,
-        .cloud  = GColorOxfordBlue,    .precip = GColorPictonBlue,
-        .bar_ink = GColorPictonBlue,
+        .readouts = {.text = GColorWhite, .dim = GColorPictonBlue},
+        .land_far = GColorOxfordBlue,   .land     = GColorBlack,
     },
     [THEME_FOREST] = {
-        .sky_hi = GColorBlack,         .sky_lo = GColorMidnightGreen,
-        .land_far = GColorArmyGreen,   .land   = GColorBlack,
-        .ink    = GColorJaegerGreen,   .text   = GColorSpringBud,
-        .dim    = GColorMayGreen,      .disc   = GColorPastelYellow,
-        .cloud  = GColorArmyGreen,     .precip = GColorTiffanyBlue,
-        .bar_ink = GColorMayGreen,
+        .readouts = {.text = GColorSpringBud, .dim = GColorMayGreen},
+        .land_far = GColorArmyGreen,    .land     = GColorBlack,
     },
     [THEME_MONO] = {
-        .sky_hi = GColorBlack,         .sky_lo = GColorBlack,
-        .land_far = GColorDarkGray,    .land   = GColorBlack,
-        .ink    = GColorWhite,         .text   = GColorWhite,
-        .dim    = GColorLightGray,     .disc   = GColorWhite,
-        .cloud  = GColorDarkGray,      .precip = GColorWhite,
-        .bar_ink = GColorLightGray,
+        .readouts = {.text = GColorWhite, .dim = GColorLightGray},
+        .land_far = GColorDarkGray,     .land     = GColorBlack,
     },
     [THEME_CYBERPUNK] = {
-        // the one it is really for: magenta linework and a cyan moon over black, with the
-        // clock in cyan so the two neons split the screen between them
-        .sky_hi = GColorBlack,         .sky_lo = GColorIndigo,
-        .land_far = GColorJazzberryJam, .land  = GColorBlack,
-        .ink    = GColorMagenta,       .text   = GColorCyan,
-        .dim    = GColorMagenta,       .disc   = GColorCyan,
-        .cloud  = GColorImperialPurple, .precip = GColorCyan,
-        .bar_ink = GColorMagenta,
+        // the clock in cyan, so it splits the screen with the magenta linework
+        .readouts = {.text = GColorCyan, .dim = GColorMagenta},
+        .land_far = GColorJazzberryJam, .land     = GColorBlack,
     },
     [THEME_NEO_TOKYO] = {
-        // red neon bleeding up off the city into a deep blue night, with a cold white moon
-        // over it. warmer and quieter than Cyberpunk, and it keeps white for the clock
-        .sky_hi = GColorBlack,         .sky_lo = GColorOxfordBlue,
-        .land_far = GColorBulgarianRose, .land = GColorBlack,
-        .ink    = GColorRed,           .text   = GColorWhite,
-        .dim    = GColorSunsetOrange,  .disc   = GColorWhite,
-        .cloud  = GColorBulgarianRose, .precip = GColorSunsetOrange,
-        .bar_ink = GColorSunsetOrange,
+        // red neon bleeding up off the ridges, and it keeps white for the clock
+        .readouts = {.text = GColorWhite, .dim = GColorSunsetOrange},
+        .land_far = GColorBulgarianRose, .land     = GColorBlack,
     },
 };
 
-const void *ridgeline_palette_for_theme(uint8_t theme, bool night)
+const void *ridgeline_ground_for_theme(uint8_t theme, bool night)
 {
     if (theme >= THEME_COUNT)
     {
