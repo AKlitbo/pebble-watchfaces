@@ -12,7 +12,7 @@ A hand-drawn landscape watchface for the Pebble Time 2 and the Pebble Round 2, w
 
 ## Features
 
-- Five scenes: Ridgeline, Shoreline, Skyline, Treeline, and Mount Fuji, a landmark scene with the mountain over a lake.
+- Six scenes: Ridgeline, Shoreline, Skyline, and Treeline, and the landmarks Mount Fuji, with the mountain over a lake, and Giza, with the pyramids over the desert.
 - A sky that follows the real sunrise and sunset, with the moon at tonight's phase.
 - Weather drawn into the scene, from snow on the peaks to a choppy sea and the cabin's smoke leaning with the wind.
 - Eight palettes, each with a day and a night version.
@@ -35,7 +35,7 @@ Open Sketchbook Horizon's settings in the Pebble app.
 
 | Section | Setting | What It Does |
 | :-- | :-- | :-- |
-| Appearance | Scene | Ridgeline, Shoreline, Skyline, Treeline, or Mount Fuji. Ridgeline by default. |
+| Appearance | Scene | Ridgeline, Shoreline, Skyline, Treeline, Mount Fuji, or Giza. Ridgeline by default. |
 | Appearance | Scene Palette | One of eight, with a preview of each under the picker. Sketchbook by default. |
 | Appearance | Palette Mode | Fixed, the default, keeps the Scene Palette. Shuffle rotates through all eight. Day / Night / Quiet can swap in another after dark or during Quiet Time. |
 | Appearance | Shuffle Every | How long each palette stays up in Shuffle mode, from 15 minutes to a day. Hour by default. |

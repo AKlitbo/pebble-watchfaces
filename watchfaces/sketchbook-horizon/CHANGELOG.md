@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added a Mount Fuji scene, with the mountain over a lake. On the Pebble Round 2 the temperature rides on a boat's sail.
+- Added a Giza scene, with the three pyramids over the desert. On the Pebble Round 2 the temperature sits in a cartouche on a stone stele.
 
 ### Changed
 

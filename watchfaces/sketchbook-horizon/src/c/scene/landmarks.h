@@ -9,9 +9,9 @@
  * clock keeps the colours that palette picked for it.
  *
  * A landmark is drawn for the rectangle and carried to the round screen through LM_X and LM_Y,
- * which spread the picture to the wider glass and drop it to the round horizon. A width goes
- * through LM_W, which scales it the same way without moving it. What the round screen adds, the
- * holder that carries the temperature, is placed for it directly.
+ * which spread the picture to the wider glass and drop it to the round horizon. A width or a height
+ * goes through LM_W and LM_H, which scale it the same way without moving it. What the round screen
+ * adds, the holder that carries the temperature, is placed for it directly.
  *
  * @ingroup watchface-sketchbook
  */
@@ -31,9 +31,11 @@
 #if defined(PBL_ROUND)
 #define LM_X(x) (((x) * 13) / 10)    ///< A column on the rectangle, spread to the round screen
 #define LM_Y(y) (((y) * 6) / 5 + 2)  ///< A row on the rectangle, dropped to the round screen
+#define LM_H(h) (((h) * 6) / 5)      ///< A height on the rectangle, scaled like a row without its 2px drop
 #else
 #define LM_X(x) (x)
 #define LM_Y(y) (y)
+#define LM_H(h) (h)
 #endif
 #define LM_W(w) LM_X(w)  ///< A width on the rectangle, spread the same way a column is
 
@@ -59,6 +61,27 @@ void fuji_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
  * @param frame This frame's reading. Its ground row is a RidgelineGround.
  */
 void fuji_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
+
+/**
+ * @brief Paint the Giza scene's ground: the pyramids, the sand and its dunes, and the palms.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void giza_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather in the Giza scene: the stele with the
+ * temperature on it.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void giza_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif
 
 /** @} */
