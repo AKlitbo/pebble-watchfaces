@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Changed the wake around the buoy on the Skyline scene to the colour of the ripples on the river on the Pebble Round 2.
 - Changed the heart rate on the Pebble Time 2 to update at most every ten seconds during a workout, which saves battery. A new reading after a quiet spell still shows straight away.
 - Changed how the weather is drawn on every scene. Rain and snow now fall from under the clouds, and a passing shower rains only beneath its cloud. Rain falls in thin streaks, snow in small flakes, and drizzle in short ticks. The clouds are fuller, with shading along their undersides, and a thunderstorm strikes three bolts of different sizes, placed clear of each scene's peaks, towers, and falls.
+- Changed the chimney smoke on the Treeline scene to have a thin outline, so it shows against the night sky rather than fading into it.
 
 ### Fixed
 

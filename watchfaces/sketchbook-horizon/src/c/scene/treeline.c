@@ -27,6 +27,9 @@
 // flat, and a gale and a storm look the same from a chimney
 #define WIND_FULL_KMH 40
 
+#define SMOKE_EDGE 1   ///< how far the smoke's thin outline reaches past the smoke colour
+#define SMOKE_PUFFS 8  ///< the most puffs in the plume, in a dead calm
+
 // where the treelines stand and where the clearing floor starts. only what this scene draws for
 // itself lives here. where the sky, the weather and the arc sit is in the geometry below
 //
@@ -345,12 +348,27 @@ static void draw_cabin(GContext *ctx, const CommonPalette *pal, const TreelineGr
 }
 
 /**
+ * @brief How big a puff of smoke is. They swell as the column rises and loses its heat.
+ *
+ * @param puff Which puff, counting up from the chimney.
+ * @return Its radius in pixels.
+ */
+static int smoke_radius(int puff)
+{
+    return 3 + (puff * 2) / 3;
+}
+
+/**
  * @brief Draw the chimney and the smoke coming off it.
  *
  * The plume is the one part of the scene the wind reading drives. It leaves the stack upright
  * and bends over as it rises, because that is what the wind gets hold of: the drift grows with
  * the square of how far up a puff has got, so a light air only tips the top of the column while
  * a gale lays the whole thing flat.
+ *
+ * The plume goes down twice, a pixel fatter in the dim colour and then the smoke on top, which
+ * leaves it a thin outline. The chimney is drawn between the two, so it covers the outline where
+ * the smoke leaves the stack.
  *
  * @param ctx The graphics context.
  * @param pal The palette in use.
@@ -361,6 +379,44 @@ static void draw_cabin(GContext *ctx, const CommonPalette *pal, const TreelineGr
 static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGround *ground,
     int lean, int strength)
 {
+    // a wind blowing straight at you or straight away has no sideways part, so lean alone would
+    // draw a gale out of the south exactly like a dead calm. strength gets its own say: it tears
+    // the top off the column and shakes what is left, which is what a strong wind looks like
+    // from any quarter
+    int puffs = clamp_int(SMOKE_PUFFS - (strength * 3) / 100, 0, SMOKE_PUFFS);
+
+    GPoint centres[SMOKE_PUFFS];
+    int count = 0;
+
+    // spaced closer than their own width so they run together into one plume rather than
+    // beading up the sky, and swelling as the column loses its heat
+    for (int puff = 0; puff < puffs; puff++)
+    {
+        int rise = 4 + puff * 5;
+        int drift = (lean * strength * rise * rise) / 260000;
+        int shake = ((puff % 2) ? strength : -strength) * puff / 220;
+        int radius = smoke_radius(puff);
+        int y = STACK_TOP - rise;
+
+        if (y - radius - SMOKE_EDGE < 20)
+        {
+            break;  // gone into the status bar, which would clip it flat
+        }
+
+        centres[count] = GPoint(STACK_X + drift + shake, y);
+        count++;
+    }
+
+    // the whole plume goes down a pixel fatter in the dim colour first and the smoke on top, so
+    // the puffs merge into one thinly outlined column that still shows against a dark sky
+    // it goes down before the chimney, so the stack keeps its own clean edge where the smoke leaves
+    graphics_context_set_fill_color(ctx, pal->dim);
+
+    for (int i = 0; i < count; i++)
+    {
+        graphics_fill_circle(ctx, centres[i], smoke_radius(i) + SMOKE_EDGE);
+    }
+
     // the chimney itself, standing proud of the roof
     graphics_context_set_fill_color(ctx, ground->roof);
     graphics_fill_rect(ctx, GRect(STACK_X - 4, STACK_TOP, 8, STACK_BOTTOM - STACK_TOP), 0, GCornerNone);
@@ -370,28 +426,9 @@ static void draw_smoke(GContext *ctx, const CommonPalette *pal, const TreelineGr
 
     graphics_context_set_fill_color(ctx, ground->smoke);
 
-    // a wind blowing straight at you or straight away has no sideways part, so lean alone would
-    // draw a gale out of the south exactly like a dead calm. strength gets its own say: it tears
-    // the top off the column and shakes what is left, which is what a strong wind looks like
-    // from any quarter
-    int puffs = 8 - (strength * 3) / 100;
-
-    // spaced closer than their own width so they run together into one plume rather than
-    // beading up the sky, and swelling as the column loses its heat
-    for (int puff = 0; puff < puffs; puff++)
+    for (int i = 0; i < count; i++)
     {
-        int rise = 4 + puff * 5;
-        int drift = (lean * strength * rise * rise) / 260000;
-        int shake = ((puff % 2) ? strength : -strength) * puff / 220;
-        int radius = 3 + (puff * 2) / 3;
-        int y = STACK_TOP - rise;
-
-        if (y - radius < 20)
-        {
-            break;  // gone into the status bar, which would clip it flat
-        }
-
-        graphics_fill_circle(ctx, GPoint(STACK_X + drift + shake, y), radius);
+        graphics_fill_circle(ctx, centres[i], smoke_radius(i));
     }
 }
 
