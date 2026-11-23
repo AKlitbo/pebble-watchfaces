@@ -306,7 +306,10 @@ static bool moon_shadow_covers(int phase, GPoint at, int x, int y)
  */
 static void draw_moon(GContext *ctx, const CommonPalette *pal, GPoint at)
 {
-    int phase = moon_glyph_index(time(NULL), 8);
+    // the phase follows the time store's clock rather than time(NULL), so a dev build's pinned
+    // date shows its own moon. mktime turns the local clock back into the moment it stands for
+    struct tm now = *time_store_tm();
+    int phase = moon_glyph_index(mktime(&now), 8);
 
     graphics_context_set_fill_color(ctx, pal->disc);
     graphics_fill_circle(ctx, at, SKETCHBOOK_DISC_R);
