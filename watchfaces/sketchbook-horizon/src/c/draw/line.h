@@ -1,6 +1,7 @@
 /**
  * @file line.h
- * @brief Lines drawn from a table of points: a run joined end to end, and a dashed path.
+ * @brief Lines drawn from a table of points: a run joined end to end, loose pairs, and a dashed
+ * path.
  *
  * None of these pick a colour or a width. They draw with whatever stroke the context already has,
  * so the caller sets it first. That keeps one helper for a crest drawn 3px wide in ink and a river
@@ -28,6 +29,15 @@ typedef GPoint LineSegment[2];
  * @param count How many there are. Fewer than two draws nothing.
  */
 void line_polyline(GContext *ctx, const GPoint *pts, int count);
+
+/**
+ * @brief Draw each pair of points as its own stroke.
+ *
+ * @param ctx The graphics context, with its stroke colour and width already set.
+ * @param segments The pairs.
+ * @param count How many pairs there are.
+ */
+void line_segments(GContext *ctx, const LineSegment *segments, int count);
 
 /**
  * @brief Draw a run of points as a dashed path, so it reads as a trodden path rather than a drawn

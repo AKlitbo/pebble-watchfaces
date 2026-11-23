@@ -119,7 +119,7 @@ static void draw_scene(GContext *ctx, GRect bounds, const void *data)
     sketchbook_sky_draw(ctx, bounds, &frame);
 
     // clouds sit in front of the disc but behind the scene's ground, so a low sun still goes down
-    // behind the mountains, the sea or the city
+    // behind the mountains, the sea, the city or the landmark
     sketchbook_fx_draw_clouds(ctx, &frame);
 
     s_scene->ground(ctx, bounds, &frame);

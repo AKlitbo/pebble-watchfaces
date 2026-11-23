@@ -1,10 +1,11 @@
 /**
  * @addtogroup watchface-sketchbook
  *
- * One face, four scenes. The wearer picks a scene in settings (Ridgeline's mountains, Shoreline's
- * sea, Skyline's bridge, Treeline's forest) and the face draws that one. All four share the sky and
- * its sun and moon, the weather laid over them, the painted chrome, and the eight palettes, and
- * differ in what stands under it and where the clock and readouts sit.
+ * One face, many scenes. The wearer picks a scene in settings, one of the four landscapes
+ * (Ridgeline's mountains, Shoreline's sea, Skyline's bridge, Treeline's forest) or one of the
+ * landmarks, and the face draws that one. They all share the sky and its sun and moon, the weather
+ * laid over them, the painted chrome, and the eight palettes, and differ in what stands under it
+ * and where the clock and readouts sit.
  *
  * The shared engine is in `sky/`, `fx/`, `widgets/`, `theme/palette*` and `fx/conditions`. It paints
  * with a `CommonPalette`, the shared sky for the theme put together with the clock and readout
@@ -18,11 +19,12 @@
  * clouds, hands the frame to the scene to paint its ground, lays the weather over that, and hands
  * it back for anything the scene stands in front of the weather.
  *
- * A scene lives in two files: `scene/<name>` draws its ground and supplies its geometry and stars,
- * and `theme/<name>` holds its ground type and the day and night table for every theme. The sky
- * over every scene is one table in `theme/palette`. Every scene is one row of the table in
- * `scene/scene`, and the engine runs whichever row the Scene setting names. Adding a scene is a new
- * SceneId, its row in that table, and its own files: nothing in the shared engine moves.
+ * A landscape lives in two files: `scene/<name>` draws its ground and supplies its geometry and
+ * stars, and `theme/<name>` holds its ground type and the day and night table for every theme. The
+ * sky over every scene is one table in `theme/palette`. A landmark borrows Skyline's geometry and
+ * stars and Ridgeline's or Skyline's ground, so it is only a drawing. Every scene is one row of the
+ * table in `scene/scene`, and the engine runs whichever row the Scene setting names. Adding a scene
+ * is a new SceneId, its row in that table, and its own files: nothing in the shared engine moves.
  *
  * @{
  * @}

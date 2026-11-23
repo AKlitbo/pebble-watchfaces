@@ -7,7 +7,7 @@
         "APPEARANCE_PALETTE_MODE": 0
       },
       "each": {
-        "APPEARANCE_SCENE": [0, 1, 2, 3]
+        "APPEARANCE_SCENE": [0, 1, 2, 3, 4]
       },
       "steps": [
         {

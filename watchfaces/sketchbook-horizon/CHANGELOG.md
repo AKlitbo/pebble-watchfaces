@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added a Mount Fuji scene, with the mountain over a lake. On the Pebble Round 2 the temperature rides on a boat's sail.
+
 ### Changed
 
 - Changed the Forest palette's daytime outlines from dark green to black on the Ridgeline and Shoreline scenes. They now stand out against the pale sky, as they do on the other scenes.

@@ -4,7 +4,7 @@
  *
  * Ridgeline draws its whole background, so a theme is a palette rather than a baked bitmap. The sky
  * over it is the shared one in palette.h. This is the land under it, which the scene swaps along with
- * the sky as the sun goes down.
+ * the sky as the sun goes down. The landmarks that stand on land paint with it too.
  *
  * @ingroup watchface-sketchbook
  */
@@ -19,7 +19,7 @@
  */
 
 /**
- * @brief The colours of Ridgeline's land.
+ * @brief The colours of Ridgeline's land, and of a landmark that stands on land.
  *
  * The clock sits on the land and the linework sits over the sky, which is why a dark theme pairs a
  * light `text` with a dark `land`.

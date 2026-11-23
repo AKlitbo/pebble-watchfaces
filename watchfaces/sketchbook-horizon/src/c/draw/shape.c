@@ -1,6 +1,6 @@
 /**
  * @file shape.c
- * @brief Fill a shape from a table of corners, through a path on the stack.
+ * @brief Fill or outline a shape from a table of corners, through a path on the stack.
  *
  * @ingroup watchface-sketchbook
  */
@@ -31,6 +31,21 @@ void shape_fill(GContext *ctx, const GPoint *pts, int count, GColor fill)
 
     graphics_context_set_fill_color(ctx, fill);
     gpath_draw_filled(ctx, &path);
+}
+
+void shape_outline(GContext *ctx, const GPoint *pts, int count, GColor line)
+{
+    GPath path = stack_path(pts, count);
+
+    graphics_context_set_stroke_color(ctx, line);
+    graphics_context_set_stroke_width(ctx, 1);
+    gpath_draw_outline(ctx, &path);
+}
+
+void shape_fill_outlined(GContext *ctx, const GPoint *pts, int count, GColor fill, GColor line)
+{
+    shape_fill(ctx, pts, count, fill);
+    shape_outline(ctx, pts, count, line);
 }
 
 /** @} */

@@ -10,6 +10,7 @@
 #include "scene/shoreline.h"
 #include "scene/skyline.h"
 #include "scene/treeline.h"
+#include "scene/landmarks.h"
 #include "theme/ridgeline.h"
 #include "theme/shoreline.h"
 #include "theme/skyline.h"
@@ -26,6 +27,9 @@
 // sand at the high-water mark rather than wherever the water happens to be, since following the
 // live waterline would walk the clock up and down the screen twice a day. Skyline's centres on
 // the water, from where the reflections stop, and Treeline's on the clearing floor
+//
+// a landmark stands on Skyline's horizon, so it shares Skyline's sky, stars and weather and its
+// clock row. one on land paints its ground with Ridgeline's colours and one on water with Skyline's
 //
 // a scene's front is what a round screen draws in front of the weather, the temperature's holder
 // or the mast that carries it. the rectangle has none
@@ -48,6 +52,11 @@ static const SceneDef s_scenes[] = {
     [SCENE_TREELINE] = {
         .geometry = &treeline_geometry, .ground_for_theme = treeline_ground_for_theme,
         .ground = treeline_draw_ground, .front = PBL_IF_ROUND_ELSE(treeline_draw_front, NULL),
+        .clock_only_y = 113,
+    },
+    [SCENE_FUJI] = {
+        .geometry = &skyline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
+        .ground = fuji_draw_ground, .front = PBL_IF_ROUND_ELSE(fuji_draw_front, NULL),
         .clock_only_y = 113,
     },
 };

@@ -19,6 +19,14 @@ void line_polyline(GContext *ctx, const GPoint *pts, int count)
     }
 }
 
+void line_segments(GContext *ctx, const LineSegment *segments, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        graphics_draw_line(ctx, segments[i][0], segments[i][1]);
+    }
+}
+
 void line_dashed(GContext *ctx, const GPoint *pts, int count, int on, int period)
 {
     // a period of 0 would never step along the leg, and a dash of 0 would draw nothing anyway

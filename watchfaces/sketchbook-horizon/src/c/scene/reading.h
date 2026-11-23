@@ -1,6 +1,6 @@
 /**
  * @file reading.h
- * @brief The temperature a round scene carries on a holder of its own, a sign or a buoy.
+ * @brief The temperature a round scene carries on a holder of its own, a sign or a buoy or a sail.
  *
  * Every round scene but Shoreline sizes its holder to the reading, so a long one never runs off
  * its edges, and letters it with draw/letter.h. Shoreline's pennant is a fixed width, and it

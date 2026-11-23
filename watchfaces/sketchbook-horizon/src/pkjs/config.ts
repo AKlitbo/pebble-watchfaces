@@ -19,14 +19,15 @@ const paletteOptions = [
   { label: 'Mono (Black & White)', value: 5 },
 ];
 
-// the scenes, in the Scene picker's order. a new scene also needs a key in
-// resources/theme-previews.json naming its folder of shots under .github/images/sketchbook-horizon,
-// and config.spec.ts checks the keys match this list
+// the scenes, in the Scene picker's order: the four landscapes, then the landmarks. a new scene also
+// needs a key in resources/theme-previews.json naming its folder of shots under
+// .github/images/sketchbook-horizon, and config.spec.ts checks the keys match this list
 export const sceneOptions = [
   { label: 'Ridgeline', value: 0 },
   { label: 'Shoreline', value: 1 },
   { label: 'Skyline', value: 2 },
   { label: 'Treeline', value: 3 },
+  { label: 'Mount Fuji', value: 4 },
 ];
 
 export default buildConfig({
@@ -39,7 +40,7 @@ export default buildConfig({
       'type': 'select',
       'messageKey': 'APPEARANCE_SCENE',
       'label': 'Scene',
-      'description': 'What the face draws under the clock: a mountain range, a shoreline, a city bridge, or a forest. They all share the same sky, weather, and palettes.',
+      'description': 'What the face draws under the clock: a mountain range, a shoreline, a city bridge, a forest, or Mount Fuji over a lake. They all share the same sky, weather, and palettes.',
       'defaultValue': 0,
       'options': sceneOptions,
     },

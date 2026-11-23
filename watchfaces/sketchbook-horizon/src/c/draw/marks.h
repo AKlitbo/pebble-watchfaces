@@ -1,6 +1,6 @@
 /**
  * @file marks.h
- * @brief Small pen marks a scene draws: grass tufts.
+ * @brief Small pen marks more than one scene draws: grass tufts.
  *
  * @ingroup watchface-sketchbook
  */
