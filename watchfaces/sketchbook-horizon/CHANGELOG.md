@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added a Mount Fuji scene, with the mountain over a lake. On the Pebble Round 2 the temperature rides on a boat's sail.
 - Added a Giza scene, with the three pyramids over the desert. On the Pebble Round 2 the temperature sits in a cartouche on a stone stele.
 - Added a Half Dome scene, with Yosemite's granite dome over a meadow. On the Pebble Round 2 the temperature sits on a park sign.
+- Added an Uluru scene, with the rock across the desert and a water tank on its stand. On the Pebble Round 2 the temperature is painted on the tank.
 
 ### Changed
 

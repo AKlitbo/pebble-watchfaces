@@ -83,10 +83,10 @@ typedef struct GroundReadouts
  * `text` is the clock down on the ground, and the two are rarely the same once the ground is dark.
  *
  * `dim` is the colour for anything drawn on the scene's ground. That covers the date in the standard
- * layout and the stats row, and marks such as tufts, trails, sign posts, ripples, and wakes. The
- * date-up layouts move the date onto the status bar, where it takes `bar_ink`. Each scene picks `dim`
- * so it reads on its own ground in every theme, so a new mark down there takes `dim` rather than
- * borrowing a colour picked for something else.
+ * layout and the stats row, and marks such as tufts, trails, sign posts, tank legs, ripples, and
+ * wakes. The date-up layouts move the date onto the status bar, where it takes `bar_ink`. Each scene
+ * picks `dim` so it reads on its own ground in every theme, so a new mark down there takes `dim`
+ * rather than borrowing a colour picked for something else.
  */
 typedef struct CommonPalette
 {

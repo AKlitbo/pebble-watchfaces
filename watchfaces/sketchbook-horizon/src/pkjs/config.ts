@@ -30,6 +30,7 @@ export const sceneOptions = [
   { label: 'Mount Fuji', value: 4 },
   { label: 'Giza', value: 5 },
   { label: 'Half Dome', value: 6 },
+  { label: 'Uluru', value: 7 },
 ];
 
 export default buildConfig({

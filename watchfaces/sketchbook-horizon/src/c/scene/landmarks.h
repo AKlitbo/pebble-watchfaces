@@ -104,6 +104,28 @@ void giza_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif
 
 /**
+ * @brief Paint the Uluru scene's ground: the rock, the sand and its spinifex, the oak, and on the
+ * rectangle the tank.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void uluru_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather in the Uluru scene: the tank with the
+ * temperature on it.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void uluru_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
+
+/**
  * @brief Paint the Half Dome scene's ground: the valley walls, the dome, the climbers' headlamps
  * after dark, the meadow, the pines and the river.
  *
