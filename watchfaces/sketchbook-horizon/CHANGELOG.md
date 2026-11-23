@@ -8,30 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added a Mount Fuji scene, with the mountain over a lake. On the Pebble Round 2 the temperature rides on a boat's sail.
-- Added a Giza scene, with the three pyramids over the desert. On the Pebble Round 2 the temperature sits in a cartouche on a stone stele.
-- Added a Half Dome scene, with Yosemite's granite dome over a meadow. On the Pebble Round 2 the temperature sits on a park sign.
-- Added an Uluru scene, with the rock across the desert and a water tank on its stand. On the Pebble Round 2 the temperature is painted on the tank.
-- Added a Niagara Falls scene, with the falls pouring into the mist. On the Pebble Round 2 the temperature floats on a barrel below the falls.
-- Added a Table Mountain scene, with the city along the bay and cloud pouring over the top on a cloudy day. On the Pebble Round 2 the temperature rides in the cable car.
-- Added a Monument Valley scene, with the Mittens and Merrick Butte over the desert and the highway running in. On the Pebble Round 2 the temperature sits on a roadside sign.
+- Added seven landmark scenes: Mount Fuji, Giza, Half Dome, Uluru, Niagara Falls, Table Mountain, and Monument Valley. On the Pebble Round 2 each one carries the temperature on part of the scene, such as a boat's sail or a roadside sign.
 - Added an Animation setting that plays a short burst of the scene when you open the watchface, and when you flick your wrist or raise it to look, whichever you pick. It is off by default and stays still during Quiet Time or on a low battery.
 
 ### Changed
 
-- Changed the Forest palette's daytime outlines from dark green to black on the Ridgeline and Shoreline scenes. They now stand out against the pale sky, as they do on the other scenes.
-- Changed the battery gauge, the Bluetooth and Quiet Time icons, and the date when it sits in the status bar to light grey under the Mono palette by day on the Ridgeline scene. They now match the other scenes.
-- Changed the trail sign's post on the Ridgeline scene to the colour of the other marks on the ground on the Pebble Round 2.
-- Changed the wake around the buoy on the Skyline scene to the colour of the ripples on the river on the Pebble Round 2.
-- Changed the heart rate on the Pebble Time 2 to update at most every ten seconds during a workout, which saves battery. A new reading after a quiet spell still shows straight away.
-- Changed how the weather is drawn on every scene. Rain and snow now fall from under the clouds, and a passing shower rains only beneath its cloud. Rain falls in thin streaks, snow in small flakes, and drizzle in short ticks. The clouds are fuller, with shading along their undersides, and a thunderstorm strikes three bolts of different sizes, placed clear of each scene's peaks, towers, and falls.
-- Changed the chimney smoke on the Treeline scene to have a thin outline, so it shows against the night sky rather than fading into it.
+- Changed how the weather is drawn on every scene. Rain and snow fall from under fuller clouds, and a thunderstorm strikes three bolts.
+- Changed the heart rate on the Pebble Time 2 to update at most every ten seconds during a workout, which saves battery.
+- Changed the chimney smoke on Treeline to have a thin outline, so it shows against the night sky.
+- Changed the Forest palette's daytime outlines on Ridgeline and Shoreline to black, so they stand out against the pale sky.
+- Changed the status bar on Ridgeline to light grey under the Mono palette by day, to match the other scenes.
 
 ### Fixed
 
-- Fixed the stats row's icons and numbers coming apart when the heart rate came or went, and the temperature and steps staying in the middle of the row after the heart rate came back on the Ridgeline, Shoreline, Skyline, and Treeline scenes.
-- Fixed the battery gauge following the Scene Palette rather than the palette on screen. When Shuffle, the Night Palette, or the Quiet Time Palette landed on Mono the gauge still turned red or amber, and a Mono Scene Palette kept it grey under a colour palette.
-- Fixed the passing cloud on the Pebble Round 2 stopping halfway across the sky while the sun or moon carried on past it. It also no longer runs off the left edge of the screen on Skyline and the landmark scenes in the first few hours after sunrise or sunset.
+- Fixed the stats row's icons and numbers coming apart when the heart rate came or went.
+- Fixed the battery gauge taking its colour from the Scene Palette rather than the palette on screen, so it could turn red under Mono.
+- Fixed the passing cloud on the Pebble Round 2 stopping halfway across the sky, and on Skyline running off the left edge after sunrise or sunset.
 
 ## [1.1.2] - 2026-11-20
 
