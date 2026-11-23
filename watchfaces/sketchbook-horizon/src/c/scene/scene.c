@@ -64,6 +64,11 @@ static const SceneDef s_scenes[] = {
         .ground = giza_draw_ground, .front = PBL_IF_ROUND_ELSE(giza_draw_front, NULL),
         .clock_only_y = 113,
     },
+    [SCENE_HALF_DOME] = {
+        .geometry = &skyline_geometry, .ground_for_theme = ridgeline_ground_for_theme,
+        .ground = half_dome_draw_ground, .front = PBL_IF_ROUND_ELSE(half_dome_draw_front, NULL),
+        .clock_only_y = 113,
+    },
 };
 
 // a missing last row makes the table short and fails here. a row left out in the middle comes up

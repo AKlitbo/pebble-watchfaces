@@ -29,6 +29,7 @@ export const sceneOptions = [
   { label: 'Treeline', value: 3 },
   { label: 'Mount Fuji', value: 4 },
   { label: 'Giza', value: 5 },
+  { label: 'Half Dome', value: 6 },
 ];
 
 export default buildConfig({
@@ -41,7 +42,7 @@ export default buildConfig({
       'type': 'select',
       'messageKey': 'APPEARANCE_SCENE',
       'label': 'Scene',
-      'description': 'What the face draws under the clock: a mountain range, a shoreline, a city bridge, a forest, Mount Fuji over a lake, or the pyramids of Giza. They all share the same sky, weather, and palettes.',
+      'description': 'What the face draws under the clock: a mountain range, a shoreline, a city bridge, a forest, or one of the landmarks, such as Mount Fuji or the pyramids of Giza. They all share the same sky, weather, and palettes.',
       'defaultValue': 0,
       'options': sceneOptions,
     },

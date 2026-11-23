@@ -41,6 +41,25 @@
 
 #define LM_HORIZON 108       ///< The rectangle row the land or the water starts on, as on Skyline
 
+#if defined(PBL_ROUND)
+/**
+ * @brief Plant a board on two posts with the temperature on it, sized to the reading.
+ *
+ * The posts go in first, so the board closes over their tops. The rim and the lettering share a
+ * colour, which is the one the board is paired with. With no reading there is no sign, rather
+ * than a board reading "--".
+ *
+ * @param ctx The graphics context.
+ * @param x The board's centre line.
+ * @param pad Air either side of the reading, inside the board.
+ * @param radius How round the board's corners are.
+ * @param post The posts' colour.
+ * @param board The board's fill.
+ * @param ink The board's rim and its lettering.
+ */
+void landmarks_draw_sign(GContext *ctx, int x, int pad, int radius, GColor post, GColor board, GColor ink);
+#endif
+
 /**
  * @brief Paint the Fuji scene's ground: the cone and its snow, the lake, and the forest along its
  * far shore.
@@ -82,6 +101,28 @@ void giza_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
  * @param frame This frame's reading. Its ground row is a RidgelineGround.
  */
 void giza_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
+#endif
+
+/**
+ * @brief Paint the Half Dome scene's ground: the valley walls, the dome, the climbers' headlamps
+ * after dark, the meadow, the pines and the river.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void half_dome_draw_ground(GContext *ctx, GRect bounds, const SceneFrame *frame);
+
+#if defined(PBL_ROUND)
+/**
+ * @brief Paint what stands in front of the weather in the Half Dome scene: the sign with the
+ * temperature on it.
+ *
+ * @param ctx The graphics context.
+ * @param bounds The window's root bounds.
+ * @param frame This frame's reading. Its ground row is a RidgelineGround.
+ */
+void half_dome_draw_front(GContext *ctx, GRect bounds, const SceneFrame *frame);
 #endif
 
 /** @} */
