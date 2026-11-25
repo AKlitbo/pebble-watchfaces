@@ -40,7 +40,7 @@ static void time_beats_1x2(GridCtx *gctx)
     graphics_draw_text(gctx->ctx, val + 1, fonts_get(FONT_TEKO_26), num_rect,
                        GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 
-    gh_icon_bottom_of(gctx, &ICON_GLOBE, base, FONT_TEKO_26);
+    gh_icon_beside_value(gctx, &ICON_GLOBE, base, FONT_TEKO_26);
 }
 
 // draws the big beats value centred up top with the '@' lifted a pixel like the 1x2 does.

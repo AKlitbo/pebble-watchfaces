@@ -150,6 +150,34 @@ void gh_icon_bottom_of(GridCtx *gctx, const IconSpec *icon, GRect value_rect, Fo
     icon_draw_rect(gctx, icon->res, GRect(x, y, is.w, is.h));
 }
 
+void gh_icon_beside_value(GridCtx *gctx, const IconSpec *icon, GRect value_rect, FontId value_font)
+{
+    if (!gctx->headerless)
+    {
+        gh_icon_bottom_of(gctx, icon, value_rect, value_font);
+        return;
+    }
+
+    GSize is = icon_size(icon->res);
+    if (is.w == 0)
+    {
+        return;
+    }
+
+    IconMargins trim = icon_margins(icon->res);
+    int x = gctx->body.origin.x + gctx->body.size.w - is.w - EDGE_PAD(gctx) + trim.e + ICON_DX(icon);
+    int y = gh_icon_y_middle(gctx, is.h, trim) + ICON_DY(icon);
+    icon_draw_rect(gctx, icon->res, GRect(x, y, is.w, is.h));
+}
+
+int gh_icon_y_middle(const GridCtx *gctx, int icon_h, IconMargins trim)
+{
+    int middle = gctx->body.origin.y + gctx->body.size.h / 2;
+    int opaque_h = icon_h - trim.n - trim.s;
+
+    return middle - opaque_h / 2 - trim.n;
+}
+
 void gh_stat_2x2(GridCtx *gctx, const char *val, const char *line1, const char *line2,
                  const IconSpec *icon, int progress_pct)
 {
@@ -539,7 +567,7 @@ void gh_stat_1x2(GridCtx *gctx, const char *val, const char *trailing, FontId fo
 
     if (icon)
     {
-        gh_icon_bottom_of(gctx, icon, r, draw_font);
+        gh_icon_beside_value(gctx, icon, r, draw_font);
     }
 }
 

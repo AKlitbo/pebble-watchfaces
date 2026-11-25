@@ -184,8 +184,9 @@ static void draw_2x4(GridCtx *gctx)
         return;
     }
 
-    // the next few events under the strip, up to three
-    for (int i = 0; i < 3; i++)
+    // as many events as fit under the strip, so a headerless panel's taller body shows one more
+    int rows = (body.origin.y + body.size.h - list_top) / CAL_ROW_H;
+    for (int i = 0; i < rows; i++)
     {
         const CalendarEvent *event = cal_upcoming(i, now);
         if (!event)

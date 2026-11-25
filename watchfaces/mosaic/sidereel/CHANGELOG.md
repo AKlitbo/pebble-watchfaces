@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added Undo to the panel colour editor. Reset turns into Undo after you tap it, so a mis-tap no longer loses your colours.
 - Added a note in the layout builder while Swap Day & Night Layouts is set to Never, since the Night layout only shows once that is on.
 
+### Changed
+
+- Changed the 2x2 Weather panel to draw its sky picture bigger, filling the space under the temperature.
+- Changed a small panel with its header turned off to keep its icon level with the reading rather than down in the corner.
+
 ### Fixed
 
 - Fixed a panel vanishing when you let go of it where it did not fit, or when the page scrolled partway through a drag. It now goes back where it was.

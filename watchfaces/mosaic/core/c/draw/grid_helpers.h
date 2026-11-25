@@ -96,12 +96,44 @@ void gh_gauge(GridCtx *gctx, GRect area, int segments, int level);
  * was already drawn, sat 5px in from the right edge. We figure out the value's bottom
  * from the font's size facts and then add the icon's own little nudge (spec.dx/dy).
  *
+ * A 1x2 pins its icon to the bottom corner instead.
+ *
  * @param gctx The grid context.
  * @param icon The icon to place.
  * @param value_rect The box the value was drawn in.
  * @param value_font The font the value used, so we know its cap height.
  */
 void gh_icon_bottom_of(GridCtx *gctx, const IconSpec *icon, GRect value_rect, FontId value_font);
+
+/**
+ * @brief Places the icon of a 1x2 whose value is centred in the body.
+ *
+ * A headed one pins the icon to the bottom corner, as gh_icon_bottom_of does. A headerless
+ * one centres it top to bottom, as gh_icon_y_middle does, so it sits level with the value.
+ * A panel whose value sits at the top, such as a 1x2 with a bar under it, keeps the corner
+ * pin, since a centred icon would land between the value and the bar.
+ *
+ * @param gctx The grid context.
+ * @param icon The icon to place.
+ * @param value_rect The box the value was drawn in.
+ * @param value_font The font the value used.
+ */
+void gh_icon_beside_value(GridCtx *gctx, const IconSpec *icon, GRect value_rect, FontId value_font);
+
+/**
+ * @brief Where an icon's top goes so its visible art is centred top to bottom in the body.
+ *
+ * A headerless 1x2 draws its value bigger in a taller body, so an icon pinned to the
+ * bottom corner drops below the value. gh_value_left centres the value in the body, so
+ * centring the art there too keeps the two reading as one line. The body is used rather
+ * than the font's cap height, since Teko 34's digits sit well below where its metrics say.
+ *
+ * @param gctx The grid context. It carries the body.
+ * @param icon_h The icon bitmap's full height.
+ * @param trim The icon's see-through margins, so only the visible art is centred.
+ * @return The y for the icon bitmap's top edge.
+ */
+int gh_icon_y_middle(const GridCtx *gctx, int icon_h, IconMargins trim);
 
 /**
  * @brief Writes a time of day in the wearer's clock style, or "--" when there is none.
