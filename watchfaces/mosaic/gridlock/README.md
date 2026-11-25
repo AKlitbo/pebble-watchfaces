@@ -1,6 +1,6 @@
 # Gridlock
 
-<img src="../../../.github/images/gridlock/layout_everyday.png" width="100" title="Everyday"> <img src="../../../.github/images/gridlock/layout_big-clock.png" width="100" title="Big clock"> <img src="../../../.github/images/gridlock/layout_analog.png" width="100" title="Analog"> <img src="../../../.github/images/gridlock/layout_weather.png" width="100" title="Weather station"> <img src="../../../.github/images/gridlock/layout_training.png" width="100" title="Training"> <img src="../../../.github/images/gridlock/layout_agenda.png" width="100" title="Agenda"> <img src="../../../.github/images/gridlock/layout_stocks.png" width="100" title="Stocks"> <img src="../../../.github/images/gridlock/layout_minimal.png" width="100" title="Minimal"><br><img src="../../../.github/images/gridlock/layout_sun-moon.png" width="100" title="Sun and moon"> <img src="../../../.github/images/gridlock/layout_dense.png" width="100" title="Dense"> <img src="../../../.github/images/gridlock/layout_forecast.png" width="100" title="Forecast"> <img src="../../../.github/images/gridlock/layout_time-units.png" width="100" title="Time units"> <img src="../../../.github/images/gridlock/layout_two-clocks.png" width="100" title="Two clocks"> <img src="../../../.github/images/gridlock/layout_recovery.png" width="100" title="Recovery"> <img src="../../../.github/images/gridlock/layout_month.png" width="100" title="Month"> <img src="../../../.github/images/gridlock/layout_hot.png" width="100" title="Hot"><br><img src="../../../.github/images/gridlock/layout_everyday-bare.png" width="100" title="Everyday, bare"> <img src="../../../.github/images/gridlock/layout_cold.png" width="100" title="Cold"> <img src="../../../.github/images/gridlock/layout_big-hour.png" width="100" title="Big hour"> <img src="../../../.github/images/gridlock/layout_forecast-pair.png" width="100" title="Forecast pair"> <img src="../../../.github/images/gridlock/layout_agenda-bare.png" width="100" title="Agenda, bare"> <img src="../../../.github/images/gridlock/layout_neon.png" width="100" title="Neon"> <img src="../../../.github/images/gridlock/layout_dial.png" width="100" title="Dial"> <img src="../../../.github/images/gridlock/layout_health.png" width="100" title="Health"><br><img src="../../../.github/images/gridlock/layout_watchlist.png" width="100" title="Watchlist"> <img src="../../../.github/images/gridlock/layout_mixed.png" width="100" title="Mixed"> <img src="../../../.github/images/gridlock/layout_daylight.png" width="100" title="Daylight"> <img src="../../../.github/images/gridlock/layout_month-bare.png" width="100" title="Month, bare"> <img src="../../../.github/images/gridlock/layout_terminal.png" width="100" title="Terminal"> <img src="../../../.github/images/gridlock/layout_beats.png" width="100" title="Beats"> <img src="../../../.github/images/gridlock/layout_timeline.png" width="100" title="Timeline"> <img src="../../../.github/images/gridlock/layout_dusk.png" width="100" title="Dusk">
+<img src="../../../.github/images/gridlock/layout_everyday.png" width="100" title="Everyday"> <img src="../../../.github/images/gridlock/layout_heart.png" width="100" title="Heart"> <img src="../../../.github/images/gridlock/layout_weather-hourly.png" width="100" title="Weather"> <img src="../../../.github/images/gridlock/layout_now-playing.png" width="100" title="Now playing"> <img src="../../../.github/images/gridlock/layout_agenda.png" width="100" title="Agenda"> <img src="../../../.github/images/gridlock/layout_goals.png" width="100" title="Goals"> <img src="../../../.github/images/gridlock/layout_stocks.png" width="100" title="Stocks"> <img src="../../../.github/images/gridlock/layout_terminal.png" width="100" title="Terminal">
 
 A grid watchface for the Pebble Time 2 that you fill with the panels you want. It's one of the Mosaic faces, which share their panels with [Sidereel](../sidereel/).
 
@@ -40,6 +40,8 @@ Open Gridlock's settings in the Pebble app.
 | Night Starts and Night Ends | The custom times, 21:00 and 07:00 by default. At Sunset & Sunrise uses them too until the weather brings the sun times. |
 
 **Panels That Need a Plugin.** A warning under the watch names any placed panel whose plugin is turned off or missing, and says what to do in the Pebble app.
+
+<img src="../../../.github/images/gridlock/day-night.gif" width="100" title="The Night layout taking over at 22:00"> <img src="../../../.github/images/gridlock/layout_quiet-time.png" width="100" title="A Quiet Time layout">
 
 ### Appearance
 
@@ -151,6 +153,12 @@ The settings page offers these to start from, shown here in the Vibrant theme. C
 
 <img src="../../../.github/images/gridlock/preset_default.png" width="105" title="Default"> <img src="../../../.github/images/gridlock/preset_activity.png" width="105" title="Activity"> <img src="../../../.github/images/gridlock/preset_weather.png" width="105" title="Weather"> <img src="../../../.github/images/gridlock/preset_data.png" width="105" title="Data"> <img src="../../../.github/images/gridlock/preset_sleep.png" width="105" title="Sleep"> <img src="../../../.github/images/gridlock/preset_creator.png" width="105" title="Creator">
 
+### Example Layouts
+
+A few more layouts built from the panels below.
+
+<img src="../../../.github/images/gridlock/layout_calendar.png" width="100" title="Calendar"> <img src="../../../.github/images/gridlock/layout_commute.png" width="100" title="Commute"> <img src="../../../.github/images/gridlock/layout_forecast.png" width="100" title="Forecast"> <img src="../../../.github/images/gridlock/layout_month.png" width="100" title="Month"> <img src="../../../.github/images/gridlock/layout_two-clocks.png" width="100" title="Two clocks"> <img src="../../../.github/images/gridlock/layout_outdoors.png" width="100" title="Outdoors"> <img src="../../../.github/images/gridlock/layout_time-units.png" width="100" title="Time units"><br><img src="../../../.github/images/gridlock/layout_sun-moon.png" width="100" title="Sun and moon"> <img src="../../../.github/images/gridlock/layout_bpm-today.png" width="100" title="BPM today"> <img src="../../../.github/images/gridlock/layout_dense.png" width="100" title="Dense"> <img src="../../../.github/images/gridlock/layout_progress.png" width="100" title="Progress"> <img src="../../../.github/images/gridlock/layout_analog.png" width="100" title="Analog"> <img src="../../../.github/images/gridlock/layout_big-clock.png" width="100" title="Big clock"> <img src="../../../.github/images/gridlock/layout_mixed-rounded.png" width="100" title="Mixed, rounded"> <img src="../../../.github/images/gridlock/layout_minimal.png" width="100" title="Minimal">
+
 ### 1×2
 
 | | | | | | | |
@@ -197,6 +205,10 @@ The settings page offers these to start from, shown here in the Vibrant theme. C
 ## Themes
 
 Mono (White on Black) is the classic look, and Mono (Black on White) flips it. Vibrant colours each panel by what it shows. Custom uses the colours you set under Edit Panel Colours and Headers.
+
+| Themes | Header Fonts | Panel Styles | Analog Dials |
+| :-: | :-: | :-: | :-: |
+| <img src="../../../.github/images/gridlock/themes.gif" width="100" title="The four themes"> | <img src="../../../.github/images/gridlock/header-fonts.gif" width="100" title="The eight header fonts"> | <img src="../../../.github/images/gridlock/borders.gif" width="100" title="Square, rounded, headers off, borders off, and bare"> | <img src="../../../.github/images/gridlock/dials.gif" width="100" title="The nine analog dials"> |
 
 ## Weather Sources
 
