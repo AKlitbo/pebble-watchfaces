@@ -34,14 +34,14 @@ export function weatherSection(): ClayConfigItem {
         { label: 'Open-Meteo (Free, No Key)', value: 'openmeteo' },
         { label: 'OpenWeatherMap (Needs Key)', value: 'owm' },
         { label: 'WeatherAPI.com (Needs Key)', value: 'weatherapi' },
-      ], 'openmeteo', 'Where the phone gets the weather. Open-Meteo needs no key.'),
+      ], 'openmeteo', 'Where the phone gets the weather.'),
       {
         type: 'input',
         messageKey: 'WEATHER_API_KEY',
         label: 'API Key',
         description: 'Paste the key from your OpenWeatherMap or WeatherAPI.com account.',
         attributes: {
-          placeholder: 'Paste your private API key here...',
+          placeholder: 'Your API key',
           maxlength: 64,
         },
         // only the two providers that take a key show it. that also hides it while the weather

@@ -21,6 +21,7 @@ export default {
     'ts/shared/thumbs',
     'ts/shared/overlay',
     'ts/shared/io-panel',
+    'ts/shared/import-note',
     'ts/theme/palette',
     'ts/theme/codec',
     'ts/theme/model',

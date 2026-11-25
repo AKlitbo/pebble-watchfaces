@@ -84,7 +84,7 @@ export function createRowBuilder(env: RowEnv): { buildRow(module: ThemeModule): 
       const noshot = document.createElement('div');
 
       noshot.className = 'sz-noshot';
-      noshot.textContent = 'no shot';
+      noshot.textContent = 'No picture';
       shot.appendChild(noshot);
     }
 

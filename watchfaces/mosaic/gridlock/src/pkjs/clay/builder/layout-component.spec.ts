@@ -14,7 +14,7 @@
  * get their own unit specs.
  */
 
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import component from '../layout-component.g.js';
 import { mount } from '../../../../../paf/ts/clay/builder/ts/testing/harness';
 import { moduleOptionsFixture } from '../../../../../core/pkjs/clay/builder/ts/testing/fixtures';
@@ -58,6 +58,10 @@ function pickGroup(root: HTMLElement, name: string): void {
 
 beforeEach(() => {
   document.body.innerHTML = '';
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe('LAYOUT wire string round trip', () => {
@@ -170,6 +174,68 @@ describe('actions bar', () => {
     expect(result).toBe('3,1,2,2,1');
     expect(document.querySelector<HTMLElement>('.lb-panel')).toBeNull();
   });
+
+  /**
+   * Text with no panels in it, such as a colours string pasted into the wrong box, reads as an empty
+   * layout. Applying it would wipe the grid, so the popup stays open and says why.
+   */
+  test('Import/Export refuses text with no panels in it and leaves the layout alone', () => {
+    const { ctx, root } = mountLayout();
+
+    ctx.set('2,0,0,2,1');
+
+    root.querySelector<HTMLElement>('.lb-btn-io').click();
+    document.querySelector<HTMLTextAreaElement>('.lb-io-textarea').value = '~3Cw...|CB.';
+    document.querySelector<HTMLElement>('.lb-io-btn.primary').click();
+    const result = ctx.get();
+
+    expect(result).toBe('2,0,0,2,1');
+    expect(document.querySelector<HTMLElement>('.lb-panel')).not.toBeNull();
+    expect(document.querySelector<HTMLElement>('.lb-io-note')).not.toBeNull();
+  });
+
+  /** One tap on Clear or a preset replaces the whole grid, so Undo is the way back from a mis-tap. */
+  test('Undo puts back the layout from before Clear', () => {
+    const { ctx, root } = mountLayout();
+
+    ctx.set('2,0,0,2,1;3,0,2,2,1');
+    root.querySelector<HTMLElement>('.lb-btn-clear').click();
+
+    root.querySelector<HTMLElement>('.lb-btn-undo').click();
+    const result = ctx.get();
+
+    expect(result).toBe('2,0,0,2,1;3,0,2,2,1');
+  });
+
+  /** A drag that puts the panel back changed nothing, so Undo has to stay on through it. */
+  test('Undo stays on through a drag that changes nothing', () => {
+    const { root } = mountLayout();
+    const undo = root.querySelector<HTMLButtonElement>('.lb-btn-undo');
+
+    root.querySelector<HTMLElement>('.lb-preset[data-preset="1"]').click();
+
+    // lift a block, carry it off and back over the panel beside it, and let go where it does not fit
+    root.querySelectorAll<HTMLElement>('.lb-block')[1].dispatchEvent(pointer('pointerdown', 5, 5));
+    document.dispatchEvent(pointer('pointermove', 100, 100));
+    document.dispatchEvent(pointer('pointermove', 6, 6));
+    document.dispatchEvent(pointer('pointerup', 5, 5));
+
+    expect(undo.disabled).toBe(false);
+  });
+
+  /** Undo steps back over the replace just made, so an edit after it has to turn it off. */
+  test('Undo turns off again after the next edit', () => {
+    const { ctx, root } = mountLayout();
+    const undo = root.querySelector<HTMLButtonElement>('.lb-btn-undo');
+
+    root.querySelector<HTMLElement>('.lb-preset[data-preset="1"]').click();
+    const afterPreset = undo.disabled;
+
+    ctx.set('2,0,0,2,1');
+
+    expect(afterPreset).toBe(false);
+    expect(undo.disabled).toBe(true);
+  });
 });
 
 describe('drag and drop', () => {
@@ -246,6 +312,40 @@ describe('drag and drop', () => {
     expect(document.querySelector<HTMLElement>('.lb-ghost')).toBeNull();
   });
 
+  /**
+   * A move that lands on another panel missed. Removing the panel there would lose it to a slightly
+   * wrong drop on a phone, so only a drop off the grid deletes.
+   */
+  test('a placed block let go where it does not fit goes back where it was', () => {
+    const { ctx, root } = mountLayout();
+
+    ctx.set('2,0,0,2,1;3,0,2,2,1');
+
+    // lift the second block, carry it off the grid and back onto the first one, then let go
+    root.querySelectorAll<HTMLElement>('.lb-block')[1].dispatchEvent(pointer('pointerdown', 5, 5));
+    document.dispatchEvent(pointer('pointermove', 100, 100));
+    document.dispatchEvent(pointer('pointermove', 6, 6));
+    document.dispatchEvent(pointer('pointerup', 5, 5));
+    const result = ctx.get();
+
+    expect(result).toBe('2,0,0,2,1;3,0,2,2,1');
+  });
+
+  /** The webview taking the touch to scroll mid move never let the block go, so it has to come back. */
+  test('a placed block whose drag is cancelled goes back where it was', () => {
+    const { ctx, root } = mountLayout();
+
+    ctx.set('2,0,0,2,1');
+
+    root.querySelector<HTMLElement>('.lb-block').dispatchEvent(pointer('pointerdown', 5, 5));
+    document.dispatchEvent(pointer('pointermove', 100, 100));
+    document.dispatchEvent(pointer('pointercancel', 100, 100));
+    const result = ctx.get();
+
+    expect(result).toBe('2,0,0,2,1');
+    expect(document.querySelector<HTMLElement>('.lb-ghost')).toBeNull();
+  });
+
   /** A cancelled drag that leaks its ghost leaves a block floating over the page forever. */
   test('pointercancel cleans up the ghost and places nothing', () => {
     const { ctx, root } = mountLayout();
@@ -300,6 +400,35 @@ describe('the layout library', () => {
 
     expect(stores.night.value).toBe('0');
     expect(JSON.parse(stores.library.value).night).toBe(2);
+  });
+
+  /**
+   * A Night layout does nothing while Swap Day & Night Layouts is Never. That select sits below the
+   * grid, so without the note a wearer picks a Night layout, saves, and never sees it.
+   */
+  test('warns about the Night layout while the swap is off', () => {
+    vi.useFakeTimers();
+    mountStores();
+    const swap = document.createElement('select');
+
+    swap.setAttribute('data-night-mode', '');
+    swap.innerHTML = '<option value="0">Never</option><option value="1">At Sunset &amp; Sunrise</option>';
+    const { root } = mountLayout();
+
+    document.body.appendChild(swap); // Clay builds the swap after the builder
+    vi.runAllTimers(); // the deferred lookup that finds it
+    const night = root.querySelectorAll<HTMLSelectElement>('.lb-assign-sel')[1];
+    const note = root.querySelector<HTMLElement>('.lb-assign-note');
+
+    night.value = '1';
+    night.dispatchEvent(new Event('change'));
+    const shownWhileNever = !note.hidden;
+
+    swap.value = '1';
+    swap.dispatchEvent(new Event('change'));
+
+    expect(shownWhileNever).toBe(true);
+    expect(note.hidden).toBe(true);
   });
 
   /** And clearing the assignment has to turn it off rather than leave a stale layout behind. */

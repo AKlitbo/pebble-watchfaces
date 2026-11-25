@@ -14,9 +14,9 @@
 module.exports = {
   name: "layoutBuilder",
 
-  template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Pick a layout, then drag panels onto the watch.<br>Drag a placed panel to move it, or drag it off to remove it. Switching layouts keeps your edits.</p>  </div>  <div class=\"lb-modes\"></div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Activity</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Data</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Sleep</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"5\">Creator</button>        <div class=\"lb-actions-tools\">          <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>          <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>        </div>      </div>    </div>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
+  template: "<div class=\"component lb\">  <div class=\"lb-header\">    <p class=\"lb-desc\">Pick a layout, then drag panels onto the watch.<br>Drag a placed panel to move it, or drag it off to remove it. Switching layouts keeps your edits.</p>  </div>  <div class=\"lb-modes\"></div>  <div class=\"lb-middle-wrap\">    <div class=\"lb-bezel\">      <div class=\"lb-grid\"></div>      <div class=\"lb-actions-side\">        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"default\">Default</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"1\">Activity</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"2\">Weather</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"3\">Data</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"4\">Sleep</button>        <button type=\"button\" class=\"lb-btn lb-preset\" data-preset=\"5\">Creator</button>        <div class=\"lb-actions-tools\">          <button type=\"button\" class=\"lb-btn lb-btn-undo\" disabled>Undo</button>          <button type=\"button\" class=\"lb-btn lb-btn-io\">Import / Export</button>          <button type=\"button\" class=\"lb-btn lb-btn-clear\">Clear</button>        </div>      </div>    </div>  </div>  <div class=\"lb-palette-container\"></div>  <input type=\"hidden\" class=\"lb-value\"></div>",
 
-  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid var(--mo-line);box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-tools{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:6px;border-top:1px solid #2c3038}.lb-actions-side .lb-btn{line-height:1.3}.lb-actions-tools .lb-btn-io{white-space:normal}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;border:1px solid;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-grid{position:relative;display:grid;align-self:flex-start;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:var(--mo-inset);border:1px dashed var(--mo-line);border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:var(--mo-card);border:2px solid var(--mo-line);border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid var(--mo-line);border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:var(--mo-inset);color:#eceef2}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;text-transform:uppercase;border:2px solid}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid;border-radius:0;font-size:11px}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}.lb-assign-lbl{flex-shrink:0;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{width:100%;box-sizing:border-box;min-width:0;padding:6px 4px;border:2px solid var(--mo-line-control);border-radius:0;background:var(--mo-inset);color:var(--mo-ink);font-family:var(--mo-mono);font-size:11px}.pf-palette{padding:0 var(--pf-palette-gutter,12px);margin-top:8px;width:100%;box-sizing:border-box}.pf-palette-sizes{display:flex;gap:4px;position:relative;z-index:1}.pf-palette-size{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;font-size:10px;text-transform:uppercase;margin-bottom:-1px}.pf-palette-groups{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}.pf-palette-groups[hidden]{display:none}.pf-palette-group{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0 !important;margin:0 !important;padding:5px 6px 3px !important;border:none;border-bottom:2px solid;border-radius:0;font-size:9px;text-transform:uppercase}.pf-palette-group-icon{font-size:12px;line-height:1}.pf-palette-group-name{white-space:nowrap}.pf-palette-box{background:var(--pf-palette-panel,transparent);border-radius:0;padding:10px 8px;border:1px solid var(--pf-palette-line,rgba(128,128,128,0.4))}.pf-palette-status{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--pf-palette-line,rgba(128,128,128,0.4));font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.pf-palette-all{flex-shrink:0;min-width:0 !important;margin:0 !important;padding:4px 8px !important;border:1px solid;border-radius:0;font:inherit}.pf-palette-tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.pf-palette-tile{min-height:42px;flex-shrink:0;box-sizing:border-box;padding:2px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.pf-palette-tile.narrow{width:calc((100% - 24px) / 4);max-width:94px}.pf-palette-tile.wide{width:calc((100% - 8px) / 2);max-width:192px}.pf-palette-tile:active{opacity:0.7}.pf-palette-tile.placed{opacity:0.3;pointer-events:none}.pf-palette-icon{font-size:20px;line-height:1;color:#fff}.pf-palette-shot{width:100%;height:auto;display:block}",
+  style: ".lb{padding:12px 0;user-select:none;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.lb-header{text-align:center;margin-bottom:12px}.lb-desc{font-size:11px;line-height:1.4;margin:0}.lb-middle-wrap{display:flex;justify-content:center;margin-bottom:12px;width:100%;box-sizing:border-box;padding:0 8px}.lb-bezel{background:#191c22;border-radius:0;padding:8px;border:2px solid var(--mo-line);box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:stretch;gap:8px}.lb-actions-side{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;width:74px;box-sizing:border-box;border-left:1px solid #2c3038;padding-left:8px}.lb-actions-tools{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:6px;border-top:1px solid #2c3038}.lb-actions-side .lb-btn{line-height:1.3}.lb-actions-tools .lb-btn-io{white-space:normal}.lb-btn{padding:5px !important;margin:0 !important;box-sizing:border-box;min-width:0 !important;width:100%;border-radius:0;font-size:9px;border:1px solid;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-grid{position:relative;display:grid;align-self:flex-start;grid-template-columns:repeat(4,52px);grid-template-rows:repeat(5,45px);gap:3px;padding:5px;background:#000;border-radius:0;overflow:hidden}.lb-cell{background:var(--mo-inset);border:1px dashed var(--mo-line);border-radius:0;transition:background 0.12s;display:flex;align-items:center;justify-content:center;position:relative}.lb-cell.occupied{pointer-events:none;opacity:0}.lb-cell.selecting{background:#ff6a1f30;border:1px solid #ff6a1f}.lb-block-img{width:100%;height:100%;object-fit:contain;display:block}.lb-block{border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;text-align:center;padding:4px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);touch-action:none}.lb-block:active{transform:scale(0.96)}.lb-icon{font-size:20px;line-height:1}.lb-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;line-height:1.2}.lb-block.big .lb-icon{font-size:26px}.lb-block.big .lb-name{font-size:10px}.lb-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:translate(-50%,-50%);border-radius:0;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}.lb-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(8,9,11,0.8);z-index:50000}.lb-panel{position:fixed;z-index:50001;background:var(--mo-card);border:2px solid var(--mo-line);border-radius:0;padding:14px;box-sizing:border-box;box-shadow:0 20px 60px -20px rgba(0,0,0,0.9);min-width:240px;max-width:300px;left:50%;top:50%;transform:translate(-50%,-50%);max-height:80vh;display:flex;flex-direction:column}.lb-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ff6a1f;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;margin-bottom:10px}.lb-io-textarea{width:100%;height:100px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;border:2px solid var(--mo-line);border-radius:0;margin-bottom:12px;resize:none;box-sizing:border-box;background:var(--mo-inset);color:#eceef2}.lb-io-note{font-size:11px;line-height:1.4;margin:-4px 0 12px}.lb-io-btns{display:flex;gap:8px;justify-content:flex-end}.lb-io-btn{padding:8px 16px !important;margin:0 !important;min-width:0 !important;flex:1;box-sizing:border-box;border-radius:0;font-size:12px;text-transform:uppercase;border:2px solid}.platform-ios .button,.platform-ios button{padding:0px}.lb-ltabs{display:flex;gap:4px;padding:0 12px;margin-bottom:8px}.lb-ltab{flex:1;min-width:0;padding:8px 4px;border:2px solid;border-radius:0;font-size:11px}.lb-assign{display:flex;gap:8px;padding:0 12px;margin-bottom:10px}.lb-assign-row{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}.lb-assign-lbl{flex-shrink:0;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}.lb-assign-sel{width:100%;box-sizing:border-box;min-width:0;padding:6px 4px;border:2px solid var(--mo-line-control);border-radius:0;background:var(--mo-inset);color:var(--mo-ink);font-family:var(--mo-mono);font-size:11px}.pf-palette{padding:0 var(--pf-palette-gutter,12px);margin-top:8px;width:100%;box-sizing:border-box}.pf-palette-sizes{display:flex;gap:4px;position:relative;z-index:1}.pf-palette-size{flex:1;min-width:0;padding:9px 4px;border:none;border-radius:0;font-size:10px;text-transform:uppercase;margin-bottom:-1px}.pf-palette-groups{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}.pf-palette-groups[hidden]{display:none}.pf-palette-group{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0 !important;margin:0 !important;padding:5px 6px 3px !important;border:none;border-bottom:2px solid;border-radius:0;font-size:9px;text-transform:uppercase}.pf-palette-group-icon{font-size:12px;line-height:1}.pf-palette-group-name{white-space:nowrap}.pf-palette-box{background:var(--pf-palette-panel,transparent);border-radius:0;padding:10px 8px;border:1px solid var(--pf-palette-line,rgba(128,128,128,0.4))}.pf-palette-status{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--pf-palette-line,rgba(128,128,128,0.4));font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace}.pf-palette-all{flex-shrink:0;min-width:0 !important;margin:0 !important;padding:4px 8px !important;border:1px solid;border-radius:0;font:inherit}.pf-palette-tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.pf-palette-tile{min-height:42px;flex-shrink:0;box-sizing:border-box;padding:2px;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.1);transition:opacity 0.2s}.pf-palette-tile.narrow{width:calc((100% - 24px) / 4);max-width:94px}.pf-palette-tile.wide{width:calc((100% - 8px) / 2);max-width:192px}.pf-palette-tile:active{opacity:0.7}.pf-palette-tile.placed{opacity:0.3;pointer-events:none}.pf-palette-icon{font-size:20px;line-height:1;color:#fff}.pf-palette-shot{width:100%;height:auto;display:block}",
 
   manipulator: {
     set: function (value) {
@@ -544,6 +544,15 @@ module.exports = {
       });
       function createDragEngine(env) {
         const rules = env.geometry;
+        let lifted = null;
+        let overGrid = false;
+        function putBack() {
+          if (lifted) {
+            env.getBlocks().splice(lifted.idx, 0, lifted.block);
+            lifted = null;
+          }
+          env.render();
+        }
         function cellAt(x, y) {
           const rect = env.gridEl.getBoundingClientRect();
           const localX = x - rect.left;
@@ -586,6 +595,9 @@ module.exports = {
           },
           highlight(dragged, cell, allowed) {
             clearHighlight();
+            if (dragged) {
+              overGrid = cell !== null;
+            }
             if (!dragged || cell === null || !allowed) {
               return;
             }
@@ -601,6 +613,7 @@ module.exports = {
           },
           drop(dragged, cell) {
             const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+            lifted = null;
             env.getBlocks().push({
               module: dragged.value,
               row: snap.row,
@@ -611,11 +624,21 @@ module.exports = {
             env.render();
           },
           dropOutside() {
-            env.render();
+            if (!overGrid) {
+              lifted = null;
+            }
+            putBack();
+          },
+          // the webview took the touch to scroll, so the block was never let go anywhere
+          cancel() {
+            putBack();
           },
           lift(dragged) {
+            overGrid = true;
             if (dragged.blockIdx !== null) {
-              env.getBlocks().splice(dragged.blockIdx, 1);
+              const idx = dragged.blockIdx;
+              lifted = { block: env.getBlocks()[idx], idx };
+              env.getBlocks().splice(idx, 1);
               env.render();
             }
           }
@@ -867,6 +890,15 @@ module.exports = {
         }
       });
 
+      // paf/ts/clay/callout-style.ts
+      var CALLOUT_BOX, CALLOUT_BADGE;
+      var init_callout_style = __esm({
+        "paf/ts/clay/callout-style.ts"() {
+          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
+          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
+        }
+      });
+
       // core/pkjs/clay/builder/ts/layout/modes.ts
       var modes_exports = {};
       __export(modes_exports, {
@@ -940,6 +972,24 @@ module.exports = {
         const assignments = document.createElement("div");
         assignments.className = "lb-assign";
         const quietWanted = document.querySelector(".gl-quiet") !== null;
+        const nightNote = document.createElement("div");
+        const nightBadge = document.createElement("span");
+        const nightWords = document.createElement("span");
+        nightNote.className = "lb-assign-note";
+        nightNote.setAttribute("style", CALLOUT_BOX + " margin: 0 12px 10px;");
+        nightBadge.setAttribute("style", CALLOUT_BADGE);
+        nightBadge.textContent = "!";
+        nightWords.textContent = "Your Night layout only shows once Swap Day & Night Layouts is on, below the grid.";
+        nightNote.appendChild(nightBadge);
+        nightNote.appendChild(nightWords);
+        nightNote.hidden = true;
+        function nightModeSelect() {
+          return document.querySelector("select[data-night-mode]");
+        }
+        function updateNightNote() {
+          const mode = nightModeSelect();
+          nightNote.hidden = !mode || mode.value !== "0" || library.night === ROLE_NONE;
+        }
         function keep() {
           library.layouts[selected] = opts.getCurrent();
           opts.save();
@@ -963,6 +1013,7 @@ module.exports = {
           for (let i = 0; i < selects.length && i < order.length; i++) {
             selects[i].value = String(library[order[i]]);
           }
+          updateNightNote();
         }
         for (let i = 0; i < LAYOUT_COUNT; i++) {
           (function(index) {
@@ -1019,7 +1070,15 @@ module.exports = {
         }
         host.appendChild(tabs);
         host.appendChild(assignments);
+        host.appendChild(nightNote);
         redraw();
+        setTimeout(function() {
+          const mode = nightModeSelect();
+          if (mode) {
+            mode.addEventListener("change", updateNightNote);
+          }
+          updateNightNote();
+        }, 0);
         return {
           selected: function() {
             return selected;
@@ -1031,6 +1090,7 @@ module.exports = {
       var init_modes = __esm({
         "core/pkjs/clay/builder/ts/layout/modes.ts"() {
           init_wire();
+          init_callout_style();
           LAYOUT_COUNT = 5;
           ROLE_NONE = -1;
         }
@@ -1105,15 +1165,6 @@ module.exports = {
             "Agenda": "calendar",
             "Timeline": "calendar"
           };
-        }
-      });
-
-      // paf/ts/clay/callout-style.ts
-      var CALLOUT_BOX, CALLOUT_BADGE;
-      var init_callout_style = __esm({
-        "paf/ts/clay/callout-style.ts"() {
-          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
-          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
         }
       });
 
@@ -1237,6 +1288,32 @@ module.exports = {
         }
       });
 
+      // core/pkjs/clay/builder/ts/shared/import-note.ts
+      function showImportNote(panel, noteClass, buttonsClass, message) {
+        let note = panel.querySelector("." + noteClass);
+        if (!note) {
+          note = document.createElement("div");
+          note.className = noteClass + " mo-io-note";
+          note.setAttribute("role", "alert");
+          const buttons = panel.querySelector("." + buttonsClass);
+          panel.insertBefore(note, buttons);
+          const textarea = panel.querySelector("textarea");
+          const shown = note;
+          if (textarea) {
+            textarea.addEventListener("input", function() {
+              if (shown.parentNode) {
+                shown.parentNode.removeChild(shown);
+              }
+            });
+          }
+        }
+        note.textContent = message;
+      }
+      var init_import_note = __esm({
+        "core/pkjs/clay/builder/ts/shared/import-note.ts"() {
+        }
+      });
+
       // gridlock/src/pkjs/clay/builder/ts/layout/init.ts
       var init_exports = {};
       __export(init_exports, {
@@ -1292,7 +1369,22 @@ module.exports = {
           return modes ? modes.selected() : library.day;
         }
         const MODULES = buildModuleList(rawModules);
+        const undoBtn = root.querySelector(".lb-btn-undo");
+        let undoBlocks = null;
+        let undoAfter = "";
+        function replaceAll(next) {
+          undoBlocks = blocks;
+          blocks = next;
+          undoAfter = serializeLayout(blocks);
+          render();
+        }
+        function canUndo() {
+          return undoBlocks !== null && serializeLayout(blocks) === undoAfter;
+        }
         function render() {
+          if (undoBtn) {
+            undoBtn.disabled = !canUndo();
+          }
           gridEl.innerHTML = "";
           const grid = occupancyGrid(blocks);
           for (let r = 0; r < GRID_ROWS; r++) {
@@ -1362,16 +1454,23 @@ module.exports = {
           }
         });
         root.querySelector(".lb-btn-clear").addEventListener("click", function() {
-          blocks = [];
-          render();
+          replaceAll([]);
         });
+        if (undoBtn) {
+          undoBtn.addEventListener("click", function() {
+            if (undoBlocks && canUndo()) {
+              blocks = undoBlocks;
+              undoBlocks = null;
+              render();
+            }
+          });
+        }
         const presetBtns = root.querySelectorAll(".lb-preset");
         for (let i = 0; i < presetBtns.length; i++) {
           presetBtns[i].addEventListener("click", function(e) {
             const id = e.target.getAttribute("data-preset") || "";
             if (LAYOUT_PRESETS[id]) {
-              blocks = parseLayoutString(LAYOUT_PRESETS[id]);
-              render();
+              replaceAll(parseLayoutString(LAYOUT_PRESETS[id]));
             }
           });
         }
@@ -1381,6 +1480,7 @@ module.exports = {
               return serializeLayout(blocks);
             },
             onSelect: function(layout) {
+              undoBlocks = null;
               blocks = parseLayoutString(layout);
               render();
             },
@@ -1401,8 +1501,12 @@ module.exports = {
               value: serializeLayout(blocks),
               copyResetMs: 2e3,
               onApply: function(text) {
-                blocks = parseLayoutString(text);
-                render();
+                const parsed = parseLayoutString(text);
+                if (parsed.length === 0 && text.trim() !== "" && text.trim() !== EMPTY_LAYOUT) {
+                  showImportNote(panel, "lb-io-note", "lb-io-btns", "No panels found in that text, so your layout is unchanged.");
+                  return;
+                }
+                replaceAll(parsed);
                 overlay.close();
               }
             });
@@ -1410,6 +1514,7 @@ module.exports = {
         }
         root._lbSet = function(value) {
           library.layouts[library.day] = value || EMPTY_LAYOUT;
+          undoBlocks = null;
           if (selected() === library.day) {
             blocks = parseLayoutString(library.layouts[library.day]);
             render();
@@ -1435,6 +1540,7 @@ module.exports = {
               library.day = saved.day;
               library.night = saved.night;
               library.quiet = saved.quiet;
+              undoBlocks = null;
               blocks = parseLayoutString(library.layouts[library.day]);
               if (modes) {
                 modes.refresh();
@@ -1458,6 +1564,7 @@ module.exports = {
           init_plugin_warnings();
           init_overlay();
           init_io_panel();
+          init_import_note();
           init_modes();
         }
       });

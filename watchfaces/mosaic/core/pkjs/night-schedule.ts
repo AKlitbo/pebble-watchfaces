@@ -42,6 +42,9 @@ export function nightScheduleItems(): ClayConfigItem[] {
       defaultValue: 0,
       options: MODE_OPTIONS,
       description: 'When the watch swaps to your night layout and back. At Sunset & Sunrise uses the times from your weather source, and the times below until it has them.',
+      // the layout builder finds this select by the marker, since Clay puts no message key in the
+      // page, and warns under its Night picker while the swap is off
+      attributes: { 'data-night-mode': '' },
     },
     {
       type: 'select',
@@ -49,7 +52,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       label: 'Night Starts',
       defaultValue: 42, // 21:00
       options: HALF_HOURS,
-      description: 'When the night layout takes over. At Sunset & Sunrise also uses it until the watch has a sunset time.',
+      description: 'When the night layout takes over. At Sunset & Sunrise also uses this time until the watch has a sunset time.',
       visibleWhen: { key: 'LAYOUT_NIGHT_MODE', in: [1, 2] },
     },
     {
@@ -58,7 +61,7 @@ export function nightScheduleItems(): ClayConfigItem[] {
       label: 'Night Ends',
       defaultValue: 14, // 07:00
       options: HALF_HOURS,
-      description: 'When the day layout comes back. At Sunset & Sunrise also uses it until the watch has a sunrise time.',
+      description: 'When the day layout comes back. At Sunset & Sunrise also uses this time until the watch has a sunrise time.',
       visibleWhen: { key: 'LAYOUT_NIGHT_MODE', in: [1, 2] },
     },
   ];

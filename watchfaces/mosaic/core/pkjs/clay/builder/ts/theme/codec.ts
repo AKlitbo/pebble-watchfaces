@@ -341,3 +341,45 @@ export function parseAppearance(text: string): AppearanceMaps {
 
   return result;
 }
+
+/**
+ * Whether pasted text is a colour string in one of the formats parseAppearance reads.
+ *
+ * parseAppearance reads what it can and skips the rest, and its oldest format takes any untagged
+ * text, so a layout string or a stray sentence would decode as junk colours. The import checks
+ * this first so it can refuse that paste rather than wipe every panel with it.
+ *
+ * @param text The pasted text, already trimmed.
+ * @return True for an empty table, a tagged string, or an older string of the right shape.
+ */
+export function looksLikeAppearance(text: string): boolean {
+  if (text === '' || text === '0') {
+    return true;
+  }
+
+  const plain = COLOR_ALPHABET + '.';
+
+  function only(body: string, allowed: string): boolean {
+    for (let index = 0; index < body.length; index++) {
+      if (allowed.indexOf(body.charAt(index)) < 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  const tag = text.charAt(1);
+
+  if (text.charAt(0) === FORMAT_MARKER && (tag === '3' || tag === '4')) {
+    return only(text.substring(2), plain + '|' + ID_ESCAPE);
+  }
+
+  if (text.charAt(0) === FORMAT_MARKER) {
+    const body = text.substring(1);
+
+    return body.length > 0 && body.length % 6 === 0 && only(body, plain);
+  }
+
+  return text.length % 5 === 0 && only(text, plain);
+}

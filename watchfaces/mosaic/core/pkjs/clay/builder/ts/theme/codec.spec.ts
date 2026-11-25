@@ -21,6 +21,7 @@ import {
   unpackFlags,
   serializeAppearance,
   parseAppearance,
+  looksLikeAppearance,
 } from './codec';
 
 describe('wire chars', () => {
@@ -230,5 +231,36 @@ describe('parseAppearance', () => {
     expect(roundTrip(null)).toBe('0');
     expect(roundTrip('0')).toBe('0');
     expect(roundTrip('abc')).toBe('0');
+  });
+});
+
+describe('looksLikeAppearance', () => {
+  /** Each real format, and an empty table, has to pass or a wearer's own export would be refused. */
+  test.each([
+    ['an empty table', '0'],
+    ['a blank box', ''],
+    ['a ~3 string', '~3Cw...|CB.'],
+    ['a ~4 string with an escaped id', '~4!Aw...|'],
+    ['a positional ~ string', '~......Cw....'],
+    ['an oldest 5 char string', '.....Cw..H'],
+  ])('accepts %s', (_name, text) => {
+    const result = looksLikeAppearance(text);
+
+    expect(result).toBe(true);
+  });
+
+  /**
+   * The oldest format takes any untagged text, so without this a layout string or a sentence pasted
+   * into the colour box would decode as junk colours and replace every panel's.
+   */
+  test.each([
+    ['a layout string', '2,0,0,2,1;3,0,2,2,1'],
+    ['a sentence', 'hello world'],
+    ['an untagged string of the wrong length', 'Cw..'],
+    ['a positional string of the wrong length', '~Cw..'],
+  ])('refuses %s', (_name, text) => {
+    const result = looksLikeAppearance(text);
+
+    expect(result).toBe(false);
   });
 });

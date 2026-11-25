@@ -27,6 +27,7 @@
   --mo-on-accent: #1a0c03;
   --mo-danger: #c53a2c;
   --mo-danger-press: #a82f24;
+  --mo-danger-ink: #ff7a6b; /* text that says something went wrong. 6.9:1 on a card */
   --mo-edge: 2px; /* the drawn edge of a tab that has no border of its own */
   --mo-mono: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
   /* the framework's own controls, the location search and the plugins panel, take their focus ring,
@@ -169,6 +170,16 @@
   border-color: var(--mo-danger-press);
 }
 
+/* ---- disabled: the builder's Undo while there is nothing to undo. faded, with the edge of a card
+   rather than a control, so it does not read as something to tap ---- */
+:root .lb-btn:disabled,
+:root .lb-btn:disabled:active {
+  background: var(--mo-inset);
+  border-color: var(--mo-line);
+  color: var(--mo-ink-muted);
+  cursor: default;
+}
+
 /* ---- tabs: the layout tabs, the size tabs, and Mono | Vibrant. a row of edged cells with the
    picked one solid, so a tab that is not picked still reads as something to tap ---- */
 :root .lb-ltab,
@@ -259,10 +270,15 @@
   color: var(--mo-ink-muted);
 }
 
+/* an import that found nothing to apply */
+:root .mo-io-note {
+  color: var(--mo-danger-ink);
+}
+
 /* ---- hover only on a device with a mouse or a trackpad. a phone keeps the hover after a tap, so
    a hover colour there would leave the last preset tapped looking picked ---- */
 @media (hover: hover) and (pointer: fine) {
-  :root .lb-btn:not(.lb-btn-clear):hover,
+  :root .lb-btn:not(.lb-btn-clear):not(:disabled):hover,
   :root .lb-io-btn:not(.primary):hover,
   :root .tb-io-btn:not(.primary):hover,
   :root .tb-bar-btn.ghost:hover,

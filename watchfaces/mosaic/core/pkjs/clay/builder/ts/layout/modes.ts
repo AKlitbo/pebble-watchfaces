@@ -15,6 +15,7 @@
  */
 
 import { EMPTY_LAYOUT } from './wire';
+import { CALLOUT_BADGE, CALLOUT_BOX } from '../../../../../../paf/ts/clay/callout-style';
 
 /** How many layouts the library holds. Some get used; the rest are somewhere to keep a design. */
 export const LAYOUT_COUNT = 5;
@@ -178,6 +179,34 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
   // only offered where the page has a store to keep the answer in
   const quietWanted = document.querySelector('.gl-quiet') !== null;
 
+  // a Night layout does nothing while Swap Day & Night Layouts is Never, and that select sits below
+  // the grid where it is easy to miss. this callout says so under the row of pickers, in the look of
+  // the plugin notes under the grid. the pickers sit side by side, so it names the Night layout
+  const nightNote = document.createElement('div');
+  const nightBadge = document.createElement('span');
+  const nightWords = document.createElement('span');
+
+  nightNote.className = 'lb-assign-note';
+  // the same side gutter as the pickers above it
+  nightNote.setAttribute('style', CALLOUT_BOX + ' margin: 0 12px 10px;');
+  nightBadge.setAttribute('style', CALLOUT_BADGE);
+  nightBadge.textContent = '!';
+  nightWords.textContent = 'Your Night layout only shows once Swap Day & Night Layouts is on, below the grid.';
+  nightNote.appendChild(nightBadge);
+  nightNote.appendChild(nightWords);
+  nightNote.hidden = true;
+
+  /** The swap select, which Clay builds after this bar, so it is looked up each time. */
+  function nightModeSelect(): HTMLSelectElement | null {
+    return document.querySelector('select[data-night-mode]');
+  }
+
+  function updateNightNote(): void {
+    const mode = nightModeSelect();
+
+    nightNote.hidden = !mode || mode.value !== '0' || library.night === ROLE_NONE;
+  }
+
   /** Stash whatever is on the grid into the layout it belongs to. */
   function keep(): void {
     library.layouts[selected] = opts.getCurrent();
@@ -213,6 +242,8 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
     for (let i = 0; i < selects.length && i < order.length; i++) {
       selects[i].value = String(library[order[i]]);
     }
+
+    updateNightNote();
   }
 
   for (let i = 0; i < LAYOUT_COUNT; i++) {
@@ -289,7 +320,19 @@ export function buildModesBar(host: HTMLElement, library: LayoutLibrary, opts: M
 
   host.appendChild(tabs);
   host.appendChild(assignments);
+  host.appendChild(nightNote);
   redraw();
+
+  // the swap select only exists once Clay has built the rest of the page, and its value is set then
+  setTimeout(function () {
+    const mode = nightModeSelect();
+
+    if (mode) {
+      mode.addEventListener('change', updateNightNote);
+    }
+
+    updateNightNote();
+  }, 0);
 
   return {
     selected: function () {

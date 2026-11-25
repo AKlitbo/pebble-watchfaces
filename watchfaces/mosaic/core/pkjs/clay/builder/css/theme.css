@@ -97,6 +97,13 @@
   color: #eceef2;
 }
 
+/* the line saying an import found nothing, between the text box and the buttons */
+.tb-io-note {
+  font-size: 11px;
+  line-height: 1.4;
+  margin: -4px 0 12px;
+}
+
 .tb-io-btns {
   display: flex;
   gap: 8px;

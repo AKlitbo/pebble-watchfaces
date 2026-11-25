@@ -177,6 +177,55 @@ describe('editor sheet', () => {
     expect(result).toBe('0');
   });
 
+  /** Reset wipes every panel's colours, headers, and borders at once, so Undo is the way back from a mis-tap. */
+  test('Undo after Reset puts every colour and flag back', () => {
+    const { ctx, root } = mountTheme();
+
+    ctx.set('~3Cw...|CB.');
+    root.querySelector<HTMLElement>('.tb-edit-btn').click();
+    barButton('Reset').click();
+
+    barButton('Undo').click();
+    const result = ctx.get();
+
+    expect(result).toBe('~3Cw...|CB.');
+    expect(barButton('Reset')).not.toBeNull();
+  });
+
+  /** Undo after Reset steps back over the Reset alone, so an edit made after it has to turn it off. */
+  test('an edit after Reset turns Undo back into Reset', () => {
+    const { ctx, root } = mountTheme();
+
+    ctx.set('~3Cw...|CB.');
+    root.querySelector<HTMLElement>('.tb-edit-btn').click();
+    barButton('Reset').click();
+
+    document.querySelector<HTMLElement>('.tb-toggle[title="Header 1x2"]').click();
+
+    expect(barButton('Undo')).toBeNull();
+    expect(barButton('Reset')).not.toBeNull();
+  });
+
+  /**
+   * A layout string pasted into the colour box would decode as junk colours through the oldest
+   * format, which takes any untagged text. Applying it would wipe every panel, so the popup stays
+   * open and says why.
+   */
+  test('Import refuses text with no colours in it and leaves the panels alone', () => {
+    const { ctx, root } = mountTheme();
+
+    ctx.set('~3Cw...|CB.');
+    root.querySelector<HTMLElement>('.tb-edit-btn').click();
+    barButton('Import/Export').click();
+    document.querySelector<HTMLTextAreaElement>('.tb-io-textarea').value = '2,0,0,2,1;3,0,2,2,1';
+
+    document.querySelector<HTMLElement>('.tb-pick .tb-io-btn.primary').click();
+    const result = ctx.get();
+
+    expect(result).toBe('~3Cw...|CB.');
+    expect(document.querySelector<HTMLElement>('.tb-io-note')).not.toBeNull();
+  });
+
   /** Done must both close the sheet and tell Clay the value changed, or the save button never lights. */
   test('Done closes the sheet and triggers change', () => {
     const { ctx } = openEditor();

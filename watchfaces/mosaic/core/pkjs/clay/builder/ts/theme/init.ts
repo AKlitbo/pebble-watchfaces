@@ -9,7 +9,7 @@
  */
 
 import { PEBBLE_COLORS_CSV, buildPalette, buildArgbByName } from './palette';
-import { serializeAppearance, parseAppearance } from './codec';
+import { serializeAppearance, parseAppearance, looksLikeAppearance } from './codec';
 import { buildThemeModules } from './model';
 import { colourAll } from './bulk';
 import { createPicker } from './picker';
@@ -58,8 +58,12 @@ export function init(this: ClayComponentInstance): void {
   // module value -> { "1x2": true, ... } for the sizes whose outer border is hidden
   let borderless: FlagMap = {};
 
+  // the sheet listens here so any edit can drop the Undo that Reset offers
+  let onEdit = function (): void {};
+
   function persist(): void {
     hidden.value = serializeAppearance(colors, headerless, borderless);
+    onEdit();
   }
 
   function setChannel(moduleValue: number, channelKey: ChannelKey, byte: number | null): void {
@@ -100,12 +104,27 @@ export function init(this: ClayComponentInstance): void {
       return serializeAppearance(colors, headerless, borderless);
     },
     applyImport: function (text) {
-      const parsed = parseAppearance(text);
+      const trimmed = text.trim();
+
+      // a layout string or a stray sentence would decode as junk colours, so only a real colour
+      // string gets applied
+      if (!looksLikeAppearance(trimmed)) {
+        return false;
+      }
+
+      const parsed = parseAppearance(trimmed);
 
       colors = parsed.colors;
       headerless = parsed.headerless;
       borderless = parsed.borderless;
       persist();
+      return true;
+    },
+    restore: function (text) {
+      root._tbSet(text);
+    },
+    watchEdits: function (listener) {
+      onEdit = listener;
     },
     resetAll: function () {
       colors = {};

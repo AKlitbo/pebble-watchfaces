@@ -9,6 +9,7 @@
 
 import { createOverlayHost } from '../../../../../../paf/ts/clay/builder/ts/shared/overlay';
 import { buildIoPanel } from '../../../../../../paf/ts/clay/builder/ts/shared/io-panel';
+import { showImportNote } from '../shared/import-note';
 import { flagOn, setFlag } from './codec';
 import type { FlagMap, ThemeModule } from '../types';
 
@@ -19,7 +20,12 @@ export interface SheetEnv {
   getHeaderless(): FlagMap;
   getBorderless(): FlagMap;
   serialize(): string;
-  applyImport(text: string): void;
+  /** Applies an imported string, or refuses text that holds nothing and reports false. */
+  applyImport(text: string): boolean;
+  /** Puts back a string serialize gave earlier, which Undo after Reset uses. */
+  restore(text: string): void;
+  /** Calls the listener whenever the table is written, so the sheet can drop its Undo. */
+  watchEdits(listener: () => void): void;
   resetAll(): void;
   persist(): void;
   openColourAll(onApplied: () => void): void;
@@ -43,6 +49,10 @@ export function createSheet(env: SheetEnv): { open(): void } {
   const ioHost = createOverlayHost('tb-pick-overlay', 'tb-pick', true);
   let editorList: HTMLElement | null = null;
 
+  // the bulk buttons' label painters. Reset, Undo, and an import change the flags under them, so
+  // the list redraw repaints them too
+  let bulkPainters: Array<() => void> = [];
+
   // (re)fill the module list in place. used on open and reset and import
   function renderList(): void {
     if (!editorList) {
@@ -56,6 +66,10 @@ export function createSheet(env: SheetEnv): { open(): void } {
     for (let index = 0; index < env.modules.length; index++) {
       editorList.appendChild(env.buildRow(env.modules[index]));
     }
+
+    for (let index = 0; index < bulkPainters.length; index++) {
+      bulkPainters[index]();
+    }
   }
 
   // share a colour string with someone else or paste one in
@@ -68,7 +82,13 @@ export function createSheet(env: SheetEnv): { open(): void } {
       value: env.serialize(),
       copyResetMs: 1500,
       onApply: function (text) {
-        env.applyImport(text);
+        // a stray paste can read as no colours at all, and applying it would wipe every panel.
+        // the popup stays open and says why
+        if (!env.applyImport(text)) {
+          showImportNote(panel, 'tb-io-note', 'tb-io-btns', 'No colours found in that text, so your panels are unchanged.');
+          return;
+        }
+
         renderList();
         ioHost.close();
       },
@@ -156,6 +176,7 @@ export function createSheet(env: SheetEnv): { open(): void } {
       };
 
       paint();
+      bulkPainters.push(paint);
       button.addEventListener('click', function () {
         // any still on -> hide them all. otherwise show them all again
         setAll(which, anyStillOn(which));
@@ -200,12 +221,32 @@ export function createSheet(env: SheetEnv): { open(): void } {
 
     const resetButton = document.createElement('button');
 
+    // what the table held before the last Reset, so the same button can turn into Undo. any edit
+    // after the Reset drops it, so Undo only ever steps back over the Reset itself
+    let beforeReset: string | null = null;
+
     resetButton.type = 'button';
     resetButton.className = 'tb-bar-btn ghost';
     resetButton.textContent = 'Reset';
+
+    env.watchEdits(function () {
+      beforeReset = null;
+      resetButton.textContent = 'Reset';
+    });
+
     resetButton.addEventListener('click', function () {
-      env.resetAll();
-      env.persist();
+      if (beforeReset !== null) {
+        // putting the old table back counts as an edit, which turns the button back into Reset
+        env.restore(beforeReset);
+      } else {
+        const saved = env.serialize();
+
+        env.resetAll();
+        env.persist();
+        beforeReset = saved;
+        resetButton.textContent = 'Undo';
+      }
+
       renderList();
     });
     bar.appendChild(resetButton);
@@ -232,6 +273,8 @@ export function createSheet(env: SheetEnv): { open(): void } {
   function open(): void {
     const panel = sheetHost.open();
 
+    bulkPainters = [];
+
     const legend = document.createElement('div');
 
     legend.className = 'tb-legend';
@@ -242,15 +285,15 @@ export function createSheet(env: SheetEnv): { open(): void } {
       '<div class="tb-legend-ttl">What each control changes</div>' +
       '<div class="tb-legend-grid">' +
       '<div class="tb-lg-term"><span class="tb-lg-dot empty"></span>H / B</div>' +
-      '<div class="tb-lg-desc">show or hide the header strip / the panel outline, per size (green shown, grey hidden)</div>' +
+      '<div class="tb-lg-desc">shows or hides the header strip or the panel outline at each size. Green is shown, grey is hidden</div>' +
       '<div class="tb-lg-term"><span class="tb-lg-dot"></span>Accent</div>' +
-      '<div class="tb-lg-desc">the header bar, border &amp; progress (shared across every size)</div>' +
+      '<div class="tb-lg-desc">the header bar, border, and progress bar, the same at every size</div>' +
       '<div class="tb-lg-term"><span class="tb-lg-dot"></span>Value</div>' +
       '<div class="tb-lg-desc">the big number or readout</div>' +
       '<div class="tb-lg-term"><span class="tb-lg-dot"></span>Icon</div>' +
       '<div class="tb-lg-desc">the icon</div>' +
       '<div class="tb-lg-term"><span class="tb-lg-dot"></span>Sub</div>' +
-      '<div class="tb-lg-desc">the small caption line (e.g. OF 10000 STEPS)</div>' +
+      '<div class="tb-lg-desc">the small caption line, such as OF 10,000</div>' +
       '</div>';
 
     editorList = document.createElement('div');

@@ -4,6 +4,18 @@ All notable changes to the Gridlock watchface are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added Undo to the layout builder, which brings your layout back after Clear, a preset, or an import. Reset in the panel colour editor turns into Undo the same way.
+- Added a note in the layout builder while Swap Day & Night Layouts is set to Never, since the Night layout only shows once that is on.
+
+### Fixed
+
+- Fixed a panel vanishing when you let go of it where it did not fit, or when the page scrolled partway through a drag. It now goes back where it was.
+- Fixed pasting text with no panels or colours in it into Import wiping your layout or colours. The page now says so and leaves them as they were.
+
 ## [1.9.2] - 2026-11-20
 
 ### Changed

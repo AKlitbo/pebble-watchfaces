@@ -571,6 +571,15 @@ module.exports = {
       });
       function createDragEngine(env) {
         const rules = env.geometry;
+        let lifted = null;
+        let overGrid = false;
+        function putBack() {
+          if (lifted) {
+            env.getBlocks().splice(lifted.idx, 0, lifted.block);
+            lifted = null;
+          }
+          env.render();
+        }
         function cellAt(x, y) {
           const rect = env.gridEl.getBoundingClientRect();
           const localX = x - rect.left;
@@ -613,6 +622,9 @@ module.exports = {
           },
           highlight(dragged, cell, allowed) {
             clearHighlight();
+            if (dragged) {
+              overGrid = cell !== null;
+            }
             if (!dragged || cell === null || !allowed) {
               return;
             }
@@ -628,6 +640,7 @@ module.exports = {
           },
           drop(dragged, cell) {
             const snap = rules.snapDrop(cell, dragged.w, dragged.h);
+            lifted = null;
             env.getBlocks().push({
               module: dragged.value,
               row: snap.row,
@@ -638,11 +651,21 @@ module.exports = {
             env.render();
           },
           dropOutside() {
-            env.render();
+            if (!overGrid) {
+              lifted = null;
+            }
+            putBack();
+          },
+          // the webview took the touch to scroll, so the block was never let go anywhere
+          cancel() {
+            putBack();
           },
           lift(dragged) {
+            overGrid = true;
             if (dragged.blockIdx !== null) {
-              env.getBlocks().splice(dragged.blockIdx, 1);
+              const idx = dragged.blockIdx;
+              lifted = { block: env.getBlocks()[idx], idx };
+              env.getBlocks().splice(idx, 1);
               env.render();
             }
           }
@@ -894,6 +917,15 @@ module.exports = {
         }
       });
 
+      // paf/ts/clay/callout-style.ts
+      var CALLOUT_BOX, CALLOUT_BADGE;
+      var init_callout_style = __esm({
+        "paf/ts/clay/callout-style.ts"() {
+          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
+          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
+        }
+      });
+
       // core/pkjs/clay/builder/ts/layout/modes.ts
       var modes_exports = {};
       __export(modes_exports, {
@@ -967,6 +999,24 @@ module.exports = {
         const assignments = document.createElement("div");
         assignments.className = "lb-assign";
         const quietWanted = document.querySelector(".gl-quiet") !== null;
+        const nightNote = document.createElement("div");
+        const nightBadge = document.createElement("span");
+        const nightWords = document.createElement("span");
+        nightNote.className = "lb-assign-note";
+        nightNote.setAttribute("style", CALLOUT_BOX + " margin: 0 12px 10px;");
+        nightBadge.setAttribute("style", CALLOUT_BADGE);
+        nightBadge.textContent = "!";
+        nightWords.textContent = "Your Night layout only shows once Swap Day & Night Layouts is on, below the grid.";
+        nightNote.appendChild(nightBadge);
+        nightNote.appendChild(nightWords);
+        nightNote.hidden = true;
+        function nightModeSelect() {
+          return document.querySelector("select[data-night-mode]");
+        }
+        function updateNightNote() {
+          const mode = nightModeSelect();
+          nightNote.hidden = !mode || mode.value !== "0" || library.night === ROLE_NONE;
+        }
         function keep() {
           library.layouts[selected] = opts.getCurrent();
           opts.save();
@@ -990,6 +1040,7 @@ module.exports = {
           for (let i = 0; i < selects.length && i < order.length; i++) {
             selects[i].value = String(library[order[i]]);
           }
+          updateNightNote();
         }
         for (let i = 0; i < LAYOUT_COUNT; i++) {
           (function(index) {
@@ -1046,7 +1097,15 @@ module.exports = {
         }
         host.appendChild(tabs);
         host.appendChild(assignments);
+        host.appendChild(nightNote);
         redraw();
+        setTimeout(function() {
+          const mode = nightModeSelect();
+          if (mode) {
+            mode.addEventListener("change", updateNightNote);
+          }
+          updateNightNote();
+        }, 0);
         return {
           selected: function() {
             return selected;
@@ -1058,6 +1117,7 @@ module.exports = {
       var init_modes = __esm({
         "core/pkjs/clay/builder/ts/layout/modes.ts"() {
           init_wire();
+          init_callout_style();
           LAYOUT_COUNT = 5;
           ROLE_NONE = -1;
         }
@@ -1132,15 +1192,6 @@ module.exports = {
             "Agenda": "calendar",
             "Timeline": "calendar"
           };
-        }
-      });
-
-      // paf/ts/clay/callout-style.ts
-      var CALLOUT_BOX, CALLOUT_BADGE;
-      var init_callout_style = __esm({
-        "paf/ts/clay/callout-style.ts"() {
-          CALLOUT_BOX = "position: relative; margin: 0.7rem 0 0.15rem; padding: 0.5rem 0.6rem 0.5rem 2.1rem; background: rgba(255, 71, 0, 0.1); background: color-mix(in srgb, var(--pf-note-accent, #ff4700) 10%, transparent); border-left: 3px solid var(--pf-note-accent, #ff4700); font-size: 0.85em; line-height: 1.4;";
-          CALLOUT_BADGE = 'content: "!"; position: absolute; left: 0.6rem; top: 0.65rem; width: 1.15em; height: 1.15em; border: 1px solid var(--pf-note-accent, #ff4700); border-radius: 50%; color: var(--pf-note-accent, #ff4700); font-size: 0.95em; font-weight: 700; line-height: 1.1em; text-align: center;';
         }
       });
 

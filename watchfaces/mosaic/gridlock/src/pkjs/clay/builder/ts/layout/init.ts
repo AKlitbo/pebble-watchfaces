@@ -19,6 +19,7 @@ import { createPalette } from '../../../../../../../paf/ts/clay/builder/ts/share
 import { createPluginWarnings } from '../../../../../../../paf/ts/clay/builder/ts/shared/plugin-warnings';
 import { createOverlayHost } from '../../../../../../../paf/ts/clay/builder/ts/shared/overlay';
 import { buildIoPanel } from '../../../../../../../paf/ts/clay/builder/ts/shared/io-panel';
+import { showImportNote } from '../../../../../../../core/pkjs/clay/builder/ts/shared/import-note';
 import { buildModesBar, readLibrary, seedLibrary, writeLibrary, storePresent, ROLE_NONE } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { ModesBar } from '../../../../../../../core/pkjs/clay/builder/ts/layout/modes';
 import type { Block, ClayComponentInstance, ModuleInfo, RawModule, Thumbs } from '../../../../../../../core/pkjs/clay/builder/ts/types';
@@ -135,7 +136,32 @@ export function init(this: ClayComponentInstance): void {
 
   const MODULES = buildModuleList(rawModules);
 
+  const undoBtn = root.querySelector('.lb-btn-undo') as HTMLButtonElement | null;
+
+  // the grid from before the last Clear, preset, or import, which each replace the whole layout at
+  // once, and the layout that replace left. Undo only works while the grid still matches it, so a
+  // drag that puts a panel back keeps it and an edit that sticks turns it off
+  let undoBlocks: Block[] | null = null;
+  let undoAfter = '';
+
+  /** Swaps the whole grid for another, keeping the old one for Undo. */
+  function replaceAll(next: Block[]): void {
+    undoBlocks = blocks;
+    blocks = next;
+    undoAfter = serializeLayout(blocks);
+    render();
+  }
+
+  /** Whether Undo would step back over the last replace, rather than over later edits too. */
+  function canUndo(): boolean {
+    return undoBlocks !== null && serializeLayout(blocks) === undoAfter;
+  }
+
   function render(): void {
+    if (undoBtn) {
+      undoBtn.disabled = !canUndo();
+    }
+
     gridEl.innerHTML = '';
     const grid = occupancyGrid(blocks);
 
@@ -218,9 +244,18 @@ export function init(this: ClayComponentInstance): void {
   });
 
   (root.querySelector('.lb-btn-clear') as HTMLElement).addEventListener('click', function () {
-    blocks = [];
-    render();
+    replaceAll([]);
   });
+
+  if (undoBtn) {
+    undoBtn.addEventListener('click', function () {
+      if (undoBlocks && canUndo()) {
+        blocks = undoBlocks;
+        undoBlocks = null;
+        render();
+      }
+    });
+  }
 
   const presetBtns = root.querySelectorAll<HTMLElement>('.lb-preset');
 
@@ -229,8 +264,7 @@ export function init(this: ClayComponentInstance): void {
       const id = (e.target as HTMLElement).getAttribute('data-preset') || '';
 
       if (LAYOUT_PRESETS[id]) {
-        blocks = parseLayoutString(LAYOUT_PRESETS[id]);
-        render();
+        replaceAll(parseLayoutString(LAYOUT_PRESETS[id]));
       }
     });
   }
@@ -241,6 +275,8 @@ export function init(this: ClayComponentInstance): void {
         return serializeLayout(blocks);
       },
       onSelect: function (layout) {
+        // the kept grid belongs to the layout being left
+        undoBlocks = null;
         blocks = parseLayoutString(layout);
         render();
       },
@@ -265,8 +301,16 @@ export function init(this: ClayComponentInstance): void {
         value: serializeLayout(blocks),
         copyResetMs: 2000,
         onApply: function (text) {
-          blocks = parseLayoutString(text);
-          render();
+          const parsed = parseLayoutString(text);
+
+          // text with no panels in it, such as a colours string pasted here, would empty the grid.
+          // the popup stays open and says why. a blank box still clears on purpose
+          if (parsed.length === 0 && text.trim() !== '' && text.trim() !== EMPTY_LAYOUT) {
+            showImportNote(panel, 'lb-io-note', 'lb-io-btns', 'No panels found in that text, so your layout is unchanged.');
+            return;
+          }
+
+          replaceAll(parsed);
           overlay.close();
         },
       });
@@ -277,6 +321,7 @@ export function init(this: ClayComponentInstance): void {
   // writes into whichever layout is assigned to day rather than whatever happens to be on screen
   root._lbSet = function (value) {
     library.layouts[library.day] = value || EMPTY_LAYOUT;
+    undoBlocks = null;
 
     // only follow it onto the grid while the day layout is the one being edited. Clay seeds this
     // at open, and yanking the user off the tab they were on would be its own small betrayal
@@ -310,6 +355,7 @@ export function init(this: ClayComponentInstance): void {
         library.day = saved.day;
         library.night = saved.night;
         library.quiet = saved.quiet;
+        undoBlocks = null;
         blocks = parseLayoutString(library.layouts[library.day]);
 
         if (modes) {

@@ -8,8 +8,9 @@
  * shared, but what may sit where is each face's own and arrives through the env.
  *
  * A block is spliced out of the model the moment its drag begins, so the space it leaves reads as
- * free for the rest of the move. That is why a drag ending anywhere illegal removes it: there is
- * nothing to put back, which is also how a block is deleted.
+ * free for the rest of the move. Letting go off the grid is how a block is deleted, so that drop
+ * leaves it out. Letting go on the grid where it does not fit, or losing the touch to a scroll,
+ * puts it back where it was, since a move that missed is not a delete.
  *
  * A Clay builder piece. esbuild bundles it into the component's initialize, which runs in the
  * config webview, so it sticks to browser APIs.
@@ -78,6 +79,22 @@ export interface DragEngine {
 export function createDragEngine(env: DragEnv): DragEngine {
   const rules = env.geometry;
 
+  // the block a drag took off the grid and where it sat in the list, kept until the drag ends
+  let lifted: { block: Block; idx: number } | null = null;
+
+  // whether the pointer was over the grid on the last move, which tells a missed move from a delete
+  let overGrid = false;
+
+  /** Puts a lifted block back where it was and repaints. */
+  function putBack(): void {
+    if (lifted) {
+      env.getBlocks().splice(lifted.idx, 0, lifted.block);
+      lifted = null;
+    }
+
+    env.render();
+  }
+
   /** The cell under a point, or null when the pointer has left the grid. */
   function cellAt(x: number, y: number): Cell | null {
     const rect = env.gridEl.getBoundingClientRect();
@@ -138,6 +155,11 @@ export function createDragEngine(env: DragEnv): DragEngine {
     highlight(dragged, cell, allowed) {
       clearHighlight();
 
+      // the engine clears the highlight with no payload as a drag ends, so only a real move counts
+      if (dragged) {
+        overGrid = cell !== null;
+      }
+
       if (!dragged || cell === null || !allowed) {
         return;
       }
@@ -159,6 +181,7 @@ export function createDragEngine(env: DragEnv): DragEngine {
     drop(dragged, cell) {
       const snap = rules.snapDrop(cell, dragged.w, dragged.h);
 
+      lifted = null;
       env.getBlocks().push({
         module: dragged.value,
         row: snap.row,
@@ -170,14 +193,28 @@ export function createDragEngine(env: DragEnv): DragEngine {
     },
 
     dropOutside() {
-      // a lifted block was spliced out when the drag began, so letting go anywhere illegal is
-      // what removes it. a palette drag that lands nowhere simply never placed anything
-      env.render();
+      // off the grid, a lifted block stays out, which is how one is removed. on the grid it just
+      // did not fit, so it goes back. a palette drag that lands nowhere never placed anything
+      if (!overGrid) {
+        lifted = null;
+      }
+
+      putBack();
+    },
+
+    // the webview took the touch to scroll, so the block was never let go anywhere
+    cancel() {
+      putBack();
     },
 
     lift(dragged) {
+      overGrid = true;
+
       if (dragged.blockIdx !== null) {
-        env.getBlocks().splice(dragged.blockIdx, 1);
+        const idx = dragged.blockIdx;
+
+        lifted = { block: env.getBlocks()[idx], idx: idx };
+        env.getBlocks().splice(idx, 1);
         env.render();
       }
     },
