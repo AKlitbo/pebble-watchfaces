@@ -9,6 +9,13 @@
 #include <stdio.h>
 #include <string.h>
 
+// how wide a line of text draws, so the 2x2 can tell whether its glyph clears the words
+static int text_width(const char *text, GFont font)
+{
+    return graphics_text_layout_get_content_size(text, font, GRect(0, 0, 200, 40), GTextOverflowModeFill,
+                                                 GTextAlignmentLeft).w;
+}
+
 static void weather_current_inner_2x2(GridCtx *gctx)
 {
     // the number rides big with the "°C"/"°F" alongside, formatted from the setting like the panels
@@ -31,11 +38,6 @@ static void weather_current_inner_2x2(GridCtx *gctx)
     const char *label = weather_store_cond_label();
     const char *cond = !raw[0] ? "--" : (label[0] ? label : word);
 
-    // the 2x2 has room under the temperature, so it draws the 40px glyph rather than the 24px one
-    IconMargins margin;
-    GBitmap *bmp = wx_icon_get_big(&margin);
-    GSize gs = bmp ? gbitmap_get_bounds(bmp).size : GSize(0, 0);
-
     // big temperature up in the top-left
     // the -7 nudges the big number up so it looks right
     GRect t_val_rect = grid_anchor(gctx, GSize(gctx->body.size.w, 38), GAlignTopLeft, PANEL_PAD, -7);
@@ -43,23 +45,44 @@ static void weather_current_inner_2x2(GridCtx *gctx)
     graphics_draw_text(gctx->ctx, temp, fonts_get(FONT_TEKO_34), t_val_rect,
                        GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 
-    // bottom-right corner like the shared 2x2 stat icon, auto-trimmed so the visible
-    // art rests in the corner instead of floating up on its own whitespace
-    GRect icon_rect = grid_anchor(gctx, gs, GAlignBottomRight, -EDGE_PAD(gctx) + margin.e, -5 + margin.s);
-
-    // the condition text sits under the temperature. a tall glyph, such as a storm's bolt, can
-    // reach up into its row, so a long condition ellipsizes short of the art rather than under it
+    // the condition text sits under it
     GRect cond_rect = grid_anchor(gctx, GSize(gctx->body.size.w, 14), GAlignLeft, PANEL_PAD, -1);
-    int art_top = icon_rect.origin.y + margin.n;
-    int art_left = icon_rect.origin.x + margin.w;
-    if (bmp && art_top < cond_rect.origin.y + cond_rect.size.h && art_left < cond_rect.origin.x + cond_rect.size.w)
-    {
-        cond_rect.size.w = art_left - cond_rect.origin.x - 2;
-    }
-
+    GFont cond_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
     graphics_context_set_text_color(gctx->ctx, gctx->color_subtitle);
-    graphics_draw_text(gctx->ctx, cond, fonts_get_system_font(FONT_KEY_GOTHIC_14), cond_rect,
+    graphics_draw_text(gctx->ctx, cond, cond_font, cond_rect,
                        GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
+
+    // the 40px glyph fills the room under the temperature. a tall one, such as the sun, reaches up
+    // into the text's rows, and then it is only kept when both texts end short of it. otherwise
+    // the panel draws the 24px glyph, so the words are never cut and the art never touches them
+    IconMargins margin;
+    GBitmap *bmp = wx_icon_get_big(&margin);
+    GRect icon_rect = GRect(0, 0, 0, 0);
+    if (bmp)
+    {
+        GSize gs = gbitmap_get_bounds(bmp).size;
+        icon_rect = grid_anchor(gctx, gs, GAlignBottomRight, -EDGE_PAD(gctx) + margin.e, -5 + margin.s);
+
+        int art_top = icon_rect.origin.y + margin.n;
+        int art_left = icon_rect.origin.x + margin.w;
+        // Teko 34's digits end about 34px into their box
+        int temp_bottom = t_val_rect.origin.y + 34;
+        int temp_right = t_val_rect.origin.x + text_width(temp, fonts_get(FONT_TEKO_34));
+        int cond_bottom = cond_rect.origin.y + cond_rect.size.h;
+        int cond_right = cond_rect.origin.x + text_width(cond, cond_font);
+
+        bool hits_temp = art_top < temp_bottom && temp_right > art_left - 2;
+        bool hits_cond = art_top < cond_bottom && cond_right > art_left - 2;
+        if (hits_temp || hits_cond)
+        {
+            bmp = wx_icon_get(&margin);
+            if (bmp)
+            {
+                gs = gbitmap_get_bounds(bmp).size;
+                icon_rect = grid_anchor(gctx, gs, GAlignBottomRight, -EDGE_PAD(gctx) + margin.e, -5 + margin.s);
+            }
+        }
+    }
 
     if (bmp)
     {
