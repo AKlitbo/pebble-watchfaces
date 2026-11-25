@@ -97,12 +97,7 @@ void sidereel_apply_header_font(void)
         return;
     }
 
-    if (s_header_font)
-    {
-        fonts_unload_custom_font(s_header_font);
-    }
-
-    s_header_font = fonts_load_custom_font(resource_get_handle(header_font_spec(choice)->resource));
+    s_header_font = header_font_swap(s_header_font, choice);
     fonts_register(FONT_HEADER, s_header_font);
     s_header_choice = choice;
 }

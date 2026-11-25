@@ -116,6 +116,22 @@ static void apply_hrv_rules(void)
 static GFont   s_header_font;
 static uint8_t s_header_choice = 0xFF;
 
+#if defined(DEV_WALK_FROM_CONFIG)
+// a walk from the dev config sets each screen's colours through dev_show_layout. a dev build never
+// saves, so the phone sends its saved colours back on every launch, and they would land over the
+// walk after its first screen. the dev config cannot hold this key, since it rides the long text
+// channel rather than the settings table, so the face drops it while such a walk runs
+static void receive_custom_colors(const char *value)
+{
+    (void)value;
+}
+#else
+static void receive_custom_colors(const char *value)
+{
+    gridlock_set_custom_colors(value);
+}
+#endif
+
 /**
  * @brief Loads the user's chosen header font under FONT_HEADER, swapping out the previous one.
  *
@@ -130,11 +146,7 @@ static void apply_header_font(void)
         return;
     }
 
-    if (s_header_font)
-    {
-        fonts_unload_custom_font(s_header_font);
-    }
-    s_header_font = fonts_load_custom_font(resource_get_handle(header_font_spec(choice)->resource));
+    s_header_font = header_font_swap(s_header_font, choice);
     fonts_register(FONT_HEADER, s_header_font);
     s_header_choice = choice;
 }
@@ -344,7 +356,7 @@ static void init(void)
     // custom colours are stored split across two keys, so they skip the settings table
     // the long text channel splits them on the way in and puts them back together on the way out
     appmessage_set_long_text(MESSAGE_KEY_APPEARANCE_CUSTOM_COLORS, GRIDLOCK_CUSTOM_COLORS_CAP, gridlock_get_custom_colors,
-                             gridlock_set_custom_colors);
+                             receive_custom_colors);
     appmessage_open(6144);
 
 #ifdef BUILD_WATCHAPP

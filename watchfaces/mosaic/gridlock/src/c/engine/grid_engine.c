@@ -20,6 +20,11 @@
 #include "system/settings/settings.h"
 #include "settings_schema.h"
 
+// the header label sits 2px nearer the block's left edge than the body's PANEL_PAD, since the
+// header fonts carry their own left-bearing and a full PANEL_PAD read as a gap. the block keeps
+// PANEL_PAD after the text, so it shrinks by the same 2px
+#define HEADER_TEXT_PAD (PANEL_PAD - 2)
+
 #define HEADER_H 14    // header strip height
 
 GRect grid_anchor(GridCtx *gctx, GSize size, GAlign anchor, int dx, int dy)
@@ -51,9 +56,9 @@ static ResolvedSlot s_resolved[GRIDLOCK_MAX_CELLS];
 static uint8_t s_theme;
 static Palette s_base_pal;
 
-// the header label's seating nudge for the user's chosen Header Font, worked out once per build
+// the user's chosen Header Font, whose nudges seat its labels in the strip, picked once per build
 // alongside the theme. 0/0 for the default Share Tech Mono
-static int8_t s_header_dx;
+static const HeaderFontSpec *s_header;
 static int8_t s_header_dy;
 
 // the corner radius from the user's Panel Style pick, resolved once per build like the theme
@@ -242,7 +247,7 @@ static void draw_panel(GridCtx *gctx, const ModuleDef *def, bool headerless, boo
     }
 
     // --- header. solid label block plus a 50% checker pattern across the strip ---
-    // the header font is the user's Header Font pick (registered as FONT_HEADER). s_header_dx
+    // the header font is the user's Header Font pick (registered as FONT_HEADER). s_header
     // and s_header_dy seat that font in the strip. worked out once per build in gridlock_build
     const char *label_text = def->get_label ? def->get_label(gctx->size) : def->label;
     GFont header_font = fonts_get(FONT_HEADER);
@@ -250,16 +255,18 @@ static void draw_panel(GridCtx *gctx, const ModuleDef *def, bool headerless, boo
                                                             GRect(0, 0, gctx->bounds.size.w, HEADER_H),
                                                             GTextOverflowModeFill, GTextAlignmentLeft);
 
-    int label_w = text_size.w + PANEL_PAD * 2;
+    int label_w = text_size.w + HEADER_TEXT_PAD + PANEL_PAD;
+    // a label that would leave the hatch less than 12px takes the whole strip rather than cutting
+    // short, so a label only ends in "..." when it is wider than the panel itself
     if (label_w > gctx->bounds.size.w - 12)
     {
-        label_w = gctx->bounds.size.w - 12;
+        label_w = gctx->bounds.size.w;
     }
 
     // fit the label to the block, adding a plain "..." when it overflows so truncation looks the
     // same on every font (see fit_header_label). the block width itself stays as sized above
     char label_buf[24];
-    label_text = fit_header_label(label_text, header_font, label_w - PANEL_PAD * 2,
+    label_text = fit_header_label(label_text, header_font, label_w - HEADER_TEXT_PAD - PANEL_PAD,
                                   label_buf, sizeof(label_buf));
 
     int left = gctx->bounds.origin.x;
@@ -271,15 +278,19 @@ static void draw_panel(GridCtx *gctx, const ModuleDef *def, bool headerless, boo
     int dither_x = s_header_label_right ? left : block_x + label_w;
     int dither_w = gctx->bounds.size.w - label_w;
 
-    // 1. checker dither fills the side opposite the label
-    draw_checker(gctx->ctx, GRect(dither_x, top + 1, dither_w, strip_h - 1), gctx->color_accent);
+    // 1. checker dither fills the side opposite the label, unless the label takes the whole strip
+    if (dither_w > 0)
+    {
+        draw_checker(gctx->ctx, GRect(dither_x, top + 1, dither_w, strip_h - 1), gctx->color_accent);
+    }
 
     // 2. solid block behind the label. on a rounded panel its top outer corner follows the border,
-    // since the block runs right into the corner the curve just cut away
+    // since the block runs right into the corner the curve just cut away. a block across the whole
+    // strip reaches both corners
     GCornerMask block_corner = GCornerNone;
     if (s_radius > 0)
     {
-        block_corner = s_header_label_right ? GCornerTopRight : GCornerTopLeft;
+        block_corner = dither_w <= 0 ? GCornersTop : (s_header_label_right ? GCornerTopRight : GCornerTopLeft);
     }
     graphics_context_set_fill_color(gctx->ctx, gctx->color_accent);
     graphics_fill_rect(gctx->ctx, GRect(block_x, top, label_w, strip_h), s_radius, block_corner);
@@ -289,11 +300,11 @@ static void draw_panel(GridCtx *gctx, const ModuleDef *def, bool headerless, boo
     graphics_draw_line(gctx->ctx, GPoint(left, top + HEADER_H - 1),
                             GPoint(right - 1, top + HEADER_H - 1));
 
-    // 4. label text. flipped colour, left-aligned a PANEL_PAD in from the block so a label too
-    // long for the tile clips cleanly on the right instead of shifting to fit. s_header_dx/dy seat
-    // the chosen font (0/0 for the default Share Tech Mono, so this is the usual PANEL_PAD / top - 1)
-    GRect label_rect = GRect(block_x + PANEL_PAD + s_header_dx, top - 1 + s_header_dy,
-                             label_w - PANEL_PAD * 2, HEADER_H);
+    // 4. label text. flipped colour, left-aligned HEADER_TEXT_PAD in from the block so a label too
+    // long for the tile clips cleanly on the right instead of shifting to fit. s_header's nudges seat
+    // the chosen font (0/0 for the default Share Tech Mono, so this is the usual HEADER_TEXT_PAD / top - 1)
+    GRect label_rect = GRect(block_x + HEADER_TEXT_PAD + header_label_dx(s_header, label_text), top - 1 + s_header_dy,
+                             label_w - HEADER_TEXT_PAD - PANEL_PAD, HEADER_H);
     graphics_context_set_text_color(gctx->ctx, gctx->color_label);
     graphics_draw_text(gctx->ctx, label_text, header_font, label_rect,
                        GTextOverflowModeFill, GTextAlignmentLeft, NULL);
@@ -422,7 +433,7 @@ uint8_t gridlock_build(EngineSlot *out, uint8_t max, GRect bounds)
     // the header font's seating nudge is the same for every cell too, so resolve it here from
     // the user's Header Font pick (the font handle itself lives under FONT_HEADER, set in main)
     const HeaderFontSpec *header = header_font_spec(gridlock_header_font());
-    s_header_dx = header->dx;
+    s_header = header;
     s_header_dy = header->dy;
 
     // and the same for the Panel Style pick, so draw_panel reads a plain radius per cell

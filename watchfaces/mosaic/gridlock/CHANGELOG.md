@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Fixed a panel vanishing when you let go of it where it did not fit, or when the page scrolled partway through a drag. It now goes back where it was.
 - Fixed pasting text with no panels or colours in it into Import wiping your layout or colours. The page now says so and leaves them as they were.
+- Fixed panel headers losing letters or showing specks of noise after you changed the header font.
+- Fixed a header such as Wind Speed being cut short in the wider header fonts when the panel had room for it.
 
 ## [1.9.2] - 2026-11-20
 

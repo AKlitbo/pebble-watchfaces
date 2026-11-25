@@ -23,6 +23,11 @@
 
 #include <string.h>
 
+// the header label sits 2px nearer the block's left edge than the body's PANEL_PAD, since the
+// header fonts carry their own left-bearing and a full PANEL_PAD read as a gap. the block keeps
+// PANEL_PAD after the text, so it shrinks by the same 2px
+#define HEADER_TEXT_PAD (PANEL_PAD - 2)
+
 /**
  * @addtogroup watchface-sidereel
  * @{
@@ -287,14 +292,16 @@ void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
                                                             GRect(0, 0, gctx.bounds.size.w, HEADER_H),
                                                             GTextOverflowModeFill, GTextAlignmentLeft);
 
-    int label_w = text_size.w + PANEL_PAD * 2;
+    int label_w = text_size.w + HEADER_TEXT_PAD + PANEL_PAD;
+    // a label that would leave the hatch less than 12px takes the whole strip rather than cutting
+    // short, so a label only ends in "..." when it is wider than the panel itself
     if (label_w > gctx.bounds.size.w - 12)
     {
-        label_w = gctx.bounds.size.w - 12;
+        label_w = gctx.bounds.size.w;
     }
 
     char label_buf[24];
-    label_text = fit_header_label(label_text, header_font, label_w - PANEL_PAD * 2,
+    label_text = fit_header_label(label_text, header_font, label_w - HEADER_TEXT_PAD - PANEL_PAD,
                                   label_buf, sizeof(label_buf));
 
     int left = gctx.bounds.origin.x;
@@ -302,20 +309,25 @@ void panel_draw(GContext *ctx, GRect bounds, ModuleType type, ModuleSize size)
     int top = gctx.bounds.origin.y;
     int strip_h = HEADER_H - 1;   // last row is the divider
 
-    draw_checker(ctx, GRect(left + label_w, top + 1, gctx.bounds.size.w - label_w, strip_h - 1),
-                 gctx.color_accent);
+    bool full = label_w >= gctx.bounds.size.w;
+    if (!full)
+    {
+        draw_checker(ctx, GRect(left + label_w, top + 1, gctx.bounds.size.w - label_w, strip_h - 1),
+                     gctx.color_accent);
+    }
 
     // the label block sits in the panel's top-left, so under a rounded style it has to carry
-    // that corner itself rather than fill square over the border
+    // that corner itself rather than fill square over the border. a block across the whole strip
+    // carries both top corners
     graphics_context_set_fill_color(ctx, gctx.color_accent);
     graphics_fill_rect(ctx, GRect(left, top, label_w, strip_h), radius,
-                       radius > 0 ? GCornerTopLeft : GCornerNone);
+                       radius > 0 ? (full ? GCornersTop : GCornerTopLeft) : GCornerNone);
 
     graphics_context_set_stroke_color(ctx, gctx.color_accent);
     graphics_draw_line(ctx, GPoint(left, top + HEADER_H - 1), GPoint(right - 1, top + HEADER_H - 1));
 
-    GRect label_rect = GRect(left + PANEL_PAD + header->dx, top - 1 + header->dy,
-                             label_w - PANEL_PAD * 2, HEADER_H);
+    GRect label_rect = GRect(left + HEADER_TEXT_PAD + header_label_dx(header, label_text), top - 1 + header->dy,
+                             label_w - HEADER_TEXT_PAD - PANEL_PAD, HEADER_H);
     graphics_context_set_text_color(ctx, gctx.color_label);
     graphics_draw_text(ctx, label_text, header_font, label_rect,
                        GTextOverflowModeFill, GTextAlignmentLeft, NULL);
