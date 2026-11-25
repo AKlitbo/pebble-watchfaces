@@ -9,12 +9,13 @@
         "CLOCK_TIME_FORMAT": 1,
         "WEATHER_TEMPERATURE_UNIT": 1,
         "CLOCK_TIMEZONE_1": "0,Time Zone 1",
-        "LAYOUT_NIGHT_MODE": 0
+        "LAYOUT_NIGHT_MODE": 0,
+        "LAYOUT": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
       },
       "stores": {
         "weather": {
-          "temp": 105,
-          "cond": "CLDY",
+          "temp": 91,
+          "cond": "CLEAR_NIGHT",
           "humidity": 31,
           "windKmh": 12,
           "windDir": "NW",
@@ -24,21 +25,21 @@
           "tempMax": 110,
           "tempMin": 78,
           "precipChance": 20,
-          "feelsLike": 112,
+          "feelsLike": 94,
           "pressure": 1008,
           "dewPoint": 54,
           "hourly": {
-            "from": 9,
+            "from": 22,
             "every": 2,
             "columns": [
-              ["CLEAR", 90],
-              ["PCLDY", 104],
-              ["RAIN", 101],
-              ["STRM", 95],
-              ["CLDY", 98],
-              ["CLEAR", 92],
               ["CLEAR_NIGHT", 88],
-              ["PCLDY_NIGHT", 85]
+              ["CLEAR_NIGHT", 85],
+              ["PCLDY_NIGHT", 82],
+              ["PCLDY_NIGHT", 80],
+              ["CLEAR", 81],
+              ["PCLDY", 89],
+              ["CLEAR", 98],
+              ["CLEAR", 105]
             ]
           },
           "daily": {
@@ -368,169 +369,580 @@
         ]
       },
       "walks": {
-        "thumbnails": { "panels": "all" },
+        "thumbnails": {
+          "stores": {
+            "weather": {
+              "temp": 105,
+              "cond": "CLDY",
+              "humidity": 31,
+              "windKmh": 12,
+              "windDir": "NW",
+              "sunrise": "05:30",
+              "sunset": "19:40",
+              "uv": 8,
+              "tempMax": 110,
+              "tempMin": 78,
+              "precipChance": 20,
+              "feelsLike": 112,
+              "pressure": 1008,
+              "dewPoint": 54,
+              "hourly": {
+                "from": 9,
+                "every": 2,
+                "columns": [
+                  ["CLEAR", 90],
+                  ["PCLDY", 104],
+                  ["RAIN", 101],
+                  ["STRM", 95],
+                  ["CLDY", 98],
+                  ["CLEAR", 92],
+                  ["CLEAR_NIGHT", 88],
+                  ["PCLDY_NIGHT", 85]
+                ]
+              },
+              "daily": {
+                "from": "sat",
+                "columns": [
+                  ["CLEAR", 110, 78],
+                  ["PCLDY", 108, 80],
+                  ["CLDY", 99, 74],
+                  ["RAIN", 92, 70],
+                  ["CLEAR", 101, 72],
+                  ["STRM", 97, 71],
+                  ["PCLDY", 105, 79],
+                  ["CLDY", 100, 73]
+                ]
+              }
+            }
+          },
+          "panels": "all"
+        },
         "phone": { "panels": { "1x2": ["phone-battery", "battery-battery"], "2x2": ["phone-battery"] } },
         "music": { "panels": { "1x4": ["now-playing"], "2x4": ["now-playing"] } },
+        "daytime": {
+          "settings": { "CLOCK_TIMEZONE_1": "60,London" },
+          "stores": {
+            "weather": {
+              "temp": 105,
+              "cond": "CLDY",
+              "humidity": 31,
+              "windKmh": 12,
+              "windDir": "NW",
+              "sunrise": "05:30",
+              "sunset": "19:40",
+              "uv": 8,
+              "tempMax": 110,
+              "tempMin": 78,
+              "precipChance": 20,
+              "feelsLike": 112,
+              "pressure": 1008,
+              "dewPoint": 54,
+              "hourly": {
+                "from": 9,
+                "every": 2,
+                "columns": [
+                  ["CLEAR", 90],
+                  ["PCLDY", 104],
+                  ["RAIN", 101],
+                  ["STRM", 95],
+                  ["CLDY", 98],
+                  ["CLEAR", 92],
+                  ["CLEAR_NIGHT", 88],
+                  ["PCLDY_NIGHT", 85]
+                ]
+              },
+              "daily": {
+                "from": "sat",
+                "columns": [
+                  ["CLEAR", 110, 78],
+                  ["PCLDY", 108, 80],
+                  ["CLDY", 99, 74],
+                  ["RAIN", 92, 70],
+                  ["CLEAR", 101, 72],
+                  ["STRM", 97, 71],
+                  ["PCLDY", 105, 79],
+                  ["CLDY", 100, 73]
+                ]
+              }
+            },
+            "health": {
+              "hr": 74,
+              "steps": 2140,
+              "calories": 160,
+              "sleepMin": 437,
+              "activeMin": 14,
+              "distanceM": 1540,
+              "hrvMs": 45,
+              "hrHistory": [
+                103, 102, 100, 99, 98, 97, 96, 95, 94, 94, 93, 93, 92, 91, 90, 92, 93, 95, 94, 92, 90, 89, 88, 87, 86,
+                88, 90, 91, 93, 92, 90, 89, 91, 93, 94, 92, 91, 90, 92, 93, 94, 95, 97, 96, 95, 93, 92, 91, 90, 89, 90,
+                92, 93, 91, 90, 89, 90, 91, 93, 92
+              ],
+              "stepHourly": [0, 0, 0, 0, 0, 40, 320, 850],
+              "hrDay": [
+                [84, 86, 87, 85, 89, 85],
+                [84, 86, 87, 85, 89, 85],
+                [85, 87, 88, 86, 90, 86],
+                [85, 87, 88, 86, 90, 86],
+                [84, 86, 87, 85, 89, 85],
+                [86, 88, 89, 87, 91, 87],
+                [88, 90, 91, 89, 93, 89],
+                [90, 92, 93, 91, 95, 91]
+              ],
+              "hrvLog": [
+                {
+                  "from": "00:00",
+                  "ms": [52, 54, 51, 56, 50, 53, 52, 49, 54, 51, 53, 50],
+                  "state": "still",
+                  "asleep": true
+                },
+                {
+                  "from": "01:00",
+                  "ms": [56, 58, 55, 60, 54, 57, 56, 53, 58, 55, 57, 54],
+                  "state": "still",
+                  "asleep": true
+                },
+                {
+                  "from": "02:00",
+                  "ms": [58, 60, 57, 62, 56, 59, 58, 55, 60, 57, 59, 56],
+                  "state": "still",
+                  "asleep": true
+                },
+                {
+                  "from": "03:00",
+                  "ms": [55, 57, 54, 59, 53, 56, 55, 52, 57, 54, 56, 53],
+                  "state": "still",
+                  "asleep": true
+                },
+                {
+                  "from": "04:00",
+                  "ms": [53, 55, 52, 57, 51, 54, 53, 50, 55, 52, 54, 51],
+                  "state": "still",
+                  "asleep": true
+                },
+                {
+                  "from": "05:00",
+                  "ms": [49, 51, 48, 53, 47, 50, 49, 46, 51, 48, 50, 47],
+                  "state": "still",
+                  "asleep": true
+                },
+                {
+                  "from": "06:00",
+                  "ms": [45, 47, 44, 49, 43, 46, 45, 42, 47, 44, 46, 43],
+                  "state": "still",
+                  "asleep": true
+                }
+              ]
+            }
+          },
+          "steps": [
+            {
+              "clock": "09:06",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "41,0,0,4,2;40,2,0,4,1;1,3,0,4,1;17,4,0,2,1;18,4,2,2,1"
+            },
+            {
+              "clock": "09:09",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 1,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "1,0,0,4,1;42,1,0,4,2;40,3,0,4,1;17,4,0,2,1;3,4,2,2,1~3|BE.DB.RB.oE.qI."
+            },
+            {
+              "clock": "09:13",
+              "settings": {
+                "APPEARANCE_THEME": 3,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "49,0,0,4,2;1,2,0,4,1;42,3,0,4,1;17,4,0,2,1;2,4,2,2,1"
+            },
+            {
+              "clock": "07:48",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 2,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "55,0,0,4,2;75,2,0,2,2;56,2,2,2,2;25,4,0,4,1"
+            },
+            {
+              "clock": "08:17",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "26,0,0,4,2;25,2,0,4,1;3,3,0,2,2;22,3,2,2,1;21,4,2,2,1~4|aACZABDgAWQAVQA"
+            },
+            {
+              "clock": "08:44",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "25,0,0,4,1;3,1,0,2,2;15,1,2,2,2;22,3,0,2,1;10,3,2,2,1;11,4,0,2,1;23,4,2,2,1"
+            },
+            {
+              "clock": "10:53",
+              "settings": {
+                "APPEARANCE_THEME": 3,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "30,0,0,4,2;29,2,0,2,2;18,2,2,2,1;17,3,2,2,1;2,4,0,2,1;31,4,2,2,1"
+            },
+            {
+              "clock": "12:19",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "53,0,0,2,2;54,0,2,2,2;19,2,0,2,1;18,2,2,2,1;1,3,0,4,1;3,4,0,2,1;4,4,2,2,1"
+            },
+            {
+              "clock": "14:02",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "3,0,0,2,2;21,0,2,2,2;22,2,0,2,1;35,2,2,2,1;36,3,0,2,1;37,3,2,2,1;11,4,0,2,1;10,4,2,2,1~3|Dg.KQ.LQ.Vg.WQ.jQ.kQ.lQ."
+            },
+            {
+              "clock": "15:37",
+              "settings": {
+                "APPEARANCE_THEME": 3,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "16,0,0,2,2;45,0,2,2,1;50,1,2,2,1;43,2,0,2,1;44,2,2,2,1;51,3,0,2,1;46,3,2,2,1;47,4,0,2,1;33,4,2,2,1"
+            },
+            {
+              "clock": "16:58",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "28,0,0,2,2;33,0,2,2,2;12,2,0,2,1;13,2,2,2,1;14,3,0,2,2;21,3,2,2,1;48,4,2,2,1"
+            }
+          ]
+        },
+        "evening": {
+          "steps": [
+            {
+              "clock": "21:14",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1,
+                "APPEARANCE_ANALOG_STYLE": 0
+              },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
+            },
+            {
+              "clock": "20:47",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 5,
+                "APPEARANCE_PANEL_STYLE": 1,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "68,0,0,2,2;70,0,2,2,2;72,2,0,4,1;66,3,0,2,1;67,3,2,2,1;69,4,0,2,1;18,4,2,2,1"
+            },
+            {
+              "clock": "20:53",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 4,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "74,0,0,4,2;32,2,0,2,2;71,2,2,2,2;18,4,0,2,1;6,4,2,2,1"
+            },
+            {
+              "clock": "21:08",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 3,
+                "APPEARANCE_PANEL_STYLE": 1,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "1,0,0,4,1;61,1,0,4,1;62,2,0,2,1;63,2,2,2,1;64,3,0,4,1;65,4,0,2,1;2,4,2,2,1"
+            },
+            {
+              "clock": "21:29",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "18,0,0,2,1;17,0,2,2,1;4,1,0,2,1;10,1,2,2,1;5,2,0,2,1;6,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1"
+            },
+            {
+              "clock": "21:36",
+              "settings": {
+                "APPEARANCE_THEME": 3,
+                "APPEARANCE_HEADER_FONT": 6,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "1,0,0,4,1;58,1,0,2,2;57,1,2,2,2;60,3,0,4,1;59,4,0,2,1;17,4,2,2,1"
+            },
+            {
+              "clock": "21:51",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "20,0,0,2,2;17,0,2,2,1;18,1,2,2,1;3,2,0,2,2;5,2,2,2,2;6,4,0,2,1;2,4,2,2,1~4|UgARQASQADgAFgAGQACQA"
+            },
+            {
+              "clock": "22:05",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "55,0,0,4,2;17,2,0,2,1;4,2,2,2,1;6,3,0,2,2;3,3,2,2,2"
+            },
+            {
+              "clock": "22:22",
+              "settings": {
+                "APPEARANCE_THEME": 2,
+                "APPEARANCE_HEADER_FONT": 3,
+                "APPEARANCE_PANEL_STYLE": 1,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "1,0,0,4,1;5,1,0,2,1;6,1,2,2,1;4,2,0,2,1;10,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1~4B8_8.Fw_w.GM_M.EP_P.KD_D.Lz_z.X4_4.CM_M.0P_P.|"
+            },
+            {
+              "clock": "22:38",
+              "settings": {
+                "APPEARANCE_THEME": 2,
+                "APPEARANCE_HEADER_FONT": 5,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
+              "layout": "18,0,0,2,1;17,0,2,2,1;16,1,0,2,2;3,1,2,2,2;5,3,0,2,1;6,3,2,2,1;2,4,0,2,1;52,4,2,2,1~4SMMM.RMMM.QMMM.DMMM.FMMM.GMMM.CMMM.0MMM.|SBARBAQCADCAFBAGBACBA0BA"
+            },
+            {
+              "clock": "23:47",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "55,1,0,4,2;2,4,0,2,1;52,4,2,2,1~4|3ICCRA0RA"
+            },
+            {
+              "clock": "23:52",
+              "settings": {
+                "APPEARANCE_THEME": 0,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 1,
+                "CLOCK_TIME_FORMAT": 1
+              },
+              "layout": "55,0,0,4,2;34,2,0,2,1;56,2,2,2,1;64,3,0,4,1;69,4,0,2,1;2,4,2,2,1"
+            }
+          ]
+        },
         "presets": {
           "steps": [
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "20:44",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
               "layout": "2,0,0,2,2;12,0,2,2,1;13,1,2,2,1;1,2,0,4,1;3,3,0,2,2;6,3,2,2,2"
             },
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "21:19",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
               "layout": "2,0,0,2,1;18,0,2,2,1;5,1,0,2,2;6,1,2,2,2;9,3,0,2,2;7,3,2,2,2"
             },
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "21:42",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
               "layout": "17,0,0,2,1;28,0,2,2,2;18,1,0,2,1;25,2,0,4,1;22,3,0,2,1;21,3,2,2,1;11,4,0,2,1;23,4,2,2,1"
             },
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "22:16",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
               "layout": "3,0,0,2,2;12,0,2,2,1;10,1,2,2,1;1,2,0,4,1;6,3,0,2,1;5,4,0,2,1;11,3,2,2,1;13,4,2,2,1"
             },
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "22:31",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2
+              },
               "layout": "2,0,0,2,1;5,0,2,2,1;1,1,0,4,1;9,2,0,2,1;6,2,2,2,1;8,3,0,2,2;28,3,2,2,2"
             },
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "23:03",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
               "layout": "52,0,0,2,1;17,0,2,2,1;18,1,0,2,1;19,1,2,2,1;3,2,0,2,2;28,2,2,2,2;6,4,0,2,1;5,4,2,2,1"
             }
           ]
         },
-        "store": {
+        "themecycle": {
+          "each": { "APPEARANCE_THEME": [0, 3, 1, 2] },
           "steps": [
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "21:14",
+              "settings": { "APPEARANCE_HEADER_FONT": 0, "APPEARANCE_PANEL_STYLE": 0, "CLOCK_TIME_FORMAT": 1 },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1~3B0_0.C4_4.DL_L.Fw_w.Gc_c.Rj_j.YO_O.|"
+            }
+          ]
+        },
+        "fonts": {
+          "each": { "APPEARANCE_HEADER_FONT": [0, 1, 2, 3, 4, 5, 6, 7] },
+          "steps": [
+            {
+              "clock": "21:29",
+              "settings": { "APPEARANCE_THEME": 1, "APPEARANCE_PANEL_STYLE": 0, "CLOCK_TIME_FORMAT": 2 },
+              "layout": "18,0,0,2,1;17,0,2,2,1;4,1,0,2,1;10,1,2,2,1;5,2,0,2,1;6,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1"
+            }
+          ]
+        },
+        "borders": {
+          "steps": [
+            {
+              "clock": "21:14",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
               "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
             },
-            { "settings": { "APPEARANCE_THEME": 0 }, "layout": "55,0,0,4,2;17,2,0,2,1;4,2,2,2,1;6,3,0,2,2;3,3,2,2,2" },
             {
-              "settings": { "APPEARANCE_THEME": 1 },
+              "clock": "21:14",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 1,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
+            },
+            {
+              "clock": "21:14",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 1,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1~3|BE.CB.DC.FB.GC.RB.YB."
+            },
+            {
+              "clock": "21:14",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1~3|B.BCQ.Dg.FQ.Gg.RQ.YQ."
+            },
+            {
+              "clock": "21:14",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 4
+              },
+              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1~3|BEBCR.Di.FR.Gi.RR.YR."
+            }
+          ]
+        },
+        "dials": {
+          "each": { "APPEARANCE_ANALOG_STYLE": [0, 1, 2, 3, 4, 5, 6, 7, 8] },
+          "steps": [
+            {
+              "clock": "22:09",
+              "settings": {
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 1
+              },
               "layout": "20,0,0,2,2;17,0,2,2,1;18,1,2,2,1;3,2,0,2,2;5,2,2,2,2;6,4,0,2,1;2,4,2,2,1~4|UgARQASQADgAFgAGQACQA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "27,0,0,4,1;3,1,0,2,2;15,1,2,2,2;22,3,0,2,1;10,3,2,2,1;11,4,0,2,1;23,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "32,0,0,2,2;39,0,2,2,2;9,2,0,2,2;7,2,2,2,2;24,4,0,2,1;5,4,2,2,1~4|gCAnCAJCAHCAYBAFBA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 0 },
-              "layout": "41,0,0,4,2;40,2,0,4,1;1,3,0,4,1;17,4,0,2,1;18,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 3 },
-              "layout": "30,0,0,4,2;29,2,0,2,2;18,2,2,2,1;17,3,2,2,1;2,4,0,2,1;31,4,2,2,1"
-            },
-            { "settings": { "APPEARANCE_THEME": 0 }, "layout": "55,1,0,4,2;2,4,0,2,1;52,4,2,2,1~4|3ICCRA0RA" },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "28,0,0,2,2;33,0,2,2,2;12,2,0,2,1;13,2,2,2,1;14,3,0,2,2;21,3,2,2,1;48,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 0 },
-              "layout": "18,0,0,2,1;17,0,2,2,1;4,1,0,2,1;10,1,2,2,1;5,2,0,2,1;6,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "26,0,0,4,2;25,2,0,4,1;3,3,0,2,2;22,3,2,2,1;21,4,2,2,1~4|aACZABDgAWQAVQA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 3 },
-              "layout": "16,0,0,2,2;45,0,2,2,1;50,1,2,2,1;43,2,0,2,1;44,2,2,2,1;51,3,0,2,1;46,3,2,2,1;47,4,0,2,1;33,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "53,0,0,2,2;54,0,2,2,2;19,2,0,2,1;18,2,2,2,1;1,3,0,4,1;3,4,0,2,1;4,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "8,0,0,2,2;5,0,2,2,2;9,2,0,2,2;6,2,2,2,2;7,4,0,2,1;24,4,2,2,1~4|IiAFiAJiAGiAHRAYRA"
-            },
-            { "settings": { "APPEARANCE_THEME": 3 }, "layout": "49,0,0,4,2;1,2,0,4,1;42,3,0,4,1;17,4,0,2,1;2,4,2,2,1" },
-            {
-              "settings": { "APPEARANCE_THEME": 2 },
-              "layout": "20,0,0,2,2;3,0,2,2,2;18,2,0,2,1;17,2,2,2,1;5,3,0,2,1;6,3,2,2,1;12,4,0,2,1;13,4,2,2,1~4Uw8w.Dz8z.Sw_w.Rz8z.Fw8w.Gz_z.M484.N484.|"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 0 },
-              "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1~4|BEBDiAGiARRACRAFRAYRA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 2 },
-              "layout": "20,0,0,2,2;28,0,2,2,2;18,2,0,2,1;4,2,2,2,1;10,3,0,2,1;11,3,2,2,1;2,4,0,2,1;31,4,2,2,1~4UP_P.cDPD.SP_P.EDPD.KP_P.LDPD.CP_P.fDPD.|UgAcgASQAEQAKQALQACQAfQA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "53,0,0,2,2;33,0,2,2,2;1,2,0,4,1;25,3,0,4,1;6,4,0,2,1;5,4,2,2,1~4|1CAhCABEAZEAGBAFBA"
-            },
-            { "settings": { "APPEARANCE_THEME": 3 }, "layout": "25,0,0,4,2;26,2,0,4,2;3,4,0,2,1;22,4,2,2,1" },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "41,0,0,4,2;18,2,0,2,1;17,2,2,2,1;42,3,0,4,1;31,4,0,2,1;2,4,2,2,1~4|pICSRARRAqEBfRACRA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 2 },
-              "layout": "55,0,0,4,2;18,2,0,2,1;17,2,2,2,1;5,3,0,2,2;6,3,2,2,2~43zPz.SzPz.RzPz.FzPz.GzPz.|3ACSQARQAFgAGgA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 0 },
-              "layout": "20,1,0,2,2;14,1,2,2,2;1,3,0,4,1;12,4,0,2,1;13,4,2,2,1~4|UgAOgABABMQANQA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "32,0,0,2,2;5,0,2,2,2;39,2,0,2,2;9,2,2,2,2;7,4,0,2,1;24,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 0 },
-              "layout": "30,0,0,4,2;29,2,0,2,2;16,2,2,2,2;18,4,0,2,1;2,4,2,2,1~4|eIAdCAQCASBACBA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 2 },
-              "layout": "1,0,0,4,1;5,1,0,2,1;6,1,2,2,1;4,2,0,2,1;10,2,2,2,1;11,3,0,2,1;23,3,2,2,1;2,4,0,2,1;52,4,2,2,1~4B8_8.Fw_w.GM_M.EP_P.KD_D.Lz_z.X4_4.CM_M.0P_P.|"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "14,0,0,2,2;33,0,2,2,2;12,2,0,2,1;13,2,2,2,1;28,3,0,2,2;21,3,2,2,1;48,4,2,2,1~4|OgAhgAMQANQAcgAVQAwQA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 0 },
-              "layout": "49,0,0,4,2;40,2,0,4,1;18,3,0,2,1;17,3,2,2,1;2,4,0,2,1;31,4,2,2,1~4|xICoEBSRARRACRAfRA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 2 },
-              "layout": "18,0,0,2,1;17,0,2,2,1;16,1,0,2,2;3,1,2,2,2;5,3,0,2,1;6,3,2,2,1;2,4,0,2,1;52,4,2,2,1~4SMMM.RMMM.QMMM.DMMM.FMMM.GMMM.CMMM.0MMM.|SBARBAQCADCAFBAGBACBA0BA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 1 },
-              "layout": "16,0,0,2,2;45,0,2,2,1;50,1,2,2,1;1,2,0,4,1;43,3,0,2,1;44,3,2,2,1;47,4,0,2,1;46,4,2,2,1"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 3 },
-              "layout": "42,0,0,4,2;40,2,0,4,1;25,3,0,4,1;18,4,0,2,1;2,4,2,2,1~4|qACoABZABSQACQA"
-            },
-            {
-              "settings": { "APPEARANCE_THEME": 2 },
-              "layout": "55,0,0,4,2;3,2,0,2,2;13,2,2,2,1;12,3,2,2,1;5,4,0,2,1;6,4,2,2,1~43484.D484.N484.M484.F484.G484.|3ICDiANRAMRAFRAGRA"
             }
           ]
         },
         "night": {
           "steps": [
             {
+              "clock": "21:55",
               "settings": {
-                "LAYOUT_NIGHT": "55,0,0,4,2;17,2,0,2,1;12,2,2,2,1;2,4,0,2,1;52,4,2,2,1",
+                "APPEARANCE_THEME": 1,
+                "APPEARANCE_HEADER_FONT": 0,
+                "APPEARANCE_PANEL_STYLE": 0,
+                "CLOCK_TIME_FORMAT": 2,
+                "LAYOUT_NIGHT": "55,0,0,4,2;8,2,0,2,2;56,2,2,2,2;69,4,0,2,1;2,4,2,2,1",
                 "LAYOUT_NIGHT_MODE": 2,
-                "LAYOUT_NIGHT_START": 42,
+                "LAYOUT_NIGHT_START": 44,
                 "LAYOUT_NIGHT_END": 14
               },
               "layout": "1,0,0,4,1;3,1,0,2,2;6,1,2,2,2;17,3,0,2,1;2,3,2,2,1;5,4,0,2,1;24,4,2,2,1"
             },
-            { "settings": { "LAYOUT_NIGHT_START": 41 } }
+            { "clock": "22:05" }
           ]
         },
         "analog": {
